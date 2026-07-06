@@ -9007,6 +9007,7 @@ namespace Gekko
             public List names = null;
             public bool question = false;
             public double opt_replace = double.NaN;
+            public string opt_ref = null;
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);

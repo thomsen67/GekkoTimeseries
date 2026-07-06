@@ -3232,7 +3232,9 @@ findmissingdataOpt1:        ISNOTQUAL
                           | leftAngle2          findmissingdataOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 findmissingdataOpt1h* localOptions?)							
 						  | leftAngleNo2 dates? findmissingdataOpt1h* (SEMICOLON localOptions)? RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) findmissingdataOpt1h* localOptions?)
                             ;
-findmissingdataOpt1h:       REPLACE EQUAL expression -> ^(ASTOPT_VAL_REPLACE expression);
+findmissingdataOpt1h:       REPLACE EQUAL expression -> ^(ASTOPT_VAL_REPLACE expression)
+                          | REF (EQUAL yesNo)?  -> ^(ASTOPT_STRING_REF yesNo?)							  
+                            ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // FOR

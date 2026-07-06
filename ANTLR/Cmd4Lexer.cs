@@ -1,4 +1,4 @@
-// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g 2026-04-12 10:31:24
+// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g 2026-06-29 18:18:23
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 168, 219
@@ -2198,7 +2198,7 @@ public partial class Cmd4Lexer : Lexer {
     
     override public string GrammarFileName
     {
-    	get { return "c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g";} 
+    	get { return "c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g";} 
     }
 
     // $ANTLR start "MAXLAG"
@@ -2208,8 +2208,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MAXLAG;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:659:8: ( 'MAXLAG' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:659:10: 'MAXLAG'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:659:8: ( 'MAXLAG' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:659:10: 'MAXLAG'
             {
             	Match("MAXLAG"); 
 
@@ -2232,8 +2232,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DFMIN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:660:7: ( 'DFMIN' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:660:9: 'DFMIN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:660:7: ( 'DFMIN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:660:9: 'DFMIN'
             {
             	Match("DFMIN"); 
 
@@ -2256,8 +2256,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LEAD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:661:6: ( 'LEAD' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:661:8: 'LEAD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:661:6: ( 'LEAD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:661:8: 'LEAD'
             {
             	Match("LEAD"); 
 
@@ -2280,8 +2280,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = REKUR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:662:7: ( 'REKUR' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:662:9: 'REKUR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:662:7: ( 'REKUR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:662:9: 'REKUR'
             {
             	Match("REKUR"); 
 
@@ -2304,8 +2304,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MAXLEAD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:663:9: ( 'MAXLEAD' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:663:11: 'MAXLEAD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:663:9: ( 'MAXLEAD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:663:11: 'MAXLEAD'
             {
             	Match("MAXLEAD"); 
 
@@ -2328,8 +2328,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FIT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:664:5: ( 'FIT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:664:7: 'FIT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:664:5: ( 'FIT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:664:7: 'FIT'
             {
             	Match("FIT"); 
 
@@ -2352,8 +2352,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GMS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:665:5: ( 'GMS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:665:7: 'GMS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:665:5: ( 'GMS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:665:7: 'GMS'
             {
             	Match("GMS"); 
 
@@ -2376,8 +2376,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ELEMENTS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:666:10: ( 'ELEMENTS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:666:12: 'ELEMENTS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:666:10: ( 'ELEMENTS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:666:12: 'ELEMENTS'
             {
             	Match("ELEMENTS"); 
 
@@ -2400,8 +2400,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NOMAX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:667:7: ( 'NOMAX' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:667:9: 'NOMAX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:667:7: ( 'NOMAX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:667:9: 'NOMAX'
             {
             	Match("NOMAX"); 
 
@@ -2424,8 +2424,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RETURN2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:668:9: ( 'RETURN' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:668:11: 'RETURN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:668:9: ( 'RETURN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:668:11: 'RETURN'
             {
             	Match("RETURN"); 
 
@@ -2448,8 +2448,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = IN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:669:4: ( 'IN' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:669:6: 'IN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:669:4: ( 'IN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:669:6: 'IN'
             {
             	Match("IN"); 
 
@@ -2472,8 +2472,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MAP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:670:5: ( 'MAP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:670:7: 'MAP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:670:5: ( 'MAP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:670:7: 'MAP'
             {
             	Match("MAP"); 
 
@@ -2496,8 +2496,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = STRING2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:671:9: ( 'STRING' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:671:11: 'STRING'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:671:9: ( 'STRING' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:671:11: 'STRING'
             {
             	Match("STRING"); 
 
@@ -2520,8 +2520,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = REMOTE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:672:8: ( 'REMOTE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:672:10: 'REMOTE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:672:8: ( 'REMOTE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:672:10: 'REMOTE'
             {
             	Match("REMOTE"); 
 
@@ -2544,8 +2544,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ALIAS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:673:7: ( 'ALIAS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:673:9: 'ALIAS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:673:7: ( 'ALIAS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:673:9: 'ALIAS'
             {
             	Match("ALIAS"); 
 
@@ -2568,8 +2568,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = OFFSET;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:674:8: ( 'OFFSET' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:674:10: 'OFFSET'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:674:8: ( 'OFFSET' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:674:10: 'OFFSET'
             {
             	Match("OFFSET"); 
 
@@ -2592,8 +2592,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DETECT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:675:8: ( 'DETECT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:675:10: 'DETECT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:675:8: ( 'DETECT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:675:10: 'DETECT'
             {
             	Match("DETECT"); 
 
@@ -2616,8 +2616,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GRIDSTYLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:676:11: ( 'GRIDSTYLE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:676:13: 'GRIDSTYLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:676:11: ( 'GRIDSTYLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:676:13: 'GRIDSTYLE'
             {
             	Match("GRIDSTYLE"); 
 
@@ -2640,8 +2640,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BOLD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:677:6: ( 'BOLD' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:677:8: 'BOLD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:677:6: ( 'BOLD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:677:8: 'BOLD'
             {
             	Match("BOLD"); 
 
@@ -2664,8 +2664,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ITALIC;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:678:8: ( 'ITALIC' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:678:10: 'ITALIC'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:678:8: ( 'ITALIC' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:678:10: 'ITALIC'
             {
             	Match("ITALIC"); 
 
@@ -2688,8 +2688,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ASER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:679:6: ( 'ASER' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:679:8: 'ASER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:679:6: ( 'ASER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:679:8: 'ASER'
             {
             	Match("ASER"); 
 
@@ -2712,8 +2712,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ASERIES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:680:9: ( 'ASERIES' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:680:11: 'ASERIES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:680:9: ( 'ASERIES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:680:11: 'ASERIES'
             {
             	Match("ASERIES"); 
 
@@ -2736,8 +2736,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = XLABELS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:681:9: ( 'XLABELS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:681:11: 'XLABELS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:681:9: ( 'XLABELS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:681:11: 'XLABELS'
             {
             	Match("XLABELS"); 
 
@@ -2760,8 +2760,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = YLABELS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:682:9: ( 'YLABELS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:682:11: 'YLABELS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:682:9: ( 'YLABELS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:682:11: 'YLABELS'
             {
             	Match("YLABELS"); 
 
@@ -2784,8 +2784,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ANNUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:683:8: ( 'ANNUAL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:683:10: 'ANNUAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:683:8: ( 'ANNUAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:683:10: 'ANNUAL'
             {
             	Match("ANNUAL"); 
 
@@ -2808,8 +2808,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = AT2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:684:5: ( 'AT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:684:7: 'AT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:684:5: ( 'AT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:684:7: 'AT'
             {
             	Match("AT"); 
 
@@ -2832,8 +2832,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BETWEEN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:685:9: ( 'BETWEEN' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:685:11: 'BETWEEN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:685:9: ( 'BETWEEN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:685:11: 'BETWEEN'
             {
             	Match("BETWEEN"); 
 
@@ -2856,8 +2856,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NONANNUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:686:11: ( 'NONANNUAL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:686:13: 'NONANNUAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:686:11: ( 'NONANNUAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:686:13: 'NONANNUAL'
             {
             	Match("NONANNUAL"); 
 
@@ -2880,8 +2880,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CURRENT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:687:9: ( 'CURRENT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:687:11: 'CURRENT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:687:9: ( 'CURRENT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:687:11: 'CURRENT'
             {
             	Match("CURRENT"); 
 
@@ -2904,8 +2904,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DIGITS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:688:8: ( 'DIGITS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:688:10: 'DIGITS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:688:8: ( 'DIGITS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:688:10: 'DIGITS'
             {
             	Match("DIGITS"); 
 
@@ -2928,8 +2928,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GAMS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:689:6: ( 'GAMS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:689:8: 'GAMS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:689:6: ( 'GAMS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:689:8: 'GAMS'
             {
             	Match("GAMS"); 
 
@@ -2952,8 +2952,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GDX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:690:5: ( 'GDX' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:690:7: 'GDX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:690:5: ( 'GDX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:690:7: 'GDX'
             {
             	Match("GDX"); 
 
@@ -2976,8 +2976,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GDXOPT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:691:8: ( 'GDXOPT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:691:10: 'GDXOPT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:691:8: ( 'GDXOPT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:691:10: 'GDXOPT'
             {
             	Match("GDXOPT"); 
 
@@ -3000,8 +3000,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LAGFIX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:692:8: ( 'LAGFIX' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:692:10: 'LAGFIX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:692:8: ( 'LAGFIX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:692:10: 'LAGFIX'
             {
             	Match("LAGFIX"); 
 
@@ -3024,8 +3024,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ADDBANK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:693:9: ( 'ADDBANK' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:693:11: 'ADDBANK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:693:9: ( 'ADDBANK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:693:11: 'ADDBANK'
             {
             	Match("ADDBANK"); 
 
@@ -3048,8 +3048,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SHOWBANK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:694:10: ( 'SHOWBANK' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:694:12: 'SHOWBANK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:694:10: ( 'SHOWBANK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:694:12: 'SHOWBANK'
             {
             	Match("SHOWBANK"); 
 
@@ -3072,8 +3072,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SHOWFREQ;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:695:10: ( 'SHOWFREQ' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:695:12: 'SHOWFREQ'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:695:10: ( 'SHOWFREQ' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:695:12: 'SHOWFREQ'
             {
             	Match("SHOWFREQ"); 
 
@@ -3096,8 +3096,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = REBASE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:696:8: ( 'REBASE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:696:10: 'REBASE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:696:8: ( 'REBASE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:696:10: 'REBASE'
             {
             	Match("REBASE"); 
 
@@ -3120,8 +3120,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LINESPOINTS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:697:13: ( 'LINESPOINTS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:697:15: 'LINESPOINTS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:697:13: ( 'LINESPOINTS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:697:15: 'LINESPOINTS'
             {
             	Match("LINESPOINTS"); 
 
@@ -3144,8 +3144,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BOXES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:698:7: ( 'BOXES' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:698:9: 'BOXES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:698:7: ( 'BOXES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:698:9: 'BOXES'
             {
             	Match("BOXES"); 
 
@@ -3168,8 +3168,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FILLEDCURVES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:699:14: ( 'FILLEDCURVES' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:699:16: 'FILLEDCURVES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:699:14: ( 'FILLEDCURVES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:699:16: 'FILLEDCURVES'
             {
             	Match("FILLEDCURVES"); 
 
@@ -3192,8 +3192,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = STEPS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:700:7: ( 'STEPS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:700:9: 'STEPS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:700:7: ( 'STEPS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:700:9: 'STEPS'
             {
             	Match("STEPS"); 
 
@@ -3216,8 +3216,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DOTS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:701:6: ( 'DOTS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:701:8: 'DOTS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:701:6: ( 'DOTS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:701:8: 'DOTS'
             {
             	Match("DOTS"); 
 
@@ -3240,8 +3240,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = IMPULSES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:702:10: ( 'IMPULSES' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:702:12: 'IMPULSES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:702:10: ( 'IMPULSES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:702:12: 'IMPULSES'
             {
             	Match("IMPULSES"); 
 
@@ -3264,8 +3264,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CONTINUE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:703:10: ( 'CONTINUE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:703:12: 'CONTINUE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:703:10: ( 'CONTINUE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:703:12: 'CONTINUE'
             {
             	Match("CONTINUE"); 
 
@@ -3288,8 +3288,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = VOID;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:704:6: ( 'VOID' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:704:8: 'VOID'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:704:6: ( 'VOID' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:704:8: 'VOID'
             {
             	Match("VOID"); 
 
@@ -3312,8 +3312,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PROCEDURE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:705:11: ( 'PROCEDURE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:705:13: 'PROCEDURE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:705:11: ( 'PROCEDURE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:705:13: 'PROCEDURE'
             {
             	Match("PROCEDURE"); 
 
@@ -3336,8 +3336,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SIZE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:706:6: ( 'SIZE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:706:8: 'SIZE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:706:6: ( 'SIZE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:706:8: 'SIZE'
             {
             	Match("SIZE"); 
 
@@ -3360,8 +3360,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SUBTITLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:707:10: ( 'SUBTITLE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:707:12: 'SUBTITLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:707:10: ( 'SUBTITLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:707:12: 'SUBTITLE'
             {
             	Match("SUBTITLE"); 
 
@@ -3384,8 +3384,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TICS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:708:6: ( 'TICS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:708:8: 'TICS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:708:6: ( 'TICS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:708:8: 'TICS'
             {
             	Match("TICS"); 
 
@@ -3408,8 +3408,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GRID;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:709:6: ( 'GRID' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:709:8: 'GRID'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:709:6: ( 'GRID' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:709:8: 'GRID'
             {
             	Match("GRID"); 
 
@@ -3432,8 +3432,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = KEY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:710:5: ( 'KEY' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:710:7: 'KEY'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:710:5: ( 'KEY' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:710:7: 'KEY'
             {
             	Match("KEY"); 
 
@@ -3456,8 +3456,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PALETTE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:711:9: ( 'PALETTE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:711:11: 'PALETTE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:711:9: ( 'PALETTE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:711:11: 'PALETTE'
             {
             	Match("PALETTE"); 
 
@@ -3480,8 +3480,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = STACK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:712:7: ( 'STACK' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:712:9: 'STACK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:712:7: ( 'STACK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:712:9: 'STACK'
             {
             	Match("STACK"); 
 
@@ -3504,8 +3504,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BOXWIDTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:713:10: ( 'BOXWIDTH' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:713:12: 'BOXWIDTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:713:10: ( 'BOXWIDTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:713:12: 'BOXWIDTH'
             {
             	Match("BOXWIDTH"); 
 
@@ -3528,8 +3528,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BOXGAP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:714:8: ( 'BOXGAP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:714:10: 'BOXGAP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:714:8: ( 'BOXGAP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:714:10: 'BOXGAP'
             {
             	Match("BOXGAP"); 
 
@@ -3552,8 +3552,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SEPARATE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:715:10: ( 'SEPARATE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:715:12: 'SEPARATE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:715:10: ( 'SEPARATE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:715:12: 'SEPARATE'
             {
             	Match("SEPARATE"); 
 
@@ -3576,8 +3576,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = XLINE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:716:7: ( 'XLINE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:716:9: 'XLINE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:716:7: ( 'XLINE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:716:9: 'XLINE'
             {
             	Match("XLINE"); 
 
@@ -3600,8 +3600,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = XLINEBEFORE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:717:13: ( 'XLINEBEFORE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:717:15: 'XLINEBEFORE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:717:13: ( 'XLINEBEFORE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:717:15: 'XLINEBEFORE'
             {
             	Match("XLINEBEFORE"); 
 
@@ -3624,8 +3624,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = XLINEAFTER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:718:12: ( 'XLINEAFTER' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:718:14: 'XLINEAFTER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:718:12: ( 'XLINEAFTER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:718:14: 'XLINEAFTER'
             {
             	Match("XLINEAFTER"); 
 
@@ -3648,8 +3648,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = YMIRROR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:719:9: ( 'YMIRROR' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:719:11: 'YMIRROR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:719:9: ( 'YMIRROR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:719:11: 'YMIRROR'
             {
             	Match("YMIRROR"); 
 
@@ -3672,8 +3672,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = YTITLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:720:8: ( 'YTITLE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:720:10: 'YTITLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:720:8: ( 'YTITLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:720:10: 'YTITLE'
             {
             	Match("YTITLE"); 
 
@@ -3696,8 +3696,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = YLINE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:721:7: ( 'YLINE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:721:9: 'YLINE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:721:7: ( 'YLINE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:721:9: 'YLINE'
             {
             	Match("YLINE"); 
 
@@ -3720,8 +3720,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SHARES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:722:8: ( 'SHARES' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:722:10: 'SHARES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:722:8: ( 'SHARES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:722:10: 'SHARES'
             {
             	Match("SHARES"); 
 
@@ -3744,8 +3744,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ERRORS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:723:8: ( 'ERRORS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:723:10: 'ERRORS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:723:8: ( 'ERRORS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:723:10: 'ERRORS'
             {
             	Match("ERRORS"); 
 
@@ -3768,8 +3768,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LINE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:724:6: ( 'LINE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:724:8: 'LINE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:724:6: ( 'LINE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:724:8: 'LINE'
             {
             	Match("LINE"); 
 
@@ -3792,8 +3792,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = IGNORE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:725:8: ( 'IGNORE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:725:10: 'IGNORE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:725:8: ( 'IGNORE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:725:10: 'IGNORE'
             {
             	Match("IGNORE"); 
 
@@ -3816,8 +3816,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = YMAXHARD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:726:10: ( 'YMAXHARD' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:726:12: 'YMAXHARD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:726:10: ( 'YMAXHARD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:726:12: 'YMAXHARD'
             {
             	Match("YMAXHARD"); 
 
@@ -3840,8 +3840,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = YMAXSOFT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:727:10: ( 'YMAXSOFT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:727:12: 'YMAXSOFT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:727:10: ( 'YMAXSOFT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:727:12: 'YMAXSOFT'
             {
             	Match("YMAXSOFT"); 
 
@@ -3864,8 +3864,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = YMINHARD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:728:10: ( 'YMINHARD' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:728:12: 'YMINHARD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:728:10: ( 'YMINHARD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:728:12: 'YMINHARD'
             {
             	Match("YMINHARD"); 
 
@@ -3888,8 +3888,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = YMINSOFT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:729:10: ( 'YMINSOFT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:729:12: 'YMINSOFT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:729:10: ( 'YMINSOFT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:729:12: 'YMINSOFT'
             {
             	Match("YMINSOFT"); 
 
@@ -3912,8 +3912,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = XZEROAXIS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:730:11: ( 'XZEROAXIS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:730:13: 'XZEROAXIS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:730:11: ( 'XZEROAXIS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:730:13: 'XZEROAXIS'
             {
             	Match("XZEROAXIS"); 
 
@@ -3936,8 +3936,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = Y2TITLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:731:9: ( 'Y2TITLE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:731:11: 'Y2TITLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:731:9: ( 'Y2TITLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:731:11: 'Y2TITLE'
             {
             	Match("Y2TITLE"); 
 
@@ -3960,8 +3960,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = Y2LINE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:732:8: ( 'Y2LINE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:732:10: 'Y2LINE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:732:8: ( 'Y2LINE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:732:10: 'Y2LINE'
             {
             	Match("Y2LINE"); 
 
@@ -3984,8 +3984,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = Y2MAXHARD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:733:11: ( 'Y2MAXHARD' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:733:13: 'Y2MAXHARD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:733:11: ( 'Y2MAXHARD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:733:13: 'Y2MAXHARD'
             {
             	Match("Y2MAXHARD"); 
 
@@ -4008,8 +4008,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = Y2MAXSOFT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:734:11: ( 'Y2MAXSOFT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:734:13: 'Y2MAXSOFT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:734:11: ( 'Y2MAXSOFT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:734:13: 'Y2MAXSOFT'
             {
             	Match("Y2MAXSOFT"); 
 
@@ -4032,8 +4032,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = Y2MINHARD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:735:11: ( 'Y2MINHARD' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:735:13: 'Y2MINHARD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:735:11: ( 'Y2MINHARD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:735:13: 'Y2MINHARD'
             {
             	Match("Y2MINHARD"); 
 
@@ -4056,8 +4056,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = Y2MINSOFT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:736:11: ( 'Y2MINSOFT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:736:13: 'Y2MINSOFT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:736:11: ( 'Y2MINSOFT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:736:13: 'Y2MINSOFT'
             {
             	Match("Y2MINSOFT"); 
 
@@ -4080,8 +4080,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = X2ZEROAXIS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:737:12: ( 'X2ZEROAXIS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:737:14: 'X2ZEROAXIS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:737:12: ( 'X2ZEROAXIS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:737:14: 'X2ZEROAXIS'
             {
             	Match("X2ZEROAXIS"); 
 
@@ -4104,8 +4104,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ARROW;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:738:7: ( 'ARROW' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:738:9: 'ARROW'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:738:7: ( 'ARROW' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:738:9: 'ARROW'
             {
             	Match("ARROW"); 
 
@@ -4128,8 +4128,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PARQUET;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:739:9: ( 'PARQUET' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:739:11: 'PARQUET'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:739:9: ( 'PARQUET' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:739:11: 'PARQUET'
             {
             	Match("PARQUET"); 
 
@@ -4152,8 +4152,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DASHTYPE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:740:10: ( 'DASHTYPE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:740:12: 'DASHTYPE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:740:10: ( 'DASHTYPE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:740:12: 'DASHTYPE'
             {
             	Match("DASHTYPE"); 
 
@@ -4176,8 +4176,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LINEWIDTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:741:11: ( 'LINEWIDTH' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:741:13: 'LINEWIDTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:741:11: ( 'LINEWIDTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:741:13: 'LINEWIDTH'
             {
             	Match("LINEWIDTH"); 
 
@@ -4200,8 +4200,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LINECOLOR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:742:11: ( 'LINECOLOR' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:742:13: 'LINECOLOR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:742:11: ( 'LINECOLOR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:742:13: 'LINECOLOR'
             {
             	Match("LINECOLOR"); 
 
@@ -4224,8 +4224,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = POINTTYPE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:743:11: ( 'POINTTYPE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:743:13: 'POINTTYPE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:743:11: ( 'POINTTYPE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:743:13: 'POINTTYPE'
             {
             	Match("POINTTYPE"); 
 
@@ -4248,8 +4248,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = POINTSIZE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:744:11: ( 'POINTSIZE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:744:13: 'POINTSIZE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:744:11: ( 'POINTSIZE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:744:13: 'POINTSIZE'
             {
             	Match("POINTSIZE"); 
 
@@ -4272,8 +4272,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FILLSTYLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:745:11: ( 'FILLSTYLE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:745:13: 'FILLSTYLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:745:11: ( 'FILLSTYLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:745:13: 'FILLSTYLE'
             {
             	Match("FILLSTYLE"); 
 
@@ -4296,8 +4296,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LABEL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:746:7: ( 'LABEL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:746:9: 'LABEL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:746:7: ( 'LABEL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:746:9: 'LABEL'
             {
             	Match("LABEL"); 
 
@@ -4320,8 +4320,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = Y2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:747:4: ( 'Y2' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:747:6: 'Y2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:747:4: ( 'Y2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:747:6: 'Y2'
             {
             	Match("Y2"); 
 
@@ -4344,8 +4344,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = X;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:748:3: ( 'X' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:748:5: 'X'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:748:3: ( 'X' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:748:5: 'X'
             {
             	Match('X'); 
 
@@ -4367,8 +4367,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = Y;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:749:3: ( 'Y' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:749:5: 'Y'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:749:3: ( 'Y' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:749:5: 'Y'
             {
             	Match('Y'); 
 
@@ -4390,8 +4390,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MDATEFORMAT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:750:13: ( 'MDATEFORMAT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:750:15: 'MDATEFORMAT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:750:13: ( 'MDATEFORMAT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:750:15: 'MDATEFORMAT'
             {
             	Match("MDATEFORMAT"); 
 
@@ -4414,8 +4414,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = THOUSANDSSEPARATOR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:751:20: ( 'THOUSANDSSEPARATOR' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:751:22: 'THOUSANDSSEPARATOR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:751:20: ( 'THOUSANDSSEPARATOR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:751:22: 'THOUSANDSSEPARATOR'
             {
             	Match("THOUSANDSSEPARATOR"); 
 
@@ -4438,8 +4438,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = XEDIT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:752:7: ( 'XEDIT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:752:9: 'XEDIT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:752:7: ( 'XEDIT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:752:9: 'XEDIT'
             {
             	Match("XEDIT"); 
 
@@ -4462,8 +4462,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = IMPOSE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:753:8: ( 'IMPOSE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:753:10: 'IMPOSE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:753:8: ( 'IMPOSE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:753:10: 'IMPOSE'
             {
             	Match("IMPOSE"); 
 
@@ -4486,8 +4486,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CONSTANT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:754:10: ( 'CONSTANT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:754:12: 'CONSTANT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:754:10: ( 'CONSTANT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:754:12: 'CONSTANT'
             {
             	Match("CONSTANT"); 
 
@@ -4510,8 +4510,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = INTERPOLATE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:755:13: ( 'INTERPOLATE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:755:15: 'INTERPOLATE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:755:13: ( 'INTERPOLATE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:755:15: 'INTERPOLATE'
             {
             	Match("INTERPOLATE"); 
 
@@ -4534,8 +4534,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PRORATE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:756:9: ( 'PRORATE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:756:11: 'PRORATE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:756:9: ( 'PRORATE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:756:11: 'PRORATE'
             {
             	Match("PRORATE"); 
 
@@ -4558,8 +4558,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TRIM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:757:6: ( 'TRIM' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:757:8: 'TRIM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:757:6: ( 'TRIM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:757:8: 'TRIM'
             {
             	Match("TRIM"); 
 
@@ -4582,8 +4582,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = USING;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:758:7: ( 'USING' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:758:9: 'USING'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:758:7: ( 'USING' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:758:9: 'USING'
             {
             	Match("USING"); 
 
@@ -4606,8 +4606,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = A;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:759:3: ( 'A' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:759:5: 'A'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:759:3: ( 'A' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:759:5: 'A'
             {
             	Match('A'); 
 
@@ -4629,8 +4629,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DEFAULT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:760:9: ( 'DEFAULT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:760:11: 'DEFAULT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:760:9: ( 'DEFAULT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:760:11: 'DEFAULT'
             {
             	Match("DEFAULT"); 
 
@@ -4653,8 +4653,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LOGIC;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:761:7: ( 'LOGIC' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:761:9: 'LOGIC'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:761:7: ( 'LOGIC' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:761:9: 'LOGIC'
             {
             	Match("LOGIC"); 
 
@@ -4677,8 +4677,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ABS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:762:5: ( 'ABS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:762:7: 'ABS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:762:5: ( 'ABS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:762:7: 'ABS'
             {
             	Match("ABS"); 
 
@@ -4701,8 +4701,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ABSOLUTE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:763:10: ( 'absolute' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:763:12: 'absolute'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:763:10: ( 'absolute' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:763:12: 'absolute'
             {
             	Match("absolute"); 
 
@@ -4725,8 +4725,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ACCEPT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:764:8: ( 'ACCEPT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:764:10: 'ACCEPT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:764:8: ( 'ACCEPT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:764:10: 'ACCEPT'
             {
             	Match("ACCEPT"); 
 
@@ -4749,8 +4749,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ADD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:765:5: ( 'ADD' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:765:7: 'ADD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:765:5: ( 'ADD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:765:7: 'ADD'
             {
             	Match("ADD"); 
 
@@ -4773,8 +4773,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = AFTER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:766:7: ( 'AFTER' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:766:9: 'AFTER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:766:7: ( 'AFTER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:766:9: 'AFTER'
             {
             	Match("AFTER"); 
 
@@ -4797,8 +4797,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = AFTER2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:767:8: ( 'AFTER2' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:767:10: 'AFTER2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:767:8: ( 'AFTER2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:767:10: 'AFTER2'
             {
             	Match("AFTER2"); 
 
@@ -4821,8 +4821,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ALIGNCENTER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:768:13: ( 'ALIGNCENTER' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:768:15: 'ALIGNCENTER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:768:13: ( 'ALIGNCENTER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:768:15: 'ALIGNCENTER'
             {
             	Match("ALIGNCENTER"); 
 
@@ -4845,8 +4845,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ALIGNLEFT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:769:11: ( 'ALIGNLEFT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:769:13: 'ALIGNLEFT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:769:11: ( 'ALIGNLEFT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:769:13: 'ALIGNLEFT'
             {
             	Match("ALIGNLEFT"); 
 
@@ -4869,8 +4869,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ALIGNRIGHT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:770:12: ( 'ALIGNRIGHT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:770:14: 'ALIGNRIGHT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:770:12: ( 'ALIGNRIGHT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:770:14: 'ALIGNRIGHT'
             {
             	Match("ALIGNRIGHT"); 
 
@@ -4893,8 +4893,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ALL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:771:5: ( 'ALL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:771:7: 'ALL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:771:5: ( 'ALL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:771:7: 'ALL'
             {
             	Match("ALL"); 
 
@@ -4917,8 +4917,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ANALYZE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:772:9: ( 'ANALYZE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:772:11: 'ANALYZE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:772:9: ( 'ANALYZE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:772:11: 'ANALYZE'
             {
             	Match("ANALYZE"); 
 
@@ -4941,8 +4941,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = AND;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:773:5: ( 'AND' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:773:7: 'AND'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:773:5: ( 'AND' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:773:7: 'AND'
             {
             	Match("AND"); 
 
@@ -4965,8 +4965,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = APPEND;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:774:8: ( 'APPEND' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:774:10: 'APPEND'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:774:8: ( 'APPEND' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:774:10: 'APPEND'
             {
             	Match("APPEND"); 
 
@@ -4989,8 +4989,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = AREMOS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:775:8: ( 'AREMOS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:775:10: 'AREMOS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:775:8: ( 'AREMOS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:775:10: 'AREMOS'
             {
             	Match("AREMOS"); 
 
@@ -5013,8 +5013,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = OP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:776:4: ( 'OP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:776:6: 'OP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:776:4: ( 'OP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:776:6: 'OP'
             {
             	Match("OP"); 
 
@@ -5037,8 +5037,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = AS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:777:4: ( 'AS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:777:6: 'AS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:777:4: ( 'AS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:777:6: 'AS'
             {
             	Match("AS"); 
 
@@ -5061,8 +5061,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = AUTO;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:778:6: ( 'AUTO' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:778:8: 'AUTO'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:778:6: ( 'AUTO' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:778:8: 'AUTO'
             {
             	Match("AUTO"); 
 
@@ -5085,8 +5085,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = AVG;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:779:5: ( 'AVG' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:779:7: 'AVG'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:779:5: ( 'AVG' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:779:7: 'AVG'
             {
             	Match("AVG"); 
 
@@ -5109,8 +5109,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = INDICATOR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:780:11: ( 'INDICATOR' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:780:13: 'INDICATOR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:780:11: ( 'INDICATOR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:780:13: 'INDICATOR'
             {
             	Match("INDICATOR"); 
 
@@ -5133,8 +5133,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BACKTRACK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:781:11: ( 'BACKTRACK' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:781:13: 'BACKTRACK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:781:11: ( 'BACKTRACK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:781:13: 'BACKTRACK'
             {
             	Match("BACKTRACK"); 
 
@@ -5157,8 +5157,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BANK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:782:6: ( 'BANK' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:782:8: 'BANK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:782:6: ( 'BANK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:782:8: 'BANK'
             {
             	Match("BANK"); 
 
@@ -5181,8 +5181,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BANK1;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:783:7: ( 'BANK1' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:783:9: 'BANK1'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:783:7: ( 'BANK1' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:783:9: 'BANK1'
             {
             	Match("BANK1"); 
 
@@ -5205,8 +5205,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BANK2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:784:7: ( 'BANK2' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:784:9: 'BANK2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:784:7: ( 'BANK2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:784:9: 'BANK2'
             {
             	Match("BANK2"); 
 
@@ -5229,8 +5229,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BOWL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:785:6: ( 'BOWL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:785:8: 'BOWL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:785:6: ( 'BOWL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:785:8: 'BOWL'
             {
             	Match("BOWL"); 
 
@@ -5253,8 +5253,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:786:4: ( 'BY' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:786:6: 'BY'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:786:4: ( 'BY' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:786:6: 'BY'
             {
             	Match("BY"); 
 
@@ -5277,8 +5277,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CACHE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:787:7: ( 'CACHE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:787:9: 'CACHE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:787:7: ( 'CACHE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:787:9: 'CACHE'
             {
             	Match("CACHE"); 
 
@@ -5301,8 +5301,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CALC;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:788:6: ( 'CALC' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:788:8: 'CALC'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:788:6: ( 'CALC' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:788:8: 'CALC'
             {
             	Match("CALC"); 
 
@@ -5325,8 +5325,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CAPS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:789:6: ( 'CAPS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:789:8: 'CAPS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:789:6: ( 'CAPS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:789:8: 'CAPS'
             {
             	Match("CAPS"); 
 
@@ -5349,8 +5349,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CELL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:790:6: ( 'CELL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:790:8: 'CELL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:790:6: ( 'CELL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:790:8: 'CELL'
             {
             	Match("CELL"); 
 
@@ -5373,8 +5373,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CHANGE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:791:8: ( 'CHANGE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:791:10: 'CHANGE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:791:8: ( 'CHANGE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:791:10: 'CHANGE'
             {
             	Match("CHANGE"); 
 
@@ -5397,8 +5397,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CHECKOFF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:792:10: ( 'CHECKOFF' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:792:12: 'CHECKOFF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:792:10: ( 'CHECKOFF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:792:12: 'CHECKOFF'
             {
             	Match("CHECKOFF"); 
 
@@ -5421,8 +5421,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CLEAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:793:7: ( 'CLEAR' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:793:9: 'CLEAR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:793:7: ( 'CLEAR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:793:9: 'CLEAR'
             {
             	Match("CLEAR"); 
 
@@ -5445,8 +5445,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CLEAR2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:794:8: ( 'CLEAR2' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:794:10: 'CLEAR2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:794:8: ( 'CLEAR2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:794:10: 'CLEAR2'
             {
             	Match("CLEAR2"); 
 
@@ -5469,8 +5469,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CLIP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:795:6: ( 'CLIP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:795:8: 'CLIP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:795:6: ( 'CLIP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:795:8: 'CLIP'
             {
             	Match("CLIP"); 
 
@@ -5493,8 +5493,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CLIPBOARD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:796:11: ( 'CLIPBOARD' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:796:13: 'CLIPBOARD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:796:11: ( 'CLIPBOARD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:796:13: 'CLIPBOARD'
             {
             	Match("CLIPBOARD"); 
 
@@ -5517,8 +5517,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CLONE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:797:7: ( 'CLONE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:797:9: 'CLONE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:797:7: ( 'CLONE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:797:9: 'CLONE'
             {
             	Match("CLONE"); 
 
@@ -5541,8 +5541,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MOVE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:798:6: ( 'MOVE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:798:8: 'MOVE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:798:6: ( 'MOVE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:798:8: 'MOVE'
             {
             	Match("MOVE"); 
 
@@ -5565,8 +5565,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = REMOVE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:799:8: ( 'REMOVE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:799:10: 'REMOVE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:799:8: ( 'REMOVE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:799:10: 'REMOVE'
             {
             	Match("REMOVE"); 
 
@@ -5589,8 +5589,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CLOSE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:800:7: ( 'CLOSE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:800:9: 'CLOSE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:800:7: ( 'CLOSE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:800:9: 'CLOSE'
             {
             	Match("CLOSE"); 
 
@@ -5613,8 +5613,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CLOSEALL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:801:10: ( 'CLOSEALL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:801:12: 'CLOSEALL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:801:10: ( 'CLOSEALL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:801:12: 'CLOSEALL'
             {
             	Match("CLOSEALL"); 
 
@@ -5637,8 +5637,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CLOSEBANKS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:802:12: ( 'CLOSEBANKS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:802:14: 'CLOSEBANKS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:802:12: ( 'CLOSEBANKS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:802:14: 'CLOSEBANKS'
             {
             	Match("CLOSEBANKS"); 
 
@@ -5661,8 +5661,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CLS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:803:5: ( 'CLS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:803:7: 'CLS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:803:5: ( 'CLS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:803:7: 'CLS'
             {
             	Match("CLS"); 
 
@@ -5685,8 +5685,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CODE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:804:6: ( 'CODE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:804:8: 'CODE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:804:6: ( 'CODE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:804:8: 'CODE'
             {
             	Match("CODE"); 
 
@@ -5709,8 +5709,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COLLAPSE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:805:10: ( 'COLLAPSE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:805:12: 'COLLAPSE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:805:10: ( 'COLLAPSE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:805:12: 'COLLAPSE'
             {
             	Match("COLLAPSE"); 
 
@@ -5733,8 +5733,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = XTREND;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:806:8: ( 'XTREND' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:806:10: 'XTREND'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:806:8: ( 'XTREND' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:806:10: 'XTREND'
             {
             	Match("XTREND"); 
 
@@ -5757,8 +5757,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = XFLAT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:807:7: ( 'XFLAT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:807:9: 'XFLAT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:807:7: ( 'XFLAT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:807:9: 'XFLAT'
             {
             	Match("XFLAT"); 
 
@@ -5781,8 +5781,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:808:4: ( 'PX' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:808:6: 'PX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:808:4: ( 'PX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:808:6: 'PX'
             {
             	Match("PX"); 
 
@@ -5805,8 +5805,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ARRAY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:809:7: ( 'ARRAY' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:809:9: 'ARRAY'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:809:7: ( 'ARRAY' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:809:9: 'ARRAY'
             {
             	Match("ARRAY"); 
 
@@ -5829,8 +5829,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BUGFIX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:810:8: ( 'BUGFIX' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:810:10: 'BUGFIX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:810:8: ( 'BUGFIX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:810:10: 'BUGFIX'
             {
             	Match("BUGFIX"); 
 
@@ -5853,8 +5853,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GCM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:811:5: ( 'GCM' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:811:7: 'GCM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:811:5: ( 'GCM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:811:7: 'GCM'
             {
             	Match("GCM"); 
 
@@ -5877,8 +5877,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COLORS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:812:8: ( 'COLORS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:812:10: 'COLORS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:812:8: ( 'COLORS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:812:10: 'COLORS'
             {
             	Match("COLORS"); 
 
@@ -5901,8 +5901,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COLS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:813:6: ( 'COLS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:813:8: 'COLS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:813:6: ( 'COLS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:813:8: 'COLS'
             {
             	Match("COLS"); 
 
@@ -5925,8 +5925,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DELIMITER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:814:11: ( 'DELIMITER' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:814:13: 'DELIMITER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:814:11: ( 'DELIMITER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:814:13: 'DELIMITER'
             {
             	Match("DELIMITER"); 
 
@@ -5949,8 +5949,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DATEFORMAT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:815:12: ( 'DATEFORMAT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:815:14: 'DATEFORMAT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:815:12: ( 'DATEFORMAT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:815:14: 'DATEFORMAT'
             {
             	Match("DATEFORMAT"); 
 
@@ -5973,8 +5973,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DATETYPE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:816:10: ( 'DATETYPE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:816:12: 'DATETYPE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:816:10: ( 'DATETYPE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:816:12: 'DATETYPE'
             {
             	Match("DATETYPE"); 
 
@@ -5997,8 +5997,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COMMA;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:817:7: ( 'COMMA' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:817:9: 'COMMA'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:817:7: ( 'COMMA' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:817:9: 'COMMA'
             {
             	Match("COMMA"); 
 
@@ -6021,8 +6021,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COMMAND;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:818:9: ( 'COMMAND' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:818:11: 'COMMAND'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:818:9: ( 'COMMAND' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:818:11: 'COMMAND'
             {
             	Match("COMMAND"); 
 
@@ -6045,8 +6045,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COMMAND1;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:819:10: ( 'COMMAND1' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:819:12: 'COMMAND1'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:819:10: ( 'COMMAND1' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:819:12: 'COMMAND1'
             {
             	Match("COMMAND1"); 
 
@@ -6069,8 +6069,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COMMAND2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:820:10: ( 'COMMAND2' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:820:12: 'COMMAND2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:820:10: ( 'COMMAND2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:820:12: 'COMMAND2'
             {
             	Match("COMMAND2"); 
 
@@ -6093,8 +6093,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COMPARE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:821:9: ( 'COMPARE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:821:11: 'COMPARE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:821:9: ( 'COMPARE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:821:11: 'COMPARE'
             {
             	Match("COMPARE"); 
 
@@ -6117,8 +6117,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COMPRESS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:822:10: ( 'COMPRESS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:822:12: 'COMPRESS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:822:10: ( 'COMPRESS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:822:12: 'COMPRESS'
             {
             	Match("COMPRESS"); 
 
@@ -6141,8 +6141,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CONST;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:823:7: ( 'CONST' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:823:9: 'CONST'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:823:7: ( 'CONST' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:823:9: 'CONST'
             {
             	Match("CONST"); 
 
@@ -6165,8 +6165,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CONV;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:824:6: ( 'CONV' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:824:8: 'CONV'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:824:6: ( 'CONV' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:824:8: 'CONV'
             {
             	Match("CONV"); 
 
@@ -6189,8 +6189,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CONV1;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:825:7: ( 'CONV1' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:825:9: 'CONV1'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:825:7: ( 'CONV1' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:825:9: 'CONV1'
             {
             	Match("CONV1"); 
 
@@ -6213,8 +6213,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CONV2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:826:7: ( 'CONV2' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:826:9: 'CONV2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:826:7: ( 'CONV2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:826:9: 'CONV2'
             {
             	Match("CONV2"); 
 
@@ -6237,8 +6237,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COPY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:827:6: ( 'COPY' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:827:8: 'COPY'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:827:6: ( 'COPY' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:827:8: 'COPY'
             {
             	Match("COPY"); 
 
@@ -6261,8 +6261,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COPYLOCAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:828:11: ( 'COPYLOCAL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:828:13: 'COPYLOCAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:828:11: ( 'COPYLOCAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:828:13: 'COPYLOCAL'
             {
             	Match("COPYLOCAL"); 
 
@@ -6285,8 +6285,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LOCAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:829:7: ( 'LOCAL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:829:9: 'LOCAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:829:7: ( 'LOCAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:829:9: 'LOCAL'
             {
             	Match("LOCAL"); 
 
@@ -6309,8 +6309,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GLOBAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:830:8: ( 'GLOBAL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:830:10: 'GLOBAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:830:8: ( 'GLOBAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:830:10: 'GLOBAL'
             {
             	Match("GLOBAL"); 
 
@@ -6333,8 +6333,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COUNT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:831:7: ( 'COUNT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:831:9: 'COUNT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:831:7: ( 'COUNT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:831:9: 'COUNT'
             {
             	Match("COUNT"); 
 
@@ -6357,8 +6357,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CPLOT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:832:7: ( 'CPLOT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:832:9: 'CPLOT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:832:7: ( 'CPLOT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:832:9: 'CPLOT'
             {
             	Match("CPLOT"); 
 
@@ -6381,8 +6381,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CREATE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:833:8: ( 'CREATE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:833:10: 'CREATE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:833:8: ( 'CREATE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:833:10: 'CREATE'
             {
             	Match("CREATE"); 
 
@@ -6405,8 +6405,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CREATEVARS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:834:12: ( 'CREATEVARS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:834:14: 'CREATEVARS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:834:12: ( 'CREATEVARS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:834:14: 'CREATEVARS'
             {
             	Match("CREATEVARS"); 
 
@@ -6429,8 +6429,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CSV;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:835:5: ( 'CSV' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:835:7: 'CSV'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:835:5: ( 'CSV' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:835:7: 'CSV'
             {
             	Match("CSV"); 
 
@@ -6453,8 +6453,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SDF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:836:5: ( 'SDF' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:836:7: 'SDF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:836:5: ( 'SDF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:836:7: 'SDF'
             {
             	Match("SDF"); 
 
@@ -6477,8 +6477,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CURROW;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:837:8: ( 'CURROW' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:837:10: 'CURROW'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:837:8: ( 'CURROW' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:837:10: 'CURROW'
             {
             	Match("CURROW"); 
 
@@ -6501,8 +6501,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = D;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:838:3: ( 'D' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:838:5: 'D'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:838:3: ( 'D' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:838:5: 'D'
             {
             	Match('D'); 
 
@@ -6524,8 +6524,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DAMP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:839:6: ( 'DAMP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:839:8: 'DAMP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:839:6: ( 'DAMP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:839:8: 'DAMP'
             {
             	Match("DAMP"); 
 
@@ -6548,8 +6548,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DANISH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:840:8: ( 'DANISH' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:840:10: 'DANISH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:840:8: ( 'DANISH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:840:10: 'DANISH'
             {
             	Match("DANISH"); 
 
@@ -6572,8 +6572,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DATA;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:841:6: ( 'DATA' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:841:8: 'DATA'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:841:6: ( 'DATA' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:841:8: 'DATA'
             {
             	Match("DATA"); 
 
@@ -6596,8 +6596,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DATABANK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:842:10: ( 'DATABANK' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:842:12: 'DATABANK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:842:10: ( 'DATABANK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:842:12: 'DATABANK'
             {
             	Match("DATABANK"); 
 
@@ -6620,8 +6620,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DATAWIDTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:843:11: ( 'DATAWIDTH' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:843:13: 'DATAWIDTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:843:11: ( 'DATAWIDTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:843:13: 'DATAWIDTH'
             {
             	Match("DATAWIDTH"); 
 
@@ -6644,8 +6644,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DATE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:844:6: ( 'DATE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:844:8: 'DATE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:844:6: ( 'DATE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:844:8: 'DATE'
             {
             	Match("DATE"); 
 
@@ -6668,8 +6668,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DATES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:845:7: ( 'DATES' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:845:9: 'DATES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:845:7: ( 'DATES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:845:9: 'DATES'
             {
             	Match("DATES"); 
 
@@ -6692,8 +6692,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DEBUG;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:846:7: ( 'DEBUG' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:846:9: 'DEBUG'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:846:7: ( 'DEBUG' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:846:9: 'DEBUG'
             {
             	Match("DEBUG"); 
 
@@ -6716,8 +6716,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DEC;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:847:5: ( 'DEC' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:847:7: 'DEC'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:847:5: ( 'DEC' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:847:7: 'DEC'
             {
             	Match("DEC"); 
 
@@ -6740,8 +6740,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DECIMALSEPARATOR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:848:18: ( 'DECIMALSEPARATOR' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:848:20: 'DECIMALSEPARATOR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:848:18: ( 'DECIMALSEPARATOR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:848:20: 'DECIMALSEPARATOR'
             {
             	Match("DECIMALSEPARATOR"); 
 
@@ -6764,8 +6764,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DECOMP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:849:8: ( 'DECOMP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:849:10: 'DECOMP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:849:8: ( 'DECOMP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:849:10: 'DECOMP'
             {
             	Match("DECOMP"); 
 
@@ -6788,8 +6788,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DECOMP2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:850:9: ( 'DECOMP2' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:850:11: 'DECOMP2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:850:9: ( 'DECOMP2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:850:11: 'DECOMP2'
             {
             	Match("DECOMP2"); 
 
@@ -6812,8 +6812,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DECOMP3;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:851:9: ( 'DECOMP3' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:851:11: 'DECOMP3'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:851:9: ( 'DECOMP3' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:851:11: 'DECOMP3'
             {
             	Match("DECOMP3"); 
 
@@ -6836,8 +6836,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = EVAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:852:6: ( 'EVAL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:852:8: 'EVAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:852:6: ( 'EVAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:852:8: 'EVAL'
             {
             	Match("EVAL"); 
 
@@ -6860,8 +6860,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DELETE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:853:8: ( 'DELETE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:853:10: 'DELETE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:853:8: ( 'DELETE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:853:10: 'DELETE'
             {
             	Match("DELETE"); 
 
@@ -6884,8 +6884,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DETAILS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:854:9: ( 'DETAILS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:854:11: 'DETAILS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:854:9: ( 'DETAILS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:854:11: 'DETAILS'
             {
             	Match("DETAILS"); 
 
@@ -6908,8 +6908,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DIALOG;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:855:8: ( 'DIALOG' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:855:10: 'DIALOG'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:855:8: ( 'DIALOG' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:855:10: 'DIALOG'
             {
             	Match("DIALOG"); 
 
@@ -6932,8 +6932,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DIF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:856:5: ( 'DIF' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:856:7: 'DIF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:856:5: ( 'DIF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:856:7: 'DIF'
             {
             	Match("DIF"); 
 
@@ -6956,8 +6956,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DIFF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:857:6: ( 'DIFF' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:857:8: 'DIFF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:857:6: ( 'DIFF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:857:8: 'DIFF'
             {
             	Match("DIFF"); 
 
@@ -6980,8 +6980,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DIFPRT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:858:8: ( 'DIFPRT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:858:10: 'DIFPRT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:858:8: ( 'DIFPRT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:858:10: 'DIFPRT'
             {
             	Match("DIFPRT"); 
 
@@ -7004,8 +7004,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DING;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:859:6: ( 'DING' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:859:8: 'DING'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:859:6: ( 'DING' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:859:8: 'DING'
             {
             	Match("DING"); 
 
@@ -7028,8 +7028,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DYN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:860:5: ( 'DYN' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:860:7: 'DYN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:860:5: ( 'DYN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:860:7: 'DYN'
             {
             	Match("DYN"); 
 
@@ -7052,8 +7052,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DIRECT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:861:8: ( 'DIRECT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:861:10: 'DIRECT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:861:8: ( 'DIRECT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:861:10: 'DIRECT'
             {
             	Match("DIRECT"); 
 
@@ -7076,8 +7076,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DISP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:862:6: ( 'DISP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:862:8: 'DISP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:862:6: ( 'DISP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:862:8: 'DISP'
             {
             	Match("DISP"); 
 
@@ -7100,8 +7100,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GEKKO;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:863:7: ( 'GEKKO' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:863:9: 'GEKKO'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:863:7: ( 'GEKKO' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:863:9: 'GEKKO'
             {
             	Match("GEKKO"); 
 
@@ -7124,8 +7124,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DISPLAY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:864:9: ( 'DISPLAY' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:864:11: 'DISPLAY'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:864:9: ( 'DISPLAY' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:864:11: 'DISPLAY'
             {
             	Match("DISPLAY"); 
 
@@ -7148,8 +7148,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DOC;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:865:5: ( 'DOC' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:865:7: 'DOC'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:865:5: ( 'DOC' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:865:7: 'DOC'
             {
             	Match("DOC"); 
 
@@ -7172,8 +7172,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DOWNLOAD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:866:10: ( 'DOWNLOAD' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:866:12: 'DOWNLOAD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:866:10: ( 'DOWNLOAD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:866:12: 'DOWNLOAD'
             {
             	Match("DOWNLOAD"); 
 
@@ -7196,8 +7196,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:867:4: ( 'DP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:867:6: 'DP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:867:4: ( 'DP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:867:6: 'DP'
             {
             	Match("DP"); 
 
@@ -7220,8 +7220,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DUMOF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:868:7: ( 'DUMOF' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:868:9: 'DUMOF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:868:7: ( 'DUMOF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:868:9: 'DUMOF'
             {
             	Match("DUMOF"); 
 
@@ -7244,8 +7244,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DUMOFF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:869:8: ( 'DUMOFF' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:869:10: 'DUMOFF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:869:8: ( 'DUMOFF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:869:10: 'DUMOFF'
             {
             	Match("DUMOFF"); 
 
@@ -7268,8 +7268,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DUMON;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:870:7: ( 'DUMON' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:870:9: 'DUMON'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:870:7: ( 'DUMON' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:870:9: 'DUMON'
             {
             	Match("DUMON"); 
 
@@ -7292,8 +7292,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DUMP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:871:6: ( 'DUMP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:871:8: 'DUMP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:871:6: ( 'DUMP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:871:8: 'DUMP'
             {
             	Match("DUMP"); 
 
@@ -7316,8 +7316,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DUMPOPTIONS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:872:13: ( 'DUMPOPTIONS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:872:15: 'DUMPOPTIONS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:872:13: ( 'DUMPOPTIONS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:872:15: 'DUMPOPTIONS'
             {
             	Match("DUMPOPTIONS"); 
 
@@ -7340,8 +7340,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = EDIT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:873:6: ( 'EDIT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:873:8: 'EDIT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:873:6: ( 'EDIT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:873:8: 'EDIT'
             {
             	Match("EDIT"); 
 
@@ -7364,8 +7364,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = EFTER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:874:7: ( 'EFTER' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:874:9: 'EFTER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:874:7: ( 'EFTER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:874:9: 'EFTER'
             {
             	Match("EFTER"); 
 
@@ -7388,8 +7388,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ELSE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:875:6: ( 'ELSE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:875:8: 'ELSE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:875:6: ( 'ELSE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:875:8: 'ELSE'
             {
             	Match("ELSE"); 
 
@@ -7412,8 +7412,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ELSEIF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:876:8: ( 'ELSEIF' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:876:10: 'ELSEIF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:876:8: ( 'ELSEIF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:876:10: 'ELSEIF'
             {
             	Match("ELSEIF"); 
 
@@ -7436,8 +7436,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = END;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:877:5: ( 'END' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:877:7: 'END'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:877:5: ( 'END' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:877:7: 'END'
             {
             	Match("END"); 
 
@@ -7460,8 +7460,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ENDO;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:878:6: ( 'ENDO' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:878:8: 'ENDO'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:878:6: ( 'ENDO' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:878:8: 'ENDO'
             {
             	Match("ENDO"); 
 
@@ -7484,8 +7484,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ENGLISH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:879:9: ( 'ENGLISH' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:879:11: 'ENGLISH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:879:9: ( 'ENGLISH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:879:11: 'ENGLISH'
             {
             	Match("ENGLISH"); 
 
@@ -7508,8 +7508,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ERROR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:880:7: ( 'ERROR' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:880:9: 'ERROR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:880:7: ( 'ERROR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:880:9: 'ERROR'
             {
             	Match("ERROR"); 
 
@@ -7532,8 +7532,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = EXCEL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:881:7: ( 'EXCEL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:881:9: 'EXCEL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:881:7: ( 'EXCEL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:881:9: 'EXCEL'
             {
             	Match("EXCEL"); 
 
@@ -7556,8 +7556,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = EXE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:882:5: ( 'EXE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:882:7: 'EXE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:882:5: ( 'EXE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:882:7: 'EXE'
             {
             	Match("EXE"); 
 
@@ -7580,8 +7580,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = EXIT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:883:6: ( 'EXIT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:883:8: 'EXIT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:883:6: ( 'EXIT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:883:8: 'EXIT'
             {
             	Match("EXIT"); 
 
@@ -7604,8 +7604,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = EXO;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:884:5: ( 'EXO' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:884:7: 'EXO'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:884:5: ( 'EXO' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:884:7: 'EXO'
             {
             	Match("EXO"); 
 
@@ -7628,8 +7628,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = EXP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:885:5: ( 'EXP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:885:7: 'EXP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:885:5: ( 'EXP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:885:7: 'EXP'
             {
             	Match("EXP"); 
 
@@ -7652,8 +7652,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = EXPORT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:886:8: ( 'EXPORT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:886:10: 'EXPORT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:886:8: ( 'EXPORT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:886:10: 'EXPORT'
             {
             	Match("EXPORT"); 
 
@@ -7676,8 +7676,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = EXTERNAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:887:10: ( 'EXTERNAL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:887:12: 'EXTERNAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:887:10: ( 'EXTERNAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:887:12: 'EXTERNAL'
             {
             	Match("EXTERNAL"); 
 
@@ -7700,8 +7700,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FAILSAFE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:888:10: ( 'FAILSAFE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:888:12: 'FAILSAFE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:888:10: ( 'FAILSAFE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:888:12: 'FAILSAFE'
             {
             	Match("FAILSAFE"); 
 
@@ -7724,8 +7724,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FAIR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:889:6: ( 'FAIR' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:889:8: 'FAIR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:889:6: ( 'FAIR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:889:8: 'FAIR'
             {
             	Match("FAIR"); 
 
@@ -7748,8 +7748,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FALSE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:890:7: ( 'false' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:890:9: 'false'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:890:7: ( 'false' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:890:9: 'false'
             {
             	Match("false"); 
 
@@ -7772,8 +7772,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FAST;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:891:6: ( 'FAST' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:891:8: 'FAST'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:891:6: ( 'FAST' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:891:8: 'FAST'
             {
             	Match("FAST"); 
 
@@ -7796,8 +7796,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FEED;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:892:6: ( 'FEED' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:892:8: 'FEED'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:892:6: ( 'FEED' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:892:8: 'FEED'
             {
             	Match("FEED"); 
 
@@ -7820,8 +7820,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FEEDBACK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:893:10: ( 'FEEDBACK' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:893:12: 'FEEDBACK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:893:10: ( 'FEEDBACK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:893:12: 'FEEDBACK'
             {
             	Match("FEEDBACK"); 
 
@@ -7844,8 +7844,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FIELDS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:894:8: ( 'FIELDS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:894:10: 'FIELDS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:894:8: ( 'FIELDS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:894:10: 'FIELDS'
             {
             	Match("FIELDS"); 
 
@@ -7868,8 +7868,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FILE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:895:6: ( 'FILE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:895:8: 'FILE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:895:6: ( 'FILE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:895:8: 'FILE'
             {
             	Match("FILE"); 
 
@@ -7892,8 +7892,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FILEWIDTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:896:11: ( 'FILEWIDTH' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:896:13: 'FILEWIDTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:896:11: ( 'FILEWIDTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:896:13: 'FILEWIDTH'
             {
             	Match("FILEWIDTH"); 
 
@@ -7916,8 +7916,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FILTER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:897:8: ( 'FILTER' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:897:10: 'FILTER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:897:8: ( 'FILTER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:897:10: 'FILTER'
             {
             	Match("FILTER"); 
 
@@ -7940,8 +7940,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FINDMISSINGDATA;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:898:17: ( 'FINDMISSINGDATA' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:898:19: 'FINDMISSINGDATA'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:898:17: ( 'FINDMISSINGDATA' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:898:19: 'FINDMISSINGDATA'
             {
             	Match("FINDMISSINGDATA"); 
 
@@ -7964,8 +7964,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BANKNAME;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:899:10: ( 'BANKNAME' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:899:12: 'BANKNAME'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:899:10: ( 'BANKNAME' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:899:12: 'BANKNAME'
             {
             	Match("BANKNAME"); 
 
@@ -7988,8 +7988,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FLOW;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:900:6: ( 'FLOW' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:900:8: 'FLOW'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:900:6: ( 'FLOW' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:900:8: 'FLOW'
             {
             	Match("FLOW"); 
 
@@ -8012,8 +8012,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = META;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:901:6: ( 'META' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:901:8: 'META'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:901:6: ( 'META' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:901:8: 'META'
             {
             	Match("META"); 
 
@@ -8036,8 +8036,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ECHO;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:902:6: ( 'ECHO' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:902:8: 'ECHO'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:902:6: ( 'ECHO' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:902:8: 'ECHO'
             {
             	Match("ECHO"); 
 
@@ -8060,8 +8060,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = OBS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:903:5: ( 'OBS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:903:7: 'OBS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:903:5: ( 'OBS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:903:7: 'OBS'
             {
             	Match("OBS"); 
 
@@ -8084,8 +8084,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = A3DP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:904:6: ( 'A3DP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:904:8: 'A3DP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:904:6: ( 'A3DP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:904:8: 'A3DP'
             {
             	Match("A3DP"); 
 
@@ -8108,8 +8108,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = A3;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:905:4: ( 'A3' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:905:6: 'A3'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:905:4: ( 'A3' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:905:6: 'A3'
             {
             	Match("A3"); 
 
@@ -8132,8 +8132,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = A3N;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:906:5: ( 'A3N' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:906:7: 'A3N'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:906:5: ( 'A3N' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:906:7: 'A3N'
             {
             	Match("A3N"); 
 
@@ -8156,8 +8156,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ADP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:907:5: ( 'ADP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:907:7: 'ADP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:907:5: ( 'ADP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:907:7: 'ADP'
             {
             	Match("ADP"); 
 
@@ -8180,8 +8180,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = AL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:908:4: ( 'AL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:908:6: 'AL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:908:4: ( 'AL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:908:6: 'AL'
             {
             	Match("AL"); 
 
@@ -8204,8 +8204,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ADL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:909:5: ( 'ADL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:909:7: 'ADL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:909:5: ( 'ADL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:909:7: 'ADL'
             {
             	Match("ADL"); 
 
@@ -8228,8 +8228,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = A3P;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:910:5: ( 'A3P' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:910:7: 'A3P'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:910:5: ( 'A3P' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:910:7: 'A3P'
             {
             	Match("A3P"); 
 
@@ -8252,8 +8252,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = AN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:911:4: ( 'AN' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:911:6: 'AN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:911:4: ( 'AN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:911:6: 'AN'
             {
             	Match("AN"); 
 
@@ -8276,8 +8276,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = AD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:912:4: ( 'AD' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:912:6: 'AD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:912:4: ( 'AD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:912:6: 'AD'
             {
             	Match("AD"); 
 
@@ -8300,8 +8300,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = AP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:913:4: ( 'AP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:913:6: 'AP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:913:4: ( 'AP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:913:6: 'AP'
             {
             	Match("AP"); 
 
@@ -8324,8 +8324,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = A3D;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:914:5: ( 'A3D' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:914:7: 'A3D'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:914:5: ( 'A3D' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:914:7: 'A3D'
             {
             	Match("A3D"); 
 
@@ -8348,8 +8348,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = A3L;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:915:5: ( 'A3L' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:915:7: 'A3L'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:915:5: ( 'A3L' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:915:7: 'A3L'
             {
             	Match("A3L"); 
 
@@ -8372,8 +8372,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = A3DL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:916:6: ( 'A3DL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:916:8: 'A3DL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:916:6: ( 'A3DL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:916:8: 'A3DL'
             {
             	Match("A3DL"); 
 
@@ -8396,8 +8396,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = YOY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:917:5: ( 'YOY' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:917:7: 'YOY'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:917:5: ( 'YOY' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:917:7: 'YOY'
             {
             	Match("YOY"); 
 
@@ -8420,8 +8420,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = EXPAND;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:918:8: ( 'EXPAND' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:918:10: 'EXPAND'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:918:8: ( 'EXPAND' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:918:10: 'EXPAND'
             {
             	Match("EXPAND"); 
 
@@ -8444,8 +8444,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = VARIABLECODE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:919:14: ( 'VARIABLECODE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:919:16: 'VARIABLECODE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:919:14: ( 'VARIABLECODE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:919:16: 'VARIABLECODE'
             {
             	Match("VARIABLECODE"); 
 
@@ -8468,8 +8468,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = VIEW;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:920:6: ( 'VIEW' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:920:8: 'VIEW'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:920:6: ( 'VIEW' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:920:8: 'VIEW'
             {
             	Match("VIEW"); 
 
@@ -8492,8 +8492,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = KEEPTYPES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:921:11: ( 'KEEPTYPES' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:921:13: 'KEEPTYPES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:921:11: ( 'KEEPTYPES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:921:13: 'KEEPTYPES'
             {
             	Match("KEEPTYPES"); 
 
@@ -8516,8 +8516,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PREDICT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:922:9: ( 'PREDICT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:922:11: 'PREDICT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:922:9: ( 'PREDICT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:922:11: 'PREDICT'
             {
             	Match("PREDICT"); 
 
@@ -8540,8 +8540,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FIND;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:923:6: ( 'FIND' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:923:8: 'FIND'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:923:6: ( 'FIND' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:923:8: 'FIND'
             {
             	Match("FIND"); 
 
@@ -8564,8 +8564,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PYTHON;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:924:8: ( 'PYTHON' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:924:10: 'PYTHON'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:924:8: ( 'PYTHON' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:924:10: 'PYTHON'
             {
             	Match("PYTHON"); 
 
@@ -8588,8 +8588,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DEP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:925:5: ( 'DEP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:925:7: 'DEP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:925:5: ( 'DEP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:925:7: 'DEP'
             {
             	Match("DEP"); 
 
@@ -8612,8 +8612,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BROWSER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:926:9: ( 'BROWSER' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:926:11: 'BROWSER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:926:9: ( 'BROWSER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:926:11: 'BROWSER'
             {
             	Match("BROWSER"); 
 
@@ -8636,8 +8636,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FIRST;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:927:7: ( 'FIRST' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:927:9: 'FIRST'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:927:7: ( 'FIRST' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:927:9: 'FIRST'
             {
             	Match("FIRST"); 
 
@@ -8660,8 +8660,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FIRSTCOLWIDTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:928:15: ( 'FIRSTCOLWIDTH' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:928:17: 'FIRSTCOLWIDTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:928:15: ( 'FIRSTCOLWIDTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:928:17: 'FIRSTCOLWIDTH'
             {
             	Match("FIRSTCOLWIDTH"); 
 
@@ -8684,8 +8684,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FIX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:929:5: ( 'FIX' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:929:7: 'FIX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:929:5: ( 'FIX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:929:7: 'FIX'
             {
             	Match("FIX"); 
 
@@ -8708,8 +8708,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FLAT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:930:6: ( 'FLAT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:930:8: 'FLAT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:930:6: ( 'FLAT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:930:8: 'FLAT'
             {
             	Match("FLAT"); 
 
@@ -8732,8 +8732,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DATECELL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:931:10: ( 'DATECELL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:931:12: 'DATECELL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:931:10: ( 'DATECELL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:931:12: 'DATECELL'
             {
             	Match("DATECELL"); 
 
@@ -8756,8 +8756,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NAMECELL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:932:10: ( 'NAMECELL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:932:12: 'NAMECELL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:932:10: ( 'NAMECELL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:932:12: 'NAMECELL'
             {
             	Match("NAMECELL"); 
 
@@ -8780,8 +8780,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FOLDER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:933:8: ( 'FOLDER' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:933:10: 'FOLDER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:933:8: ( 'FOLDER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:933:10: 'FOLDER'
             {
             	Match("FOLDER"); 
 
@@ -8804,8 +8804,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FONT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:934:6: ( 'FONT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:934:8: 'FONT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:934:6: ( 'FONT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:934:8: 'FONT'
             {
             	Match("FONT"); 
 
@@ -8828,8 +8828,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FONTSIZE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:935:10: ( 'FONTSIZE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:935:12: 'FONTSIZE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:935:10: ( 'FONTSIZE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:935:12: 'FONTSIZE'
             {
             	Match("FONTSIZE"); 
 
@@ -8852,8 +8852,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FOR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:936:5: ( 'FOR' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:936:7: 'FOR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:936:5: ( 'FOR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:936:7: 'FOR'
             {
             	Match("FOR"); 
 
@@ -8876,8 +8876,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FORMAT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:937:8: ( 'FORMAT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:937:10: 'FORMAT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:937:8: ( 'FORMAT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:937:10: 'FORMAT'
             {
             	Match("FORMAT"); 
 
@@ -8900,8 +8900,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FORWARD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:938:9: ( 'FORWARD' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:938:11: 'FORWARD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:938:9: ( 'FORWARD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:938:11: 'FORWARD'
             {
             	Match("FORWARD"); 
 
@@ -8924,8 +8924,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FREQ;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:939:6: ( 'FREQ' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:939:8: 'FREQ'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:939:6: ( 'FREQ' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:939:8: 'FREQ'
             {
             	Match("FREQ"); 
 
@@ -8948,8 +8948,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FRML;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:940:6: ( 'FRML' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:940:8: 'FRML'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:940:6: ( 'FRML' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:940:8: 'FRML'
             {
             	Match("FRML"); 
 
@@ -8972,8 +8972,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FROM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:941:6: ( 'FROM' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:941:8: 'FROM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:941:6: ( 'FROM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:941:8: 'FROM'
             {
             	Match("FROM"); 
 
@@ -8996,8 +8996,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FUNCTION;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:942:10: ( 'FUNCTION' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:942:12: 'FUNCTION'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:942:10: ( 'FUNCTION' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:942:12: 'FUNCTION'
             {
             	Match("FUNCTION"); 
 
@@ -9020,8 +9020,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GAUSS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:943:7: ( 'GAUSS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:943:9: 'GAUSS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:943:7: ( 'GAUSS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:943:9: 'GAUSS'
             {
             	Match("GAUSS"); 
 
@@ -9044,8 +9044,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GBK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:944:5: ( 'GBK' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:944:7: 'GBK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:944:5: ( 'GBK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:944:7: 'GBK'
             {
             	Match("GBK"); 
 
@@ -9068,8 +9068,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GDIF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:945:6: ( 'GDIF' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:945:8: 'GDIF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:945:6: ( 'GDIF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:945:8: 'GDIF'
             {
             	Match("GDIF"); 
 
@@ -9092,8 +9092,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GDIFF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:946:7: ( 'GDIFF' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:946:9: 'GDIFF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:946:7: ( 'GDIFF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:946:9: 'GDIFF'
             {
             	Match("GDIFF"); 
 
@@ -9116,8 +9116,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GEKKO18;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:947:9: ( 'GEKKO18' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:947:11: 'GEKKO18'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:947:9: ( 'GEKKO18' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:947:11: 'GEKKO18'
             {
             	Match("GEKKO18"); 
 
@@ -9140,8 +9140,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GEKKO20;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:948:9: ( 'GEKKO20' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:948:11: 'GEKKO20'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:948:9: ( 'GEKKO20' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:948:11: 'GEKKO20'
             {
             	Match("GEKKO20"); 
 
@@ -9164,8 +9164,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GENR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:949:6: ( 'GENR' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:949:8: 'GENR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:949:6: ( 'GENR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:949:8: 'GENR'
             {
             	Match("GENR"); 
 
@@ -9188,8 +9188,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GEOMETRIC;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:950:11: ( 'GEOMETRIC' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:950:13: 'GEOMETRIC'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:950:11: ( 'GEOMETRIC' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:950:13: 'GEOMETRIC'
             {
             	Match("GEOMETRIC"); 
 
@@ -9212,8 +9212,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = OVERLAY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:951:9: ( 'OVERLAY' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:951:11: 'OVERLAY'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:951:9: ( 'OVERLAY' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:951:11: 'OVERLAY'
             {
             	Match("OVERLAY"); 
 
@@ -9236,8 +9236,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GMULPRT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:952:9: ( 'GMULPRT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:952:11: 'GMULPRT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:952:9: ( 'GMULPRT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:952:11: 'GMULPRT'
             {
             	Match("GMULPRT"); 
 
@@ -9260,8 +9260,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GNUPLOT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:953:9: ( 'GNUPLOT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:953:11: 'GNUPLOT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:953:9: ( 'GNUPLOT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:953:11: 'GNUPLOT'
             {
             	Match("GNUPLOT"); 
 
@@ -9284,8 +9284,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GOAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:954:6: ( 'GOAL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:954:8: 'GOAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:954:6: ( 'GOAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:954:8: 'GOAL'
             {
             	Match("GOAL"); 
 
@@ -9308,8 +9308,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GOTO;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:955:6: ( 'GOTO' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:955:8: 'GOTO'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:955:6: ( 'GOTO' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:955:8: 'GOTO'
             {
             	Match("GOTO"); 
 
@@ -9332,8 +9332,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GRAPH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:956:7: ( 'GRAPH' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:956:9: 'GRAPH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:956:7: ( 'GRAPH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:956:9: 'GRAPH'
             {
             	Match("GRAPH"); 
 
@@ -9356,8 +9356,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GROWTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:957:8: ( 'GROWTH' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:957:10: 'GROWTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:957:8: ( 'GROWTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:957:10: 'GROWTH'
             {
             	Match("GROWTH"); 
 
@@ -9380,8 +9380,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = HDG;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:958:5: ( 'HDG' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:958:7: 'HDG'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:958:5: ( 'HDG' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:958:7: 'HDG'
             {
             	Match("HDG"); 
 
@@ -9404,8 +9404,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = HEADING;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:959:9: ( 'HEADING' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:959:11: 'HEADING'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:959:9: ( 'HEADING' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:959:11: 'HEADING'
             {
             	Match("HEADING"); 
 
@@ -9428,8 +9428,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = HELP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:960:6: ( 'HELP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:960:8: 'HELP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:960:6: ( 'HELP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:960:8: 'HELP'
             {
             	Match("HELP"); 
 
@@ -9452,8 +9452,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = HIDE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:961:6: ( 'HIDE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:961:8: 'HIDE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:961:6: ( 'HIDE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:961:8: 'HIDE'
             {
             	Match("HIDE"); 
 
@@ -9476,8 +9476,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = HIDELEFTBORDER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:962:16: ( 'HIDELEFTBORDER' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:962:18: 'HIDELEFTBORDER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:962:16: ( 'HIDELEFTBORDER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:962:18: 'HIDELEFTBORDER'
             {
             	Match("HIDELEFTBORDER"); 
 
@@ -9500,8 +9500,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = HIDERIGHTBORDER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:963:17: ( 'HIDERIGHTBORDER' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:963:19: 'HIDERIGHTBORDER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:963:17: ( 'HIDERIGHTBORDER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:963:19: 'HIDERIGHTBORDER'
             {
             	Match("HIDERIGHTBORDER"); 
 
@@ -9524,8 +9524,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = HORIZON;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:964:9: ( 'HORIZON' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:964:11: 'HORIZON'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:964:9: ( 'HORIZON' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:964:11: 'HORIZON'
             {
             	Match("HORIZON"); 
 
@@ -9548,8 +9548,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = HPFILTER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:965:10: ( 'HPFILTER' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:965:12: 'HPFILTER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:965:10: ( 'HPFILTER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:965:12: 'HPFILTER'
             {
             	Match("HPFILTER"); 
 
@@ -9572,8 +9572,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = HTML;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:966:6: ( 'HTML' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:966:8: 'HTML'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:966:6: ( 'HTML' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:966:8: 'HTML'
             {
             	Match("HTML"); 
 
@@ -9596,8 +9596,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = IF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:967:4: ( 'IF' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:967:6: 'IF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:967:4: ( 'IF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:967:6: 'IF'
             {
             	Match("IF"); 
 
@@ -9620,8 +9620,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = IF_OLD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:968:8: ( 'IF_OLD' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:968:10: 'IF_OLD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:968:8: ( 'IF_OLD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:968:10: 'IF_OLD'
             {
             	Match("IF_OLD"); 
 
@@ -9644,8 +9644,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ASBANK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:969:8: ( 'ASBANK' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:969:10: 'ASBANK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:969:8: ( 'ASBANK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:969:10: 'ASBANK'
             {
             	Match("ASBANK"); 
 
@@ -9668,8 +9668,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TOBANK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:970:8: ( 'TOBANK' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:970:10: 'TOBANK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:970:8: ( 'TOBANK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:970:10: 'TOBANK'
             {
             	Match("TOBANK"); 
 
@@ -9692,8 +9692,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = VARLIST;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:971:9: ( 'VARLIST' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:971:11: 'VARLIST'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:971:9: ( 'VARLIST' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:971:11: 'VARLIST'
             {
             	Match("VARLIST"); 
 
@@ -9716,8 +9716,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = FROMBANK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:972:10: ( 'FROMBANK' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:972:12: 'FROMBANK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:972:10: ( 'FROMBANK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:972:12: 'FROMBANK'
             {
             	Match("FROMBANK"); 
 
@@ -9740,8 +9740,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = IGNOREMISSING;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:973:15: ( 'IGNOREMISSING' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:973:17: 'IGNOREMISSING'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:973:15: ( 'IGNOREMISSING' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:973:17: 'IGNOREMISSING'
             {
             	Match("IGNOREMISSING"); 
 
@@ -9764,8 +9764,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = IGNOREMISSINGVARS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:974:19: ( 'IGNOREMISSINGVARS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:974:21: 'IGNOREMISSINGVARS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:974:19: ( 'IGNOREMISSINGVARS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:974:21: 'IGNOREMISSINGVARS'
             {
             	Match("IGNOREMISSINGVARS"); 
 
@@ -9788,8 +9788,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = IGNOREVARS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:975:12: ( 'IGNOREVARS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:975:14: 'IGNOREVARS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:975:12: ( 'IGNOREVARS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:975:14: 'IGNOREVARS'
             {
             	Match("IGNOREVARS"); 
 
@@ -9812,8 +9812,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = IMPORT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:976:8: ( 'IMPORT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:976:10: 'IMPORT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:976:8: ( 'IMPORT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:976:10: 'IMPORT'
             {
             	Match("IMPORT"); 
 
@@ -9836,8 +9836,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = INDEX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:977:7: ( 'INDEX' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:977:9: 'INDEX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:977:7: ( 'INDEX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:977:9: 'INDEX'
             {
             	Match("INDEX"); 
 
@@ -9860,8 +9860,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = INFO;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:978:6: ( 'INFO' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:978:8: 'INFO'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:978:6: ( 'INFO' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:978:8: 'INFO'
             {
             	Match("INFO"); 
 
@@ -9884,8 +9884,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = INFOFILE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:979:10: ( 'INFOFILE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:979:12: 'INFOFILE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:979:10: ( 'INFOFILE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:979:12: 'INFOFILE'
             {
             	Match("INFOFILE"); 
 
@@ -9908,8 +9908,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = INI;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:980:5: ( 'INI' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:980:7: 'INI'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:980:5: ( 'INI' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:980:7: 'INI'
             {
             	Match("INI"); 
 
@@ -9932,8 +9932,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = INIT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:981:6: ( 'INIT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:981:8: 'INIT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:981:6: ( 'INIT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:981:8: 'INIT'
             {
             	Match("INIT"); 
 
@@ -9956,8 +9956,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = INTERFACE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:982:11: ( 'INTERFACE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:982:13: 'INTERFACE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:982:11: ( 'INTERFACE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:982:13: 'INTERFACE'
             {
             	Match("INTERFACE"); 
 
@@ -9980,8 +9980,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = INTERNAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:983:10: ( 'INTERNAL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:983:12: 'INTERNAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:983:10: ( 'INTERNAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:983:12: 'INTERNAL'
             {
             	Match("INTERNAL"); 
 
@@ -10004,8 +10004,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = INVERT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:984:8: ( 'INVERT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:984:10: 'INVERT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:984:8: ( 'INVERT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:984:10: 'INVERT'
             {
             	Match("INVERT"); 
 
@@ -10028,8 +10028,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ROBUST;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:985:8: ( 'ROBUST' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:985:10: 'ROBUST'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:985:8: ( 'ROBUST' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:985:10: 'ROBUST'
             {
             	Match("ROBUST"); 
 
@@ -10052,8 +10052,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ITER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:986:6: ( 'ITER' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:986:8: 'ITER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:986:6: ( 'ITER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:986:8: 'ITER'
             {
             	Match("ITER"); 
 
@@ -10076,8 +10076,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ITERMAX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:987:9: ( 'ITERMAX' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:987:11: 'ITERMAX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:987:9: ( 'ITERMAX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:987:11: 'ITERMAX'
             {
             	Match("ITERMAX"); 
 
@@ -10100,8 +10100,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ITERMIN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:988:9: ( 'ITERMIN' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:988:11: 'ITERMIN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:988:9: ( 'ITERMIN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:988:11: 'ITERMIN'
             {
             	Match("ITERMIN"); 
 
@@ -10124,8 +10124,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ITERSHOW;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:989:10: ( 'ITERSHOW' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:989:12: 'ITERSHOW'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:989:10: ( 'ITERSHOW' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:989:12: 'ITERSHOW'
             {
             	Match("ITERSHOW"); 
 
@@ -10148,8 +10148,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = KEEP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:990:6: ( 'KEEP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:990:8: 'KEEP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:990:6: ( 'KEEP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:990:8: 'KEEP'
             {
             	Match("KEEP"); 
 
@@ -10172,8 +10172,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LABELS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:991:8: ( 'LABELS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:991:10: 'LABELS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:991:8: ( 'LABELS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:991:10: 'LABELS'
             {
             	Match("LABELS"); 
 
@@ -10196,8 +10196,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LAG;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:992:5: ( 'LAG' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:992:7: 'LAG'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:992:5: ( 'LAG' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:992:7: 'LAG'
             {
             	Match("LAG"); 
 
@@ -10220,8 +10220,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LANGUAGE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:993:10: ( 'LANGUAGE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:993:12: 'LANGUAGE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:993:10: ( 'LANGUAGE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:993:12: 'LANGUAGE'
             {
             	Match("LANGUAGE"); 
 
@@ -10244,8 +10244,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LAST;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:994:6: ( 'LAST' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:994:8: 'LAST'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:994:6: ( 'LAST' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:994:8: 'LAST'
             {
             	Match("LAST"); 
 
@@ -10268,8 +10268,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LEV;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:995:5: ( 'LEV' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:995:7: 'LEV'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:995:5: ( 'LEV' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:995:7: 'LEV'
             {
             	Match("LEV"); 
 
@@ -10292,8 +10292,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LINEAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:996:8: ( 'LINEAR' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:996:10: 'LINEAR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:996:8: ( 'LINEAR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:996:10: 'LINEAR'
             {
             	Match("LINEAR"); 
 
@@ -10316,8 +10316,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LINES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:997:7: ( 'LINES' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:997:9: 'LINES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:997:7: ( 'LINES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:997:9: 'LINES'
             {
             	Match("LINES"); 
 
@@ -10340,8 +10340,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LIST;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:998:6: ( 'LIST' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:998:8: 'LIST'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:998:6: ( 'LIST' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:998:8: 'LIST'
             {
             	Match("LIST"); 
 
@@ -10364,8 +10364,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LISTFILE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:999:10: ( 'LISTFILE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:999:12: 'LISTFILE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:999:10: ( 'LISTFILE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:999:12: 'LISTFILE'
             {
             	Match("LISTFILE"); 
 
@@ -10388,8 +10388,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LOG;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1000:5: ( 'LOG' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1000:7: 'LOG'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1000:5: ( 'LOG' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1000:7: 'LOG'
             {
             	Match("LOG"); 
 
@@ -10412,8 +10412,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LOCK_;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1001:7: ( 'LOCK' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1001:9: 'LOCK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1001:7: ( 'LOCK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1001:9: 'LOCK'
             {
             	Match("LOCK"); 
 
@@ -10436,8 +10436,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = UNLOCK_;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1002:9: ( 'UNLOCK' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1002:11: 'UNLOCK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1002:9: ( 'UNLOCK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1002:11: 'UNLOCK'
             {
             	Match("UNLOCK"); 
 
@@ -10460,8 +10460,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LU;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1003:4: ( 'LU' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1003:6: 'LU'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1003:4: ( 'LU' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1003:6: 'LU'
             {
             	Match("LU"); 
 
@@ -10484,8 +10484,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = M;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1004:3: ( 'M' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1004:5: 'M'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1004:3: ( 'M' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1004:5: 'M'
             {
             	Match('M'); 
 
@@ -10507,8 +10507,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MACRO2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1005:8: ( 'MACRO2' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1005:10: 'MACRO2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1005:8: ( 'MACRO2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1005:10: 'MACRO2'
             {
             	Match("MACRO2"); 
 
@@ -10531,8 +10531,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MAIN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1006:6: ( 'MAIN' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1006:8: 'MAIN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1006:6: ( 'MAIN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1006:8: 'MAIN'
             {
             	Match("MAIN"); 
 
@@ -10555,8 +10555,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MAT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1007:5: ( 'MAT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1007:7: 'MAT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1007:5: ( 'MAT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1007:7: 'MAT'
             {
             	Match("MAT"); 
 
@@ -10579,8 +10579,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MATRIX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1008:8: ( 'MATRIX' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1008:10: 'MATRIX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1008:8: ( 'MATRIX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1008:10: 'MATRIX'
             {
             	Match("MATRIX"); 
 
@@ -10603,8 +10603,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ROWNAMES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1009:10: ( 'ROWNAMES' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1009:12: 'ROWNAMES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1009:10: ( 'ROWNAMES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1009:12: 'ROWNAMES'
             {
             	Match("ROWNAMES"); 
 
@@ -10627,8 +10627,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COLNAMES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1010:10: ( 'COLNAMES' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1010:12: 'COLNAMES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1010:10: ( 'COLNAMES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1010:12: 'COLNAMES'
             {
             	Match("COLNAMES"); 
 
@@ -10651,8 +10651,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MAX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1011:5: ( 'MAX' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1011:7: 'MAX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1011:5: ( 'MAX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1011:7: 'MAX'
             {
             	Match("MAX"); 
 
@@ -10675,8 +10675,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MAXLINES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1012:10: ( 'MAXLINES' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1012:12: 'MAXLINES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1012:10: ( 'MAXLINES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1012:12: 'MAXLINES'
             {
             	Match("MAXLINES"); 
 
@@ -10699,8 +10699,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MEM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1013:5: ( 'MEM' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1013:7: 'MEM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1013:5: ( 'MEM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1013:7: 'MEM'
             {
             	Match("MEM"); 
 
@@ -10723,8 +10723,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MENU;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1014:6: ( 'MENU' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1014:8: 'MENU'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1014:6: ( 'MENU' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1014:8: 'MENU'
             {
             	Match("MENU"); 
 
@@ -10747,8 +10747,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MENUTABLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1015:11: ( 'MENUTABLE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1015:13: 'MENUTABLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1015:11: ( 'MENUTABLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1015:13: 'MENUTABLE'
             {
             	Match("MENUTABLE"); 
 
@@ -10771,8 +10771,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MERGE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1016:7: ( 'MERGE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1016:9: 'MERGE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1016:7: ( 'MERGE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1016:9: 'MERGE'
             {
             	Match("MERGE"); 
 
@@ -10795,8 +10795,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MERGECOLS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1017:11: ( 'MERGECOLS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1017:13: 'MERGECOLS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1017:11: ( 'MERGECOLS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1017:13: 'MERGECOLS'
             {
             	Match("MERGECOLS"); 
 
@@ -10819,8 +10819,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MESSAGE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1018:9: ( 'MESSAGE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1018:11: 'MESSAGE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1018:9: ( 'MESSAGE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1018:11: 'MESSAGE'
             {
             	Match("MESSAGE"); 
 
@@ -10843,8 +10843,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = METHOD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1019:8: ( 'METHOD' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1019:10: 'METHOD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1019:8: ( 'METHOD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1019:10: 'METHOD'
             {
             	Match("METHOD"); 
 
@@ -10867,8 +10867,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MIN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1020:5: ( 'MIN' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1020:7: 'MIN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1020:5: ( 'MIN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1020:7: 'MIN'
             {
             	Match("MIN"); 
 
@@ -10891,8 +10891,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MIXED;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1021:7: ( 'MIXED' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1021:9: 'MIXED'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1021:7: ( 'MIXED' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1021:9: 'MIXED'
             {
             	Match("MIXED"); 
 
@@ -10915,8 +10915,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MISSING;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1022:9: ( 'MISSING' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1022:11: 'MISSING'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1022:9: ( 'MISSING' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1022:11: 'MISSING'
             {
             	Match("MISSING"); 
 
@@ -10939,8 +10939,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MODE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1023:6: ( 'MODE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1023:8: 'MODE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1023:6: ( 'MODE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1023:8: 'MODE'
             {
             	Match("MODE"); 
 
@@ -10963,8 +10963,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MODEL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1024:7: ( 'MODEL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1024:9: 'MODEL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1024:7: ( 'MODEL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1024:9: 'MODEL'
             {
             	Match("MODEL"); 
 
@@ -10987,8 +10987,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MODERNLOOK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1025:12: ( 'MODERNLOOK' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1025:14: 'MODERNLOOK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1025:12: ( 'MODERNLOOK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1025:14: 'MODERNLOOK'
             {
             	Match("MODERNLOOK"); 
 
@@ -11011,8 +11011,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1026:4: ( 'MP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1026:6: 'MP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1026:4: ( 'MP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1026:6: 'MP'
             {
             	Match("MP"); 
 
@@ -11035,8 +11035,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1027:4: ( 'DL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1027:6: 'DL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1027:4: ( 'DL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1027:6: 'DL'
             {
             	Match("DL"); 
 
@@ -11059,8 +11059,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = L;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1028:3: ( 'L' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1028:5: 'L'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1028:3: ( 'L' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1028:5: 'L'
             {
             	Match('L'); 
 
@@ -11082,8 +11082,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RDL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1029:5: ( 'RDL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1029:7: 'RDL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1029:5: ( 'RDL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1029:7: 'RDL'
             {
             	Match("RDL"); 
 
@@ -11106,8 +11106,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1030:4: ( 'RL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1030:6: 'RL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1030:4: ( 'RL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1030:6: 'RL'
             {
             	Match("RL"); 
 
@@ -11130,8 +11130,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MULBK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1031:7: ( 'MULBK' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1031:9: 'MULBK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1031:7: ( 'MULBK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1031:9: 'MULBK'
             {
             	Match("MULBK"); 
 
@@ -11154,8 +11154,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MULPCT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1032:8: ( 'MULPCT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1032:10: 'MULPCT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1032:8: ( 'MULPCT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1032:10: 'MULPCT'
             {
             	Match("MULPCT"); 
 
@@ -11178,8 +11178,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MULPRT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1033:8: ( 'MULPRT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1033:10: 'MULPRT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1033:8: ( 'MULPRT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1033:10: 'MULPRT'
             {
             	Match("MULPRT"); 
 
@@ -11202,8 +11202,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MUTE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1034:6: ( 'MUTE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1034:8: 'MUTE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1034:6: ( 'MUTE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1034:8: 'MUTE'
             {
             	Match("MUTE"); 
 
@@ -11226,8 +11226,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = N;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1035:3: ( 'N' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1035:5: 'N'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1035:3: ( 'N' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1035:5: 'N'
             {
             	Match('N'); 
 
@@ -11249,8 +11249,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NAME;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1036:6: ( 'NAME' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1036:8: 'NAME'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1036:6: ( 'NAME' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1036:8: 'NAME'
             {
             	Match("NAME"); 
 
@@ -11273,8 +11273,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NAMES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1037:7: ( 'NAMES' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1037:9: 'NAMES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1037:7: ( 'NAMES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1037:9: 'NAMES'
             {
             	Match("NAMES"); 
 
@@ -11297,8 +11297,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NDEC;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1038:6: ( 'NDEC' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1038:8: 'NDEC'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1038:6: ( 'NDEC' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1038:8: 'NDEC'
             {
             	Match("NDEC"); 
 
@@ -11321,8 +11321,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NDIFPRT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1039:9: ( 'NDIFPRT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1039:11: 'NDIFPRT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1039:9: ( 'NDIFPRT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1039:11: 'NDIFPRT'
             {
             	Match("NDIFPRT"); 
 
@@ -11345,8 +11345,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NEW;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1040:5: ( 'NEW' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1040:7: 'NEW'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1040:5: ( 'NEW' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1040:7: 'NEW'
             {
             	Match("NEW"); 
 
@@ -11369,8 +11369,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NEWTON;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1041:8: ( 'NEWTON' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1041:10: 'NEWTON'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1041:8: ( 'NEWTON' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1041:10: 'NEWTON'
             {
             	Match("NEWTON"); 
 
@@ -11393,8 +11393,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NEXT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1042:6: ( 'NEXT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1042:8: 'NEXT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1042:6: ( 'NEXT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1042:8: 'NEXT'
             {
             	Match("NEXT"); 
 
@@ -11417,8 +11417,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NFAIR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1043:7: ( 'NFAIR' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1043:9: 'NFAIR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1043:7: ( 'NFAIR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1043:9: 'NFAIR'
             {
             	Match("NFAIR"); 
 
@@ -11441,8 +11441,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NO;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1044:4: ( 'no' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1044:6: 'no'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1044:4: ( 'no' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1044:6: 'no'
             {
             	Match("no"); 
 
@@ -11465,8 +11465,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NOABS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1045:7: ( 'NOABS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1045:9: 'NOABS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1045:7: ( 'NOABS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1045:9: 'NOABS'
             {
             	Match("NOABS"); 
 
@@ -11489,8 +11489,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NOCR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1046:6: ( 'NOCR' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1046:8: 'NOCR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1046:6: ( 'NOCR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1046:8: 'NOCR'
             {
             	Match("NOCR"); 
 
@@ -11513,8 +11513,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NODIF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1047:7: ( 'NODIF' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1047:9: 'NODIF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1047:7: ( 'NODIF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1047:9: 'NODIF'
             {
             	Match("NODIF"); 
 
@@ -11537,8 +11537,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NODIFF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1048:8: ( 'NODIFF' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1048:10: 'NODIFF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1048:8: ( 'NODIFF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1048:10: 'NODIFF'
             {
             	Match("NODIFF"); 
 
@@ -11561,8 +11561,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NOFILTER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1049:10: ( 'NOFILTER' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1049:12: 'NOFILTER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1049:10: ( 'NOFILTER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1049:12: 'NOFILTER'
             {
             	Match("NOFILTER"); 
 
@@ -11585,8 +11585,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NOGDIF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1050:8: ( 'NOGDIF' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1050:10: 'NOGDIF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1050:8: ( 'NOGDIF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1050:10: 'NOGDIF'
             {
             	Match("NOGDIF"); 
 
@@ -11609,8 +11609,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NOGDIFF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1051:9: ( 'NOGDIFF' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1051:11: 'NOGDIFF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1051:9: ( 'NOGDIFF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1051:11: 'NOGDIFF'
             {
             	Match("NOGDIFF"); 
 
@@ -11633,8 +11633,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NOLEV;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1052:7: ( 'NOLEV' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1052:9: 'NOLEV'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1052:7: ( 'NOLEV' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1052:9: 'NOLEV'
             {
             	Match("NOLEV"); 
 
@@ -11657,8 +11657,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NONE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1053:6: ( 'NONE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1053:8: 'NONE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1053:6: ( 'NONE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1053:8: 'NONE'
             {
             	Match("NONE"); 
 
@@ -11681,8 +11681,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NONMODEL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1054:10: ( 'NONMODEL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1054:12: 'NONMODEL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1054:10: ( 'NONMODEL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1054:12: 'NONMODEL'
             {
             	Match("NONMODEL"); 
 
@@ -11705,8 +11705,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NOPCH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1055:7: ( 'NOPCH' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1055:9: 'NOPCH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1055:7: ( 'NOPCH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1055:9: 'NOPCH'
             {
             	Match("NOPCH"); 
 
@@ -11729,8 +11729,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SAVE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1056:6: ( 'SAVE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1056:8: 'SAVE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1056:6: ( 'SAVE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1056:8: 'SAVE'
             {
             	Match("SAVE"); 
 
@@ -11753,8 +11753,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NOT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1057:5: ( 'NOT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1057:7: 'NOT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1057:5: ( 'NOT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1057:7: 'NOT'
             {
             	Match("NOT"); 
 
@@ -11777,8 +11777,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NOTIFY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1058:8: ( 'NOTIFY' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1058:10: 'NOTIFY'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1058:8: ( 'NOTIFY' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1058:10: 'NOTIFY'
             {
             	Match("NOTIFY"); 
 
@@ -11801,8 +11801,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NOV;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1059:5: ( 'NOV' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1059:7: 'NOV'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1059:5: ( 'NOV' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1059:7: 'NOV'
             {
             	Match("NOV"); 
 
@@ -11825,8 +11825,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NWIDTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1060:8: ( 'NWIDTH' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1060:10: 'NWIDTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1060:8: ( 'NWIDTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1060:10: 'NWIDTH'
             {
             	Match("NWIDTH"); 
 
@@ -11849,8 +11849,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NYTVINDU;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1061:10: ( 'NYTVINDU' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1061:12: 'NYTVINDU'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1061:10: ( 'NYTVINDU' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1061:12: 'NYTVINDU'
             {
             	Match("NYTVINDU"); 
 
@@ -11873,8 +11873,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = OLS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1062:5: ( 'OLS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1062:7: 'OLS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1062:5: ( 'OLS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1062:7: 'OLS'
             {
             	Match("OLS"); 
 
@@ -11897,8 +11897,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = OPEN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1063:6: ( 'OPEN' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1063:8: 'OPEN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1063:6: ( 'OPEN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1063:8: 'OPEN'
             {
             	Match("OPEN"); 
 
@@ -11921,8 +11921,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = OPTION;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1064:8: ( 'OPTION' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1064:10: 'OPTION'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1064:8: ( 'OPTION' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1064:10: 'OPTION'
             {
             	Match("OPTION"); 
 
@@ -11945,8 +11945,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = OR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1065:4: ( 'OR' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1065:6: 'OR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1065:4: ( 'OR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1065:6: 'OR'
             {
             	Match("OR"); 
 
@@ -11969,8 +11969,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = P;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1066:3: ( 'P' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1066:5: 'P'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1066:3: ( 'P' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1066:5: 'P'
             {
             	Match('P'); 
 
@@ -11992,8 +11992,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PARAM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1067:7: ( 'PARAM' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1067:9: 'PARAM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1067:7: ( 'PARAM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1067:9: 'PARAM'
             {
             	Match("PARAM"); 
 
@@ -12016,8 +12016,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PATCH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1068:7: ( 'PATCH' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1068:9: 'PATCH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1068:7: ( 'PATCH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1068:9: 'PATCH'
             {
             	Match("PATCH"); 
 
@@ -12040,8 +12040,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PATH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1069:6: ( 'PATH' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1069:8: 'PATH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1069:6: ( 'PATH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1069:8: 'PATH'
             {
             	Match("PATH"); 
 
@@ -12064,8 +12064,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PAUSE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1070:7: ( 'PAUSE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1070:9: 'PAUSE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1070:7: ( 'PAUSE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1070:9: 'PAUSE'
             {
             	Match("PAUSE"); 
 
@@ -12088,8 +12088,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PCH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1071:5: ( 'PCH' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1071:7: 'PCH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1071:5: ( 'PCH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1071:7: 'PCH'
             {
             	Match("PCH"); 
 
@@ -12112,8 +12112,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PCIM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1072:6: ( 'PCIM' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1072:8: 'PCIM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1072:6: ( 'PCIM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1072:8: 'PCIM'
             {
             	Match("PCIM"); 
 
@@ -12136,8 +12136,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PCIMSTYLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1073:11: ( 'PCIMSTYLE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1073:13: 'PCIMSTYLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1073:11: ( 'PCIMSTYLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1073:13: 'PCIMSTYLE'
             {
             	Match("PCIMSTYLE"); 
 
@@ -12160,8 +12160,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = STYLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1074:7: ( 'STYLE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1074:9: 'STYLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1074:7: ( 'STYLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1074:9: 'STYLE'
             {
             	Match("STYLE"); 
 
@@ -12184,8 +12184,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PCTPRT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1075:8: ( 'PCTPRT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1075:10: 'PCTPRT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1075:8: ( 'PCTPRT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1075:10: 'PCTPRT'
             {
             	Match("PCTPRT"); 
 
@@ -12208,8 +12208,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PDEC;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1076:6: ( 'PDEC' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1076:8: 'PDEC'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1076:6: ( 'PDEC' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1076:8: 'PDEC'
             {
             	Match("PDEC"); 
 
@@ -12232,8 +12232,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PERIOD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1077:8: ( 'PERIOD' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1077:10: 'PERIOD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1077:8: ( 'PERIOD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1077:10: 'PERIOD'
             {
             	Match("PERIOD"); 
 
@@ -12256,8 +12256,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PIPE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1078:6: ( 'PIPE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1078:8: 'PIPE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1078:6: ( 'PIPE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1078:8: 'PIPE'
             {
             	Match("PIPE"); 
 
@@ -12280,8 +12280,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PLOT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1079:6: ( 'PLOT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1079:8: 'PLOT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1079:6: ( 'PLOT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1079:8: 'PLOT'
             {
             	Match("PLOT"); 
 
@@ -12304,8 +12304,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PLOTCODE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1080:10: ( 'PLOTCODE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1080:12: 'PLOTCODE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1080:10: ( 'PLOTCODE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1080:12: 'PLOTCODE'
             {
             	Match("PLOTCODE"); 
 
@@ -12328,8 +12328,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CUT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1081:5: ( 'CUT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1081:7: 'CUT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1081:5: ( 'CUT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1081:7: 'CUT'
             {
             	Match("CUT"); 
 
@@ -12352,8 +12352,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = POINTS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1082:8: ( 'POINTS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1082:10: 'POINTS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1082:8: ( 'POINTS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1082:10: 'POINTS'
             {
             	Match("POINTS"); 
 
@@ -12376,8 +12376,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = POS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1083:5: ( 'POS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1083:7: 'POS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1083:5: ( 'POS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1083:7: 'POS'
             {
             	Match("POS"); 
 
@@ -12400,8 +12400,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PREFIX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1084:8: ( 'PREFIX' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1084:10: 'PREFIX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1084:8: ( 'PREFIX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1084:10: 'PREFIX'
             {
             	Match("PREFIX"); 
 
@@ -12424,8 +12424,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PRETTY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1085:8: ( 'PRETTY' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1085:10: 'PRETTY'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1085:8: ( 'PRETTY' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1085:10: 'PRETTY'
             {
             	Match("PRETTY"); 
 
@@ -12448,8 +12448,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PRI;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1086:5: ( 'PRI' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1086:7: 'PRI'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1086:5: ( 'PRI' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1086:7: 'PRI'
             {
             	Match("PRI"); 
 
@@ -12472,8 +12472,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PRIM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1087:6: ( 'PRIM' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1087:8: 'PRIM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1087:6: ( 'PRIM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1087:8: 'PRIM'
             {
             	Match("PRIM"); 
 
@@ -12496,8 +12496,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PRINT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1088:7: ( 'PRINT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1088:9: 'PRINT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1088:7: ( 'PRINT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1088:9: 'PRINT'
             {
             	Match("PRINT"); 
 
@@ -12520,8 +12520,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = OPERATORS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1089:11: ( 'OPERATORS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1089:13: 'OPERATORS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1089:11: ( 'OPERATORS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1089:13: 'OPERATORS'
             {
             	Match("OPERATORS"); 
 
@@ -12544,8 +12544,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PRN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1090:5: ( 'PRN' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1090:7: 'PRN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1090:5: ( 'PRN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1090:7: 'PRN'
             {
             	Match("PRN"); 
 
@@ -12568,8 +12568,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PROT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1091:6: ( 'PROT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1091:8: 'PROT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1091:6: ( 'PROT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1091:8: 'PROT'
             {
             	Match("PROT"); 
 
@@ -12592,8 +12592,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PRT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1092:5: ( 'PRT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1092:7: 'PRT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1092:5: ( 'PRT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1092:7: 'PRT'
             {
             	Match("PRT"); 
 
@@ -12616,8 +12616,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PRTX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1093:6: ( 'PRTX' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1093:8: 'PRTX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1093:6: ( 'PRTX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1093:8: 'PRTX'
             {
             	Match("PRTX"); 
 
@@ -12640,8 +12640,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PUDVALG;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1094:9: ( 'PUDVALG' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1094:11: 'PUDVALG'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1094:9: ( 'PUDVALG' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1094:11: 'PUDVALG'
             {
             	Match("PUDVALG"); 
 
@@ -12664,8 +12664,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PWIDTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1095:8: ( 'PWIDTH' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1095:10: 'PWIDTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1095:8: ( 'PWIDTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1095:10: 'PWIDTH'
             {
             	Match("PWIDTH"); 
 
@@ -12688,8 +12688,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = Q;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1096:3: ( 'Q' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1096:5: 'Q'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1096:3: ( 'Q' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1096:5: 'Q'
             {
             	Match('Q'); 
 
@@ -12711,8 +12711,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = R;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1097:3: ( 'R' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1097:5: 'R'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1097:3: ( 'R' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1097:5: 'R'
             {
             	Match('R'); 
 
@@ -12734,8 +12734,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = R_EXPORT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1098:10: ( 'R_EXPORT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1098:12: 'R_EXPORT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1098:10: ( 'R_EXPORT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1098:12: 'R_EXPORT'
             {
             	Match("R_EXPORT"); 
 
@@ -12758,8 +12758,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = R_FILE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1099:8: ( 'R_FILE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1099:10: 'R_FILE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1099:8: ( 'R_FILE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1099:10: 'R_FILE'
             {
             	Match("R_FILE"); 
 
@@ -12782,8 +12782,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = R_RUN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1100:7: ( 'R_RUN' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1100:9: 'R_RUN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1100:7: ( 'R_RUN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1100:9: 'R_RUN'
             {
             	Match("R_RUN"); 
 
@@ -12806,8 +12806,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PYTHON_EXPORT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1101:15: ( 'PYTHON_EXPORT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1101:17: 'PYTHON_EXPORT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1101:15: ( 'PYTHON_EXPORT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1101:17: 'PYTHON_EXPORT'
             {
             	Match("PYTHON_EXPORT"); 
 
@@ -12830,8 +12830,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PYTHON_FILE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1102:13: ( 'PYTHON_FILE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1102:15: 'PYTHON_FILE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1102:13: ( 'PYTHON_FILE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1102:15: 'PYTHON_FILE'
             {
             	Match("PYTHON_FILE"); 
 
@@ -12854,8 +12854,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PYTHON_RUN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1103:12: ( 'PYTHON_RUN' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1103:14: 'PYTHON_RUN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1103:12: ( 'PYTHON_RUN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1103:14: 'PYTHON_RUN'
             {
             	Match("PYTHON_RUN"); 
 
@@ -12878,8 +12878,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1104:4: ( 'RD' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1104:6: 'RD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1104:4: ( 'RD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1104:6: 'RD'
             {
             	Match("RD"); 
 
@@ -12902,8 +12902,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RDP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1105:5: ( 'RDP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1105:7: 'RDP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1105:5: ( 'RDP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1105:7: 'RDP'
             {
             	Match("RDP"); 
 
@@ -12926,8 +12926,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = READ;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1106:6: ( 'READ' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1106:8: 'READ'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1106:6: ( 'READ' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1106:8: 'READ'
             {
             	Match("READ"); 
 
@@ -12950,8 +12950,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = REF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1107:5: ( 'REF' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1107:7: 'REF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1107:5: ( 'REF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1107:7: 'REF'
             {
             	Match("REF"); 
 
@@ -12974,8 +12974,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = REL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1108:5: ( 'REL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1108:7: 'REL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1108:5: ( 'REL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1108:7: 'REL'
             {
             	Match("REL"); 
 
@@ -12998,8 +12998,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RENAME;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1109:8: ( 'RENAME' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1109:10: 'RENAME'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1109:8: ( 'RENAME' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1109:10: 'RENAME'
             {
             	Match("RENAME"); 
 
@@ -13022,8 +13022,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = REORDER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1110:9: ( 'REORDER' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1110:11: 'REORDER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1110:9: ( 'REORDER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1110:11: 'REORDER'
             {
             	Match("REORDER"); 
 
@@ -13046,8 +13046,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = REP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1111:5: ( 'REP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1111:7: 'REP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1111:5: ( 'REP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1111:7: 'REP'
             {
             	Match("REP"); 
 
@@ -13070,8 +13070,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = REPEAT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1112:8: ( 'REPEAT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1112:10: 'REPEAT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1112:8: ( 'REPEAT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1112:10: 'REPEAT'
             {
             	Match("REPEAT"); 
 
@@ -13094,8 +13094,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = REPLACE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1113:9: ( 'REPLACE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1113:11: 'REPLACE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1113:9: ( 'REPLACE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1113:11: 'REPLACE'
             {
             	Match("REPLACE"); 
 
@@ -13118,8 +13118,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1114:5: ( 'RES' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1114:7: 'RES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1114:5: ( 'RES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1114:7: 'RES'
             {
             	Match("RES"); 
 
@@ -13142,8 +13142,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RESET;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1115:7: ( 'RESET' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1115:9: 'RESET'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1115:7: ( 'RESET' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1115:9: 'RESET'
             {
             	Match("RESET"); 
 
@@ -13166,8 +13166,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BLOCK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1116:7: ( 'BLOCK' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1116:9: 'BLOCK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1116:7: ( 'BLOCK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1116:9: 'BLOCK'
             {
             	Match("BLOCK"); 
 
@@ -13190,8 +13190,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RESPECT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1117:9: ( 'RESPECT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1117:11: 'RESPECT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1117:9: ( 'RESPECT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1117:11: 'RESPECT'
             {
             	Match("RESPECT"); 
 
@@ -13214,8 +13214,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RESTART;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1118:9: ( 'RESTART' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1118:11: 'RESTART'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1118:9: ( 'RESTART' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1118:11: 'RESTART'
             {
             	Match("RESTART"); 
 
@@ -13238,8 +13238,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RING;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1119:6: ( 'RING' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1119:8: 'RING'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1119:6: ( 'RING' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1119:8: 'RING'
             {
             	Match("RING"); 
 
@@ -13262,8 +13262,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1120:4: ( 'RN' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1120:6: 'RN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1120:4: ( 'RN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1120:6: 'RN'
             {
             	Match("RN"); 
 
@@ -13286,8 +13286,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ROWS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1121:6: ( 'ROWS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1121:8: 'ROWS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1121:6: ( 'ROWS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1121:8: 'ROWS'
             {
             	Match("ROWS"); 
 
@@ -13310,8 +13310,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GROUP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1122:7: ( 'GROUP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1122:9: 'GROUP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1122:7: ( 'GROUP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1122:9: 'GROUP'
             {
             	Match("GROUP"); 
 
@@ -13334,8 +13334,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LEVEL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1123:7: ( 'LEVEL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1123:9: 'LEVEL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1123:7: ( 'LEVEL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1123:9: 'LEVEL'
             {
             	Match("LEVEL"); 
 
@@ -13358,8 +13358,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LINK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1124:6: ( 'LINK' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1124:8: 'LINK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1124:6: ( 'LINK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1124:8: 'LINK'
             {
             	Match("LINK"); 
 
@@ -13382,8 +13382,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = WHERE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1125:7: ( 'WHERE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1125:9: 'WHERE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1125:7: ( 'WHERE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1125:9: 'WHERE'
             {
             	Match("WHERE"); 
 
@@ -13406,8 +13406,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1126:4: ( 'RP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1126:6: 'RP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1126:4: ( 'RP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1126:6: 'RP'
             {
             	Match("RP"); 
 
@@ -13430,8 +13430,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RUN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1127:5: ( 'RUN' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1127:7: 'RUN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1127:5: ( 'RUN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1127:7: 'RUN'
             {
             	Match("RUN"); 
 
@@ -13454,8 +13454,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LIBRARY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1128:9: ( 'LIBRARY' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1128:11: 'LIBRARY'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1128:9: ( 'LIBRARY' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1128:11: 'LIBRARY'
             {
             	Match("LIBRARY"); 
 
@@ -13478,8 +13478,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SEARCH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1129:8: ( 'SEARCH' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1129:10: 'SEARCH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1129:8: ( 'SEARCH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1129:10: 'SEARCH'
             {
             	Match("SEARCH"); 
 
@@ -13502,8 +13502,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SEC;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1130:5: ( 'SEC' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1130:7: 'SEC'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1130:5: ( 'SEC' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1130:7: 'SEC'
             {
             	Match("SEC"); 
 
@@ -13526,8 +13526,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SECONDCOLWIDTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1131:16: ( 'SECONDCOLWIDTH' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1131:18: 'SECONDCOLWIDTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1131:16: ( 'SECONDCOLWIDTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1131:18: 'SECONDCOLWIDTH'
             {
             	Match("SECONDCOLWIDTH"); 
 
@@ -13550,8 +13550,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SER2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1132:6: ( 'S___ER' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1132:8: 'S___ER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1132:6: ( 'S___ER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1132:8: 'S___ER'
             {
             	Match("S___ER"); 
 
@@ -13574,8 +13574,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SER3;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1133:6: ( 'S____ER' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1133:8: 'S____ER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1133:6: ( 'S____ER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1133:8: 'S____ER'
             {
             	Match("S____ER"); 
 
@@ -13598,8 +13598,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1134:5: ( 'SER' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1134:7: 'SER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1134:5: ( 'SER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1134:7: 'SER'
             {
             	Match("SER"); 
 
@@ -13622,8 +13622,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SERIES2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1135:9: ( 'S___ERIES' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1135:11: 'S___ERIES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1135:9: ( 'S___ERIES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1135:11: 'S___ERIES'
             {
             	Match("S___ERIES"); 
 
@@ -13646,8 +13646,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SERIES3;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1136:9: ( 'S____ERIES' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1136:11: 'S____ERIES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1136:9: ( 'S____ERIES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1136:11: 'S____ERIES'
             {
             	Match("S____ERIES"); 
 
@@ -13670,8 +13670,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SERIES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1137:8: ( 'SERIES' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1137:10: 'SERIES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1137:8: ( 'SERIES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1137:10: 'SERIES'
             {
             	Match("SERIES"); 
 
@@ -13694,8 +13694,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SET;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1138:5: ( 'SET' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1138:7: 'SET'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1138:5: ( 'SET' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1138:7: 'SET'
             {
             	Match("SET"); 
 
@@ -13718,8 +13718,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SETBORDER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1139:11: ( 'SETBORDER' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1139:13: 'SETBORDER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1139:11: ( 'SETBORDER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1139:13: 'SETBORDER'
             {
             	Match("SETBORDER"); 
 
@@ -13742,8 +13742,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SETBOTTOMBORDER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1140:17: ( 'SETBOTTOMBORDER' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1140:19: 'SETBOTTOMBORDER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1140:17: ( 'SETBOTTOMBORDER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1140:19: 'SETBOTTOMBORDER'
             {
             	Match("SETBOTTOMBORDER"); 
 
@@ -13766,8 +13766,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SETDATES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1141:10: ( 'SETDATES' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1141:12: 'SETDATES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1141:10: ( 'SETDATES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1141:12: 'SETDATES'
             {
             	Match("SETDATES"); 
 
@@ -13790,8 +13790,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SETLEFTBORDER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1142:15: ( 'SETLEFTBORDER' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1142:17: 'SETLEFTBORDER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1142:15: ( 'SETLEFTBORDER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1142:17: 'SETLEFTBORDER'
             {
             	Match("SETLEFTBORDER"); 
 
@@ -13814,8 +13814,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SETRIGHTBORDER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1143:16: ( 'SETRIGHTBORDER' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1143:18: 'SETRIGHTBORDER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1143:16: ( 'SETRIGHTBORDER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1143:18: 'SETRIGHTBORDER'
             {
             	Match("SETRIGHTBORDER"); 
 
@@ -13838,8 +13838,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SETTEXT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1144:9: ( 'SETTEXT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1144:11: 'SETTEXT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1144:9: ( 'SETTEXT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1144:11: 'SETTEXT'
             {
             	Match("SETTEXT"); 
 
@@ -13862,8 +13862,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SETTOPBORDER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1145:14: ( 'SETTOPBORDER' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1145:16: 'SETTOPBORDER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1145:14: ( 'SETTOPBORDER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1145:16: 'SETTOPBORDER'
             {
             	Match("SETTOPBORDER"); 
 
@@ -13886,8 +13886,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SETVALUES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1146:11: ( 'SETVALUES' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1146:13: 'SETVALUES'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1146:11: ( 'SETVALUES' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1146:13: 'SETVALUES'
             {
             	Match("SETVALUES"); 
 
@@ -13910,8 +13910,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SHEET;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1147:7: ( 'SHEET' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1147:9: 'SHEET'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1147:7: ( 'SHEET' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1147:9: 'SHEET'
             {
             	Match("SHEET"); 
 
@@ -13934,8 +13934,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SHOW;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1148:6: ( 'SHOW' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1148:8: 'SHOW'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1148:6: ( 'SHOW' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1148:8: 'SHOW'
             {
             	Match("SHOW"); 
 
@@ -13958,8 +13958,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SHOWBORDERS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1149:13: ( 'SHOWBORDERS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1149:15: 'SHOWBORDERS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1149:13: ( 'SHOWBORDERS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1149:15: 'SHOWBORDERS'
             {
             	Match("SHOWBORDERS"); 
 
@@ -13982,8 +13982,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SHOWPCH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1150:9: ( 'SHOWPCH' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1150:11: 'SHOWPCH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1150:9: ( 'SHOWPCH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1150:11: 'SHOWPCH'
             {
             	Match("SHOWPCH"); 
 
@@ -14006,8 +14006,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SIGN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1151:6: ( 'SIGN' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1151:8: 'SIGN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1151:6: ( 'SIGN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1151:8: 'SIGN'
             {
             	Match("SIGN"); 
 
@@ -14030,8 +14030,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SIM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1152:5: ( 'SIM' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1152:7: 'SIM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1152:5: ( 'SIM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1152:7: 'SIM'
             {
             	Match("SIM"); 
 
@@ -14054,8 +14054,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SIMPLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1153:8: ( 'SIMPLE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1153:10: 'SIMPLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1153:8: ( 'SIMPLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1153:10: 'SIMPLE'
             {
             	Match("SIMPLE"); 
 
@@ -14078,8 +14078,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SKIP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1154:6: ( 'SKIP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1154:8: 'SKIP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1154:6: ( 'SKIP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1154:8: 'SKIP'
             {
             	Match("SKIP"); 
 
@@ -14102,8 +14102,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NAN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1155:5: ( 'NAN' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1155:7: 'NAN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1155:5: ( 'NAN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1155:7: 'NAN'
             {
             	Match("NAN"); 
 
@@ -14126,8 +14126,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ENGINE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1156:8: ( 'ENGINE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1156:10: 'ENGINE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1156:8: ( 'ENGINE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1156:10: 'ENGINE'
             {
             	Match("ENGINE"); 
 
@@ -14150,8 +14150,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = NORMAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1157:8: ( 'NORMAL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1157:10: 'NORMAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1157:8: ( 'NORMAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1157:10: 'NORMAL'
             {
             	Match("NORMAL"); 
 
@@ -14174,8 +14174,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SMOOTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1158:8: ( 'SMOOTH' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1158:10: 'SMOOTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1158:8: ( 'SMOOTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1158:10: 'SMOOTH'
             {
             	Match("SMOOTH"); 
 
@@ -14198,8 +14198,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SOLVE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1159:7: ( 'SOLVE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1159:9: 'SOLVE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1159:7: ( 'SOLVE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1159:9: 'SOLVE'
             {
             	Match("SOLVE"); 
 
@@ -14222,8 +14222,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SOME;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1160:6: ( 'SOME' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1160:8: 'SOME'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1160:6: ( 'SOME' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1160:8: 'SOME'
             {
             	Match("SOME"); 
 
@@ -14246,8 +14246,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SORT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1161:6: ( 'SORT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1161:8: 'SORT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1161:6: ( 'SORT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1161:8: 'SORT'
             {
             	Match("SORT"); 
 
@@ -14270,8 +14270,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SOUND;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1162:7: ( 'SOUND' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1162:9: 'SOUND'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1162:7: ( 'SOUND' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1162:9: 'SOUND'
             {
             	Match("SOUND"); 
 
@@ -14294,8 +14294,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SOURCE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1163:8: ( 'SOURCE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1163:10: 'SOURCE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1163:8: ( 'SOURCE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1163:10: 'SOURCE'
             {
             	Match("SOURCE"); 
 
@@ -14318,8 +14318,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SPECIALMINUS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1164:14: ( 'SPECIALMINUS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1164:16: 'SPECIALMINUS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1164:14: ( 'SPECIALMINUS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1164:16: 'SPECIALMINUS'
             {
             	Match("SPECIALMINUS"); 
 
@@ -14342,8 +14342,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SPLICE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1165:8: ( 'SPLICE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1165:10: 'SPLICE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1165:8: ( 'SPLICE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1165:10: 'SPLICE'
             {
             	Match("SPLICE"); 
 
@@ -14366,8 +14366,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SPLINE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1166:8: ( 'SPLINE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1166:10: 'SPLINE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1166:8: ( 'SPLINE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1166:10: 'SPLINE'
             {
             	Match("SPLINE"); 
 
@@ -14390,8 +14390,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SPLIT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1167:7: ( 'SPLIT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1167:9: 'SPLIT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1167:7: ( 'SPLIT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1167:9: 'SPLIT'
             {
             	Match("SPLIT"); 
 
@@ -14414,8 +14414,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = STACKED;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1168:9: ( 'STACKED' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1168:11: 'STACKED'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1168:9: ( 'STACKED' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1168:11: 'STACKED'
             {
             	Match("STACKED"); 
 
@@ -14438,8 +14438,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = STAMP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1169:7: ( 'STAMP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1169:9: 'STAMP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1169:7: ( 'STAMP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1169:9: 'STAMP'
             {
             	Match("STAMP"); 
 
@@ -14462,8 +14462,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = STARTFILE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1170:11: ( 'STARTFILE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1170:13: 'STARTFILE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1170:11: ( 'STARTFILE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1170:13: 'STARTFILE'
             {
             	Match("STARTFILE"); 
 
@@ -14486,8 +14486,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = STATIC;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1171:8: ( 'STATIC' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1171:10: 'STATIC'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1171:8: ( 'STATIC' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1171:10: 'STATIC'
             {
             	Match("STATIC"); 
 
@@ -14510,8 +14510,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = CHECK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1172:7: ( 'CHECK' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1172:9: 'CHECK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1172:7: ( 'CHECK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1172:9: 'CHECK'
             {
             	Match("CHECK"); 
 
@@ -14534,8 +14534,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = STEP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1173:6: ( 'STEP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1173:8: 'STEP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1173:6: ( 'STEP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1173:8: 'STEP'
             {
             	Match("STEP"); 
 
@@ -14558,8 +14558,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = STOP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1174:6: ( 'STOP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1174:8: 'STOP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1174:6: ( 'STOP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1174:8: 'STOP'
             {
             	Match("STOP"); 
 
@@ -14582,8 +14582,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = STRIP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1175:7: ( 'STRIP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1175:9: 'STRIP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1175:7: ( 'STRIP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1175:9: 'STRIP'
             {
             	Match("STRIP"); 
 
@@ -14606,8 +14606,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SUFFIX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1176:8: ( 'SUFFIX' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1176:10: 'SUFFIX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1176:8: ( 'SUFFIX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1176:10: 'SUFFIX'
             {
             	Match("SUFFIX"); 
 
@@ -14630,8 +14630,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SUGGESTIONS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1177:13: ( 'SUGGESTIONS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1177:15: 'SUGGESTIONS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1177:13: ( 'SUGGESTIONS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1177:15: 'SUGGESTIONS'
             {
             	Match("SUGGESTIONS"); 
 
@@ -14654,8 +14654,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SWAP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1178:6: ( 'SWAP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1178:8: 'SWAP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1178:6: ( 'SWAP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1178:8: 'SWAP'
             {
             	Match("SWAP"); 
 
@@ -14678,8 +14678,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SYS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1179:5: ( 'SYS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1179:7: 'SYS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1179:5: ( 'SYS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1179:7: 'SYS'
             {
             	Match("SYS"); 
 
@@ -14702,8 +14702,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SYSTEM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1180:8: ( 'SYSTEM' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1180:10: 'SYSTEM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1180:8: ( 'SYSTEM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1180:10: 'SYSTEM'
             {
             	Match("SYSTEM"); 
 
@@ -14726,8 +14726,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TABLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1181:7: ( 'TABLE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1181:9: 'TABLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1181:7: ( 'TABLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1181:9: 'TABLE'
             {
             	Match("TABLE"); 
 
@@ -14750,8 +14750,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TABLE1;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1182:8: ( 'TABLE1' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1182:10: 'TABLE1'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1182:8: ( 'TABLE1' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1182:10: 'TABLE1'
             {
             	Match("TABLE1"); 
 
@@ -14774,8 +14774,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TABLE2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1183:8: ( 'TABLE2' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1183:10: 'TABLE2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1183:8: ( 'TABLE2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1183:10: 'TABLE2'
             {
             	Match("TABLE2"); 
 
@@ -14798,8 +14798,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TABLEOLD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1184:10: ( 'TABLEOLD' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1184:12: 'TABLEOLD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1184:10: ( 'TABLEOLD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1184:12: 'TABLEOLD'
             {
             	Match("TABLEOLD"); 
 
@@ -14822,8 +14822,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TABS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1185:6: ( 'TABS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1185:8: 'TABS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1185:6: ( 'TABS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1185:8: 'TABS'
             {
             	Match("TABS"); 
 
@@ -14846,8 +14846,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TARGET;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1186:8: ( 'TARGET' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1186:10: 'TARGET'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1186:8: ( 'TARGET' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1186:10: 'TARGET'
             {
             	Match("TARGET"); 
 
@@ -14870,8 +14870,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TELL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1187:6: ( 'TELL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1187:8: 'TELL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1187:6: ( 'TELL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1187:8: 'TELL'
             {
             	Match("TELL"); 
 
@@ -14894,8 +14894,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TEMP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1188:6: ( 'TEMP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1188:8: 'TEMP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1188:6: ( 'TEMP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1188:8: 'TEMP'
             {
             	Match("TEMP"); 
 
@@ -14918,8 +14918,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TERMINAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1189:10: ( 'TERMINAL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1189:12: 'TERMINAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1189:10: ( 'TERMINAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1189:12: 'TERMINAL'
             {
             	Match("TERMINAL"); 
 
@@ -14942,8 +14942,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TEST;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1190:6: ( 'TEST' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1190:8: 'TEST'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1190:6: ( 'TEST' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1190:8: 'TEST'
             {
             	Match("TEST"); 
 
@@ -14966,8 +14966,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TESTRANDOMMODEL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1191:17: ( 'TESTRANDOMMODEL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1191:19: 'TESTRANDOMMODEL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1191:17: ( 'TESTRANDOMMODEL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1191:19: 'TESTRANDOMMODEL'
             {
             	Match("TESTRANDOMMODEL"); 
 
@@ -14990,8 +14990,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TESTRANDOMMODELCHECK;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1192:22: ( 'TESTRANDOMMODELCHECK' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1192:24: 'TESTRANDOMMODELCHECK'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1192:22: ( 'TESTRANDOMMODELCHECK' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1192:24: 'TESTRANDOMMODELCHECK'
             {
             	Match("TESTRANDOMMODELCHECK"); 
 
@@ -15014,8 +15014,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TESTSIM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1193:9: ( 'TESTSIM' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1193:11: 'TESTSIM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1193:9: ( 'TESTSIM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1193:11: 'TESTSIM'
             {
             	Match("TESTSIM"); 
 
@@ -15038,8 +15038,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TIME;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1194:6: ( 'TIME' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1194:8: 'TIME'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1194:6: ( 'TIME' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1194:8: 'TIME'
             {
             	Match("TIME"); 
 
@@ -15062,8 +15062,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TIMEFILTER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1195:12: ( 'TIMEFILTER' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1195:14: 'TIMEFILTER'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1195:12: ( 'TIMEFILTER' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1195:14: 'TIMEFILTER'
             {
             	Match("TIMEFILTER"); 
 
@@ -15086,8 +15086,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = UNIT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1196:6: ( 'UNIT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1196:8: 'UNIT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1196:6: ( 'UNIT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1196:8: 'UNIT'
             {
             	Match("UNIT"); 
 
@@ -15110,8 +15110,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = UNITS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1197:7: ( 'UNITS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1197:9: 'UNITS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1197:7: ( 'UNITS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1197:9: 'UNITS'
             {
             	Match("UNITS"); 
 
@@ -15134,8 +15134,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TIMESPAN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1198:10: ( 'TIMESPAN' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1198:12: 'TIMESPAN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1198:10: ( 'TIMESPAN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1198:12: 'TIMESPAN'
             {
             	Match("TIMESPAN"); 
 
@@ -15158,8 +15158,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TITLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1199:7: ( 'TITLE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1199:9: 'TITLE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1199:7: ( 'TITLE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1199:9: 'TITLE'
             {
             	Match("TITLE"); 
 
@@ -15182,8 +15182,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TO;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1200:4: ( 'TO' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1200:6: 'TO'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1200:4: ( 'TO' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1200:6: 'TO'
             {
             	Match("TO"); 
 
@@ -15206,8 +15206,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TOTAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1201:7: ( 'TOTAL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1201:9: 'TOTAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1201:7: ( 'TOTAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1201:9: 'TOTAL'
             {
             	Match("TOTAL"); 
 
@@ -15230,8 +15230,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TRACE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1202:7: ( 'TRACE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1202:9: 'TRACE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1202:7: ( 'TRACE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1202:9: 'TRACE'
             {
             	Match("TRACE"); 
 
@@ -15254,8 +15254,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TRACE2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1203:8: ( 'TRACE2' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1203:10: 'TRACE2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1203:8: ( 'TRACE2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1203:10: 'TRACE2'
             {
             	Match("TRACE2"); 
 
@@ -15278,8 +15278,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TRANSLATE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1204:11: ( 'TRANSLATE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1204:13: 'TRANSLATE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1204:11: ( 'TRANSLATE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1204:13: 'TRANSLATE'
             {
             	Match("TRANSLATE"); 
 
@@ -15302,8 +15302,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TRANSPOSE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1205:11: ( 'TRANSPOSE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1205:13: 'TRANSPOSE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1205:11: ( 'TRANSPOSE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1205:13: 'TRANSPOSE'
             {
             	Match("TRANSPOSE"); 
 
@@ -15326,8 +15326,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TREL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1206:6: ( 'TREL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1206:8: 'TREL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1206:6: ( 'TREL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1206:8: 'TREL'
             {
             	Match("TREL"); 
 
@@ -15350,8 +15350,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TRUE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1207:6: ( 'true' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1207:8: 'true'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1207:6: ( 'true' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1207:8: 'true'
             {
             	Match("true"); 
 
@@ -15374,8 +15374,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TRUNCATE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1208:10: ( 'TRUNCATE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1208:12: 'TRUNCATE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1208:10: ( 'TRUNCATE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1208:12: 'TRUNCATE'
             {
             	Match("TRUNCATE"); 
 
@@ -15398,8 +15398,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TSD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1209:5: ( 'TSD' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1209:7: 'TSD'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1209:5: ( 'TSD' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1209:7: 'TSD'
             {
             	Match("TSD"); 
 
@@ -15422,8 +15422,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TSDX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1210:6: ( 'TSDX' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1210:8: 'TSDX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1210:6: ( 'TSDX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1210:8: 'TSDX'
             {
             	Match("TSDX"); 
 
@@ -15446,8 +15446,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TSP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1211:5: ( 'TSP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1211:7: 'TSP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1211:5: ( 'TSP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1211:7: 'TSP'
             {
             	Match("TSP"); 
 
@@ -15470,8 +15470,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TXT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1212:5: ( 'TXT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1212:7: 'TXT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1212:5: ( 'TXT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1212:7: 'TXT'
             {
             	Match("TXT"); 
 
@@ -15494,8 +15494,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TYPE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1213:6: ( 'TYPE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1213:8: 'TYPE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1213:6: ( 'TYPE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1213:8: 'TYPE'
             {
             	Match("TYPE"); 
 
@@ -15518,8 +15518,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = U;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1214:3: ( 'U' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1214:5: 'U'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1214:3: ( 'U' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1214:5: 'U'
             {
             	Match('U'); 
 
@@ -15541,8 +15541,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = UABS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1215:6: ( '_ABS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1215:8: '_ABS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1215:6: ( '_ABS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1215:8: '_ABS'
             {
             	Match("_ABS"); 
 
@@ -15565,8 +15565,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = UDIF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1216:6: ( '_DIF' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1216:8: '_DIF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1216:6: ( '_DIF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1216:8: '_DIF'
             {
             	Match("_DIF"); 
 
@@ -15589,8 +15589,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = UDIFF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1217:7: ( '_DIFF' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1217:9: '_DIFF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1217:7: ( '_DIFF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1217:9: '_DIFF'
             {
             	Match("_DIFF"); 
 
@@ -15613,8 +15613,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = UDVALG;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1218:8: ( 'UDVALG' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1218:10: 'UDVALG'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1218:8: ( 'UDVALG' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1218:10: 'UDVALG'
             {
             	Match("UDVALG"); 
 
@@ -15637,8 +15637,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = UGDIF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1219:7: ( '_GDIF' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1219:9: '_GDIF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1219:7: ( '_GDIF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1219:9: '_GDIF'
             {
             	Match("_GDIF"); 
 
@@ -15661,8 +15661,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = UGDIFF;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1220:8: ( '_GDIFF' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1220:10: '_GDIFF'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1220:8: ( '_GDIFF' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1220:10: '_GDIFF'
             {
             	Match("_GDIFF"); 
 
@@ -15685,8 +15685,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ULEV;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1221:6: ( '_LEV' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1221:8: '_LEV'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1221:6: ( '_LEV' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1221:8: '_LEV'
             {
             	Match("_LEV"); 
 
@@ -15709,8 +15709,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = UNDO;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1222:6: ( 'UNDO' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1222:8: 'UNDO'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1222:6: ( 'UNDO' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1222:8: 'UNDO'
             {
             	Match("UNDO"); 
 
@@ -15733,8 +15733,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = UNFIX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1223:7: ( 'UNFIX' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1223:9: 'UNFIX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1223:7: ( 'UNFIX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1223:9: 'UNFIX'
             {
             	Match("UNFIX"); 
 
@@ -15757,8 +15757,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SPEEDUP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1224:9: ( 'SPEEDUP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1224:11: 'SPEEDUP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1224:9: ( 'SPEEDUP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1224:11: 'SPEEDUP'
             {
             	Match("SPEEDUP"); 
 
@@ -15781,8 +15781,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = UNSWAP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1225:8: ( 'UNSWAP' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1225:10: 'UNSWAP'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1225:8: ( 'UNSWAP' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1225:10: 'UNSWAP'
             {
             	Match("UNSWAP"); 
 
@@ -15805,8 +15805,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = UPCH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1226:6: ( '_PCH' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1226:8: '_PCH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1226:6: ( '_PCH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1226:8: '_PCH'
             {
             	Match("_PCH"); 
 
@@ -15829,8 +15829,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = UPDATEFREQ;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1227:12: ( 'UPDATEFREQ' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1227:14: 'UPDATEFREQ'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1227:12: ( 'UPDATEFREQ' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1227:14: 'UPDATEFREQ'
             {
             	Match("UPDATEFREQ"); 
 
@@ -15853,8 +15853,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = UPDX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1228:6: ( 'UPDX' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1228:8: 'UPDX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1228:6: ( 'UPDX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1228:8: 'UPDX'
             {
             	Match("UPDX"); 
 
@@ -15877,8 +15877,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = V;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1229:3: ( 'V' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1229:5: 'V'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1229:3: ( 'V' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1229:5: 'V'
             {
             	Match('V'); 
 
@@ -15900,8 +15900,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = VAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1230:5: ( 'VAL' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1230:7: 'VAL'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1230:5: ( 'VAL' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1230:7: 'VAL'
             {
             	Match("VAL"); 
 
@@ -15924,8 +15924,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = VAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1231:5: ( 'VAR' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1231:7: 'VAR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1231:5: ( 'VAR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1231:7: 'VAR'
             {
             	Match("VAR"); 
 
@@ -15948,8 +15948,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = VAR_KDUSJFLQO2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1232:16: ( 'VAR_KDUSJFLQO2' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1232:18: 'VAR_KDUSJFLQO2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1232:16: ( 'VAR_KDUSJFLQO2' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1232:18: 'VAR_KDUSJFLQO2'
             {
             	Match("VAR_KDUSJFLQO2"); 
 
@@ -15972,8 +15972,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = VALUE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1233:7: ( 'VALUE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1233:9: 'VALUE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1233:7: ( 'VALUE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1233:9: 'VALUE'
             {
             	Match("VALUE"); 
 
@@ -15996,8 +15996,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = VERS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1234:6: ( 'VERS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1234:8: 'VERS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1234:6: ( 'VERS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1234:8: 'VERS'
             {
             	Match("VERS"); 
 
@@ -16020,8 +16020,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = VERSION;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1235:9: ( 'VERSION' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1235:11: 'VERSION'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1235:9: ( 'VERSION' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1235:11: 'VERSION'
             {
             	Match("VERSION"); 
 
@@ -16044,8 +16044,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = VPRT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1236:6: ( 'VPRT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1236:8: 'VPRT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1236:6: ( 'VPRT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1236:8: 'VPRT'
             {
             	Match("VPRT"); 
 
@@ -16068,8 +16068,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = WAIT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1237:6: ( 'WAIT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1237:8: 'WAIT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1237:6: ( 'WAIT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1237:8: 'WAIT'
             {
             	Match("WAIT"); 
 
@@ -16092,8 +16092,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = WIDTH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1238:7: ( 'WIDTH' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1238:9: 'WIDTH'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1238:7: ( 'WIDTH' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1238:9: 'WIDTH'
             {
             	Match("WIDTH"); 
 
@@ -16116,8 +16116,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = WINDOW;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1239:8: ( 'WINDOW' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1239:10: 'WINDOW'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1239:8: ( 'WINDOW' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1239:10: 'WINDOW'
             {
             	Match("WINDOW"); 
 
@@ -16140,8 +16140,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = WORKING;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1240:9: ( 'WORKING' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1240:11: 'WORKING'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1240:9: ( 'WORKING' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1240:11: 'WORKING'
             {
             	Match("WORKING"); 
 
@@ -16164,8 +16164,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = WPLOT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1241:7: ( 'WPLOT' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1241:9: 'WPLOT'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1241:7: ( 'WPLOT' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1241:9: 'WPLOT'
             {
             	Match("WPLOT"); 
 
@@ -16188,8 +16188,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = WRITE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1242:7: ( 'WRITE' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1242:9: 'WRITE'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1242:7: ( 'WRITE' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1242:9: 'WRITE'
             {
             	Match("WRITE"); 
 
@@ -16212,8 +16212,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = WUDVALG;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1243:9: ( 'WUDVALG' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1243:11: 'WUDVALG'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1243:9: ( 'WUDVALG' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1243:11: 'WUDVALG'
             {
             	Match("WUDVALG"); 
 
@@ -16236,8 +16236,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = X12A;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1244:6: ( 'X12A' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1244:8: 'X12A'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1244:6: ( 'X12A' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1244:8: 'X12A'
             {
             	Match("X12A"); 
 
@@ -16260,8 +16260,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = XLS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1245:5: ( 'XLS' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1245:7: 'XLS'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1245:5: ( 'XLS' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1245:7: 'XLS'
             {
             	Match("XLS"); 
 
@@ -16284,8 +16284,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = XLSX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1246:6: ( 'XLSX' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1246:8: 'XLSX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1246:6: ( 'XLSX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1246:8: 'XLSX'
             {
             	Match("XLSX"); 
 
@@ -16308,8 +16308,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = YES;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1247:5: ( 'yes' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1247:7: 'yes'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1247:5: ( 'yes' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1247:7: 'yes'
             {
             	Match("yes"); 
 
@@ -16332,8 +16332,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = YMAX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1248:6: ( 'YMAX' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1248:8: 'YMAX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1248:6: ( 'YMAX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1248:8: 'YMAX'
             {
             	Match("YMAX"); 
 
@@ -16356,8 +16356,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = YMIN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1249:6: ( 'YMIN' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1249:8: 'YMIN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1249:6: ( 'YMIN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1249:8: 'YMIN'
             {
             	Match("YMIN"); 
 
@@ -16380,8 +16380,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = I;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1250:3: ( 'I' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1250:5: 'I'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1250:3: ( 'I' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1250:5: 'I'
             {
             	Match('I'); 
 
@@ -16403,8 +16403,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = Y2MAX;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1251:7: ( 'Y2MAX' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1251:9: 'Y2MAX'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1251:7: ( 'Y2MAX' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1251:9: 'Y2MAX'
             {
             	Match("Y2MAX"); 
 
@@ -16427,8 +16427,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = Y2MIN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1252:7: ( 'Y2MIN' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1252:9: 'Y2MIN'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1252:7: ( 'Y2MIN' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1252:9: 'Y2MIN'
             {
             	Match("Y2MIN"); 
 
@@ -16451,8 +16451,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ZERO;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1253:6: ( 'ZERO' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1253:8: 'ZERO'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1253:6: ( 'ZERO' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1253:8: 'ZERO'
             {
             	Match("ZERO"); 
 
@@ -16475,8 +16475,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ZOOM;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1254:6: ( 'ZOOM' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1254:8: 'ZOOM'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1254:6: ( 'ZOOM' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1254:8: 'ZOOM'
             {
             	Match("ZOOM"); 
 
@@ -16499,8 +16499,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ZVAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1255:6: ( 'ZVAR' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1255:8: 'ZVAR'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1255:6: ( 'ZVAR' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1255:8: 'ZVAR'
             {
             	Match("ZVAR"); 
 
@@ -16521,8 +16521,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5498:18: ( '\\n' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5498:29: '\\n'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5500:18: ( '\\n' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5500:29: '\\n'
             {
             	Match('\n'); 
 
@@ -16540,8 +16540,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5499:18: ( '\\r\\n' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5499:29: '\\r\\n'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5501:18: ( '\\r\\n' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5501:29: '\\r\\n'
             {
             	Match("\r\n"); 
 
@@ -16560,8 +16560,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5500:15: ( '0' .. '9' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5500:29: '0' .. '9'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5502:15: ( '0' .. '9' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5502:29: '0' .. '9'
             {
             	MatchRange('0','9'); 
 
@@ -16579,8 +16579,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5501:16: ( 'a' .. 'z' | 'A' .. 'Z' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5503:16: ( 'a' .. 'z' | 'A' .. 'Z' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:
             {
             	if ( (input.LA(1) >= 'A' && input.LA(1) <= 'Z') || (input.LA(1) >= 'a' && input.LA(1) <= 'z') ) 
             	{
@@ -16610,16 +16610,16 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = HTTP;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5503:5: ( H_ T_ T_ P_ ':' ( '//' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5503:29: H_ T_ T_ P_ ':' ( '//' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5505:5: ( H_ T_ T_ P_ ':' ( '//' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5505:29: H_ T_ T_ P_ ':' ( '//' )
             {
             	mH_(); 
             	mT_(); 
             	mT_(); 
             	mP_(); 
             	Match(':'); 
-            	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5503:46: ( '//' )
-            	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5503:47: '//'
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5505:46: ( '//' )
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5505:47: '//'
             	{
             		Match("//"); 
 
@@ -16645,8 +16645,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = HTTPS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5504:6: ( H_ T_ T_ P_ S_ ':' ( '//' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5504:29: H_ T_ T_ P_ S_ ':' ( '//' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5506:6: ( H_ T_ T_ P_ S_ ':' ( '//' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5506:29: H_ T_ T_ P_ S_ ':' ( '//' )
             {
             	mH_(); 
             	mT_(); 
@@ -16654,8 +16654,8 @@ public partial class Cmd4Lexer : Lexer {
             	mP_(); 
             	mS_(); 
             	Match(':'); 
-            	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5504:49: ( '//' )
-            	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5504:50: '//'
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5506:49: ( '//' )
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5506:50: '//'
             	{
             		Match("//"); 
 
@@ -16681,10 +16681,10 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = WHITESPACE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5506:11: ( ( '\\t' | ' ' | '\\u000C' | NEWLINE2 | NEWLINE3 )+ )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5506:29: ( '\\t' | ' ' | '\\u000C' | NEWLINE2 | NEWLINE3 )+
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5508:11: ( ( '\\t' | ' ' | '\\u000C' | NEWLINE2 | NEWLINE3 )+ )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5508:29: ( '\\t' | ' ' | '\\u000C' | NEWLINE2 | NEWLINE3 )+
             {
-            	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5506:29: ( '\\t' | ' ' | '\\u000C' | NEWLINE2 | NEWLINE3 )+
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5508:29: ( '\\t' | ' ' | '\\u000C' | NEWLINE2 | NEWLINE3 )+
             	int cnt1 = 0;
             	do 
             	{
@@ -16722,35 +16722,35 @@ public partial class Cmd4Lexer : Lexer {
             	    switch (alt1) 
             		{
             			case 1 :
-            			    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5506:31: '\\t'
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5508:31: '\\t'
             			    {
             			    	Match('\t'); 
 
             			    }
             			    break;
             			case 2 :
-            			    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5506:38: ' '
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5508:38: ' '
             			    {
             			    	Match(' '); 
 
             			    }
             			    break;
             			case 3 :
-            			    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5506:44: '\\u000C'
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5508:44: '\\u000C'
             			    {
             			    	Match('\f'); 
 
             			    }
             			    break;
             			case 4 :
-            			    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5506:54: NEWLINE2
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5508:54: NEWLINE2
             			    {
             			    	mNEWLINE2(); 
 
             			    }
             			    break;
             			case 5 :
-            			    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5506:65: NEWLINE3
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5508:65: NEWLINE3
             			    {
             			    	mNEWLINE3(); 
 
@@ -16789,18 +16789,18 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COMMENT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5508:8: ( ( '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )* )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5508:29: ( '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )*
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5510:8: ( ( '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )* )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5510:29: ( '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )*
             {
-            	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5508:29: ( '//' )
-            	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5508:30: '//'
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5510:29: ( '//' )
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5510:30: '//'
             	{
             		Match("//"); 
 
 
             	}
 
-            	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5508:36: (~ ( NEWLINE2 | NEWLINE3 ) )*
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5510:36: (~ ( NEWLINE2 | NEWLINE3 ) )*
             	do 
             	{
             	    int alt2 = 2;
@@ -16815,7 +16815,7 @@ public partial class Cmd4Lexer : Lexer {
             	    switch (alt2) 
             		{
             			case 1 :
-            			    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5508:37: ~ ( NEWLINE2 | NEWLINE3 )
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5510:37: ~ ( NEWLINE2 | NEWLINE3 )
             			    {
             			    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '\t') || (input.LA(1) >= '\u000B' && input.LA(1) <= '\uFFFF') ) 
             			    	{
@@ -16860,12 +16860,12 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COMMENT_MULTILINE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5509:18: ( '/*' ( options {greedy=false; } : COMMENT_MULTILINE | . )* '*/' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5509:29: '/*' ( options {greedy=false; } : COMMENT_MULTILINE | . )* '*/'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5511:18: ( '/*' ( options {greedy=false; } : COMMENT_MULTILINE | . )* '*/' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5511:29: '/*' ( options {greedy=false; } : COMMENT_MULTILINE | . )* '*/'
             {
             	Match("/*"); 
 
-            	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5509:34: ( options {greedy=false; } : COMMENT_MULTILINE | . )*
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5511:34: ( options {greedy=false; } : COMMENT_MULTILINE | . )*
             	do 
             	{
             	    int alt3 = 3;
@@ -16910,14 +16910,14 @@ public partial class Cmd4Lexer : Lexer {
             	    switch (alt3) 
             		{
             			case 1 :
-            			    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5509:60: COMMENT_MULTILINE
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5511:60: COMMENT_MULTILINE
             			    {
             			    	mCOMMENT_MULTILINE(); 
 
             			    }
             			    break;
             			case 2 :
-            			    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5509:80: .
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5511:80: .
             			    {
             			    	MatchAny(); 
 
@@ -16954,8 +16954,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = Ident;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5512:6: ( ( LETTER | '_' ) ( DIGIT | LETTER | '_' )* )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5512:29: ( LETTER | '_' ) ( DIGIT | LETTER | '_' )*
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5514:6: ( ( LETTER | '_' ) ( DIGIT | LETTER | '_' )* )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5514:29: ( LETTER | '_' ) ( DIGIT | LETTER | '_' )*
             {
             	if ( (input.LA(1) >= 'A' && input.LA(1) <= 'Z') || input.LA(1) == '_' || (input.LA(1) >= 'a' && input.LA(1) <= 'z') ) 
             	{
@@ -16968,7 +16968,7 @@ public partial class Cmd4Lexer : Lexer {
             	    Recover(mse);
             	    throw mse;}
 
-            	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5512:42: ( DIGIT | LETTER | '_' )*
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5514:42: ( DIGIT | LETTER | '_' )*
             	do 
             	{
             	    int alt4 = 2;
@@ -16983,7 +16983,7 @@ public partial class Cmd4Lexer : Lexer {
             	    switch (alt4) 
             		{
             			case 1 :
-            			    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:
             			    {
             			    	if ( (input.LA(1) >= '0' && input.LA(1) <= '9') || (input.LA(1) >= 'A' && input.LA(1) <= 'Z') || input.LA(1) == '_' || (input.LA(1) >= 'a' && input.LA(1) <= 'z') ) 
             			    	{
@@ -17028,10 +17028,10 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = Integer;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5514:8: ( ( DIGIT )+ )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5514:29: ( DIGIT )+
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5516:8: ( ( DIGIT )+ )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5516:29: ( DIGIT )+
             {
-            	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5514:29: ( DIGIT )+
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5516:29: ( DIGIT )+
             	int cnt5 = 0;
             	do 
             	{
@@ -17047,7 +17047,7 @@ public partial class Cmd4Lexer : Lexer {
             	    switch (alt5) 
             		{
             			case 1 :
-            			    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5514:29: DIGIT
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5516:29: DIGIT
             			    {
             			    	mDIGIT(); 
 
@@ -17085,10 +17085,10 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DigitsEDigits;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5516:14: ( ( DIGIT )+ ( E_ ) ( DIGIT )+ )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5516:29: ( DIGIT )+ ( E_ ) ( DIGIT )+
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5518:14: ( ( DIGIT )+ ( E_ ) ( DIGIT )+ )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5518:29: ( DIGIT )+ ( E_ ) ( DIGIT )+
             {
-            	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5516:29: ( DIGIT )+
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5518:29: ( DIGIT )+
             	int cnt6 = 0;
             	do 
             	{
@@ -17104,7 +17104,7 @@ public partial class Cmd4Lexer : Lexer {
             	    switch (alt6) 
             		{
             			case 1 :
-            			    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5516:29: DIGIT
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5518:29: DIGIT
             			    {
             			    	mDIGIT(); 
 
@@ -17123,14 +17123,14 @@ public partial class Cmd4Lexer : Lexer {
             	loop6:
             		;	// Stops C# compiler whining that label 'loop6' has no statements
 
-            	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5516:37: ( E_ )
-            	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5516:39: E_
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5518:37: ( E_ )
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5518:39: E_
             	{
             		mE_(); 
 
             	}
 
-            	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5516:45: ( DIGIT )+
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5518:45: ( DIGIT )+
             	int cnt7 = 0;
             	do 
             	{
@@ -17146,7 +17146,7 @@ public partial class Cmd4Lexer : Lexer {
             	    switch (alt7) 
             		{
             			case 1 :
-            			    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5516:45: DIGIT
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5518:45: DIGIT
             			    {
             			    	mDIGIT(); 
 
@@ -17184,15 +17184,15 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DateDef;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5522:8: ( ( DIGIT )+ M_ ( DIGIT )+ D_ ( DIGIT )+ | ( DIGIT )+ ( A_ | Q_ | M_ | W_ | U_ ) ( DIGIT )+ | ( DIGIT )+ ( A_ | U_ ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5524:8: ( ( DIGIT )+ M_ ( DIGIT )+ D_ ( DIGIT )+ | ( DIGIT )+ ( A_ | Q_ | M_ | W_ | U_ ) ( DIGIT )+ | ( DIGIT )+ ( A_ | U_ ) )
             int alt14 = 3;
             alt14 = dfa14.Predict(input);
             switch (alt14) 
             {
                 case 1 :
-                    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5522:14: ( DIGIT )+ M_ ( DIGIT )+ D_ ( DIGIT )+
+                    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5524:14: ( DIGIT )+ M_ ( DIGIT )+ D_ ( DIGIT )+
                     {
-                    	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5522:14: ( DIGIT )+
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5524:14: ( DIGIT )+
                     	int cnt8 = 0;
                     	do 
                     	{
@@ -17208,7 +17208,7 @@ public partial class Cmd4Lexer : Lexer {
                     	    switch (alt8) 
                     		{
                     			case 1 :
-                    			    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5522:14: DIGIT
+                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5524:14: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -17228,7 +17228,7 @@ public partial class Cmd4Lexer : Lexer {
                     		;	// Stops C# compiler whining that label 'loop8' has no statements
 
                     	mM_(); 
-                    	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5522:24: ( DIGIT )+
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5524:24: ( DIGIT )+
                     	int cnt9 = 0;
                     	do 
                     	{
@@ -17244,7 +17244,7 @@ public partial class Cmd4Lexer : Lexer {
                     	    switch (alt9) 
                     		{
                     			case 1 :
-                    			    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5522:24: DIGIT
+                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5524:24: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -17264,7 +17264,7 @@ public partial class Cmd4Lexer : Lexer {
                     		;	// Stops C# compiler whining that label 'loop9' has no statements
 
                     	mD_(); 
-                    	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5522:34: ( DIGIT )+
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5524:34: ( DIGIT )+
                     	int cnt10 = 0;
                     	do 
                     	{
@@ -17280,7 +17280,7 @@ public partial class Cmd4Lexer : Lexer {
                     	    switch (alt10) 
                     		{
                     			case 1 :
-                    			    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5522:34: DIGIT
+                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5524:34: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -17303,9 +17303,9 @@ public partial class Cmd4Lexer : Lexer {
                     }
                     break;
                 case 2 :
-                    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5523:11: ( DIGIT )+ ( A_ | Q_ | M_ | W_ | U_ ) ( DIGIT )+
+                    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5525:11: ( DIGIT )+ ( A_ | Q_ | M_ | W_ | U_ ) ( DIGIT )+
                     {
-                    	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5523:11: ( DIGIT )+
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5525:11: ( DIGIT )+
                     	int cnt11 = 0;
                     	do 
                     	{
@@ -17321,7 +17321,7 @@ public partial class Cmd4Lexer : Lexer {
                     	    switch (alt11) 
                     		{
                     			case 1 :
-                    			    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5523:11: DIGIT
+                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5525:11: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -17351,7 +17351,7 @@ public partial class Cmd4Lexer : Lexer {
                     	    Recover(mse);
                     	    throw mse;}
 
-                    	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5523:45: ( DIGIT )+
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5525:45: ( DIGIT )+
                     	int cnt12 = 0;
                     	do 
                     	{
@@ -17367,7 +17367,7 @@ public partial class Cmd4Lexer : Lexer {
                     	    switch (alt12) 
                     		{
                     			case 1 :
-                    			    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5523:45: DIGIT
+                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5525:45: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -17390,9 +17390,9 @@ public partial class Cmd4Lexer : Lexer {
                     }
                     break;
                 case 3 :
-                    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5524:14: ( DIGIT )+ ( A_ | U_ )
+                    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5526:14: ( DIGIT )+ ( A_ | U_ )
                     {
-                    	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5524:14: ( DIGIT )+
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5526:14: ( DIGIT )+
                     	int cnt13 = 0;
                     	do 
                     	{
@@ -17408,7 +17408,7 @@ public partial class Cmd4Lexer : Lexer {
                     	    switch (alt13) 
                     		{
                     			case 1 :
-                    			    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5524:14: DIGIT
+                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5526:14: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -17459,10 +17459,10 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = IdentStartingWithInt;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5527:21: ( ( DIGIT | LETTER | '_' )+ )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5527:29: ( DIGIT | LETTER | '_' )+
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5529:21: ( ( DIGIT | LETTER | '_' )+ )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5529:29: ( DIGIT | LETTER | '_' )+
             {
-            	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5527:29: ( DIGIT | LETTER | '_' )+
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5529:29: ( DIGIT | LETTER | '_' )+
             	int cnt15 = 0;
             	do 
             	{
@@ -17478,7 +17478,7 @@ public partial class Cmd4Lexer : Lexer {
             	    switch (alt15) 
             		{
             			case 1 :
-            			    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:
             			    {
             			    	if ( (input.LA(1) >= '0' && input.LA(1) <= '9') || (input.LA(1) >= 'A' && input.LA(1) <= 'Z') || input.LA(1) == '_' || (input.LA(1) >= 'a' && input.LA(1) <= 'z') ) 
             			    	{
@@ -17526,15 +17526,15 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = Double;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5532:7: ( ( DIGIT )+ GLUEDOTNUMBER DOT ( DIGIT )* ( Exponent )? | ( DIGIT )+ Exponent | GLUEDOTNUMBER DOT ( DIGIT )+ ( Exponent )? )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5534:7: ( ( DIGIT )+ GLUEDOTNUMBER DOT ( DIGIT )* ( Exponent )? | ( DIGIT )+ Exponent | GLUEDOTNUMBER DOT ( DIGIT )+ ( Exponent )? )
             int alt22 = 3;
             alt22 = dfa22.Predict(input);
             switch (alt22) 
             {
                 case 1 :
-                    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5532:29: ( DIGIT )+ GLUEDOTNUMBER DOT ( DIGIT )* ( Exponent )?
+                    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5534:29: ( DIGIT )+ GLUEDOTNUMBER DOT ( DIGIT )* ( Exponent )?
                     {
-                    	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5532:29: ( DIGIT )+
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5534:29: ( DIGIT )+
                     	int cnt16 = 0;
                     	do 
                     	{
@@ -17550,7 +17550,7 @@ public partial class Cmd4Lexer : Lexer {
                     	    switch (alt16) 
                     		{
                     			case 1 :
-                    			    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5532:29: DIGIT
+                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5534:29: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -17571,7 +17571,7 @@ public partial class Cmd4Lexer : Lexer {
 
                     	mGLUEDOTNUMBER(); 
                     	mDOT(); 
-                    	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5532:54: ( DIGIT )*
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5534:54: ( DIGIT )*
                     	do 
                     	{
                     	    int alt17 = 2;
@@ -17586,7 +17586,7 @@ public partial class Cmd4Lexer : Lexer {
                     	    switch (alt17) 
                     		{
                     			case 1 :
-                    			    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5532:54: DIGIT
+                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5534:54: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -17601,7 +17601,7 @@ public partial class Cmd4Lexer : Lexer {
                     	loop17:
                     		;	// Stops C# compiler whining that label 'loop17' has no statements
 
-                    	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5532:61: ( Exponent )?
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5534:61: ( Exponent )?
                     	int alt18 = 2;
                     	int LA18_0 = input.LA(1);
 
@@ -17612,7 +17612,7 @@ public partial class Cmd4Lexer : Lexer {
                     	switch (alt18) 
                     	{
                     	    case 1 :
-                    	        // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5532:61: Exponent
+                    	        // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5534:61: Exponent
                     	        {
                     	        	mExponent(); 
 
@@ -17625,9 +17625,9 @@ public partial class Cmd4Lexer : Lexer {
                     }
                     break;
                 case 2 :
-                    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5533:29: ( DIGIT )+ Exponent
+                    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5535:29: ( DIGIT )+ Exponent
                     {
-                    	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5533:29: ( DIGIT )+
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5535:29: ( DIGIT )+
                     	int cnt19 = 0;
                     	do 
                     	{
@@ -17643,7 +17643,7 @@ public partial class Cmd4Lexer : Lexer {
                     	    switch (alt19) 
                     		{
                     			case 1 :
-                    			    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5533:29: DIGIT
+                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5535:29: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -17667,11 +17667,11 @@ public partial class Cmd4Lexer : Lexer {
                     }
                     break;
                 case 3 :
-                    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5534:11: GLUEDOTNUMBER DOT ( DIGIT )+ ( Exponent )?
+                    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5536:11: GLUEDOTNUMBER DOT ( DIGIT )+ ( Exponent )?
                     {
                     	mGLUEDOTNUMBER(); 
                     	mDOT(); 
-                    	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5534:29: ( DIGIT )+
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5536:29: ( DIGIT )+
                     	int cnt20 = 0;
                     	do 
                     	{
@@ -17687,7 +17687,7 @@ public partial class Cmd4Lexer : Lexer {
                     	    switch (alt20) 
                     		{
                     			case 1 :
-                    			    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5534:29: DIGIT
+                    			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5536:29: DIGIT
                     			    {
                     			    	mDIGIT(); 
 
@@ -17706,7 +17706,7 @@ public partial class Cmd4Lexer : Lexer {
                     	loop20:
                     		;	// Stops C# compiler whining that label 'loop20' has no statements
 
-                    	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5534:36: ( Exponent )?
+                    	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5536:36: ( Exponent )?
                     	int alt21 = 2;
                     	int LA21_0 = input.LA(1);
 
@@ -17717,7 +17717,7 @@ public partial class Cmd4Lexer : Lexer {
                     	switch (alt21) 
                     	{
                     	    case 1 :
-                    	        // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5534:36: Exponent
+                    	        // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5536:36: Exponent
                     	        {
                     	        	mExponent(); 
 
@@ -17745,11 +17745,11 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5537:18: ( E_ ( '+' | '-' )? ( DIGIT )+ )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5537:29: E_ ( '+' | '-' )? ( DIGIT )+
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5539:18: ( E_ ( '+' | '-' )? ( DIGIT )+ )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5539:29: E_ ( '+' | '-' )? ( DIGIT )+
             {
             	mE_(); 
-            	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5537:32: ( '+' | '-' )?
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5539:32: ( '+' | '-' )?
             	int alt23 = 2;
             	int LA23_0 = input.LA(1);
 
@@ -17760,7 +17760,7 @@ public partial class Cmd4Lexer : Lexer {
             	switch (alt23) 
             	{
             	    case 1 :
-            	        // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:
+            	        // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:
             	        {
             	        	if ( input.LA(1) == '+' || input.LA(1) == '-' ) 
             	        	{
@@ -17779,7 +17779,7 @@ public partial class Cmd4Lexer : Lexer {
 
             	}
 
-            	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5537:47: ( DIGIT )+
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5539:47: ( DIGIT )+
             	int cnt24 = 0;
             	do 
             	{
@@ -17795,7 +17795,7 @@ public partial class Cmd4Lexer : Lexer {
             	    switch (alt24) 
             		{
             			case 1 :
-            			    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5537:47: DIGIT
+            			    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5539:47: DIGIT
             			    {
             			    	mDIGIT(); 
 
@@ -17831,14 +17831,14 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = StringInQuotes;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5557:15: ( ( '\\'' ( '~\\'' | '~{' | ~ ( '\\'' | '{' ) )* '\\'' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5557:29: ( '\\'' ( '~\\'' | '~{' | ~ ( '\\'' | '{' ) )* '\\'' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5559:15: ( ( '\\'' ( '~\\'' | '~{' | ~ ( '\\'' | '{' ) )* '\\'' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5559:29: ( '\\'' ( '~\\'' | '~{' | ~ ( '\\'' | '{' ) )* '\\'' )
             {
-            	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5557:29: ( '\\'' ( '~\\'' | '~{' | ~ ( '\\'' | '{' ) )* '\\'' )
-            	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5557:30: '\\'' ( '~\\'' | '~{' | ~ ( '\\'' | '{' ) )* '\\''
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5559:29: ( '\\'' ( '~\\'' | '~{' | ~ ( '\\'' | '{' ) )* '\\'' )
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5559:30: '\\'' ( '~\\'' | '~{' | ~ ( '\\'' | '{' ) )* '\\''
             	{
             		Match('\''); 
-            		// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5557:35: ( '~\\'' | '~{' | ~ ( '\\'' | '{' ) )*
+            		// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5559:35: ( '~\\'' | '~{' | ~ ( '\\'' | '{' ) )*
             		do 
             		{
             		    int alt25 = 4;
@@ -17883,7 +17883,7 @@ public partial class Cmd4Lexer : Lexer {
             		    switch (alt25) 
             			{
             				case 1 :
-            				    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5557:36: '~\\''
+            				    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5559:36: '~\\''
             				    {
             				    	Match("~'"); 
 
@@ -17891,7 +17891,7 @@ public partial class Cmd4Lexer : Lexer {
             				    }
             				    break;
             				case 2 :
-            				    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5557:44: '~{'
+            				    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5559:44: '~{'
             				    {
             				    	Match("~{"); 
 
@@ -17899,7 +17899,7 @@ public partial class Cmd4Lexer : Lexer {
             				    }
             				    break;
             				case 3 :
-            				    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5557:51: ~ ( '\\'' | '{' )
+            				    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5559:51: ~ ( '\\'' | '{' )
             				    {
             				    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '&') || (input.LA(1) >= '(' && input.LA(1) <= 'z') || (input.LA(1) >= '|' && input.LA(1) <= '\uFFFF') ) 
             				    	{
@@ -17947,18 +17947,18 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = StringInQuotes1;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5558:16: ({...}? => ( '\\'' (~ ( '{' | '\\'' ) )* '{' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5558:29: {...}? => ( '\\'' (~ ( '{' | '\\'' ) )* '{' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5560:16: ({...}? => ( '\\'' (~ ( '{' | '\\'' ) )* '{' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5560:29: {...}? => ( '\\'' (~ ( '{' | '\\'' ) )* '{' )
             {
             	if ( !(( stringCounter == 0 )) ) 
             	{
             	    throw new FailedPredicateException(input, "StringInQuotes1", " stringCounter == 0 ");
             	}
-            	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5558:55: ( '\\'' (~ ( '{' | '\\'' ) )* '{' )
-            	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5558:56: '\\'' (~ ( '{' | '\\'' ) )* '{'
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5560:55: ( '\\'' (~ ( '{' | '\\'' ) )* '{' )
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5560:56: '\\'' (~ ( '{' | '\\'' ) )* '{'
             	{
             		Match('\''); 
-            		// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5558:61: (~ ( '{' | '\\'' ) )*
+            		// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5560:61: (~ ( '{' | '\\'' ) )*
             		do 
             		{
             		    int alt26 = 2;
@@ -17973,7 +17973,7 @@ public partial class Cmd4Lexer : Lexer {
             		    switch (alt26) 
             			{
             				case 1 :
-            				    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5558:62: ~ ( '{' | '\\'' )
+            				    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5560:62: ~ ( '{' | '\\'' )
             				    {
             				    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '&') || (input.LA(1) >= '(' && input.LA(1) <= 'z') || (input.LA(1) >= '|' && input.LA(1) <= '\uFFFF') ) 
             				    	{
@@ -18022,18 +18022,18 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = StringInQuotes2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5559:16: ({...}? => ( '}' (~ ( '{' | '\\'' ) )* '{' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5559:29: {...}? => ( '}' (~ ( '{' | '\\'' ) )* '{' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5561:16: ({...}? => ( '}' (~ ( '{' | '\\'' ) )* '{' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5561:29: {...}? => ( '}' (~ ( '{' | '\\'' ) )* '{' )
             {
             	if ( !(( stringCounter == 1 )) ) 
             	{
             	    throw new FailedPredicateException(input, "StringInQuotes2", " stringCounter == 1 ");
             	}
-            	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5559:55: ( '}' (~ ( '{' | '\\'' ) )* '{' )
-            	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5559:56: '}' (~ ( '{' | '\\'' ) )* '{'
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5561:55: ( '}' (~ ( '{' | '\\'' ) )* '{' )
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5561:56: '}' (~ ( '{' | '\\'' ) )* '{'
             	{
             		Match('}'); 
-            		// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5559:60: (~ ( '{' | '\\'' ) )*
+            		// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5561:60: (~ ( '{' | '\\'' ) )*
             		do 
             		{
             		    int alt27 = 2;
@@ -18048,7 +18048,7 @@ public partial class Cmd4Lexer : Lexer {
             		    switch (alt27) 
             			{
             				case 1 :
-            				    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5559:61: ~ ( '{' | '\\'' )
+            				    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5561:61: ~ ( '{' | '\\'' )
             				    {
             				    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '&') || (input.LA(1) >= '(' && input.LA(1) <= 'z') || (input.LA(1) >= '|' && input.LA(1) <= '\uFFFF') ) 
             				    	{
@@ -18096,18 +18096,18 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = StringInQuotes3;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5560:16: ({...}? => ( '}' (~ ( '{' | '\\'' ) )* '\\'' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5560:29: {...}? => ( '}' (~ ( '{' | '\\'' ) )* '\\'' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5562:16: ({...}? => ( '}' (~ ( '{' | '\\'' ) )* '\\'' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5562:29: {...}? => ( '}' (~ ( '{' | '\\'' ) )* '\\'' )
             {
             	if ( !(( stringCounter == 1 )) ) 
             	{
             	    throw new FailedPredicateException(input, "StringInQuotes3", " stringCounter == 1 ");
             	}
-            	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5560:55: ( '}' (~ ( '{' | '\\'' ) )* '\\'' )
-            	// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5560:56: '}' (~ ( '{' | '\\'' ) )* '\\''
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5562:55: ( '}' (~ ( '{' | '\\'' ) )* '\\'' )
+            	// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5562:56: '}' (~ ( '{' | '\\'' ) )* '\\''
             	{
             		Match('}'); 
-            		// c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5560:60: (~ ( '{' | '\\'' ) )*
+            		// c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5562:60: (~ ( '{' | '\\'' ) )*
             		do 
             		{
             		    int alt28 = 2;
@@ -18122,7 +18122,7 @@ public partial class Cmd4Lexer : Lexer {
             		    switch (alt28) 
             			{
             				case 1 :
-            				    // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5560:61: ~ ( '{' | '\\'' )
+            				    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5562:61: ~ ( '{' | '\\'' )
             				    {
             				    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '&') || (input.LA(1) >= '(' && input.LA(1) <= 'z') || (input.LA(1) >= '|' && input.LA(1) <= '\uFFFF') ) 
             				    	{
@@ -18171,8 +18171,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PLUSEQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5563:10: ( '+=' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5563:29: '+='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5565:10: ( '+=' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5565:29: '+='
             {
             	Match("+="); 
 
@@ -18195,8 +18195,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = STAREQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5564:10: ( '*=' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5564:29: '*='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5566:10: ( '*=' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5566:29: '*='
             {
             	Match("*="); 
 
@@ -18219,8 +18219,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PERCENTEQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5566:13: ( '%=' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5566:29: '%='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5568:13: ( '%=' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5568:29: '%='
             {
             	Match("%="); 
 
@@ -18243,8 +18243,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = HASHEQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5568:10: ( '#=' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5568:29: '#='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5570:10: ( '#=' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5570:29: '#='
             {
             	Match("#="); 
 
@@ -18267,8 +18267,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = HATEQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5569:9: ( '^=' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5569:29: '^='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5571:9: ( '^=' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5571:29: '^='
             {
             	Match("^="); 
 
@@ -18291,8 +18291,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GLUE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5572:5: ( '¨' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5572:29: '¨'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5574:5: ( '¨' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5574:29: '¨'
             {
             	Match("¨"); 
 
@@ -18315,8 +18315,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GLUEDOT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5573:8: ( '£' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5573:29: '£'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5575:8: ( '£' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5575:29: '£'
             {
             	Match("£"); 
 
@@ -18339,8 +18339,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GLUEDOTNUMBER;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5574:14: ( '§' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5574:29: '§'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5576:14: ( '§' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5576:29: '§'
             {
             	Match("§"); 
 
@@ -18363,8 +18363,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GLUESTAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5575:9: ( '½' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5575:29: '½'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5577:9: ( '½' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5577:29: '½'
             {
             	Match("½"); 
 
@@ -18387,8 +18387,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LEFTANGLESPECIAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5576:17: ( '<=<' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5576:29: '<=<'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5578:17: ( '<=<' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5578:29: '<=<'
             {
             	Match("<=<"); 
 
@@ -18411,8 +18411,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = GLUEBACKSLASH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5579:14: ( '¨\\\\' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5579:29: '¨\\\\'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5581:14: ( '¨\\\\' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5581:29: '¨\\\\'
             {
             	Match("¨\\"); 
 
@@ -18435,8 +18435,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ISEQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5584:8: ( '==' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5584:29: '=='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5586:8: ( '==' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5586:29: '=='
             {
             	Match("=="); 
 
@@ -18459,8 +18459,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ISNOTQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5585:10: ( '<>' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5585:29: '<>'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5587:10: ( '<>' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5587:29: '<>'
             {
             	Match("<>"); 
 
@@ -18483,8 +18483,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ISLARGEROREQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5586:16: ( '>=' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5586:20: '>='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5588:16: ( '>=' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5588:20: '>='
             {
             	Match(">="); 
 
@@ -18507,8 +18507,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = ISSMALLEROREQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5587:17: ( '<=' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5587:29: '<='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5589:17: ( '<=' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5589:29: '<='
             {
             	Match("<="); 
 
@@ -18531,8 +18531,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = EXCLAMATION;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5589:12: ( '!' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5589:29: '!'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5591:12: ( '!' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5591:29: '!'
             {
             	Match('!'); 
 
@@ -18554,8 +18554,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TILDE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5590:6: ( '~' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5590:16: '~'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5592:6: ( '~' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5592:16: '~'
             {
             	Match('~'); 
 
@@ -18577,8 +18577,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = AT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5591:3: ( '@' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5591:29: '@'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5593:3: ( '@' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5593:29: '@'
             {
             	Match('@'); 
 
@@ -18600,8 +18600,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = HAT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5592:4: ( '^' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5592:29: '^'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5594:4: ( '^' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5594:29: '^'
             {
             	Match('^'); 
 
@@ -18623,8 +18623,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = SEMICOLON;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5593:10: ( ';' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5593:29: ';'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5595:10: ( ';' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5595:29: ';'
             {
             	Match(';'); 
 
@@ -18646,8 +18646,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COLONGLUE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5594:10: ( ':|' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5594:29: ':|'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5596:10: ( ':|' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5596:29: ':|'
             {
             	Match(":|"); 
 
@@ -18670,8 +18670,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COLON;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5595:6: ( ':' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5595:29: ':'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5597:6: ( ':' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5597:29: ':'
             {
             	Match(':'); 
 
@@ -18693,8 +18693,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = COMMA2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5596:7: ( ',' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5596:29: ','
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5598:7: ( ',' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5598:29: ','
             {
             	Match(','); 
 
@@ -18716,8 +18716,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DOT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5597:4: ( '.' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5597:29: '.'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5599:4: ( '.' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5599:29: '.'
             {
             	Match('.'); 
 
@@ -18739,8 +18739,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = HASH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5598:5: ( '#' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5598:29: '#'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5600:5: ( '#' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5600:29: '#'
             {
             	Match('#'); 
 
@@ -18762,8 +18762,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PERCENT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5599:8: ( '%' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5599:29: '%'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5601:8: ( '%' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5601:29: '%'
             {
             	Match('%'); 
 
@@ -18785,8 +18785,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DOLLAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5600:7: ( '$' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5600:29: '$'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5602:7: ( '$' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5602:29: '$'
             {
             	Match('$'); 
 
@@ -18808,8 +18808,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LEFTCURLY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5601:10: ( '{' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5601:29: '{'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5603:10: ( '{' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5603:29: '{'
             {
             	Match('{'); 
 
@@ -18831,8 +18831,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RIGHTCURLY;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5602:11: ( '}' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5602:29: '}'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5604:11: ( '}' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5604:29: '}'
             {
             	Match('}'); 
 
@@ -18854,8 +18854,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LEFTPAREN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5603:10: ( '(' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5603:29: '('
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5605:10: ( '(' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5605:29: '('
             {
             	Match('('); 
 
@@ -18877,8 +18877,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RIGHTPAREN;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5604:11: ( ')' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5604:29: ')'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5606:11: ( ')' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5606:29: ')'
             {
             	Match(')'); 
 
@@ -18900,8 +18900,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LEFTBRACKETGLUE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5605:16: ( '[_[' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5605:29: '[_['
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5607:16: ( '[_[' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5607:29: '[_['
             {
             	Match("[_["); 
 
@@ -18924,8 +18924,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LEFTBRACKET;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5607:12: ( '[' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5607:29: '['
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5609:12: ( '[' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5609:29: '['
             {
             	Match('['); 
 
@@ -18947,8 +18947,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RIGHTBRACKET;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5608:13: ( ']' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5608:29: ']'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5610:13: ( ']' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5610:29: ']'
             {
             	Match(']'); 
 
@@ -18970,8 +18970,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = LEFTANGLESIMPLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5611:16: ( '<' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5611:29: '<'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5613:16: ( '<' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5613:29: '<'
             {
             	Match('<'); 
 
@@ -18993,8 +18993,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = RIGHTANGLE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5612:11: ( '>' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5612:29: '>'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5614:11: ( '>' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5614:29: '>'
             {
             	Match('>'); 
 
@@ -19016,8 +19016,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = STAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5613:5: ( '*' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5613:29: '*'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5615:5: ( '*' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5615:29: '*'
             {
             	Match('*'); 
 
@@ -19039,8 +19039,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DOUBLEVERTICALBAR1;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5614:19: ( '||' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5614:29: '||'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5616:19: ( '||' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5616:29: '||'
             {
             	Match("||"); 
 
@@ -19063,8 +19063,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DOUBLEAND;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5615:10: ( '&&' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5615:29: '&&'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5617:10: ( '&&' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5617:29: '&&'
             {
             	Match("&&"); 
 
@@ -19087,8 +19087,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DOUBLEVERTICALBAR2;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5616:19: ( '|¨|' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5616:29: '|¨|'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5618:19: ( '|¨|' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5618:29: '|¨|'
             {
             	Match("|¨|"); 
 
@@ -19111,8 +19111,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = VERTICALBAR;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5618:12: ( '|' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5618:29: '|'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5620:12: ( '|' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5620:29: '|'
             {
             	Match('|'); 
 
@@ -19134,8 +19134,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = PLUS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5619:5: ( '+' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5619:29: '+'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5621:5: ( '+' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5621:29: '+'
             {
             	Match('+'); 
 
@@ -19157,8 +19157,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MINUS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5620:6: ( '-' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5620:29: '-'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5622:6: ( '-' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5622:29: '-'
             {
             	Match('-'); 
 
@@ -19180,8 +19180,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DIV;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5621:4: ( '/' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5621:29: '/'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5623:4: ( '/' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5623:29: '/'
             {
             	Match('/'); 
 
@@ -19203,8 +19203,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = TRIPLESTARS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5622:12: ( '***' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5622:29: '***'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5624:12: ( '***' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5624:29: '***'
             {
             	Match("***"); 
 
@@ -19227,8 +19227,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = STARS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5623:6: ( '**' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5623:29: '**'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5625:6: ( '**' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5625:29: '**'
             {
             	Match("**"); 
 
@@ -19251,8 +19251,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = EQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5625:6: ( '=' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5625:29: '='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5627:6: ( '=' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5627:29: '='
             {
             	Match('='); 
 
@@ -19274,8 +19274,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = MINUSEQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5626:11: ( '-=' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5626:29: '-='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5628:11: ( '-=' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5628:29: '-='
             {
             	Match("-="); 
 
@@ -19298,8 +19298,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = DIVEQUAL;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5627:9: ( '/=' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5627:29: '/='
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5629:9: ( '/=' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5629:29: '/='
             {
             	Match("/="); 
 
@@ -19322,8 +19322,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = BACKSLASH;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5629:10: ( '\\\\' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5629:29: '\\\\'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5631:10: ( '\\\\' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5631:29: '\\\\'
             {
             	Match('\\'); 
 
@@ -19345,8 +19345,8 @@ public partial class Cmd4Lexer : Lexer {
     		{
             int _type = QUESTION;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5630:9: ( '?' )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5630:29: '?'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5632:9: ( '?' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5632:29: '?'
             {
             	Match('?'); 
 
@@ -19366,8 +19366,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5632:12: ( ( 'a' | 'A' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5632:13: ( 'a' | 'A' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5634:12: ( ( 'a' | 'A' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5634:13: ( 'a' | 'A' )
             {
             	if ( input.LA(1) == 'A' || input.LA(1) == 'a' ) 
             	{
@@ -19395,8 +19395,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5633:12: ( ( 'b' | 'B' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5633:13: ( 'b' | 'B' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5635:12: ( ( 'b' | 'B' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5635:13: ( 'b' | 'B' )
             {
             	if ( input.LA(1) == 'B' || input.LA(1) == 'b' ) 
             	{
@@ -19424,8 +19424,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5634:12: ( ( 'c' | 'C' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5634:13: ( 'c' | 'C' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5636:12: ( ( 'c' | 'C' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5636:13: ( 'c' | 'C' )
             {
             	if ( input.LA(1) == 'C' || input.LA(1) == 'c' ) 
             	{
@@ -19453,8 +19453,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5635:12: ( ( 'd' | 'D' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5635:13: ( 'd' | 'D' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5637:12: ( ( 'd' | 'D' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5637:13: ( 'd' | 'D' )
             {
             	if ( input.LA(1) == 'D' || input.LA(1) == 'd' ) 
             	{
@@ -19482,8 +19482,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5636:12: ( ( 'e' | 'E' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5636:13: ( 'e' | 'E' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5638:12: ( ( 'e' | 'E' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5638:13: ( 'e' | 'E' )
             {
             	if ( input.LA(1) == 'E' || input.LA(1) == 'e' ) 
             	{
@@ -19511,8 +19511,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5637:12: ( ( 'f' | 'F' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5637:13: ( 'f' | 'F' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5639:12: ( ( 'f' | 'F' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5639:13: ( 'f' | 'F' )
             {
             	if ( input.LA(1) == 'F' || input.LA(1) == 'f' ) 
             	{
@@ -19540,8 +19540,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5638:12: ( ( 'g' | 'G' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5638:13: ( 'g' | 'G' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5640:12: ( ( 'g' | 'G' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5640:13: ( 'g' | 'G' )
             {
             	if ( input.LA(1) == 'G' || input.LA(1) == 'g' ) 
             	{
@@ -19569,8 +19569,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5639:12: ( ( 'h' | 'H' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5639:13: ( 'h' | 'H' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5641:12: ( ( 'h' | 'H' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5641:13: ( 'h' | 'H' )
             {
             	if ( input.LA(1) == 'H' || input.LA(1) == 'h' ) 
             	{
@@ -19598,8 +19598,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5640:12: ( ( 'i' | 'I' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5640:13: ( 'i' | 'I' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5642:12: ( ( 'i' | 'I' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5642:13: ( 'i' | 'I' )
             {
             	if ( input.LA(1) == 'I' || input.LA(1) == 'i' ) 
             	{
@@ -19627,8 +19627,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5641:12: ( ( 'j' | 'J' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5641:13: ( 'j' | 'J' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5643:12: ( ( 'j' | 'J' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5643:13: ( 'j' | 'J' )
             {
             	if ( input.LA(1) == 'J' || input.LA(1) == 'j' ) 
             	{
@@ -19656,8 +19656,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5642:12: ( ( 'k' | 'K' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5642:13: ( 'k' | 'K' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5644:12: ( ( 'k' | 'K' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5644:13: ( 'k' | 'K' )
             {
             	if ( input.LA(1) == 'K' || input.LA(1) == 'k' ) 
             	{
@@ -19685,8 +19685,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5644:12: ( ( 'm' | 'M' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5644:13: ( 'm' | 'M' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5646:12: ( ( 'm' | 'M' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5646:13: ( 'm' | 'M' )
             {
             	if ( input.LA(1) == 'M' || input.LA(1) == 'm' ) 
             	{
@@ -19714,8 +19714,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5645:12: ( ( 'n' | 'N' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5645:13: ( 'n' | 'N' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5647:12: ( ( 'n' | 'N' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5647:13: ( 'n' | 'N' )
             {
             	if ( input.LA(1) == 'N' || input.LA(1) == 'n' ) 
             	{
@@ -19743,8 +19743,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5646:12: ( ( 'o' | 'O' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5646:13: ( 'o' | 'O' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5648:12: ( ( 'o' | 'O' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5648:13: ( 'o' | 'O' )
             {
             	if ( input.LA(1) == 'O' || input.LA(1) == 'o' ) 
             	{
@@ -19772,8 +19772,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5647:12: ( ( 'p' | 'P' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5647:13: ( 'p' | 'P' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5649:12: ( ( 'p' | 'P' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5649:13: ( 'p' | 'P' )
             {
             	if ( input.LA(1) == 'P' || input.LA(1) == 'p' ) 
             	{
@@ -19801,8 +19801,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5648:12: ( ( 'q' | 'Q' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5648:13: ( 'q' | 'Q' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5650:12: ( ( 'q' | 'Q' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5650:13: ( 'q' | 'Q' )
             {
             	if ( input.LA(1) == 'Q' || input.LA(1) == 'q' ) 
             	{
@@ -19830,8 +19830,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5649:12: ( ( 'r' | 'R' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5649:13: ( 'r' | 'R' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5651:12: ( ( 'r' | 'R' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5651:13: ( 'r' | 'R' )
             {
             	if ( input.LA(1) == 'R' || input.LA(1) == 'r' ) 
             	{
@@ -19859,8 +19859,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5650:12: ( ( 's' | 'S' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5650:13: ( 's' | 'S' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5652:12: ( ( 's' | 'S' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5652:13: ( 's' | 'S' )
             {
             	if ( input.LA(1) == 'S' || input.LA(1) == 's' ) 
             	{
@@ -19888,8 +19888,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5651:12: ( ( 't' | 'T' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5651:13: ( 't' | 'T' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5653:12: ( ( 't' | 'T' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5653:13: ( 't' | 'T' )
             {
             	if ( input.LA(1) == 'T' || input.LA(1) == 't' ) 
             	{
@@ -19917,8 +19917,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5652:12: ( ( 'u' | 'U' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5652:13: ( 'u' | 'U' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5654:12: ( ( 'u' | 'U' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5654:13: ( 'u' | 'U' )
             {
             	if ( input.LA(1) == 'U' || input.LA(1) == 'u' ) 
             	{
@@ -19946,8 +19946,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5653:12: ( ( 'v' | 'V' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5653:13: ( 'v' | 'V' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5655:12: ( ( 'v' | 'V' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5655:13: ( 'v' | 'V' )
             {
             	if ( input.LA(1) == 'V' || input.LA(1) == 'v' ) 
             	{
@@ -19975,8 +19975,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5654:12: ( ( 'w' | 'W' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5654:13: ( 'w' | 'W' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5656:12: ( ( 'w' | 'W' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5656:13: ( 'w' | 'W' )
             {
             	if ( input.LA(1) == 'W' || input.LA(1) == 'w' ) 
             	{
@@ -20004,8 +20004,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5655:12: ( ( 'x' | 'X' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5655:13: ( 'x' | 'X' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5657:12: ( ( 'x' | 'X' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5657:13: ( 'x' | 'X' )
             {
             	if ( input.LA(1) == 'X' || input.LA(1) == 'x' ) 
             	{
@@ -20033,8 +20033,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5656:12: ( ( 'y' | 'Y' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5656:13: ( 'y' | 'Y' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5658:12: ( ( 'y' | 'Y' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5658:13: ( 'y' | 'Y' )
             {
             	if ( input.LA(1) == 'Y' || input.LA(1) == 'y' ) 
             	{
@@ -20062,8 +20062,8 @@ public partial class Cmd4Lexer : Lexer {
     {
     		try
     		{
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5657:12: ( ( 'z' | 'Z' ) )
-            // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:5657:13: ( 'z' | 'Z' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5659:12: ( ( 'z' | 'Z' ) )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5659:13: ( 'z' | 'Z' )
             {
             	if ( input.LA(1) == 'Z' || input.LA(1) == 'z' ) 
             	{
@@ -20088,4647 +20088,4647 @@ public partial class Cmd4Lexer : Lexer {
 
     override public void mTokens() // throws RecognitionException 
     {
-        // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:8: ( MAXLAG | DFMIN | LEAD | REKUR | MAXLEAD | FIT | GMS | ELEMENTS | NOMAX | RETURN2 | IN | MAP | STRING2 | REMOTE | ALIAS | OFFSET | DETECT | GRIDSTYLE | BOLD | ITALIC | ASER | ASERIES | XLABELS | YLABELS | ANNUAL | AT2 | BETWEEN | NONANNUAL | CURRENT | DIGITS | GAMS | GDX | GDXOPT | LAGFIX | ADDBANK | SHOWBANK | SHOWFREQ | REBASE | LINESPOINTS | BOXES | FILLEDCURVES | STEPS | DOTS | IMPULSES | CONTINUE | VOID | PROCEDURE | SIZE | SUBTITLE | TICS | GRID | KEY | PALETTE | STACK | BOXWIDTH | BOXGAP | SEPARATE | XLINE | XLINEBEFORE | XLINEAFTER | YMIRROR | YTITLE | YLINE | SHARES | ERRORS | LINE | IGNORE | YMAXHARD | YMAXSOFT | YMINHARD | YMINSOFT | XZEROAXIS | Y2TITLE | Y2LINE | Y2MAXHARD | Y2MAXSOFT | Y2MINHARD | Y2MINSOFT | X2ZEROAXIS | ARROW | PARQUET | DASHTYPE | LINEWIDTH | LINECOLOR | POINTTYPE | POINTSIZE | FILLSTYLE | LABEL | Y2 | X | Y | MDATEFORMAT | THOUSANDSSEPARATOR | XEDIT | IMPOSE | CONSTANT | INTERPOLATE | PRORATE | TRIM | USING | A | DEFAULT | LOGIC | ABS | ABSOLUTE | ACCEPT | ADD | AFTER | AFTER2 | ALIGNCENTER | ALIGNLEFT | ALIGNRIGHT | ALL | ANALYZE | AND | APPEND | AREMOS | OP | AS | AUTO | AVG | INDICATOR | BACKTRACK | BANK | BANK1 | BANK2 | BOWL | BY | CACHE | CALC | CAPS | CELL | CHANGE | CHECKOFF | CLEAR | CLEAR2 | CLIP | CLIPBOARD | CLONE | MOVE | REMOVE | CLOSE | CLOSEALL | CLOSEBANKS | CLS | CODE | COLLAPSE | XTREND | XFLAT | PX | ARRAY | BUGFIX | GCM | COLORS | COLS | DELIMITER | DATEFORMAT | DATETYPE | COMMA | COMMAND | COMMAND1 | COMMAND2 | COMPARE | COMPRESS | CONST | CONV | CONV1 | CONV2 | COPY | COPYLOCAL | LOCAL | GLOBAL | COUNT | CPLOT | CREATE | CREATEVARS | CSV | SDF | CURROW | D | DAMP | DANISH | DATA | DATABANK | DATAWIDTH | DATE | DATES | DEBUG | DEC | DECIMALSEPARATOR | DECOMP | DECOMP2 | DECOMP3 | EVAL | DELETE | DETAILS | DIALOG | DIF | DIFF | DIFPRT | DING | DYN | DIRECT | DISP | GEKKO | DISPLAY | DOC | DOWNLOAD | DP | DUMOF | DUMOFF | DUMON | DUMP | DUMPOPTIONS | EDIT | EFTER | ELSE | ELSEIF | END | ENDO | ENGLISH | ERROR | EXCEL | EXE | EXIT | EXO | EXP | EXPORT | EXTERNAL | FAILSAFE | FAIR | FALSE | FAST | FEED | FEEDBACK | FIELDS | FILE | FILEWIDTH | FILTER | FINDMISSINGDATA | BANKNAME | FLOW | META | ECHO | OBS | A3DP | A3 | A3N | ADP | AL | ADL | A3P | AN | AD | AP | A3D | A3L | A3DL | YOY | EXPAND | VARIABLECODE | VIEW | KEEPTYPES | PREDICT | FIND | PYTHON | DEP | BROWSER | FIRST | FIRSTCOLWIDTH | FIX | FLAT | DATECELL | NAMECELL | FOLDER | FONT | FONTSIZE | FOR | FORMAT | FORWARD | FREQ | FRML | FROM | FUNCTION | GAUSS | GBK | GDIF | GDIFF | GEKKO18 | GEKKO20 | GENR | GEOMETRIC | OVERLAY | GMULPRT | GNUPLOT | GOAL | GOTO | GRAPH | GROWTH | HDG | HEADING | HELP | HIDE | HIDELEFTBORDER | HIDERIGHTBORDER | HORIZON | HPFILTER | HTML | IF | IF_OLD | ASBANK | TOBANK | VARLIST | FROMBANK | IGNOREMISSING | IGNOREMISSINGVARS | IGNOREVARS | IMPORT | INDEX | INFO | INFOFILE | INI | INIT | INTERFACE | INTERNAL | INVERT | ROBUST | ITER | ITERMAX | ITERMIN | ITERSHOW | KEEP | LABELS | LAG | LANGUAGE | LAST | LEV | LINEAR | LINES | LIST | LISTFILE | LOG | LOCK_ | UNLOCK_ | LU | M | MACRO2 | MAIN | MAT | MATRIX | ROWNAMES | COLNAMES | MAX | MAXLINES | MEM | MENU | MENUTABLE | MERGE | MERGECOLS | MESSAGE | METHOD | MIN | MIXED | MISSING | MODE | MODEL | MODERNLOOK | MP | DL | L | RDL | RL | MULBK | MULPCT | MULPRT | MUTE | N | NAME | NAMES | NDEC | NDIFPRT | NEW | NEWTON | NEXT | NFAIR | NO | NOABS | NOCR | NODIF | NODIFF | NOFILTER | NOGDIF | NOGDIFF | NOLEV | NONE | NONMODEL | NOPCH | SAVE | NOT | NOTIFY | NOV | NWIDTH | NYTVINDU | OLS | OPEN | OPTION | OR | P | PARAM | PATCH | PATH | PAUSE | PCH | PCIM | PCIMSTYLE | STYLE | PCTPRT | PDEC | PERIOD | PIPE | PLOT | PLOTCODE | CUT | POINTS | POS | PREFIX | PRETTY | PRI | PRIM | PRINT | OPERATORS | PRN | PROT | PRT | PRTX | PUDVALG | PWIDTH | Q | R | R_EXPORT | R_FILE | R_RUN | PYTHON_EXPORT | PYTHON_FILE | PYTHON_RUN | RD | RDP | READ | REF | REL | RENAME | REORDER | REP | REPEAT | REPLACE | RES | RESET | BLOCK | RESPECT | RESTART | RING | RN | ROWS | GROUP | LEVEL | LINK | WHERE | RP | RUN | LIBRARY | SEARCH | SEC | SECONDCOLWIDTH | SER2 | SER3 | SER | SERIES2 | SERIES3 | SERIES | SET | SETBORDER | SETBOTTOMBORDER | SETDATES | SETLEFTBORDER | SETRIGHTBORDER | SETTEXT | SETTOPBORDER | SETVALUES | SHEET | SHOW | SHOWBORDERS | SHOWPCH | SIGN | SIM | SIMPLE | SKIP | NAN | ENGINE | NORMAL | SMOOTH | SOLVE | SOME | SORT | SOUND | SOURCE | SPECIALMINUS | SPLICE | SPLINE | SPLIT | STACKED | STAMP | STARTFILE | STATIC | CHECK | STEP | STOP | STRIP | SUFFIX | SUGGESTIONS | SWAP | SYS | SYSTEM | TABLE | TABLE1 | TABLE2 | TABLEOLD | TABS | TARGET | TELL | TEMP | TERMINAL | TEST | TESTRANDOMMODEL | TESTRANDOMMODELCHECK | TESTSIM | TIME | TIMEFILTER | UNIT | UNITS | TIMESPAN | TITLE | TO | TOTAL | TRACE | TRACE2 | TRANSLATE | TRANSPOSE | TREL | TRUE | TRUNCATE | TSD | TSDX | TSP | TXT | TYPE | U | UABS | UDIF | UDIFF | UDVALG | UGDIF | UGDIFF | ULEV | UNDO | UNFIX | SPEEDUP | UNSWAP | UPCH | UPDATEFREQ | UPDX | V | VAL | VAR | VAR_KDUSJFLQO2 | VALUE | VERS | VERSION | VPRT | WAIT | WIDTH | WINDOW | WORKING | WPLOT | WRITE | WUDVALG | X12A | XLS | XLSX | YES | YMAX | YMIN | I | Y2MAX | Y2MIN | ZERO | ZOOM | ZVAR | HTTP | HTTPS | WHITESPACE | COMMENT | COMMENT_MULTILINE | Ident | Integer | DigitsEDigits | DateDef | IdentStartingWithInt | Double | StringInQuotes | StringInQuotes1 | StringInQuotes2 | StringInQuotes3 | PLUSEQUAL | STAREQUAL | PERCENTEQUAL | HASHEQUAL | HATEQUAL | GLUE | GLUEDOT | GLUEDOTNUMBER | GLUESTAR | LEFTANGLESPECIAL | GLUEBACKSLASH | ISEQUAL | ISNOTQUAL | ISLARGEROREQUAL | ISSMALLEROREQUAL | EXCLAMATION | TILDE | AT | HAT | SEMICOLON | COLONGLUE | COLON | COMMA2 | DOT | HASH | PERCENT | DOLLAR | LEFTCURLY | RIGHTCURLY | LEFTPAREN | RIGHTPAREN | LEFTBRACKETGLUE | LEFTBRACKET | RIGHTBRACKET | LEFTANGLESIMPLE | RIGHTANGLE | STAR | DOUBLEVERTICALBAR1 | DOUBLEAND | DOUBLEVERTICALBAR2 | VERTICALBAR | PLUS | MINUS | DIV | TRIPLESTARS | STARS | EQUAL | MINUSEQUAL | DIVEQUAL | BACKSLASH | QUESTION )
+        // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:8: ( MAXLAG | DFMIN | LEAD | REKUR | MAXLEAD | FIT | GMS | ELEMENTS | NOMAX | RETURN2 | IN | MAP | STRING2 | REMOTE | ALIAS | OFFSET | DETECT | GRIDSTYLE | BOLD | ITALIC | ASER | ASERIES | XLABELS | YLABELS | ANNUAL | AT2 | BETWEEN | NONANNUAL | CURRENT | DIGITS | GAMS | GDX | GDXOPT | LAGFIX | ADDBANK | SHOWBANK | SHOWFREQ | REBASE | LINESPOINTS | BOXES | FILLEDCURVES | STEPS | DOTS | IMPULSES | CONTINUE | VOID | PROCEDURE | SIZE | SUBTITLE | TICS | GRID | KEY | PALETTE | STACK | BOXWIDTH | BOXGAP | SEPARATE | XLINE | XLINEBEFORE | XLINEAFTER | YMIRROR | YTITLE | YLINE | SHARES | ERRORS | LINE | IGNORE | YMAXHARD | YMAXSOFT | YMINHARD | YMINSOFT | XZEROAXIS | Y2TITLE | Y2LINE | Y2MAXHARD | Y2MAXSOFT | Y2MINHARD | Y2MINSOFT | X2ZEROAXIS | ARROW | PARQUET | DASHTYPE | LINEWIDTH | LINECOLOR | POINTTYPE | POINTSIZE | FILLSTYLE | LABEL | Y2 | X | Y | MDATEFORMAT | THOUSANDSSEPARATOR | XEDIT | IMPOSE | CONSTANT | INTERPOLATE | PRORATE | TRIM | USING | A | DEFAULT | LOGIC | ABS | ABSOLUTE | ACCEPT | ADD | AFTER | AFTER2 | ALIGNCENTER | ALIGNLEFT | ALIGNRIGHT | ALL | ANALYZE | AND | APPEND | AREMOS | OP | AS | AUTO | AVG | INDICATOR | BACKTRACK | BANK | BANK1 | BANK2 | BOWL | BY | CACHE | CALC | CAPS | CELL | CHANGE | CHECKOFF | CLEAR | CLEAR2 | CLIP | CLIPBOARD | CLONE | MOVE | REMOVE | CLOSE | CLOSEALL | CLOSEBANKS | CLS | CODE | COLLAPSE | XTREND | XFLAT | PX | ARRAY | BUGFIX | GCM | COLORS | COLS | DELIMITER | DATEFORMAT | DATETYPE | COMMA | COMMAND | COMMAND1 | COMMAND2 | COMPARE | COMPRESS | CONST | CONV | CONV1 | CONV2 | COPY | COPYLOCAL | LOCAL | GLOBAL | COUNT | CPLOT | CREATE | CREATEVARS | CSV | SDF | CURROW | D | DAMP | DANISH | DATA | DATABANK | DATAWIDTH | DATE | DATES | DEBUG | DEC | DECIMALSEPARATOR | DECOMP | DECOMP2 | DECOMP3 | EVAL | DELETE | DETAILS | DIALOG | DIF | DIFF | DIFPRT | DING | DYN | DIRECT | DISP | GEKKO | DISPLAY | DOC | DOWNLOAD | DP | DUMOF | DUMOFF | DUMON | DUMP | DUMPOPTIONS | EDIT | EFTER | ELSE | ELSEIF | END | ENDO | ENGLISH | ERROR | EXCEL | EXE | EXIT | EXO | EXP | EXPORT | EXTERNAL | FAILSAFE | FAIR | FALSE | FAST | FEED | FEEDBACK | FIELDS | FILE | FILEWIDTH | FILTER | FINDMISSINGDATA | BANKNAME | FLOW | META | ECHO | OBS | A3DP | A3 | A3N | ADP | AL | ADL | A3P | AN | AD | AP | A3D | A3L | A3DL | YOY | EXPAND | VARIABLECODE | VIEW | KEEPTYPES | PREDICT | FIND | PYTHON | DEP | BROWSER | FIRST | FIRSTCOLWIDTH | FIX | FLAT | DATECELL | NAMECELL | FOLDER | FONT | FONTSIZE | FOR | FORMAT | FORWARD | FREQ | FRML | FROM | FUNCTION | GAUSS | GBK | GDIF | GDIFF | GEKKO18 | GEKKO20 | GENR | GEOMETRIC | OVERLAY | GMULPRT | GNUPLOT | GOAL | GOTO | GRAPH | GROWTH | HDG | HEADING | HELP | HIDE | HIDELEFTBORDER | HIDERIGHTBORDER | HORIZON | HPFILTER | HTML | IF | IF_OLD | ASBANK | TOBANK | VARLIST | FROMBANK | IGNOREMISSING | IGNOREMISSINGVARS | IGNOREVARS | IMPORT | INDEX | INFO | INFOFILE | INI | INIT | INTERFACE | INTERNAL | INVERT | ROBUST | ITER | ITERMAX | ITERMIN | ITERSHOW | KEEP | LABELS | LAG | LANGUAGE | LAST | LEV | LINEAR | LINES | LIST | LISTFILE | LOG | LOCK_ | UNLOCK_ | LU | M | MACRO2 | MAIN | MAT | MATRIX | ROWNAMES | COLNAMES | MAX | MAXLINES | MEM | MENU | MENUTABLE | MERGE | MERGECOLS | MESSAGE | METHOD | MIN | MIXED | MISSING | MODE | MODEL | MODERNLOOK | MP | DL | L | RDL | RL | MULBK | MULPCT | MULPRT | MUTE | N | NAME | NAMES | NDEC | NDIFPRT | NEW | NEWTON | NEXT | NFAIR | NO | NOABS | NOCR | NODIF | NODIFF | NOFILTER | NOGDIF | NOGDIFF | NOLEV | NONE | NONMODEL | NOPCH | SAVE | NOT | NOTIFY | NOV | NWIDTH | NYTVINDU | OLS | OPEN | OPTION | OR | P | PARAM | PATCH | PATH | PAUSE | PCH | PCIM | PCIMSTYLE | STYLE | PCTPRT | PDEC | PERIOD | PIPE | PLOT | PLOTCODE | CUT | POINTS | POS | PREFIX | PRETTY | PRI | PRIM | PRINT | OPERATORS | PRN | PROT | PRT | PRTX | PUDVALG | PWIDTH | Q | R | R_EXPORT | R_FILE | R_RUN | PYTHON_EXPORT | PYTHON_FILE | PYTHON_RUN | RD | RDP | READ | REF | REL | RENAME | REORDER | REP | REPEAT | REPLACE | RES | RESET | BLOCK | RESPECT | RESTART | RING | RN | ROWS | GROUP | LEVEL | LINK | WHERE | RP | RUN | LIBRARY | SEARCH | SEC | SECONDCOLWIDTH | SER2 | SER3 | SER | SERIES2 | SERIES3 | SERIES | SET | SETBORDER | SETBOTTOMBORDER | SETDATES | SETLEFTBORDER | SETRIGHTBORDER | SETTEXT | SETTOPBORDER | SETVALUES | SHEET | SHOW | SHOWBORDERS | SHOWPCH | SIGN | SIM | SIMPLE | SKIP | NAN | ENGINE | NORMAL | SMOOTH | SOLVE | SOME | SORT | SOUND | SOURCE | SPECIALMINUS | SPLICE | SPLINE | SPLIT | STACKED | STAMP | STARTFILE | STATIC | CHECK | STEP | STOP | STRIP | SUFFIX | SUGGESTIONS | SWAP | SYS | SYSTEM | TABLE | TABLE1 | TABLE2 | TABLEOLD | TABS | TARGET | TELL | TEMP | TERMINAL | TEST | TESTRANDOMMODEL | TESTRANDOMMODELCHECK | TESTSIM | TIME | TIMEFILTER | UNIT | UNITS | TIMESPAN | TITLE | TO | TOTAL | TRACE | TRACE2 | TRANSLATE | TRANSPOSE | TREL | TRUE | TRUNCATE | TSD | TSDX | TSP | TXT | TYPE | U | UABS | UDIF | UDIFF | UDVALG | UGDIF | UGDIFF | ULEV | UNDO | UNFIX | SPEEDUP | UNSWAP | UPCH | UPDATEFREQ | UPDX | V | VAL | VAR | VAR_KDUSJFLQO2 | VALUE | VERS | VERSION | VPRT | WAIT | WIDTH | WINDOW | WORKING | WPLOT | WRITE | WUDVALG | X12A | XLS | XLSX | YES | YMAX | YMIN | I | Y2MAX | Y2MIN | ZERO | ZOOM | ZVAR | HTTP | HTTPS | WHITESPACE | COMMENT | COMMENT_MULTILINE | Ident | Integer | DigitsEDigits | DateDef | IdentStartingWithInt | Double | StringInQuotes | StringInQuotes1 | StringInQuotes2 | StringInQuotes3 | PLUSEQUAL | STAREQUAL | PERCENTEQUAL | HASHEQUAL | HATEQUAL | GLUE | GLUEDOT | GLUEDOTNUMBER | GLUESTAR | LEFTANGLESPECIAL | GLUEBACKSLASH | ISEQUAL | ISNOTQUAL | ISLARGEROREQUAL | ISSMALLEROREQUAL | EXCLAMATION | TILDE | AT | HAT | SEMICOLON | COLONGLUE | COLON | COMMA2 | DOT | HASH | PERCENT | DOLLAR | LEFTCURLY | RIGHTCURLY | LEFTPAREN | RIGHTPAREN | LEFTBRACKETGLUE | LEFTBRACKET | RIGHTBRACKET | LEFTANGLESIMPLE | RIGHTANGLE | STAR | DOUBLEVERTICALBAR1 | DOUBLEAND | DOUBLEVERTICALBAR2 | VERTICALBAR | PLUS | MINUS | DIV | TRIPLESTARS | STARS | EQUAL | MINUSEQUAL | DIVEQUAL | BACKSLASH | QUESTION )
         int alt29 = 663;
         alt29 = dfa29.Predict(input);
         switch (alt29) 
         {
             case 1 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:10: MAXLAG
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:10: MAXLAG
                 {
                 	mMAXLAG(); 
 
                 }
                 break;
             case 2 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:17: DFMIN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:17: DFMIN
                 {
                 	mDFMIN(); 
 
                 }
                 break;
             case 3 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:23: LEAD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:23: LEAD
                 {
                 	mLEAD(); 
 
                 }
                 break;
             case 4 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:28: REKUR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:28: REKUR
                 {
                 	mREKUR(); 
 
                 }
                 break;
             case 5 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:34: MAXLEAD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:34: MAXLEAD
                 {
                 	mMAXLEAD(); 
 
                 }
                 break;
             case 6 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:42: FIT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:42: FIT
                 {
                 	mFIT(); 
 
                 }
                 break;
             case 7 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:46: GMS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:46: GMS
                 {
                 	mGMS(); 
 
                 }
                 break;
             case 8 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:50: ELEMENTS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:50: ELEMENTS
                 {
                 	mELEMENTS(); 
 
                 }
                 break;
             case 9 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:59: NOMAX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:59: NOMAX
                 {
                 	mNOMAX(); 
 
                 }
                 break;
             case 10 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:65: RETURN2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:65: RETURN2
                 {
                 	mRETURN2(); 
 
                 }
                 break;
             case 11 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:73: IN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:73: IN
                 {
                 	mIN(); 
 
                 }
                 break;
             case 12 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:76: MAP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:76: MAP
                 {
                 	mMAP(); 
 
                 }
                 break;
             case 13 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:80: STRING2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:80: STRING2
                 {
                 	mSTRING2(); 
 
                 }
                 break;
             case 14 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:88: REMOTE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:88: REMOTE
                 {
                 	mREMOTE(); 
 
                 }
                 break;
             case 15 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:95: ALIAS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:95: ALIAS
                 {
                 	mALIAS(); 
 
                 }
                 break;
             case 16 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:101: OFFSET
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:101: OFFSET
                 {
                 	mOFFSET(); 
 
                 }
                 break;
             case 17 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:108: DETECT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:108: DETECT
                 {
                 	mDETECT(); 
 
                 }
                 break;
             case 18 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:115: GRIDSTYLE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:115: GRIDSTYLE
                 {
                 	mGRIDSTYLE(); 
 
                 }
                 break;
             case 19 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:125: BOLD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:125: BOLD
                 {
                 	mBOLD(); 
 
                 }
                 break;
             case 20 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:130: ITALIC
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:130: ITALIC
                 {
                 	mITALIC(); 
 
                 }
                 break;
             case 21 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:137: ASER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:137: ASER
                 {
                 	mASER(); 
 
                 }
                 break;
             case 22 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:142: ASERIES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:142: ASERIES
                 {
                 	mASERIES(); 
 
                 }
                 break;
             case 23 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:150: XLABELS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:150: XLABELS
                 {
                 	mXLABELS(); 
 
                 }
                 break;
             case 24 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:158: YLABELS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:158: YLABELS
                 {
                 	mYLABELS(); 
 
                 }
                 break;
             case 25 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:166: ANNUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:166: ANNUAL
                 {
                 	mANNUAL(); 
 
                 }
                 break;
             case 26 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:173: AT2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:173: AT2
                 {
                 	mAT2(); 
 
                 }
                 break;
             case 27 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:177: BETWEEN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:177: BETWEEN
                 {
                 	mBETWEEN(); 
 
                 }
                 break;
             case 28 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:185: NONANNUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:185: NONANNUAL
                 {
                 	mNONANNUAL(); 
 
                 }
                 break;
             case 29 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:195: CURRENT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:195: CURRENT
                 {
                 	mCURRENT(); 
 
                 }
                 break;
             case 30 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:203: DIGITS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:203: DIGITS
                 {
                 	mDIGITS(); 
 
                 }
                 break;
             case 31 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:210: GAMS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:210: GAMS
                 {
                 	mGAMS(); 
 
                 }
                 break;
             case 32 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:215: GDX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:215: GDX
                 {
                 	mGDX(); 
 
                 }
                 break;
             case 33 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:219: GDXOPT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:219: GDXOPT
                 {
                 	mGDXOPT(); 
 
                 }
                 break;
             case 34 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:226: LAGFIX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:226: LAGFIX
                 {
                 	mLAGFIX(); 
 
                 }
                 break;
             case 35 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:233: ADDBANK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:233: ADDBANK
                 {
                 	mADDBANK(); 
 
                 }
                 break;
             case 36 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:241: SHOWBANK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:241: SHOWBANK
                 {
                 	mSHOWBANK(); 
 
                 }
                 break;
             case 37 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:250: SHOWFREQ
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:250: SHOWFREQ
                 {
                 	mSHOWFREQ(); 
 
                 }
                 break;
             case 38 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:259: REBASE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:259: REBASE
                 {
                 	mREBASE(); 
 
                 }
                 break;
             case 39 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:266: LINESPOINTS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:266: LINESPOINTS
                 {
                 	mLINESPOINTS(); 
 
                 }
                 break;
             case 40 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:278: BOXES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:278: BOXES
                 {
                 	mBOXES(); 
 
                 }
                 break;
             case 41 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:284: FILLEDCURVES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:284: FILLEDCURVES
                 {
                 	mFILLEDCURVES(); 
 
                 }
                 break;
             case 42 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:297: STEPS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:297: STEPS
                 {
                 	mSTEPS(); 
 
                 }
                 break;
             case 43 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:303: DOTS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:303: DOTS
                 {
                 	mDOTS(); 
 
                 }
                 break;
             case 44 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:308: IMPULSES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:308: IMPULSES
                 {
                 	mIMPULSES(); 
 
                 }
                 break;
             case 45 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:317: CONTINUE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:317: CONTINUE
                 {
                 	mCONTINUE(); 
 
                 }
                 break;
             case 46 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:326: VOID
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:326: VOID
                 {
                 	mVOID(); 
 
                 }
                 break;
             case 47 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:331: PROCEDURE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:331: PROCEDURE
                 {
                 	mPROCEDURE(); 
 
                 }
                 break;
             case 48 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:341: SIZE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:341: SIZE
                 {
                 	mSIZE(); 
 
                 }
                 break;
             case 49 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:346: SUBTITLE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:346: SUBTITLE
                 {
                 	mSUBTITLE(); 
 
                 }
                 break;
             case 50 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:355: TICS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:355: TICS
                 {
                 	mTICS(); 
 
                 }
                 break;
             case 51 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:360: GRID
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:360: GRID
                 {
                 	mGRID(); 
 
                 }
                 break;
             case 52 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:365: KEY
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:365: KEY
                 {
                 	mKEY(); 
 
                 }
                 break;
             case 53 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:369: PALETTE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:369: PALETTE
                 {
                 	mPALETTE(); 
 
                 }
                 break;
             case 54 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:377: STACK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:377: STACK
                 {
                 	mSTACK(); 
 
                 }
                 break;
             case 55 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:383: BOXWIDTH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:383: BOXWIDTH
                 {
                 	mBOXWIDTH(); 
 
                 }
                 break;
             case 56 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:392: BOXGAP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:392: BOXGAP
                 {
                 	mBOXGAP(); 
 
                 }
                 break;
             case 57 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:399: SEPARATE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:399: SEPARATE
                 {
                 	mSEPARATE(); 
 
                 }
                 break;
             case 58 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:408: XLINE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:408: XLINE
                 {
                 	mXLINE(); 
 
                 }
                 break;
             case 59 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:414: XLINEBEFORE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:414: XLINEBEFORE
                 {
                 	mXLINEBEFORE(); 
 
                 }
                 break;
             case 60 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:426: XLINEAFTER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:426: XLINEAFTER
                 {
                 	mXLINEAFTER(); 
 
                 }
                 break;
             case 61 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:437: YMIRROR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:437: YMIRROR
                 {
                 	mYMIRROR(); 
 
                 }
                 break;
             case 62 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:445: YTITLE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:445: YTITLE
                 {
                 	mYTITLE(); 
 
                 }
                 break;
             case 63 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:452: YLINE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:452: YLINE
                 {
                 	mYLINE(); 
 
                 }
                 break;
             case 64 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:458: SHARES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:458: SHARES
                 {
                 	mSHARES(); 
 
                 }
                 break;
             case 65 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:465: ERRORS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:465: ERRORS
                 {
                 	mERRORS(); 
 
                 }
                 break;
             case 66 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:472: LINE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:472: LINE
                 {
                 	mLINE(); 
 
                 }
                 break;
             case 67 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:477: IGNORE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:477: IGNORE
                 {
                 	mIGNORE(); 
 
                 }
                 break;
             case 68 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:484: YMAXHARD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:484: YMAXHARD
                 {
                 	mYMAXHARD(); 
 
                 }
                 break;
             case 69 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:493: YMAXSOFT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:493: YMAXSOFT
                 {
                 	mYMAXSOFT(); 
 
                 }
                 break;
             case 70 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:502: YMINHARD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:502: YMINHARD
                 {
                 	mYMINHARD(); 
 
                 }
                 break;
             case 71 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:511: YMINSOFT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:511: YMINSOFT
                 {
                 	mYMINSOFT(); 
 
                 }
                 break;
             case 72 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:520: XZEROAXIS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:520: XZEROAXIS
                 {
                 	mXZEROAXIS(); 
 
                 }
                 break;
             case 73 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:530: Y2TITLE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:530: Y2TITLE
                 {
                 	mY2TITLE(); 
 
                 }
                 break;
             case 74 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:538: Y2LINE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:538: Y2LINE
                 {
                 	mY2LINE(); 
 
                 }
                 break;
             case 75 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:545: Y2MAXHARD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:545: Y2MAXHARD
                 {
                 	mY2MAXHARD(); 
 
                 }
                 break;
             case 76 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:555: Y2MAXSOFT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:555: Y2MAXSOFT
                 {
                 	mY2MAXSOFT(); 
 
                 }
                 break;
             case 77 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:565: Y2MINHARD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:565: Y2MINHARD
                 {
                 	mY2MINHARD(); 
 
                 }
                 break;
             case 78 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:575: Y2MINSOFT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:575: Y2MINSOFT
                 {
                 	mY2MINSOFT(); 
 
                 }
                 break;
             case 79 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:585: X2ZEROAXIS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:585: X2ZEROAXIS
                 {
                 	mX2ZEROAXIS(); 
 
                 }
                 break;
             case 80 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:596: ARROW
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:596: ARROW
                 {
                 	mARROW(); 
 
                 }
                 break;
             case 81 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:602: PARQUET
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:602: PARQUET
                 {
                 	mPARQUET(); 
 
                 }
                 break;
             case 82 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:610: DASHTYPE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:610: DASHTYPE
                 {
                 	mDASHTYPE(); 
 
                 }
                 break;
             case 83 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:619: LINEWIDTH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:619: LINEWIDTH
                 {
                 	mLINEWIDTH(); 
 
                 }
                 break;
             case 84 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:629: LINECOLOR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:629: LINECOLOR
                 {
                 	mLINECOLOR(); 
 
                 }
                 break;
             case 85 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:639: POINTTYPE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:639: POINTTYPE
                 {
                 	mPOINTTYPE(); 
 
                 }
                 break;
             case 86 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:649: POINTSIZE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:649: POINTSIZE
                 {
                 	mPOINTSIZE(); 
 
                 }
                 break;
             case 87 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:659: FILLSTYLE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:659: FILLSTYLE
                 {
                 	mFILLSTYLE(); 
 
                 }
                 break;
             case 88 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:669: LABEL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:669: LABEL
                 {
                 	mLABEL(); 
 
                 }
                 break;
             case 89 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:675: Y2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:675: Y2
                 {
                 	mY2(); 
 
                 }
                 break;
             case 90 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:678: X
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:678: X
                 {
                 	mX(); 
 
                 }
                 break;
             case 91 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:680: Y
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:680: Y
                 {
                 	mY(); 
 
                 }
                 break;
             case 92 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:682: MDATEFORMAT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:682: MDATEFORMAT
                 {
                 	mMDATEFORMAT(); 
 
                 }
                 break;
             case 93 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:694: THOUSANDSSEPARATOR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:694: THOUSANDSSEPARATOR
                 {
                 	mTHOUSANDSSEPARATOR(); 
 
                 }
                 break;
             case 94 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:713: XEDIT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:713: XEDIT
                 {
                 	mXEDIT(); 
 
                 }
                 break;
             case 95 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:719: IMPOSE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:719: IMPOSE
                 {
                 	mIMPOSE(); 
 
                 }
                 break;
             case 96 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:726: CONSTANT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:726: CONSTANT
                 {
                 	mCONSTANT(); 
 
                 }
                 break;
             case 97 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:735: INTERPOLATE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:735: INTERPOLATE
                 {
                 	mINTERPOLATE(); 
 
                 }
                 break;
             case 98 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:747: PRORATE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:747: PRORATE
                 {
                 	mPRORATE(); 
 
                 }
                 break;
             case 99 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:755: TRIM
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:755: TRIM
                 {
                 	mTRIM(); 
 
                 }
                 break;
             case 100 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:760: USING
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:760: USING
                 {
                 	mUSING(); 
 
                 }
                 break;
             case 101 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:766: A
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:766: A
                 {
                 	mA(); 
 
                 }
                 break;
             case 102 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:768: DEFAULT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:768: DEFAULT
                 {
                 	mDEFAULT(); 
 
                 }
                 break;
             case 103 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:776: LOGIC
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:776: LOGIC
                 {
                 	mLOGIC(); 
 
                 }
                 break;
             case 104 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:782: ABS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:782: ABS
                 {
                 	mABS(); 
 
                 }
                 break;
             case 105 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:786: ABSOLUTE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:786: ABSOLUTE
                 {
                 	mABSOLUTE(); 
 
                 }
                 break;
             case 106 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:795: ACCEPT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:795: ACCEPT
                 {
                 	mACCEPT(); 
 
                 }
                 break;
             case 107 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:802: ADD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:802: ADD
                 {
                 	mADD(); 
 
                 }
                 break;
             case 108 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:806: AFTER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:806: AFTER
                 {
                 	mAFTER(); 
 
                 }
                 break;
             case 109 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:812: AFTER2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:812: AFTER2
                 {
                 	mAFTER2(); 
 
                 }
                 break;
             case 110 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:819: ALIGNCENTER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:819: ALIGNCENTER
                 {
                 	mALIGNCENTER(); 
 
                 }
                 break;
             case 111 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:831: ALIGNLEFT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:831: ALIGNLEFT
                 {
                 	mALIGNLEFT(); 
 
                 }
                 break;
             case 112 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:841: ALIGNRIGHT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:841: ALIGNRIGHT
                 {
                 	mALIGNRIGHT(); 
 
                 }
                 break;
             case 113 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:852: ALL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:852: ALL
                 {
                 	mALL(); 
 
                 }
                 break;
             case 114 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:856: ANALYZE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:856: ANALYZE
                 {
                 	mANALYZE(); 
 
                 }
                 break;
             case 115 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:864: AND
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:864: AND
                 {
                 	mAND(); 
 
                 }
                 break;
             case 116 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:868: APPEND
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:868: APPEND
                 {
                 	mAPPEND(); 
 
                 }
                 break;
             case 117 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:875: AREMOS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:875: AREMOS
                 {
                 	mAREMOS(); 
 
                 }
                 break;
             case 118 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:882: OP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:882: OP
                 {
                 	mOP(); 
 
                 }
                 break;
             case 119 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:885: AS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:885: AS
                 {
                 	mAS(); 
 
                 }
                 break;
             case 120 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:888: AUTO
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:888: AUTO
                 {
                 	mAUTO(); 
 
                 }
                 break;
             case 121 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:893: AVG
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:893: AVG
                 {
                 	mAVG(); 
 
                 }
                 break;
             case 122 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:897: INDICATOR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:897: INDICATOR
                 {
                 	mINDICATOR(); 
 
                 }
                 break;
             case 123 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:907: BACKTRACK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:907: BACKTRACK
                 {
                 	mBACKTRACK(); 
 
                 }
                 break;
             case 124 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:917: BANK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:917: BANK
                 {
                 	mBANK(); 
 
                 }
                 break;
             case 125 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:922: BANK1
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:922: BANK1
                 {
                 	mBANK1(); 
 
                 }
                 break;
             case 126 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:928: BANK2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:928: BANK2
                 {
                 	mBANK2(); 
 
                 }
                 break;
             case 127 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:934: BOWL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:934: BOWL
                 {
                 	mBOWL(); 
 
                 }
                 break;
             case 128 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:939: BY
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:939: BY
                 {
                 	mBY(); 
 
                 }
                 break;
             case 129 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:942: CACHE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:942: CACHE
                 {
                 	mCACHE(); 
 
                 }
                 break;
             case 130 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:948: CALC
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:948: CALC
                 {
                 	mCALC(); 
 
                 }
                 break;
             case 131 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:953: CAPS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:953: CAPS
                 {
                 	mCAPS(); 
 
                 }
                 break;
             case 132 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:958: CELL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:958: CELL
                 {
                 	mCELL(); 
 
                 }
                 break;
             case 133 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:963: CHANGE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:963: CHANGE
                 {
                 	mCHANGE(); 
 
                 }
                 break;
             case 134 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:970: CHECKOFF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:970: CHECKOFF
                 {
                 	mCHECKOFF(); 
 
                 }
                 break;
             case 135 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:979: CLEAR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:979: CLEAR
                 {
                 	mCLEAR(); 
 
                 }
                 break;
             case 136 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:985: CLEAR2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:985: CLEAR2
                 {
                 	mCLEAR2(); 
 
                 }
                 break;
             case 137 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:992: CLIP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:992: CLIP
                 {
                 	mCLIP(); 
 
                 }
                 break;
             case 138 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:997: CLIPBOARD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:997: CLIPBOARD
                 {
                 	mCLIPBOARD(); 
 
                 }
                 break;
             case 139 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1007: CLONE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1007: CLONE
                 {
                 	mCLONE(); 
 
                 }
                 break;
             case 140 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1013: MOVE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1013: MOVE
                 {
                 	mMOVE(); 
 
                 }
                 break;
             case 141 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1018: REMOVE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1018: REMOVE
                 {
                 	mREMOVE(); 
 
                 }
                 break;
             case 142 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1025: CLOSE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1025: CLOSE
                 {
                 	mCLOSE(); 
 
                 }
                 break;
             case 143 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1031: CLOSEALL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1031: CLOSEALL
                 {
                 	mCLOSEALL(); 
 
                 }
                 break;
             case 144 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1040: CLOSEBANKS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1040: CLOSEBANKS
                 {
                 	mCLOSEBANKS(); 
 
                 }
                 break;
             case 145 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1051: CLS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1051: CLS
                 {
                 	mCLS(); 
 
                 }
                 break;
             case 146 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1055: CODE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1055: CODE
                 {
                 	mCODE(); 
 
                 }
                 break;
             case 147 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1060: COLLAPSE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1060: COLLAPSE
                 {
                 	mCOLLAPSE(); 
 
                 }
                 break;
             case 148 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1069: XTREND
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1069: XTREND
                 {
                 	mXTREND(); 
 
                 }
                 break;
             case 149 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1076: XFLAT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1076: XFLAT
                 {
                 	mXFLAT(); 
 
                 }
                 break;
             case 150 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1082: PX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1082: PX
                 {
                 	mPX(); 
 
                 }
                 break;
             case 151 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1085: ARRAY
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1085: ARRAY
                 {
                 	mARRAY(); 
 
                 }
                 break;
             case 152 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1091: BUGFIX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1091: BUGFIX
                 {
                 	mBUGFIX(); 
 
                 }
                 break;
             case 153 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1098: GCM
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1098: GCM
                 {
                 	mGCM(); 
 
                 }
                 break;
             case 154 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1102: COLORS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1102: COLORS
                 {
                 	mCOLORS(); 
 
                 }
                 break;
             case 155 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1109: COLS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1109: COLS
                 {
                 	mCOLS(); 
 
                 }
                 break;
             case 156 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1114: DELIMITER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1114: DELIMITER
                 {
                 	mDELIMITER(); 
 
                 }
                 break;
             case 157 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1124: DATEFORMAT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1124: DATEFORMAT
                 {
                 	mDATEFORMAT(); 
 
                 }
                 break;
             case 158 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1135: DATETYPE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1135: DATETYPE
                 {
                 	mDATETYPE(); 
 
                 }
                 break;
             case 159 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1144: COMMA
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1144: COMMA
                 {
                 	mCOMMA(); 
 
                 }
                 break;
             case 160 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1150: COMMAND
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1150: COMMAND
                 {
                 	mCOMMAND(); 
 
                 }
                 break;
             case 161 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1158: COMMAND1
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1158: COMMAND1
                 {
                 	mCOMMAND1(); 
 
                 }
                 break;
             case 162 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1167: COMMAND2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1167: COMMAND2
                 {
                 	mCOMMAND2(); 
 
                 }
                 break;
             case 163 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1176: COMPARE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1176: COMPARE
                 {
                 	mCOMPARE(); 
 
                 }
                 break;
             case 164 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1184: COMPRESS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1184: COMPRESS
                 {
                 	mCOMPRESS(); 
 
                 }
                 break;
             case 165 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1193: CONST
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1193: CONST
                 {
                 	mCONST(); 
 
                 }
                 break;
             case 166 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1199: CONV
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1199: CONV
                 {
                 	mCONV(); 
 
                 }
                 break;
             case 167 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1204: CONV1
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1204: CONV1
                 {
                 	mCONV1(); 
 
                 }
                 break;
             case 168 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1210: CONV2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1210: CONV2
                 {
                 	mCONV2(); 
 
                 }
                 break;
             case 169 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1216: COPY
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1216: COPY
                 {
                 	mCOPY(); 
 
                 }
                 break;
             case 170 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1221: COPYLOCAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1221: COPYLOCAL
                 {
                 	mCOPYLOCAL(); 
 
                 }
                 break;
             case 171 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1231: LOCAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1231: LOCAL
                 {
                 	mLOCAL(); 
 
                 }
                 break;
             case 172 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1237: GLOBAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1237: GLOBAL
                 {
                 	mGLOBAL(); 
 
                 }
                 break;
             case 173 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1244: COUNT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1244: COUNT
                 {
                 	mCOUNT(); 
 
                 }
                 break;
             case 174 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1250: CPLOT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1250: CPLOT
                 {
                 	mCPLOT(); 
 
                 }
                 break;
             case 175 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1256: CREATE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1256: CREATE
                 {
                 	mCREATE(); 
 
                 }
                 break;
             case 176 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1263: CREATEVARS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1263: CREATEVARS
                 {
                 	mCREATEVARS(); 
 
                 }
                 break;
             case 177 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1274: CSV
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1274: CSV
                 {
                 	mCSV(); 
 
                 }
                 break;
             case 178 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1278: SDF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1278: SDF
                 {
                 	mSDF(); 
 
                 }
                 break;
             case 179 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1282: CURROW
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1282: CURROW
                 {
                 	mCURROW(); 
 
                 }
                 break;
             case 180 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1289: D
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1289: D
                 {
                 	mD(); 
 
                 }
                 break;
             case 181 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1291: DAMP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1291: DAMP
                 {
                 	mDAMP(); 
 
                 }
                 break;
             case 182 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1296: DANISH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1296: DANISH
                 {
                 	mDANISH(); 
 
                 }
                 break;
             case 183 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1303: DATA
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1303: DATA
                 {
                 	mDATA(); 
 
                 }
                 break;
             case 184 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1308: DATABANK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1308: DATABANK
                 {
                 	mDATABANK(); 
 
                 }
                 break;
             case 185 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1317: DATAWIDTH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1317: DATAWIDTH
                 {
                 	mDATAWIDTH(); 
 
                 }
                 break;
             case 186 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1327: DATE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1327: DATE
                 {
                 	mDATE(); 
 
                 }
                 break;
             case 187 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1332: DATES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1332: DATES
                 {
                 	mDATES(); 
 
                 }
                 break;
             case 188 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1338: DEBUG
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1338: DEBUG
                 {
                 	mDEBUG(); 
 
                 }
                 break;
             case 189 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1344: DEC
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1344: DEC
                 {
                 	mDEC(); 
 
                 }
                 break;
             case 190 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1348: DECIMALSEPARATOR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1348: DECIMALSEPARATOR
                 {
                 	mDECIMALSEPARATOR(); 
 
                 }
                 break;
             case 191 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1365: DECOMP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1365: DECOMP
                 {
                 	mDECOMP(); 
 
                 }
                 break;
             case 192 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1372: DECOMP2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1372: DECOMP2
                 {
                 	mDECOMP2(); 
 
                 }
                 break;
             case 193 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1380: DECOMP3
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1380: DECOMP3
                 {
                 	mDECOMP3(); 
 
                 }
                 break;
             case 194 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1388: EVAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1388: EVAL
                 {
                 	mEVAL(); 
 
                 }
                 break;
             case 195 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1393: DELETE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1393: DELETE
                 {
                 	mDELETE(); 
 
                 }
                 break;
             case 196 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1400: DETAILS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1400: DETAILS
                 {
                 	mDETAILS(); 
 
                 }
                 break;
             case 197 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1408: DIALOG
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1408: DIALOG
                 {
                 	mDIALOG(); 
 
                 }
                 break;
             case 198 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1415: DIF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1415: DIF
                 {
                 	mDIF(); 
 
                 }
                 break;
             case 199 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1419: DIFF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1419: DIFF
                 {
                 	mDIFF(); 
 
                 }
                 break;
             case 200 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1424: DIFPRT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1424: DIFPRT
                 {
                 	mDIFPRT(); 
 
                 }
                 break;
             case 201 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1431: DING
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1431: DING
                 {
                 	mDING(); 
 
                 }
                 break;
             case 202 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1436: DYN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1436: DYN
                 {
                 	mDYN(); 
 
                 }
                 break;
             case 203 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1440: DIRECT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1440: DIRECT
                 {
                 	mDIRECT(); 
 
                 }
                 break;
             case 204 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1447: DISP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1447: DISP
                 {
                 	mDISP(); 
 
                 }
                 break;
             case 205 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1452: GEKKO
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1452: GEKKO
                 {
                 	mGEKKO(); 
 
                 }
                 break;
             case 206 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1458: DISPLAY
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1458: DISPLAY
                 {
                 	mDISPLAY(); 
 
                 }
                 break;
             case 207 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1466: DOC
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1466: DOC
                 {
                 	mDOC(); 
 
                 }
                 break;
             case 208 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1470: DOWNLOAD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1470: DOWNLOAD
                 {
                 	mDOWNLOAD(); 
 
                 }
                 break;
             case 209 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1479: DP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1479: DP
                 {
                 	mDP(); 
 
                 }
                 break;
             case 210 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1482: DUMOF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1482: DUMOF
                 {
                 	mDUMOF(); 
 
                 }
                 break;
             case 211 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1488: DUMOFF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1488: DUMOFF
                 {
                 	mDUMOFF(); 
 
                 }
                 break;
             case 212 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1495: DUMON
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1495: DUMON
                 {
                 	mDUMON(); 
 
                 }
                 break;
             case 213 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1501: DUMP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1501: DUMP
                 {
                 	mDUMP(); 
 
                 }
                 break;
             case 214 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1506: DUMPOPTIONS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1506: DUMPOPTIONS
                 {
                 	mDUMPOPTIONS(); 
 
                 }
                 break;
             case 215 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1518: EDIT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1518: EDIT
                 {
                 	mEDIT(); 
 
                 }
                 break;
             case 216 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1523: EFTER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1523: EFTER
                 {
                 	mEFTER(); 
 
                 }
                 break;
             case 217 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1529: ELSE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1529: ELSE
                 {
                 	mELSE(); 
 
                 }
                 break;
             case 218 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1534: ELSEIF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1534: ELSEIF
                 {
                 	mELSEIF(); 
 
                 }
                 break;
             case 219 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1541: END
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1541: END
                 {
                 	mEND(); 
 
                 }
                 break;
             case 220 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1545: ENDO
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1545: ENDO
                 {
                 	mENDO(); 
 
                 }
                 break;
             case 221 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1550: ENGLISH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1550: ENGLISH
                 {
                 	mENGLISH(); 
 
                 }
                 break;
             case 222 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1558: ERROR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1558: ERROR
                 {
                 	mERROR(); 
 
                 }
                 break;
             case 223 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1564: EXCEL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1564: EXCEL
                 {
                 	mEXCEL(); 
 
                 }
                 break;
             case 224 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1570: EXE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1570: EXE
                 {
                 	mEXE(); 
 
                 }
                 break;
             case 225 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1574: EXIT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1574: EXIT
                 {
                 	mEXIT(); 
 
                 }
                 break;
             case 226 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1579: EXO
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1579: EXO
                 {
                 	mEXO(); 
 
                 }
                 break;
             case 227 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1583: EXP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1583: EXP
                 {
                 	mEXP(); 
 
                 }
                 break;
             case 228 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1587: EXPORT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1587: EXPORT
                 {
                 	mEXPORT(); 
 
                 }
                 break;
             case 229 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1594: EXTERNAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1594: EXTERNAL
                 {
                 	mEXTERNAL(); 
 
                 }
                 break;
             case 230 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1603: FAILSAFE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1603: FAILSAFE
                 {
                 	mFAILSAFE(); 
 
                 }
                 break;
             case 231 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1612: FAIR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1612: FAIR
                 {
                 	mFAIR(); 
 
                 }
                 break;
             case 232 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1617: FALSE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1617: FALSE
                 {
                 	mFALSE(); 
 
                 }
                 break;
             case 233 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1623: FAST
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1623: FAST
                 {
                 	mFAST(); 
 
                 }
                 break;
             case 234 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1628: FEED
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1628: FEED
                 {
                 	mFEED(); 
 
                 }
                 break;
             case 235 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1633: FEEDBACK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1633: FEEDBACK
                 {
                 	mFEEDBACK(); 
 
                 }
                 break;
             case 236 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1642: FIELDS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1642: FIELDS
                 {
                 	mFIELDS(); 
 
                 }
                 break;
             case 237 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1649: FILE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1649: FILE
                 {
                 	mFILE(); 
 
                 }
                 break;
             case 238 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1654: FILEWIDTH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1654: FILEWIDTH
                 {
                 	mFILEWIDTH(); 
 
                 }
                 break;
             case 239 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1664: FILTER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1664: FILTER
                 {
                 	mFILTER(); 
 
                 }
                 break;
             case 240 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1671: FINDMISSINGDATA
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1671: FINDMISSINGDATA
                 {
                 	mFINDMISSINGDATA(); 
 
                 }
                 break;
             case 241 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1687: BANKNAME
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1687: BANKNAME
                 {
                 	mBANKNAME(); 
 
                 }
                 break;
             case 242 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1696: FLOW
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1696: FLOW
                 {
                 	mFLOW(); 
 
                 }
                 break;
             case 243 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1701: META
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1701: META
                 {
                 	mMETA(); 
 
                 }
                 break;
             case 244 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1706: ECHO
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1706: ECHO
                 {
                 	mECHO(); 
 
                 }
                 break;
             case 245 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1711: OBS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1711: OBS
                 {
                 	mOBS(); 
 
                 }
                 break;
             case 246 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1715: A3DP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1715: A3DP
                 {
                 	mA3DP(); 
 
                 }
                 break;
             case 247 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1720: A3
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1720: A3
                 {
                 	mA3(); 
 
                 }
                 break;
             case 248 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1723: A3N
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1723: A3N
                 {
                 	mA3N(); 
 
                 }
                 break;
             case 249 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1727: ADP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1727: ADP
                 {
                 	mADP(); 
 
                 }
                 break;
             case 250 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1731: AL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1731: AL
                 {
                 	mAL(); 
 
                 }
                 break;
             case 251 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1734: ADL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1734: ADL
                 {
                 	mADL(); 
 
                 }
                 break;
             case 252 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1738: A3P
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1738: A3P
                 {
                 	mA3P(); 
 
                 }
                 break;
             case 253 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1742: AN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1742: AN
                 {
                 	mAN(); 
 
                 }
                 break;
             case 254 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1745: AD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1745: AD
                 {
                 	mAD(); 
 
                 }
                 break;
             case 255 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1748: AP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1748: AP
                 {
                 	mAP(); 
 
                 }
                 break;
             case 256 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1751: A3D
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1751: A3D
                 {
                 	mA3D(); 
 
                 }
                 break;
             case 257 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1755: A3L
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1755: A3L
                 {
                 	mA3L(); 
 
                 }
                 break;
             case 258 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1759: A3DL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1759: A3DL
                 {
                 	mA3DL(); 
 
                 }
                 break;
             case 259 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1764: YOY
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1764: YOY
                 {
                 	mYOY(); 
 
                 }
                 break;
             case 260 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1768: EXPAND
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1768: EXPAND
                 {
                 	mEXPAND(); 
 
                 }
                 break;
             case 261 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1775: VARIABLECODE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1775: VARIABLECODE
                 {
                 	mVARIABLECODE(); 
 
                 }
                 break;
             case 262 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1788: VIEW
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1788: VIEW
                 {
                 	mVIEW(); 
 
                 }
                 break;
             case 263 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1793: KEEPTYPES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1793: KEEPTYPES
                 {
                 	mKEEPTYPES(); 
 
                 }
                 break;
             case 264 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1803: PREDICT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1803: PREDICT
                 {
                 	mPREDICT(); 
 
                 }
                 break;
             case 265 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1811: FIND
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1811: FIND
                 {
                 	mFIND(); 
 
                 }
                 break;
             case 266 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1816: PYTHON
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1816: PYTHON
                 {
                 	mPYTHON(); 
 
                 }
                 break;
             case 267 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1823: DEP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1823: DEP
                 {
                 	mDEP(); 
 
                 }
                 break;
             case 268 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1827: BROWSER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1827: BROWSER
                 {
                 	mBROWSER(); 
 
                 }
                 break;
             case 269 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1835: FIRST
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1835: FIRST
                 {
                 	mFIRST(); 
 
                 }
                 break;
             case 270 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1841: FIRSTCOLWIDTH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1841: FIRSTCOLWIDTH
                 {
                 	mFIRSTCOLWIDTH(); 
 
                 }
                 break;
             case 271 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1855: FIX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1855: FIX
                 {
                 	mFIX(); 
 
                 }
                 break;
             case 272 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1859: FLAT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1859: FLAT
                 {
                 	mFLAT(); 
 
                 }
                 break;
             case 273 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1864: DATECELL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1864: DATECELL
                 {
                 	mDATECELL(); 
 
                 }
                 break;
             case 274 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1873: NAMECELL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1873: NAMECELL
                 {
                 	mNAMECELL(); 
 
                 }
                 break;
             case 275 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1882: FOLDER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1882: FOLDER
                 {
                 	mFOLDER(); 
 
                 }
                 break;
             case 276 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1889: FONT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1889: FONT
                 {
                 	mFONT(); 
 
                 }
                 break;
             case 277 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1894: FONTSIZE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1894: FONTSIZE
                 {
                 	mFONTSIZE(); 
 
                 }
                 break;
             case 278 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1903: FOR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1903: FOR
                 {
                 	mFOR(); 
 
                 }
                 break;
             case 279 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1907: FORMAT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1907: FORMAT
                 {
                 	mFORMAT(); 
 
                 }
                 break;
             case 280 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1914: FORWARD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1914: FORWARD
                 {
                 	mFORWARD(); 
 
                 }
                 break;
             case 281 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1922: FREQ
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1922: FREQ
                 {
                 	mFREQ(); 
 
                 }
                 break;
             case 282 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1927: FRML
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1927: FRML
                 {
                 	mFRML(); 
 
                 }
                 break;
             case 283 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1932: FROM
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1932: FROM
                 {
                 	mFROM(); 
 
                 }
                 break;
             case 284 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1937: FUNCTION
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1937: FUNCTION
                 {
                 	mFUNCTION(); 
 
                 }
                 break;
             case 285 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1946: GAUSS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1946: GAUSS
                 {
                 	mGAUSS(); 
 
                 }
                 break;
             case 286 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1952: GBK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1952: GBK
                 {
                 	mGBK(); 
 
                 }
                 break;
             case 287 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1956: GDIF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1956: GDIF
                 {
                 	mGDIF(); 
 
                 }
                 break;
             case 288 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1961: GDIFF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1961: GDIFF
                 {
                 	mGDIFF(); 
 
                 }
                 break;
             case 289 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1967: GEKKO18
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1967: GEKKO18
                 {
                 	mGEKKO18(); 
 
                 }
                 break;
             case 290 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1975: GEKKO20
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1975: GEKKO20
                 {
                 	mGEKKO20(); 
 
                 }
                 break;
             case 291 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1983: GENR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1983: GENR
                 {
                 	mGENR(); 
 
                 }
                 break;
             case 292 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1988: GEOMETRIC
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1988: GEOMETRIC
                 {
                 	mGEOMETRIC(); 
 
                 }
                 break;
             case 293 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:1998: OVERLAY
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:1998: OVERLAY
                 {
                 	mOVERLAY(); 
 
                 }
                 break;
             case 294 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2006: GMULPRT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2006: GMULPRT
                 {
                 	mGMULPRT(); 
 
                 }
                 break;
             case 295 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2014: GNUPLOT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2014: GNUPLOT
                 {
                 	mGNUPLOT(); 
 
                 }
                 break;
             case 296 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2022: GOAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2022: GOAL
                 {
                 	mGOAL(); 
 
                 }
                 break;
             case 297 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2027: GOTO
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2027: GOTO
                 {
                 	mGOTO(); 
 
                 }
                 break;
             case 298 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2032: GRAPH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2032: GRAPH
                 {
                 	mGRAPH(); 
 
                 }
                 break;
             case 299 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2038: GROWTH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2038: GROWTH
                 {
                 	mGROWTH(); 
 
                 }
                 break;
             case 300 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2045: HDG
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2045: HDG
                 {
                 	mHDG(); 
 
                 }
                 break;
             case 301 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2049: HEADING
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2049: HEADING
                 {
                 	mHEADING(); 
 
                 }
                 break;
             case 302 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2057: HELP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2057: HELP
                 {
                 	mHELP(); 
 
                 }
                 break;
             case 303 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2062: HIDE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2062: HIDE
                 {
                 	mHIDE(); 
 
                 }
                 break;
             case 304 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2067: HIDELEFTBORDER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2067: HIDELEFTBORDER
                 {
                 	mHIDELEFTBORDER(); 
 
                 }
                 break;
             case 305 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2082: HIDERIGHTBORDER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2082: HIDERIGHTBORDER
                 {
                 	mHIDERIGHTBORDER(); 
 
                 }
                 break;
             case 306 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2098: HORIZON
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2098: HORIZON
                 {
                 	mHORIZON(); 
 
                 }
                 break;
             case 307 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2106: HPFILTER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2106: HPFILTER
                 {
                 	mHPFILTER(); 
 
                 }
                 break;
             case 308 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2115: HTML
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2115: HTML
                 {
                 	mHTML(); 
 
                 }
                 break;
             case 309 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2120: IF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2120: IF
                 {
                 	mIF(); 
 
                 }
                 break;
             case 310 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2123: IF_OLD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2123: IF_OLD
                 {
                 	mIF_OLD(); 
 
                 }
                 break;
             case 311 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2130: ASBANK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2130: ASBANK
                 {
                 	mASBANK(); 
 
                 }
                 break;
             case 312 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2137: TOBANK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2137: TOBANK
                 {
                 	mTOBANK(); 
 
                 }
                 break;
             case 313 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2144: VARLIST
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2144: VARLIST
                 {
                 	mVARLIST(); 
 
                 }
                 break;
             case 314 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2152: FROMBANK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2152: FROMBANK
                 {
                 	mFROMBANK(); 
 
                 }
                 break;
             case 315 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2161: IGNOREMISSING
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2161: IGNOREMISSING
                 {
                 	mIGNOREMISSING(); 
 
                 }
                 break;
             case 316 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2175: IGNOREMISSINGVARS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2175: IGNOREMISSINGVARS
                 {
                 	mIGNOREMISSINGVARS(); 
 
                 }
                 break;
             case 317 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2193: IGNOREVARS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2193: IGNOREVARS
                 {
                 	mIGNOREVARS(); 
 
                 }
                 break;
             case 318 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2204: IMPORT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2204: IMPORT
                 {
                 	mIMPORT(); 
 
                 }
                 break;
             case 319 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2211: INDEX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2211: INDEX
                 {
                 	mINDEX(); 
 
                 }
                 break;
             case 320 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2217: INFO
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2217: INFO
                 {
                 	mINFO(); 
 
                 }
                 break;
             case 321 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2222: INFOFILE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2222: INFOFILE
                 {
                 	mINFOFILE(); 
 
                 }
                 break;
             case 322 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2231: INI
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2231: INI
                 {
                 	mINI(); 
 
                 }
                 break;
             case 323 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2235: INIT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2235: INIT
                 {
                 	mINIT(); 
 
                 }
                 break;
             case 324 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2240: INTERFACE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2240: INTERFACE
                 {
                 	mINTERFACE(); 
 
                 }
                 break;
             case 325 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2250: INTERNAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2250: INTERNAL
                 {
                 	mINTERNAL(); 
 
                 }
                 break;
             case 326 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2259: INVERT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2259: INVERT
                 {
                 	mINVERT(); 
 
                 }
                 break;
             case 327 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2266: ROBUST
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2266: ROBUST
                 {
                 	mROBUST(); 
 
                 }
                 break;
             case 328 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2273: ITER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2273: ITER
                 {
                 	mITER(); 
 
                 }
                 break;
             case 329 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2278: ITERMAX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2278: ITERMAX
                 {
                 	mITERMAX(); 
 
                 }
                 break;
             case 330 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2286: ITERMIN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2286: ITERMIN
                 {
                 	mITERMIN(); 
 
                 }
                 break;
             case 331 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2294: ITERSHOW
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2294: ITERSHOW
                 {
                 	mITERSHOW(); 
 
                 }
                 break;
             case 332 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2303: KEEP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2303: KEEP
                 {
                 	mKEEP(); 
 
                 }
                 break;
             case 333 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2308: LABELS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2308: LABELS
                 {
                 	mLABELS(); 
 
                 }
                 break;
             case 334 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2315: LAG
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2315: LAG
                 {
                 	mLAG(); 
 
                 }
                 break;
             case 335 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2319: LANGUAGE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2319: LANGUAGE
                 {
                 	mLANGUAGE(); 
 
                 }
                 break;
             case 336 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2328: LAST
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2328: LAST
                 {
                 	mLAST(); 
 
                 }
                 break;
             case 337 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2333: LEV
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2333: LEV
                 {
                 	mLEV(); 
 
                 }
                 break;
             case 338 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2337: LINEAR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2337: LINEAR
                 {
                 	mLINEAR(); 
 
                 }
                 break;
             case 339 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2344: LINES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2344: LINES
                 {
                 	mLINES(); 
 
                 }
                 break;
             case 340 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2350: LIST
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2350: LIST
                 {
                 	mLIST(); 
 
                 }
                 break;
             case 341 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2355: LISTFILE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2355: LISTFILE
                 {
                 	mLISTFILE(); 
 
                 }
                 break;
             case 342 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2364: LOG
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2364: LOG
                 {
                 	mLOG(); 
 
                 }
                 break;
             case 343 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2368: LOCK_
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2368: LOCK_
                 {
                 	mLOCK_(); 
 
                 }
                 break;
             case 344 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2374: UNLOCK_
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2374: UNLOCK_
                 {
                 	mUNLOCK_(); 
 
                 }
                 break;
             case 345 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2382: LU
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2382: LU
                 {
                 	mLU(); 
 
                 }
                 break;
             case 346 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2385: M
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2385: M
                 {
                 	mM(); 
 
                 }
                 break;
             case 347 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2387: MACRO2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2387: MACRO2
                 {
                 	mMACRO2(); 
 
                 }
                 break;
             case 348 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2394: MAIN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2394: MAIN
                 {
                 	mMAIN(); 
 
                 }
                 break;
             case 349 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2399: MAT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2399: MAT
                 {
                 	mMAT(); 
 
                 }
                 break;
             case 350 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2403: MATRIX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2403: MATRIX
                 {
                 	mMATRIX(); 
 
                 }
                 break;
             case 351 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2410: ROWNAMES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2410: ROWNAMES
                 {
                 	mROWNAMES(); 
 
                 }
                 break;
             case 352 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2419: COLNAMES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2419: COLNAMES
                 {
                 	mCOLNAMES(); 
 
                 }
                 break;
             case 353 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2428: MAX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2428: MAX
                 {
                 	mMAX(); 
 
                 }
                 break;
             case 354 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2432: MAXLINES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2432: MAXLINES
                 {
                 	mMAXLINES(); 
 
                 }
                 break;
             case 355 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2441: MEM
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2441: MEM
                 {
                 	mMEM(); 
 
                 }
                 break;
             case 356 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2445: MENU
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2445: MENU
                 {
                 	mMENU(); 
 
                 }
                 break;
             case 357 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2450: MENUTABLE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2450: MENUTABLE
                 {
                 	mMENUTABLE(); 
 
                 }
                 break;
             case 358 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2460: MERGE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2460: MERGE
                 {
                 	mMERGE(); 
 
                 }
                 break;
             case 359 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2466: MERGECOLS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2466: MERGECOLS
                 {
                 	mMERGECOLS(); 
 
                 }
                 break;
             case 360 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2476: MESSAGE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2476: MESSAGE
                 {
                 	mMESSAGE(); 
 
                 }
                 break;
             case 361 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2484: METHOD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2484: METHOD
                 {
                 	mMETHOD(); 
 
                 }
                 break;
             case 362 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2491: MIN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2491: MIN
                 {
                 	mMIN(); 
 
                 }
                 break;
             case 363 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2495: MIXED
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2495: MIXED
                 {
                 	mMIXED(); 
 
                 }
                 break;
             case 364 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2501: MISSING
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2501: MISSING
                 {
                 	mMISSING(); 
 
                 }
                 break;
             case 365 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2509: MODE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2509: MODE
                 {
                 	mMODE(); 
 
                 }
                 break;
             case 366 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2514: MODEL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2514: MODEL
                 {
                 	mMODEL(); 
 
                 }
                 break;
             case 367 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2520: MODERNLOOK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2520: MODERNLOOK
                 {
                 	mMODERNLOOK(); 
 
                 }
                 break;
             case 368 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2531: MP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2531: MP
                 {
                 	mMP(); 
 
                 }
                 break;
             case 369 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2534: DL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2534: DL
                 {
                 	mDL(); 
 
                 }
                 break;
             case 370 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2537: L
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2537: L
                 {
                 	mL(); 
 
                 }
                 break;
             case 371 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2539: RDL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2539: RDL
                 {
                 	mRDL(); 
 
                 }
                 break;
             case 372 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2543: RL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2543: RL
                 {
                 	mRL(); 
 
                 }
                 break;
             case 373 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2546: MULBK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2546: MULBK
                 {
                 	mMULBK(); 
 
                 }
                 break;
             case 374 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2552: MULPCT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2552: MULPCT
                 {
                 	mMULPCT(); 
 
                 }
                 break;
             case 375 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2559: MULPRT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2559: MULPRT
                 {
                 	mMULPRT(); 
 
                 }
                 break;
             case 376 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2566: MUTE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2566: MUTE
                 {
                 	mMUTE(); 
 
                 }
                 break;
             case 377 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2571: N
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2571: N
                 {
                 	mN(); 
 
                 }
                 break;
             case 378 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2573: NAME
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2573: NAME
                 {
                 	mNAME(); 
 
                 }
                 break;
             case 379 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2578: NAMES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2578: NAMES
                 {
                 	mNAMES(); 
 
                 }
                 break;
             case 380 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2584: NDEC
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2584: NDEC
                 {
                 	mNDEC(); 
 
                 }
                 break;
             case 381 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2589: NDIFPRT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2589: NDIFPRT
                 {
                 	mNDIFPRT(); 
 
                 }
                 break;
             case 382 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2597: NEW
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2597: NEW
                 {
                 	mNEW(); 
 
                 }
                 break;
             case 383 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2601: NEWTON
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2601: NEWTON
                 {
                 	mNEWTON(); 
 
                 }
                 break;
             case 384 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2608: NEXT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2608: NEXT
                 {
                 	mNEXT(); 
 
                 }
                 break;
             case 385 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2613: NFAIR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2613: NFAIR
                 {
                 	mNFAIR(); 
 
                 }
                 break;
             case 386 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2619: NO
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2619: NO
                 {
                 	mNO(); 
 
                 }
                 break;
             case 387 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2622: NOABS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2622: NOABS
                 {
                 	mNOABS(); 
 
                 }
                 break;
             case 388 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2628: NOCR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2628: NOCR
                 {
                 	mNOCR(); 
 
                 }
                 break;
             case 389 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2633: NODIF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2633: NODIF
                 {
                 	mNODIF(); 
 
                 }
                 break;
             case 390 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2639: NODIFF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2639: NODIFF
                 {
                 	mNODIFF(); 
 
                 }
                 break;
             case 391 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2646: NOFILTER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2646: NOFILTER
                 {
                 	mNOFILTER(); 
 
                 }
                 break;
             case 392 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2655: NOGDIF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2655: NOGDIF
                 {
                 	mNOGDIF(); 
 
                 }
                 break;
             case 393 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2662: NOGDIFF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2662: NOGDIFF
                 {
                 	mNOGDIFF(); 
 
                 }
                 break;
             case 394 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2670: NOLEV
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2670: NOLEV
                 {
                 	mNOLEV(); 
 
                 }
                 break;
             case 395 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2676: NONE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2676: NONE
                 {
                 	mNONE(); 
 
                 }
                 break;
             case 396 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2681: NONMODEL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2681: NONMODEL
                 {
                 	mNONMODEL(); 
 
                 }
                 break;
             case 397 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2690: NOPCH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2690: NOPCH
                 {
                 	mNOPCH(); 
 
                 }
                 break;
             case 398 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2696: SAVE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2696: SAVE
                 {
                 	mSAVE(); 
 
                 }
                 break;
             case 399 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2701: NOT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2701: NOT
                 {
                 	mNOT(); 
 
                 }
                 break;
             case 400 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2705: NOTIFY
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2705: NOTIFY
                 {
                 	mNOTIFY(); 
 
                 }
                 break;
             case 401 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2712: NOV
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2712: NOV
                 {
                 	mNOV(); 
 
                 }
                 break;
             case 402 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2716: NWIDTH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2716: NWIDTH
                 {
                 	mNWIDTH(); 
 
                 }
                 break;
             case 403 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2723: NYTVINDU
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2723: NYTVINDU
                 {
                 	mNYTVINDU(); 
 
                 }
                 break;
             case 404 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2732: OLS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2732: OLS
                 {
                 	mOLS(); 
 
                 }
                 break;
             case 405 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2736: OPEN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2736: OPEN
                 {
                 	mOPEN(); 
 
                 }
                 break;
             case 406 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2741: OPTION
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2741: OPTION
                 {
                 	mOPTION(); 
 
                 }
                 break;
             case 407 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2748: OR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2748: OR
                 {
                 	mOR(); 
 
                 }
                 break;
             case 408 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2751: P
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2751: P
                 {
                 	mP(); 
 
                 }
                 break;
             case 409 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2753: PARAM
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2753: PARAM
                 {
                 	mPARAM(); 
 
                 }
                 break;
             case 410 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2759: PATCH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2759: PATCH
                 {
                 	mPATCH(); 
 
                 }
                 break;
             case 411 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2765: PATH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2765: PATH
                 {
                 	mPATH(); 
 
                 }
                 break;
             case 412 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2770: PAUSE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2770: PAUSE
                 {
                 	mPAUSE(); 
 
                 }
                 break;
             case 413 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2776: PCH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2776: PCH
                 {
                 	mPCH(); 
 
                 }
                 break;
             case 414 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2780: PCIM
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2780: PCIM
                 {
                 	mPCIM(); 
 
                 }
                 break;
             case 415 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2785: PCIMSTYLE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2785: PCIMSTYLE
                 {
                 	mPCIMSTYLE(); 
 
                 }
                 break;
             case 416 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2795: STYLE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2795: STYLE
                 {
                 	mSTYLE(); 
 
                 }
                 break;
             case 417 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2801: PCTPRT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2801: PCTPRT
                 {
                 	mPCTPRT(); 
 
                 }
                 break;
             case 418 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2808: PDEC
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2808: PDEC
                 {
                 	mPDEC(); 
 
                 }
                 break;
             case 419 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2813: PERIOD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2813: PERIOD
                 {
                 	mPERIOD(); 
 
                 }
                 break;
             case 420 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2820: PIPE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2820: PIPE
                 {
                 	mPIPE(); 
 
                 }
                 break;
             case 421 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2825: PLOT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2825: PLOT
                 {
                 	mPLOT(); 
 
                 }
                 break;
             case 422 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2830: PLOTCODE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2830: PLOTCODE
                 {
                 	mPLOTCODE(); 
 
                 }
                 break;
             case 423 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2839: CUT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2839: CUT
                 {
                 	mCUT(); 
 
                 }
                 break;
             case 424 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2843: POINTS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2843: POINTS
                 {
                 	mPOINTS(); 
 
                 }
                 break;
             case 425 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2850: POS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2850: POS
                 {
                 	mPOS(); 
 
                 }
                 break;
             case 426 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2854: PREFIX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2854: PREFIX
                 {
                 	mPREFIX(); 
 
                 }
                 break;
             case 427 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2861: PRETTY
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2861: PRETTY
                 {
                 	mPRETTY(); 
 
                 }
                 break;
             case 428 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2868: PRI
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2868: PRI
                 {
                 	mPRI(); 
 
                 }
                 break;
             case 429 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2872: PRIM
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2872: PRIM
                 {
                 	mPRIM(); 
 
                 }
                 break;
             case 430 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2877: PRINT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2877: PRINT
                 {
                 	mPRINT(); 
 
                 }
                 break;
             case 431 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2883: OPERATORS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2883: OPERATORS
                 {
                 	mOPERATORS(); 
 
                 }
                 break;
             case 432 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2893: PRN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2893: PRN
                 {
                 	mPRN(); 
 
                 }
                 break;
             case 433 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2897: PROT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2897: PROT
                 {
                 	mPROT(); 
 
                 }
                 break;
             case 434 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2902: PRT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2902: PRT
                 {
                 	mPRT(); 
 
                 }
                 break;
             case 435 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2906: PRTX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2906: PRTX
                 {
                 	mPRTX(); 
 
                 }
                 break;
             case 436 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2911: PUDVALG
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2911: PUDVALG
                 {
                 	mPUDVALG(); 
 
                 }
                 break;
             case 437 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2919: PWIDTH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2919: PWIDTH
                 {
                 	mPWIDTH(); 
 
                 }
                 break;
             case 438 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2926: Q
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2926: Q
                 {
                 	mQ(); 
 
                 }
                 break;
             case 439 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2928: R
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2928: R
                 {
                 	mR(); 
 
                 }
                 break;
             case 440 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2930: R_EXPORT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2930: R_EXPORT
                 {
                 	mR_EXPORT(); 
 
                 }
                 break;
             case 441 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2939: R_FILE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2939: R_FILE
                 {
                 	mR_FILE(); 
 
                 }
                 break;
             case 442 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2946: R_RUN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2946: R_RUN
                 {
                 	mR_RUN(); 
 
                 }
                 break;
             case 443 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2952: PYTHON_EXPORT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2952: PYTHON_EXPORT
                 {
                 	mPYTHON_EXPORT(); 
 
                 }
                 break;
             case 444 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2966: PYTHON_FILE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2966: PYTHON_FILE
                 {
                 	mPYTHON_FILE(); 
 
                 }
                 break;
             case 445 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2978: PYTHON_RUN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2978: PYTHON_RUN
                 {
                 	mPYTHON_RUN(); 
 
                 }
                 break;
             case 446 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2989: RD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2989: RD
                 {
                 	mRD(); 
 
                 }
                 break;
             case 447 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2992: RDP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2992: RDP
                 {
                 	mRDP(); 
 
                 }
                 break;
             case 448 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:2996: READ
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:2996: READ
                 {
                 	mREAD(); 
 
                 }
                 break;
             case 449 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3001: REF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3001: REF
                 {
                 	mREF(); 
 
                 }
                 break;
             case 450 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3005: REL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3005: REL
                 {
                 	mREL(); 
 
                 }
                 break;
             case 451 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3009: RENAME
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3009: RENAME
                 {
                 	mRENAME(); 
 
                 }
                 break;
             case 452 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3016: REORDER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3016: REORDER
                 {
                 	mREORDER(); 
 
                 }
                 break;
             case 453 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3024: REP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3024: REP
                 {
                 	mREP(); 
 
                 }
                 break;
             case 454 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3028: REPEAT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3028: REPEAT
                 {
                 	mREPEAT(); 
 
                 }
                 break;
             case 455 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3035: REPLACE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3035: REPLACE
                 {
                 	mREPLACE(); 
 
                 }
                 break;
             case 456 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3043: RES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3043: RES
                 {
                 	mRES(); 
 
                 }
                 break;
             case 457 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3047: RESET
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3047: RESET
                 {
                 	mRESET(); 
 
                 }
                 break;
             case 458 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3053: BLOCK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3053: BLOCK
                 {
                 	mBLOCK(); 
 
                 }
                 break;
             case 459 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3059: RESPECT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3059: RESPECT
                 {
                 	mRESPECT(); 
 
                 }
                 break;
             case 460 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3067: RESTART
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3067: RESTART
                 {
                 	mRESTART(); 
 
                 }
                 break;
             case 461 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3075: RING
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3075: RING
                 {
                 	mRING(); 
 
                 }
                 break;
             case 462 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3080: RN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3080: RN
                 {
                 	mRN(); 
 
                 }
                 break;
             case 463 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3083: ROWS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3083: ROWS
                 {
                 	mROWS(); 
 
                 }
                 break;
             case 464 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3088: GROUP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3088: GROUP
                 {
                 	mGROUP(); 
 
                 }
                 break;
             case 465 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3094: LEVEL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3094: LEVEL
                 {
                 	mLEVEL(); 
 
                 }
                 break;
             case 466 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3100: LINK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3100: LINK
                 {
                 	mLINK(); 
 
                 }
                 break;
             case 467 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3105: WHERE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3105: WHERE
                 {
                 	mWHERE(); 
 
                 }
                 break;
             case 468 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3111: RP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3111: RP
                 {
                 	mRP(); 
 
                 }
                 break;
             case 469 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3114: RUN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3114: RUN
                 {
                 	mRUN(); 
 
                 }
                 break;
             case 470 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3118: LIBRARY
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3118: LIBRARY
                 {
                 	mLIBRARY(); 
 
                 }
                 break;
             case 471 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3126: SEARCH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3126: SEARCH
                 {
                 	mSEARCH(); 
 
                 }
                 break;
             case 472 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3133: SEC
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3133: SEC
                 {
                 	mSEC(); 
 
                 }
                 break;
             case 473 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3137: SECONDCOLWIDTH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3137: SECONDCOLWIDTH
                 {
                 	mSECONDCOLWIDTH(); 
 
                 }
                 break;
             case 474 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3152: SER2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3152: SER2
                 {
                 	mSER2(); 
 
                 }
                 break;
             case 475 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3157: SER3
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3157: SER3
                 {
                 	mSER3(); 
 
                 }
                 break;
             case 476 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3162: SER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3162: SER
                 {
                 	mSER(); 
 
                 }
                 break;
             case 477 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3166: SERIES2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3166: SERIES2
                 {
                 	mSERIES2(); 
 
                 }
                 break;
             case 478 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3174: SERIES3
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3174: SERIES3
                 {
                 	mSERIES3(); 
 
                 }
                 break;
             case 479 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3182: SERIES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3182: SERIES
                 {
                 	mSERIES(); 
 
                 }
                 break;
             case 480 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3189: SET
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3189: SET
                 {
                 	mSET(); 
 
                 }
                 break;
             case 481 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3193: SETBORDER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3193: SETBORDER
                 {
                 	mSETBORDER(); 
 
                 }
                 break;
             case 482 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3203: SETBOTTOMBORDER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3203: SETBOTTOMBORDER
                 {
                 	mSETBOTTOMBORDER(); 
 
                 }
                 break;
             case 483 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3219: SETDATES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3219: SETDATES
                 {
                 	mSETDATES(); 
 
                 }
                 break;
             case 484 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3228: SETLEFTBORDER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3228: SETLEFTBORDER
                 {
                 	mSETLEFTBORDER(); 
 
                 }
                 break;
             case 485 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3242: SETRIGHTBORDER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3242: SETRIGHTBORDER
                 {
                 	mSETRIGHTBORDER(); 
 
                 }
                 break;
             case 486 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3257: SETTEXT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3257: SETTEXT
                 {
                 	mSETTEXT(); 
 
                 }
                 break;
             case 487 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3265: SETTOPBORDER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3265: SETTOPBORDER
                 {
                 	mSETTOPBORDER(); 
 
                 }
                 break;
             case 488 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3278: SETVALUES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3278: SETVALUES
                 {
                 	mSETVALUES(); 
 
                 }
                 break;
             case 489 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3288: SHEET
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3288: SHEET
                 {
                 	mSHEET(); 
 
                 }
                 break;
             case 490 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3294: SHOW
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3294: SHOW
                 {
                 	mSHOW(); 
 
                 }
                 break;
             case 491 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3299: SHOWBORDERS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3299: SHOWBORDERS
                 {
                 	mSHOWBORDERS(); 
 
                 }
                 break;
             case 492 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3311: SHOWPCH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3311: SHOWPCH
                 {
                 	mSHOWPCH(); 
 
                 }
                 break;
             case 493 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3319: SIGN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3319: SIGN
                 {
                 	mSIGN(); 
 
                 }
                 break;
             case 494 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3324: SIM
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3324: SIM
                 {
                 	mSIM(); 
 
                 }
                 break;
             case 495 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3328: SIMPLE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3328: SIMPLE
                 {
                 	mSIMPLE(); 
 
                 }
                 break;
             case 496 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3335: SKIP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3335: SKIP
                 {
                 	mSKIP(); 
 
                 }
                 break;
             case 497 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3340: NAN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3340: NAN
                 {
                 	mNAN(); 
 
                 }
                 break;
             case 498 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3344: ENGINE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3344: ENGINE
                 {
                 	mENGINE(); 
 
                 }
                 break;
             case 499 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3351: NORMAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3351: NORMAL
                 {
                 	mNORMAL(); 
 
                 }
                 break;
             case 500 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3358: SMOOTH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3358: SMOOTH
                 {
                 	mSMOOTH(); 
 
                 }
                 break;
             case 501 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3365: SOLVE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3365: SOLVE
                 {
                 	mSOLVE(); 
 
                 }
                 break;
             case 502 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3371: SOME
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3371: SOME
                 {
                 	mSOME(); 
 
                 }
                 break;
             case 503 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3376: SORT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3376: SORT
                 {
                 	mSORT(); 
 
                 }
                 break;
             case 504 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3381: SOUND
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3381: SOUND
                 {
                 	mSOUND(); 
 
                 }
                 break;
             case 505 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3387: SOURCE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3387: SOURCE
                 {
                 	mSOURCE(); 
 
                 }
                 break;
             case 506 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3394: SPECIALMINUS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3394: SPECIALMINUS
                 {
                 	mSPECIALMINUS(); 
 
                 }
                 break;
             case 507 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3407: SPLICE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3407: SPLICE
                 {
                 	mSPLICE(); 
 
                 }
                 break;
             case 508 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3414: SPLINE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3414: SPLINE
                 {
                 	mSPLINE(); 
 
                 }
                 break;
             case 509 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3421: SPLIT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3421: SPLIT
                 {
                 	mSPLIT(); 
 
                 }
                 break;
             case 510 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3427: STACKED
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3427: STACKED
                 {
                 	mSTACKED(); 
 
                 }
                 break;
             case 511 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3435: STAMP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3435: STAMP
                 {
                 	mSTAMP(); 
 
                 }
                 break;
             case 512 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3441: STARTFILE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3441: STARTFILE
                 {
                 	mSTARTFILE(); 
 
                 }
                 break;
             case 513 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3451: STATIC
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3451: STATIC
                 {
                 	mSTATIC(); 
 
                 }
                 break;
             case 514 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3458: CHECK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3458: CHECK
                 {
                 	mCHECK(); 
 
                 }
                 break;
             case 515 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3464: STEP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3464: STEP
                 {
                 	mSTEP(); 
 
                 }
                 break;
             case 516 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3469: STOP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3469: STOP
                 {
                 	mSTOP(); 
 
                 }
                 break;
             case 517 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3474: STRIP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3474: STRIP
                 {
                 	mSTRIP(); 
 
                 }
                 break;
             case 518 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3480: SUFFIX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3480: SUFFIX
                 {
                 	mSUFFIX(); 
 
                 }
                 break;
             case 519 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3487: SUGGESTIONS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3487: SUGGESTIONS
                 {
                 	mSUGGESTIONS(); 
 
                 }
                 break;
             case 520 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3499: SWAP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3499: SWAP
                 {
                 	mSWAP(); 
 
                 }
                 break;
             case 521 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3504: SYS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3504: SYS
                 {
                 	mSYS(); 
 
                 }
                 break;
             case 522 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3508: SYSTEM
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3508: SYSTEM
                 {
                 	mSYSTEM(); 
 
                 }
                 break;
             case 523 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3515: TABLE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3515: TABLE
                 {
                 	mTABLE(); 
 
                 }
                 break;
             case 524 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3521: TABLE1
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3521: TABLE1
                 {
                 	mTABLE1(); 
 
                 }
                 break;
             case 525 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3528: TABLE2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3528: TABLE2
                 {
                 	mTABLE2(); 
 
                 }
                 break;
             case 526 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3535: TABLEOLD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3535: TABLEOLD
                 {
                 	mTABLEOLD(); 
 
                 }
                 break;
             case 527 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3544: TABS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3544: TABS
                 {
                 	mTABS(); 
 
                 }
                 break;
             case 528 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3549: TARGET
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3549: TARGET
                 {
                 	mTARGET(); 
 
                 }
                 break;
             case 529 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3556: TELL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3556: TELL
                 {
                 	mTELL(); 
 
                 }
                 break;
             case 530 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3561: TEMP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3561: TEMP
                 {
                 	mTEMP(); 
 
                 }
                 break;
             case 531 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3566: TERMINAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3566: TERMINAL
                 {
                 	mTERMINAL(); 
 
                 }
                 break;
             case 532 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3575: TEST
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3575: TEST
                 {
                 	mTEST(); 
 
                 }
                 break;
             case 533 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3580: TESTRANDOMMODEL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3580: TESTRANDOMMODEL
                 {
                 	mTESTRANDOMMODEL(); 
 
                 }
                 break;
             case 534 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3596: TESTRANDOMMODELCHECK
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3596: TESTRANDOMMODELCHECK
                 {
                 	mTESTRANDOMMODELCHECK(); 
 
                 }
                 break;
             case 535 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3617: TESTSIM
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3617: TESTSIM
                 {
                 	mTESTSIM(); 
 
                 }
                 break;
             case 536 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3625: TIME
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3625: TIME
                 {
                 	mTIME(); 
 
                 }
                 break;
             case 537 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3630: TIMEFILTER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3630: TIMEFILTER
                 {
                 	mTIMEFILTER(); 
 
                 }
                 break;
             case 538 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3641: UNIT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3641: UNIT
                 {
                 	mUNIT(); 
 
                 }
                 break;
             case 539 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3646: UNITS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3646: UNITS
                 {
                 	mUNITS(); 
 
                 }
                 break;
             case 540 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3652: TIMESPAN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3652: TIMESPAN
                 {
                 	mTIMESPAN(); 
 
                 }
                 break;
             case 541 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3661: TITLE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3661: TITLE
                 {
                 	mTITLE(); 
 
                 }
                 break;
             case 542 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3667: TO
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3667: TO
                 {
                 	mTO(); 
 
                 }
                 break;
             case 543 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3670: TOTAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3670: TOTAL
                 {
                 	mTOTAL(); 
 
                 }
                 break;
             case 544 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3676: TRACE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3676: TRACE
                 {
                 	mTRACE(); 
 
                 }
                 break;
             case 545 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3682: TRACE2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3682: TRACE2
                 {
                 	mTRACE2(); 
 
                 }
                 break;
             case 546 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3689: TRANSLATE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3689: TRANSLATE
                 {
                 	mTRANSLATE(); 
 
                 }
                 break;
             case 547 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3699: TRANSPOSE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3699: TRANSPOSE
                 {
                 	mTRANSPOSE(); 
 
                 }
                 break;
             case 548 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3709: TREL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3709: TREL
                 {
                 	mTREL(); 
 
                 }
                 break;
             case 549 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3714: TRUE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3714: TRUE
                 {
                 	mTRUE(); 
 
                 }
                 break;
             case 550 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3719: TRUNCATE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3719: TRUNCATE
                 {
                 	mTRUNCATE(); 
 
                 }
                 break;
             case 551 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3728: TSD
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3728: TSD
                 {
                 	mTSD(); 
 
                 }
                 break;
             case 552 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3732: TSDX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3732: TSDX
                 {
                 	mTSDX(); 
 
                 }
                 break;
             case 553 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3737: TSP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3737: TSP
                 {
                 	mTSP(); 
 
                 }
                 break;
             case 554 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3741: TXT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3741: TXT
                 {
                 	mTXT(); 
 
                 }
                 break;
             case 555 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3745: TYPE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3745: TYPE
                 {
                 	mTYPE(); 
 
                 }
                 break;
             case 556 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3750: U
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3750: U
                 {
                 	mU(); 
 
                 }
                 break;
             case 557 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3752: UABS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3752: UABS
                 {
                 	mUABS(); 
 
                 }
                 break;
             case 558 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3757: UDIF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3757: UDIF
                 {
                 	mUDIF(); 
 
                 }
                 break;
             case 559 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3762: UDIFF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3762: UDIFF
                 {
                 	mUDIFF(); 
 
                 }
                 break;
             case 560 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3768: UDVALG
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3768: UDVALG
                 {
                 	mUDVALG(); 
 
                 }
                 break;
             case 561 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3775: UGDIF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3775: UGDIF
                 {
                 	mUGDIF(); 
 
                 }
                 break;
             case 562 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3781: UGDIFF
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3781: UGDIFF
                 {
                 	mUGDIFF(); 
 
                 }
                 break;
             case 563 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3788: ULEV
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3788: ULEV
                 {
                 	mULEV(); 
 
                 }
                 break;
             case 564 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3793: UNDO
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3793: UNDO
                 {
                 	mUNDO(); 
 
                 }
                 break;
             case 565 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3798: UNFIX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3798: UNFIX
                 {
                 	mUNFIX(); 
 
                 }
                 break;
             case 566 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3804: SPEEDUP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3804: SPEEDUP
                 {
                 	mSPEEDUP(); 
 
                 }
                 break;
             case 567 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3812: UNSWAP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3812: UNSWAP
                 {
                 	mUNSWAP(); 
 
                 }
                 break;
             case 568 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3819: UPCH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3819: UPCH
                 {
                 	mUPCH(); 
 
                 }
                 break;
             case 569 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3824: UPDATEFREQ
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3824: UPDATEFREQ
                 {
                 	mUPDATEFREQ(); 
 
                 }
                 break;
             case 570 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3835: UPDX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3835: UPDX
                 {
                 	mUPDX(); 
 
                 }
                 break;
             case 571 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3840: V
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3840: V
                 {
                 	mV(); 
 
                 }
                 break;
             case 572 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3842: VAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3842: VAL
                 {
                 	mVAL(); 
 
                 }
                 break;
             case 573 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3846: VAR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3846: VAR
                 {
                 	mVAR(); 
 
                 }
                 break;
             case 574 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3850: VAR_KDUSJFLQO2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3850: VAR_KDUSJFLQO2
                 {
                 	mVAR_KDUSJFLQO2(); 
 
                 }
                 break;
             case 575 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3865: VALUE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3865: VALUE
                 {
                 	mVALUE(); 
 
                 }
                 break;
             case 576 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3871: VERS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3871: VERS
                 {
                 	mVERS(); 
 
                 }
                 break;
             case 577 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3876: VERSION
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3876: VERSION
                 {
                 	mVERSION(); 
 
                 }
                 break;
             case 578 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3884: VPRT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3884: VPRT
                 {
                 	mVPRT(); 
 
                 }
                 break;
             case 579 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3889: WAIT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3889: WAIT
                 {
                 	mWAIT(); 
 
                 }
                 break;
             case 580 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3894: WIDTH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3894: WIDTH
                 {
                 	mWIDTH(); 
 
                 }
                 break;
             case 581 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3900: WINDOW
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3900: WINDOW
                 {
                 	mWINDOW(); 
 
                 }
                 break;
             case 582 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3907: WORKING
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3907: WORKING
                 {
                 	mWORKING(); 
 
                 }
                 break;
             case 583 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3915: WPLOT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3915: WPLOT
                 {
                 	mWPLOT(); 
 
                 }
                 break;
             case 584 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3921: WRITE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3921: WRITE
                 {
                 	mWRITE(); 
 
                 }
                 break;
             case 585 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3927: WUDVALG
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3927: WUDVALG
                 {
                 	mWUDVALG(); 
 
                 }
                 break;
             case 586 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3935: X12A
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3935: X12A
                 {
                 	mX12A(); 
 
                 }
                 break;
             case 587 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3940: XLS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3940: XLS
                 {
                 	mXLS(); 
 
                 }
                 break;
             case 588 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3944: XLSX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3944: XLSX
                 {
                 	mXLSX(); 
 
                 }
                 break;
             case 589 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3949: YES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3949: YES
                 {
                 	mYES(); 
 
                 }
                 break;
             case 590 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3953: YMAX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3953: YMAX
                 {
                 	mYMAX(); 
 
                 }
                 break;
             case 591 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3958: YMIN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3958: YMIN
                 {
                 	mYMIN(); 
 
                 }
                 break;
             case 592 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3963: I
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3963: I
                 {
                 	mI(); 
 
                 }
                 break;
             case 593 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3965: Y2MAX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3965: Y2MAX
                 {
                 	mY2MAX(); 
 
                 }
                 break;
             case 594 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3971: Y2MIN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3971: Y2MIN
                 {
                 	mY2MIN(); 
 
                 }
                 break;
             case 595 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3977: ZERO
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3977: ZERO
                 {
                 	mZERO(); 
 
                 }
                 break;
             case 596 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3982: ZOOM
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3982: ZOOM
                 {
                 	mZOOM(); 
 
                 }
                 break;
             case 597 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3987: ZVAR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3987: ZVAR
                 {
                 	mZVAR(); 
 
                 }
                 break;
             case 598 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3992: HTTP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3992: HTTP
                 {
                 	mHTTP(); 
 
                 }
                 break;
             case 599 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:3997: HTTPS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:3997: HTTPS
                 {
                 	mHTTPS(); 
 
                 }
                 break;
             case 600 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4003: WHITESPACE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4003: WHITESPACE
                 {
                 	mWHITESPACE(); 
 
                 }
                 break;
             case 601 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4014: COMMENT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4014: COMMENT
                 {
                 	mCOMMENT(); 
 
                 }
                 break;
             case 602 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4022: COMMENT_MULTILINE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4022: COMMENT_MULTILINE
                 {
                 	mCOMMENT_MULTILINE(); 
 
                 }
                 break;
             case 603 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4040: Ident
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4040: Ident
                 {
                 	mIdent(); 
 
                 }
                 break;
             case 604 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4046: Integer
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4046: Integer
                 {
                 	mInteger(); 
 
                 }
                 break;
             case 605 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4054: DigitsEDigits
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4054: DigitsEDigits
                 {
                 	mDigitsEDigits(); 
 
                 }
                 break;
             case 606 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4068: DateDef
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4068: DateDef
                 {
                 	mDateDef(); 
 
                 }
                 break;
             case 607 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4076: IdentStartingWithInt
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4076: IdentStartingWithInt
                 {
                 	mIdentStartingWithInt(); 
 
                 }
                 break;
             case 608 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4097: Double
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4097: Double
                 {
                 	mDouble(); 
 
                 }
                 break;
             case 609 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4104: StringInQuotes
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4104: StringInQuotes
                 {
                 	mStringInQuotes(); 
 
                 }
                 break;
             case 610 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4119: StringInQuotes1
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4119: StringInQuotes1
                 {
                 	mStringInQuotes1(); 
 
                 }
                 break;
             case 611 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4135: StringInQuotes2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4135: StringInQuotes2
                 {
                 	mStringInQuotes2(); 
 
                 }
                 break;
             case 612 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4151: StringInQuotes3
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4151: StringInQuotes3
                 {
                 	mStringInQuotes3(); 
 
                 }
                 break;
             case 613 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4167: PLUSEQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4167: PLUSEQUAL
                 {
                 	mPLUSEQUAL(); 
 
                 }
                 break;
             case 614 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4177: STAREQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4177: STAREQUAL
                 {
                 	mSTAREQUAL(); 
 
                 }
                 break;
             case 615 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4187: PERCENTEQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4187: PERCENTEQUAL
                 {
                 	mPERCENTEQUAL(); 
 
                 }
                 break;
             case 616 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4200: HASHEQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4200: HASHEQUAL
                 {
                 	mHASHEQUAL(); 
 
                 }
                 break;
             case 617 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4210: HATEQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4210: HATEQUAL
                 {
                 	mHATEQUAL(); 
 
                 }
                 break;
             case 618 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4219: GLUE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4219: GLUE
                 {
                 	mGLUE(); 
 
                 }
                 break;
             case 619 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4224: GLUEDOT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4224: GLUEDOT
                 {
                 	mGLUEDOT(); 
 
                 }
                 break;
             case 620 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4232: GLUEDOTNUMBER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4232: GLUEDOTNUMBER
                 {
                 	mGLUEDOTNUMBER(); 
 
                 }
                 break;
             case 621 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4246: GLUESTAR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4246: GLUESTAR
                 {
                 	mGLUESTAR(); 
 
                 }
                 break;
             case 622 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4255: LEFTANGLESPECIAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4255: LEFTANGLESPECIAL
                 {
                 	mLEFTANGLESPECIAL(); 
 
                 }
                 break;
             case 623 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4272: GLUEBACKSLASH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4272: GLUEBACKSLASH
                 {
                 	mGLUEBACKSLASH(); 
 
                 }
                 break;
             case 624 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4286: ISEQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4286: ISEQUAL
                 {
                 	mISEQUAL(); 
 
                 }
                 break;
             case 625 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4294: ISNOTQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4294: ISNOTQUAL
                 {
                 	mISNOTQUAL(); 
 
                 }
                 break;
             case 626 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4304: ISLARGEROREQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4304: ISLARGEROREQUAL
                 {
                 	mISLARGEROREQUAL(); 
 
                 }
                 break;
             case 627 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4320: ISSMALLEROREQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4320: ISSMALLEROREQUAL
                 {
                 	mISSMALLEROREQUAL(); 
 
                 }
                 break;
             case 628 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4337: EXCLAMATION
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4337: EXCLAMATION
                 {
                 	mEXCLAMATION(); 
 
                 }
                 break;
             case 629 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4349: TILDE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4349: TILDE
                 {
                 	mTILDE(); 
 
                 }
                 break;
             case 630 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4355: AT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4355: AT
                 {
                 	mAT(); 
 
                 }
                 break;
             case 631 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4358: HAT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4358: HAT
                 {
                 	mHAT(); 
 
                 }
                 break;
             case 632 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4362: SEMICOLON
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4362: SEMICOLON
                 {
                 	mSEMICOLON(); 
 
                 }
                 break;
             case 633 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4372: COLONGLUE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4372: COLONGLUE
                 {
                 	mCOLONGLUE(); 
 
                 }
                 break;
             case 634 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4382: COLON
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4382: COLON
                 {
                 	mCOLON(); 
 
                 }
                 break;
             case 635 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4388: COMMA2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4388: COMMA2
                 {
                 	mCOMMA2(); 
 
                 }
                 break;
             case 636 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4395: DOT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4395: DOT
                 {
                 	mDOT(); 
 
                 }
                 break;
             case 637 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4399: HASH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4399: HASH
                 {
                 	mHASH(); 
 
                 }
                 break;
             case 638 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4404: PERCENT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4404: PERCENT
                 {
                 	mPERCENT(); 
 
                 }
                 break;
             case 639 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4412: DOLLAR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4412: DOLLAR
                 {
                 	mDOLLAR(); 
 
                 }
                 break;
             case 640 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4419: LEFTCURLY
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4419: LEFTCURLY
                 {
                 	mLEFTCURLY(); 
 
                 }
                 break;
             case 641 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4429: RIGHTCURLY
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4429: RIGHTCURLY
                 {
                 	mRIGHTCURLY(); 
 
                 }
                 break;
             case 642 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4440: LEFTPAREN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4440: LEFTPAREN
                 {
                 	mLEFTPAREN(); 
 
                 }
                 break;
             case 643 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4450: RIGHTPAREN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4450: RIGHTPAREN
                 {
                 	mRIGHTPAREN(); 
 
                 }
                 break;
             case 644 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4461: LEFTBRACKETGLUE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4461: LEFTBRACKETGLUE
                 {
                 	mLEFTBRACKETGLUE(); 
 
                 }
                 break;
             case 645 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4477: LEFTBRACKET
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4477: LEFTBRACKET
                 {
                 	mLEFTBRACKET(); 
 
                 }
                 break;
             case 646 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4489: RIGHTBRACKET
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4489: RIGHTBRACKET
                 {
                 	mRIGHTBRACKET(); 
 
                 }
                 break;
             case 647 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4502: LEFTANGLESIMPLE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4502: LEFTANGLESIMPLE
                 {
                 	mLEFTANGLESIMPLE(); 
 
                 }
                 break;
             case 648 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4518: RIGHTANGLE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4518: RIGHTANGLE
                 {
                 	mRIGHTANGLE(); 
 
                 }
                 break;
             case 649 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4529: STAR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4529: STAR
                 {
                 	mSTAR(); 
 
                 }
                 break;
             case 650 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4534: DOUBLEVERTICALBAR1
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4534: DOUBLEVERTICALBAR1
                 {
                 	mDOUBLEVERTICALBAR1(); 
 
                 }
                 break;
             case 651 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4553: DOUBLEAND
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4553: DOUBLEAND
                 {
                 	mDOUBLEAND(); 
 
                 }
                 break;
             case 652 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4563: DOUBLEVERTICALBAR2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4563: DOUBLEVERTICALBAR2
                 {
                 	mDOUBLEVERTICALBAR2(); 
 
                 }
                 break;
             case 653 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4582: VERTICALBAR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4582: VERTICALBAR
                 {
                 	mVERTICALBAR(); 
 
                 }
                 break;
             case 654 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4594: PLUS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4594: PLUS
                 {
                 	mPLUS(); 
 
                 }
                 break;
             case 655 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4599: MINUS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4599: MINUS
                 {
                 	mMINUS(); 
 
                 }
                 break;
             case 656 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4605: DIV
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4605: DIV
                 {
                 	mDIV(); 
 
                 }
                 break;
             case 657 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4609: TRIPLESTARS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4609: TRIPLESTARS
                 {
                 	mTRIPLESTARS(); 
 
                 }
                 break;
             case 658 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4621: STARS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4621: STARS
                 {
                 	mSTARS(); 
 
                 }
                 break;
             case 659 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4627: EQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4627: EQUAL
                 {
                 	mEQUAL(); 
 
                 }
                 break;
             case 660 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4633: MINUSEQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4633: MINUSEQUAL
                 {
                 	mMINUSEQUAL(); 
 
                 }
                 break;
             case 661 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4644: DIVEQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4644: DIVEQUAL
                 {
                 	mDIVEQUAL(); 
 
                 }
                 break;
             case 662 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4653: BACKSLASH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4653: BACKSLASH
                 {
                 	mBACKSLASH(); 
 
                 }
                 break;
             case 663 :
-                // c:\\Thomas\\Gekko\\GekkoCS_MAIN\\ANTLR\\Cmd4.g:1:4663: QUESTION
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:1:4663: QUESTION
                 {
                 	mQUESTION(); 
 
@@ -24805,7 +24805,7 @@ public partial class Cmd4Lexer : Lexer {
 
         override public string Description
         {
-            get { return "5522:1: DateDef : ( ( DIGIT )+ M_ ( DIGIT )+ D_ ( DIGIT )+ | ( DIGIT )+ ( A_ | Q_ | M_ | W_ | U_ ) ( DIGIT )+ | ( DIGIT )+ ( A_ | U_ ) );"; }
+            get { return "5524:1: DateDef : ( ( DIGIT )+ M_ ( DIGIT )+ D_ ( DIGIT )+ | ( DIGIT )+ ( A_ | Q_ | M_ | W_ | U_ ) ( DIGIT )+ | ( DIGIT )+ ( A_ | U_ ) );"; }
         }
 
     }
@@ -24857,7 +24857,7 @@ public partial class Cmd4Lexer : Lexer {
 
         override public string Description
         {
-            get { return "5532:1: Double : ( ( DIGIT )+ GLUEDOTNUMBER DOT ( DIGIT )* ( Exponent )? | ( DIGIT )+ Exponent | GLUEDOTNUMBER DOT ( DIGIT )+ ( Exponent )? );"; }
+            get { return "5534:1: Double : ( ( DIGIT )+ GLUEDOTNUMBER DOT ( DIGIT )* ( Exponent )? | ( DIGIT )+ Exponent | GLUEDOTNUMBER DOT ( DIGIT )+ ( Exponent )? );"; }
         }
 
     }

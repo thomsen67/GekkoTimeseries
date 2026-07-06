@@ -4389,6 +4389,30 @@ namespace Gekko
                 return FindParent<T>(parentObject);
         }
 
+        public static void WriteIfChanged(string filePath, string content)
+        {
+            bool shouldWrite = true;
+            if (File.Exists(filePath))
+            {
+                try
+                {
+                    string existingContent = File.ReadAllText(filePath);
+                    if (existingContent == content) shouldWrite = false;
+                }
+                catch
+                {
+                }
+            }
+            if (shouldWrite)
+            {
+                using (FileStream fs = Program.WaitForFileStream(filePath, null, Program.GekkoFileReadOrWrite.Write))
+                using (StreamWriter file = G.GekkoStreamWriter(fs))
+                {
+                    file.Write(content);
+                }
+            }
+        }
+
 
         /// <summary>
         /// Helper for getting installed .NET versions

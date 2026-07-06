@@ -6803,10 +6803,16 @@ namespace Gekko
             if (Globals.runningOnTTComputer) new Warning(EWarningType.NoUsing, "TTH: Are depths really ok. We are using depth-first, use breath-first. Maybe should iterate over depth, else a trace found at deep level will end in dict and shadow the depth of a trace of a lower level.");
         }
 
+        /// <summary>
+        /// Calls GitHooks() on the first \.git folder found as a parent folder
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="_t1"></param>
+        /// <param name="_t2"></param>
         public static void githooks(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {            
             string s = O.ConvertToString(root(smpl, _t1, _t2, new ScalarString("git")));
-            Program.GitHooks(s);
+            Program.GitHooks(s, "hooks");
         }
 
         public static void gamsscalar(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] input)

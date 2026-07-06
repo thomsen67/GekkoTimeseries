@@ -63,7 +63,7 @@ namespace Gekko
         public static string ident = "dsi"; // "tth";
         public static string sub = "test"; // "test3";
         public static string dlink_programFolderGit = G.CleanupFolderName(@"k:\makrobk\" + ident + "\\" + sub, false);
-        public static string dlink_programFolderRoot = G.CleanupFolderName(@"k:\makrobk\" + ident + "\\" + sub + @"\makrobk_grunddata", false);
+        //public static string dlink_programFolderRoot = G.CleanupFolderName(@"k:\makrobk\" + ident + "\\" + sub + @"\makrobk_grunddata", false);
         public static string dlink_programFolderRunning = G.CleanupFolderName(@"k:\makrobk\" + ident + "\\" + sub + @"\makrobk_grunddata\biver", false);
         public static string dlink_dataFolder = G.CleanupFolderName(@"k:\makrobk_kilde\2025_10_01\" + ident + "\\" + sub + @"\biver", false);
         public static string dlink_blobsFolder = G.CleanupFolderName(@"k:\makrobk_kilde\2025_10_01\_blobs", false);
