@@ -60,12 +60,13 @@ namespace Gekko
         //public static string dlink_dataFolder = G.CleanupFolderName(@"c:\Tools\Makrobk_kilde\2025_10_01\" + ident + "\\" + sub + @"\biver", false);
         //public static string dlink_blobsFolder = G.CleanupFolderName(@"c:\Tools\Makrobk_kilde\2025_10_01\_blobs", false);
 
-        public static string ident = "dsi"; // "tth";
+        public static string ident = "tth"; // "tth";
         public static string sub = "test"; // "test3";
-        public static string dlink_programFolderGit = G.CleanupFolderName(@"k:\makrobk\" + ident + "\\" + sub, false);
+        public static string identsub = Path.Combine(ident, sub);
+        public static string dlink_programFolderGit = G.CleanupFolderName(@"k:\makrobk\" + identsub, false);
         //public static string dlink_programFolderRoot = G.CleanupFolderName(@"k:\makrobk\" + ident + "\\" + sub + @"\makrobk_grunddata", false);
-        public static string dlink_programFolderRunning = G.CleanupFolderName(@"k:\makrobk\" + ident + "\\" + sub + @"\makrobk_grunddata\biver", false);
-        public static string dlink_dataFolder = G.CleanupFolderName(@"k:\makrobk_kilde\2025_10_01\" + ident + "\\" + sub + @"\biver", false);
+        public static string dlink_programFolderRunning = G.CleanupFolderName(@"k:\makrobk\" + identsub + @"\makrobk_grunddata\biver", false);
+        public static string dlink_dataFolder = G.CleanupFolderName(@"k:\makrobk_kilde\2025_10_01\" + identsub + @"\biver", false);
         public static string dlink_blobsFolder = G.CleanupFolderName(@"k:\makrobk_kilde\2025_10_01\_blobs", false);
 
         public static bool gdxReaderDebug = false;        

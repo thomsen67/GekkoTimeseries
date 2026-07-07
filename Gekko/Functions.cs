@@ -6810,9 +6810,8 @@ namespace Gekko
         /// <param name="_t1"></param>
         /// <param name="_t2"></param>
         public static void githooks(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
-        {            
-            string s = O.ConvertToString(root(smpl, _t1, _t2, new ScalarString("git")));
-            Program.GitHooks(s, "hooks");
+        {
+            Program.GitHooks(O.ConvertToString(root(smpl, _t1, _t2, new ScalarString("git"))));
         }
 
         public static void gamsscalar(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] input)
