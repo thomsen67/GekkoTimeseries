@@ -5913,7 +5913,7 @@ namespace Gekko
         public static string DLinkRelativePath(string input, string f1, string f2, string warningIncongruent, bool replace)
         {
             string output = null;
-            if (input.StartsWith(f1))
+            if (input.StartsWith(f1, StringComparison.OrdinalIgnoreCase))
             {
                 string temp = G.Substring(input, f1.Length + 1, input.Length - 1);
                 output = Path.Combine(f2, temp);

@@ -2843,13 +2843,10 @@ namespace Gekko
 
             if (Globals.runningOnTTComputer)
             {
-                if (text == "v")
-                {
-                    string s = "-dlink:'pre-commit','makrobk_grunddata/biver/_uddata_dlink/x1.csv.dlink'";
-                    string[] args = new string[] { s };
-                    Program.DLinkCalledFromGitHook(args);
-                    return;
-                }
+
+                Program.ProgramFolderRunning();
+                Program.ProgramFolderGit();
+                Program.ProgramFolderRunningRelative();
 
                 // -----------------------------------------------------------
                 // Kør tell't1', tell't2', tell't3'.
@@ -23103,8 +23100,8 @@ namespace Gekko
             // TODO: Man skal kunne aborte mht. indlæggelse af ændrede datafiler
 
             // -----
-            string cacheIndexDlinkFile = Path.Combine(Globals.dlink_programFolderGit, ".git", "index_dlink");
-            string gitConfigFile = Path.Combine(Globals.dlink_programFolderGit, ".git", "config");
+            string cacheIndexDlinkFile = Path.Combine(Program.ProgramFolderGit(), ".git", "index_dlink");
+            string gitConfigFile = Path.Combine(Program.ProgramFolderGit(), ".git", "config");
             string s2 = args[0].Substring("dlink:".Length);
             MatchCollection matches = Regex.Matches(s2, @"'([^']*)'");
             List<string> dlinkFiles = new List<string>();
@@ -23127,22 +23124,22 @@ namespace Gekko
                 }
                 catch
                 {
-                    if (Globals.dlink_programFolderGit.Contains("\\tth\\")) MessageBox.Show("Loading " + cacheIndexDlinkFile + " failed");
+                    if (Program.ProgramFolderGit().Contains("\\tth\\")) MessageBox.Show("Loading " + cacheIndexDlinkFile + " failed");
                 }
-            }
+            }            
 
             GekkoDictionary<string, bool> datafiles = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             foreach (string dlinkFile2 in dlinkFiles) //Could probably be parallelized
             {
                 string dlinkFile = G.CleanupFolderName(dlinkFile2, false);
-                string dLinkFileWithPath = Path.Combine(Globals.dlink_programFolderGit, dlinkFile);
+                string dLinkFileWithPath = Path.Combine(Program.ProgramFolderGit(), dlinkFile);
                 if (!File.Exists(dLinkFileWithPath))
                 {
                     MessageBox.Show("This ." + Program.options.databank_dlink_name + " file does not exist: '" + dLinkFileWithPath + "'");
                     new Error();
                 }
                 DlinkFile dlinkFileData = G.YamlReader<DlinkFile>(dLinkFileWithPath);
-                string dataFile2 = G.DLinkRelativePath(dLinkFileWithPath, Globals.dlink_programFolderRunning, Globals.dlink_dataFolder, "The file '" + dLinkFileWithPath + "' does not reside inside the folder '" + Globals.dlink_programFolderGit + "'", false);
+                string dataFile2 = G.DLinkRelativePath(dLinkFileWithPath, Program.ProgramFolderRunning(), G.CleanupFolderName(Program.options.databank_dlink_folder_data, false) + "\\tth\\test\\biver", "The file '" + dLinkFileWithPath + "' does not reside inside the folder '" + Program.ProgramFolderGit() + "'", false);
                 string dataFile = Path.ChangeExtension(dataFile2, null).Replace("\\_inddata_dlink\\", "\\_inddata\\").Replace("\\_uddata_dlink\\", "\\_uddata\\");
                 datafiles.Add(dataFile, false); //for cleanup purposes
                 if (G.NullOrBlanks(dataFile))
@@ -23173,14 +23170,14 @@ namespace Gekko
                 if (isDataFileOk)
                 {
                     //Check that we have the file in blobs folder, else add it there
-                    Program.BlobsFile(false, realFile.name, dlinkFileData.hash, Globals.dlink_blobsFolder, filesNew, filesOverwritten);
+                    Program.BlobsFile(false, realFile.name, dlinkFileData.hash, G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), filesNew, filesOverwritten);
                     //Force-update the cache entry
                     cacheIndexDlink.storage[realFile.name] = new CacheIndexDlinkElement(realFile.name, realFile.hash, realFile.size, realFile.stamp);
                 }
                 else
                 {
                     //Get it from blobs (A or B)
-                    Program.BlobsFile(true, realFile.name, dlinkFileData.hash, Globals.dlink_blobsFolder, filesNew, filesOverwritten);
+                    Program.BlobsFile(true, realFile.name, dlinkFileData.hash, G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), filesNew, filesOverwritten);
                     FileInfo fi2 = new FileInfo(realFile.name);
                     //We update the realFile, because its contents have changed
                     realFile = new RealFile(realFile.name, dlinkFileData.hash, fi2.Length, fi2.LastWriteTimeUtc, true);
@@ -23197,7 +23194,7 @@ namespace Gekko
             }
             catch
             {
-                if (Globals.dlink_programFolderGit.Contains("\\tth\\")) MessageBox.Show("Writing " + cacheIndexDlinkFile + " failed");
+                if (Program.ProgramFolderGit().Contains("\\tth\\")) MessageBox.Show("Writing " + cacheIndexDlinkFile + " failed");
             }
 
             DLinkCalledFromGitHookReporting(type, filesNew, filesOverwritten);
@@ -23242,8 +23239,7 @@ namespace Gekko
         /// <param name="parentOfGitFolder"></param>
         public static void GitHooks(string parentOfGitFolder)
         {
-            //rhs is == "makrobk_grunddata/_utilities/githooks"
-            string hooksFolder = "_utilities/githooks"; //Use "/" not "\"
+            string hooksFolder = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), "_utilities", "githooks").Replace("\\", "/");
             string configFile = Path.Combine(parentOfGitFolder, ".git", "config");
             MessageBox.Show("GitHooks() called with " + parentOfGitFolder + ", " + hooksFolder + ", configfile=" + configFile);
             if (!File.Exists(configFile))
@@ -23360,13 +23356,12 @@ namespace Gekko
 
             try
             {
-                // ----------------------------------------------------------------------------------------------------------            
-                //string parentPath1 = parentPath.Replace("\\", "/");
-                string parentPath2 = Path.Combine(parentPath, ".git", hooksFolder).Replace("\\", "/");
-                string gekkoExePath = Path.Combine(G.GekkoExeFolder(), "Gekko.exe").Replace("\\", "/");
+                // ----------------------------------------------------------------------------------------------------------                            
+                string parentPath2 = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), "_utilities", "githooks").Replace("\\", "/");
+                string gekkoExePath = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), "_utilities", "Gekko", "Gekko.exe").Replace("\\", "/");
                 string _common = @$"
 #!/bin/sh
-ROOT_DIR=$(readlink -f -- ""$(dirname -- ""${{BASH_SOURCE[0]}}"")/../.."")
+ROOT_DIR=""$GIT_DIR""
 STAGED_FILES=$(git -C ""{{ROOT_DIR}}"" ls-files --cached -- ':(icase)*.dlink')
 FORMATTED_FILES=$(echo ""$STAGED_FILES"" | sed ""s/^/'/;s/$/'/"" | paste -sd, -)
 powershell.exe -Command ""(New-Object -ComObject WScript.Shell).Popup('... ' + $FORMATTED_FILES, 0, 'Message', 64)""
@@ -23481,8 +23476,8 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             {
                 //Note: just because a .dlink file is constructed, this it not the same
                 //      as that it has to go into blobs storage.
-                string f1 = G.CleanupFolderName(Globals.dlink_dataFolder, false); //.gbk original, 'c:\Tools\Blobs\tth\staging'
-                string f2 = G.CleanupFolderName(Globals.dlink_programFolderRunning, false); //.dlink file, c:\Thomas\Gekko\BlobsTest\tth\staging                                            
+                string f1 = G.CleanupFolderName(G.CleanupFolderName(Program.options.databank_dlink_folder_data, false) + "\\tth\\test\\biver", false); //.gbk original, 'c:\Tools\Blobs\tth\staging'
+                string f2 = G.CleanupFolderName(Program.ProgramFolderRunning(), false); //.dlink file, c:\Thomas\Gekko\BlobsTest\tth\staging                                            
                 string blobFileNameAndPath1 = G.DLinkRelativePath(fileNameAndPath, f1, f2, "Regarding ." + Program.options.databank_dlink_name + " file, the folder '" + f1 + "' does not seem to be part of '" + fileNameAndPath + "'", true);
                 if (blobFileNameAndPath1 == null)
                 {
@@ -23513,6 +23508,27 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     G.YamlWriter<DlinkFile>(blobInfo, blobFileNameAndPath2);
                 }
             }
+        }
+
+        public static string ProgramFolderRunning()
+        {
+            string s = O.ConvertToString(Functions.runfolder(null, null, null));
+            MessageBox.Show("ProgramFolderRunning(): " + s);
+            return s;
+        }
+
+        public static string ProgramFolderGit()
+        {
+            string s = O.ConvertToString(Functions.root(null, null, null, new ScalarString("git")));
+            MessageBox.Show("ProgramFolderGit(): " + s);
+            return s;
+        }
+
+        public static string ProgramFolderRunningRelative()
+        {
+            string s = O.ConvertToString(Functions.runfolder(null, null, null, new ScalarString("rel")));
+            MessageBox.Show("ProgramFolderRunningRelative(): " + s);
+            return s;
         }
 
         public static string BlobsHash(string filePath, bool specialFlagForTraces)

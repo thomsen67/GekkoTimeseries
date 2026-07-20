@@ -43,34 +43,15 @@ namespace Gekko
 
         public static bool greuHack = false;  //Year must be YYYY, digits
 
-        //public static string dlink_programFolderGit = G.CleanupFolderName(@"k:\makrobk\tth\test", false);
-        //public static string dlink_programFolderRoot = G.CleanupFolderName(@"k:\makrobk\tth\test\makrobk_grunddata", false);        
-        //public static string dlink_dataFolder = G.CleanupFolderName(@"k:\makrobk_kilde\2025_10_01\tth\test", false);
-        //public static string dlink_blobsFolder = G.CleanupFolderName(@"k:\makrobk_kilde\2025_10_01\_storage", false);
+        // -------------------------------------
 
-        //+ i config, aktivér option databank dlink = yes;
-        //+ Læg p:\tth\ny\githooks ind under \utilities, sæt 2 stier rigtigt
-        //+ Og i \.git skal denne i [core]: hooksPath = makrobk_grunddata/_utilities/githooks
-        //+ I datamappe skal der være en \_blobs og blobsroot.ini
-        //public static string ident = "tth";
-        //public static string sub = "test";
-        //public static string dlink_programFolderGit = G.CleanupFolderName(@"c:\Tools\Makrobk\" + ident + "\\" + sub, false);
-        //public static string dlink_programFolderRoot = G.CleanupFolderName(@"c:\Tools\Makrobk\" + ident + "\\" + sub + @"\makrobk_grunddata", false);
-        //public static string dlink_programFolderRunning = G.CleanupFolderName(@"c:\Tools\Makrobk\" + ident + "\\" + sub + @"\makrobk_grunddata\biver", false);
-        //public static string dlink_dataFolder = G.CleanupFolderName(@"c:\Tools\Makrobk_kilde\2025_10_01\" + ident + "\\" + sub + @"\biver", false);
-        //public static string dlink_blobsFolder = G.CleanupFolderName(@"c:\Tools\Makrobk_kilde\2025_10_01\_blobs", false);
+        //public static string dlink_programFolderGit = Program.ProgramFolderGit(); //G.CleanupFolderName(@"k:\MAKROBK\" + "tth\\test", false);
+        //public static string dlink_programFolderRunning = Program.ProgramFolderRunning(); // G.CleanupFolderName(dlink_programFolderGit + "\\makrobk_grunddata\\biver", false);
+        
+        // -------------------------------------
 
-        public static string ident = "tth"; // "tth";
-        public static string sub = "test"; // "test3";
-        public static string identsub = Path.Combine(ident, sub);
-        public static string dlink_programFolderGit = G.CleanupFolderName(@"k:\makrobk\" + identsub, false);
-        //public static string dlink_programFolderRoot = G.CleanupFolderName(@"k:\makrobk\" + ident + "\\" + sub + @"\makrobk_grunddata", false);
-        public static string dlink_programFolderRunning = G.CleanupFolderName(@"k:\makrobk\" + identsub + @"\makrobk_grunddata\biver", false);
-        public static string dlink_dataFolder = G.CleanupFolderName(@"k:\makrobk_kilde\2025_10_01\" + identsub + @"\biver", false);
-        public static string dlink_blobsFolder = G.CleanupFolderName(@"k:\makrobk_kilde\2025_10_01\_blobs", false);
-
-        public static bool gdxReaderDebug = false;        
-        public const string libraryDriveCheatString = "library___name___";        
+        public static bool gdxReaderDebug = false;
+        public const string libraryDriveCheatString = "library___name___";
         public const string tempFileStart = "tempfile";
         public const string tempFileEnd = ".tmp";
         public const string zip = ".zip";
@@ -78,12 +59,12 @@ namespace Gekko
         // =======================================================
         // ============ DATAFRAME STUFF START ====================
         // =======================================================
-                
-        public static bool decompSmartLhsSkipIrrelevant = true;        
+
+        public static bool decompSmartLhsSkipIrrelevant = true;
         public static bool decompShowSingletonSet = true;
         public static bool decompUseBracketNames = true;
         public const string decompNull = "...";  //used to be "<null>"
-        public const char decompSetDimNumberChar = '¤';        
+        public const char decompSetDimNumberChar = '¤';
         public const char decompDimension = '#';  //like x#1 for x dim 1.
         public const string decompDimension2 = "dims";
         public const string decompUniversal = "#universal";
@@ -135,7 +116,7 @@ namespace Gekko
         public static string internalPivotCols = "Cols";
         public static string internalPivotFilters = "Filters";
         public static string internalPivotRowColor = "#ffededed"; // "#fff8f8f8"; //same as this: #982354320985
-                
+
         public const string decompNullName = "________a";
         public const string decompResidualName = "ZZZZZZZZ_residual";
         public const string decompResidualName2 = "Residual";
@@ -163,7 +144,7 @@ namespace Gekko
         //Trace stuff
         public static ListUnique<IVariable> traceContainer = null;
         public static bool traceWalkAllCombinations = false;  //only activated for unit testing, counting all combinations.        
-        public static string traceError = "Something went wrong regarding {a{data-tracing¤trace2.htm}a}. Data-tracing is experimental from Gekko 3.1.16 and on, and to deactivate it, you may set 'option databank trace = no;' at the beginning of your Gekko program.";        
+        public static string traceError = "Something went wrong regarding {a{data-tracing¤trace2.htm}a}. Data-tracing is experimental from Gekko 3.1.16 and on, and to deactivate it, you may set 'option databank trace = no;' at the beginning of your Gekko program.";
         public static bool traceWallTimeHandledSpecialWayFor1UnitTest = false;  //with true we get latest changes (in wall time) at top.        
         public static GekkoTimeSpansSimple traceNullPeriods = new GekkoTimeSpansSimple();  //just a pointer to know where to find these. Only used for "divider" traces, because a null element cannot be protobuffed        
         public const int traceDeepStartDepth = -1;
@@ -183,7 +164,7 @@ namespace Gekko
 
         public static DependencyTracking dependencyTracking = new DependencyTracking();
         public const int dependencyTrackingSysNumber = 9;
-                
+
         public static WarningPool warningPool = new WarningPool();
         public const string internalGekkoWarningString = "Internal Gekko warning";
         public const string INTERNAL = "INTERNAL";
@@ -205,14 +186,14 @@ namespace Gekko
         public const string scalarModelSolve = "@solve(";
         public const string scalarModelLstFolder = "LST";
 
-        public static bool bugfixDollarOperator = true;        
-        public static bool bugfixLhsIsFunctionParameter = true;        
+        public static bool bugfixDollarOperator = true;
+        public static bool bugfixLhsIsFunctionParameter = true;
 
         public const int startPrime = 1013;  //next is 1019.
-        public static MathNet.Numerics.Distributions.CumulativeNormalDistribution cumulativeNormalDistribution = new MathNet.Numerics.Distributions.CumulativeNormalDistribution();        
-                
+        public static MathNet.Numerics.Distributions.CumulativeNormalDistribution cumulativeNormalDistribution = new MathNet.Numerics.Distributions.CumulativeNormalDistribution();
+
         public static int decomp_offset = 1; //See also Options.bugfix_decomp_lagsleads
-        public static bool findFix = true;                                     
+        public static bool findFix = true;
 
         public const bool decompFixMissingIgnoreProblem = true;
         public const string decompResidualPrefix = "res_";
@@ -246,7 +227,7 @@ namespace Gekko
 
         public static string versionInternal = "";
 
-        public static bool if_old_helper = false;        
+        public static bool if_old_helper = false;
 
         public const string languageDa = "da";
         public const string languageEn = "en";
@@ -278,7 +259,7 @@ namespace Gekko
         // ------------------------------------------------------------
         // Protobuf tuning end
         // ------------------------------------------------------------
-                
+
         public const string dimensionWithoutDomain = "*";
         public const string funnyFileName = "delete_ksajrhdfjdssdj.txt";
         public const string rootError1 = "This is not allowed, in order to avoid confusion. Please change your Gekko working folder (File --> Set working folder...) and try again.";
@@ -297,9 +278,9 @@ namespace Gekko
         public static string localTempFilesLocationGnuplot = System.Windows.Forms.Application.LocalUserAppDataPath + "\\gnuplot";
         public static double guiPlotFontScaling = 0.694d;
         public static double guiPlotSizeScaling = 0.9d;
-        
+
         public static double guiPlotSvgWidth = 450d;
-        public static double guiPlotSvgHeight = 360d;        
+        public static double guiPlotSvgHeight = 360d;
         public static double guiPlotWindowWidth = 590d;
         public static double guiPlotWindowHeight = 542d;
         public static double guiPlotExtraWidth = 10d;
@@ -327,7 +308,7 @@ namespace Gekko
         // .Gekcel        
         public static string excelDnaPath = null;  //used when compiling, to find ANTLR
         public static string excelDnaName = "Gekcel"; //probably unwise to delete this...
-        public static ExcelDnaData excelDnaData = null;        
+        public static ExcelDnaData excelDnaData = null;
         // -------------------------------------------------------------------------------------        
         // .PyGekko
         public static bool pyGekkoStdout = false; //If true uses Console.Writeln(), corresponds to "stdout" stream, same concept on Windows/Linux/Mac. Using stdout works ok for normal VS Code terminal output, but not for interactive window (Jupyter), or Gekcel for that sake.
@@ -344,7 +325,7 @@ namespace Gekko
         public static string windowDecompStatusBarText_gams = "Click to find equation(s)."; //Gams model
         public static string windowDecompStatusBarText2 = "Use Ctrl-C and Ctrl-V to copy-paste into e.g. Excel.";
         public static string windowDecompStatusBarText3 = "BEWARE: percentages may be miscalculated, when time is not shown on a row or column."; //Gekko model
-        public const string decompGekkoEquationPrefix = "e_";        
+        public const string decompGekkoEquationPrefix = "e_";
 
         // ----------------------------------------------------------------
         // GRADIENT
@@ -419,10 +400,10 @@ namespace Gekko
         public static int foldingButtonCounter = 0;
 
         public static int decompPerLag = -2;
-        
+
         public static GekkoDictionary<string, int> precedentsContainer = null;  //used in DECOMP, important that it starts out as null
         public static Dictionary<Series, int> precedentsSeries = null;  //used in SERIES, important that it starts out as null
-        
+
         public static string extensionPlot = "gpt";
         public static string extensionCommand = "gcm";
         public const string defaultCommandFileExtension = "gcm";  //merge this with the above...
@@ -458,7 +439,7 @@ namespace Gekko
 
         //maybe 14 is max??
         public static Dictionary<string, string> gamsFunctions = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "log", null }, { "exp", null }, { "sum", null }, { "power", null }, { "sqr", "sqrt" } };
-        
+
         public const string procedure = "procedure___";
 
         public static string databankformatUrl = @"www.t-t.dk/gekko/databankformat";
@@ -488,7 +469,7 @@ namespace Gekko
         public static int lastPeriodPositionInArrayNull = int.MinValue;
 
         public static List<string> unitTestDependents = null;
-                
+
         public const string stringConversionNote = "NOTE: If a string %x is enclosed in {}-curlies like {%x}, it can be used as a name reference";
         public const string stringConversionNote2 = "NOTE: A string %x or a list of strings #x can be enclosed in {}-curlies like {%x} or {#x} and be used as name reference";
         public const string stringConversionNote3 = "Scalar symbol '%' is not accepted. NOTE: a string like %x can be enclosed in {}-curlies like {%x}, to be used as a name reference.";
@@ -539,7 +520,7 @@ namespace Gekko
         public const string operator_a3n = "a3n";
         public const string operator_a3d = "a3d";
         public const string operator_a3p = "a3p";
-        public const string operator_a3dp = "a3dp";        
+        public const string operator_a3dp = "a3dp";
         public const string operator_a3l = "a3l";
         public const string operator_a3dl = "a3dl";
 
@@ -547,7 +528,7 @@ namespace Gekko
 
         public const string fixedTimelessText = "all periods (timeless)";
         public const string fixedParameterText = "everything fixed (parameter)";
-                
+
         public static string ttPath2 = @"c:\Thomas\Gekko"; //used when unit testing        
 
         public static List<Action<string, GekkoTime>> predictActions = null;
@@ -564,7 +545,7 @@ namespace Gekko
         public const int timeStringsStart = 1900;
         public const int timeStringsEnd = 2500;
         public static string[] timeStrings = null;  //stores "1900" to "2500" for easy access and reuse
-        public static List<string> alreadyZipped = new List<string>() { "gbk", "xlsx", "parquet"};
+        public static List<string> alreadyZipped = new List<string>() { "gbk", "xlsx", "parquet" };
 
         public const string forLoopName = "forloop_xe7dke6cj_";  //collision probability = 0
         public const string functionArgName = "functionarg_xf7dke8cj_";  //collision probability = 0
@@ -749,7 +730,7 @@ namespace Gekko
         public const string gekkoEquationPrefix = "e_";
 
         public static bool solveNewtonOnlyFeedback = false;  //should always be false
-                
+
         public static string gekkoVersion = "";
 
         public static double invertRelativeConvergence = 0.0001d;  //old val=0.003d
@@ -779,7 +760,7 @@ namespace Gekko
         public static bool solveUseStrictCrits = true;
 
         public static List<string> checkoff = new List<string>();
-                
+
         public static int itemCounter = 0;
 
         public static string userSettingsPath = "";
@@ -1076,7 +1057,7 @@ namespace Gekko
         public static int guiMainLinePosition = 0;
 
         public static Dictionary<string, string> gekkoInbuiltFunctions = null;
-        
+
         public static string autoExecCmdFileName = "gekko.ini";
 
         public static string detectedRPath = null;
@@ -1089,7 +1070,7 @@ namespace Gekko
 
         public static bool printGrayLinesForDebugging = false;
 
-        public static bool noini = false;        
+        public static bool noini = false;
 
         public static GAMS.GAMSWorkspace gamsWorkspace = null;
         public static string gamsWorkspaceHelper = null;
@@ -1136,7 +1117,7 @@ namespace Gekko
         public static System.Windows.Media.Color LightGray = System.Windows.Media.Color.FromArgb(255, 248, 248, 248);  //same as this: #982354320985
         public static System.Drawing.Color MiddleGray = System.Drawing.Color.FromArgb(255, 170, 170, 170);  //between .Gray and .LightGray
         public static System.Windows.Media.Color MediumBlueDecompLink = System.Windows.Media.Color.FromArgb(255, 6, 69, 173); //same color as wikipedia links //see also http://www.colorhexa.com/3232bb                
-        public static System.Windows.Media.Color LightRed = System.Windows.Media.Color.FromArgb(255, 255, 247, 237);        
+        public static System.Windows.Media.Color LightRed = System.Windows.Media.Color.FromArgb(255, 255, 247, 237);
         public static System.Windows.Media.Color GekkoModeYellow = System.Windows.Media.Color.FromArgb(255, 253, 245, 176);
         public static System.Windows.Media.Color GekkoModeGreen = System.Windows.Media.Color.FromArgb(255, 191, 234, 154);
         public static System.Windows.Media.Color GekkoModeBlue = System.Windows.Media.Color.FromArgb(255, 191, 205, 219);
@@ -1145,7 +1126,7 @@ namespace Gekko
         public static System.Windows.Media.Color red = System.Windows.Media.Color.FromRgb(240, 30, 60);
 
         public static List<System.Windows.Media.Color> RainbowParentheses = new List<System.Windows.Media.Color>() { System.Windows.Media.Colors.Blue, System.Windows.Media.Colors.Red, System.Windows.Media.Colors.Orange, System.Windows.Media.Colors.LimeGreen, System.Windows.Media.Colors.DarkGray };
-        public static System.Windows.Media.Color RainbowNumber = System.Windows.Media.Color.FromArgb(255, 163, 21, 21);        
+        public static System.Windows.Media.Color RainbowNumber = System.Windows.Media.Color.FromArgb(255, 163, 21, 21);
 
         public static System.Windows.Media.FontFamily decompFontFamily = new System.Windows.Media.FontFamily("Calibri");
         public static int decompFontSize = 13;
@@ -1181,7 +1162,7 @@ namespace Gekko
 
         public static bool isAutoExec = true;
         public static string sessionMemorySnapshot = null;
-        public static string sessionMemoryHistory = null;        
+        public static string sessionMemoryHistory = null;
 
         public static WindowIntellisense windowIntellisense = null;
         public static int windowIntellisenseType = 0;  //0:none, 1:options, 2:variable suggestions.        
