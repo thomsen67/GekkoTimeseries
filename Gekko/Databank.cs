@@ -201,10 +201,11 @@ namespace Gekko
         public void Clear()
         {
             if (!this.editable) Program.ProtectError("You cannot clear a non-editable databank, see OPEN<edit> or UNLOCK");
-            yearStart = -12345;
-            yearEnd = -12345;
-            info1 = null;
-            date = null;
+            this.yearStart = -12345;
+            this.yearEnd = -12345;
+            this.info1 = null;
+            this.date = null;                                    
+            this.traces = null; //probably null already
             this.storage.Clear();
             this.isDirty = true;
         }
@@ -609,6 +610,9 @@ namespace Gekko
         [ProtoMember(32)]
         public int nTraces;
 
+        [ProtoMember(33)]
+        public string dataHash;
+
         // ================= COMPARE =======================================================
 
         /// <summary>
@@ -618,7 +622,8 @@ namespace Gekko
         /// <returns></returns>
         public bool IsSame(DatabankCacheParams other)
         {
-            //??? should this also compare user, branch, commit and gcm ???
+            //??? should this also compare user, branch, commit and gcm ??? NO!
+            //    dataHash should not be necessary to add, since data changes affects the datafile hash anyway
             
             if (other == null) return false;
             //xlsx

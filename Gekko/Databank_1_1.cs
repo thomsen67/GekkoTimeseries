@@ -129,6 +129,15 @@ namespace Gekko
         [ProtoMember(14)]
         private bool isTimeless = false; //a timeless variable is like a ScalarVal (VAL). A timeless variable puts the value in dataArray[0]
 
+        [ProtoMember(15)]
+        public string units;
+
+        [ProtoMember(16)]
+        public Trace2_1_1 trace2 = null;
+
+        [ProtoMember(17)]
+        public TraceID2_1_1 traceID2 = null; //traceID2 because it is experimental
+
         private bool isDirty = false;  //do not keep this in protobuf
         public Databank_1_1 parentDatabank = null;  //do not keep this in protobuf
 
@@ -148,6 +157,25 @@ namespace Gekko
             this.freqEnum = frequency;
             this.frequency = G.ConvertFreq(frequency);
             this.variableName = variableName;
+        }
+        public void FromID(Dictionary<TraceID2_1_1, Trace2_1_1> dict2)
+        {
+            if (this.traceID2 != null)
+            {
+                //this.trace2 = dict2[this.traceID2];    
+                Trace2_1_1 trace = null; dict2.TryGetValue(this.traceID2, out trace); //This will just fail silently. The trace is no longer known, may have been cut off for some reason.                  
+                if (trace != null) this.trace2 = trace;
+            }
+        }
+
+        public void DeepTrace(TraceHelper_1_1 th)
+        {
+            th.seriesObjectCount++;
+            th.metas.Add(this);
+            if (this.trace2 != null)
+            {
+                this.trace2.DeepTrace(th, -1);
+            }
         }
 
         /// <summary>
@@ -842,6 +870,477 @@ namespace Gekko
 
     }
 
+    [ProtoContract]
+    public class TraceContents2_1_1  //Trace2 because it is experimental
+    {
+        [ProtoMember(1)]
+        public readonly TraceID2_1_1 id = new TraceID2_1_1();
+
+        //In principle, these fields could be made readonly, but it would take a bit of refactoring.
+
+        /// <summary>
+        /// 1 timespan. This object is immutable (just as GekkoTime)
+        /// </summary>
+        [ProtoMember(2)]
+        public GekkoTimeSpanSimple period = null;
+
+        /// <summary>
+        /// An extra char in a text string here will take up 2 bytes or 16 bits.
+        /// </summary>        
+        [ProtoMember(3)]
+        public string text = null;
+
+        [ProtoMember(4)]
+        public string name = null;  //with bank and freq
+
+        [ProtoMember(5)]
+        public string commandFileAndLine = null;
+
+        /// <summary>
+        /// For instance the file from where data was imported. Will often be null.
+        /// </summary>
+        [ProtoMember(6)]
+        public string dataFile = null;
+
+        [ProtoMember(7)]
+        public List<string> precedentsNames = null; //Elements are with bank and freq, but also starts with a type like "4¤..." to indicate info on databank, freq, and if the name has traces. See #9khsigra7ioau.
+
+        public TraceContents2_1_1()
+        {
+            //for protobuf
+        }
+
+        public TraceContents2_1_1(GekkoTime t1, GekkoTime t2)
+        {
+            this.period = new GekkoTimeSpanSimple(t1, t2);
+        }
+    }
+
+    [ProtoContract]
+    public class TraceID2_1_1 //TraceID2 because it is experimental
+    {
+        /// <summary>
+        /// Note: resolution is about 0.01 s.
+        /// Switched from .Now to .UtcNow 5/9 2024, because .Now counts ticks since local time new Year 1900, but .UtcNow counts ticks
+        /// since British New Year 1900. Local ticks will just confuse, with users in different time zones.
+        /// And also, .UtcNow runs 3-4x faster than .Now (because .UtcNow is closer to the metal and does not have to look up which
+        /// time zone the user happens to be in right now in this second).
+        /// The change from .Now to .UtcNow will make older data traces 2 hours off for Danish users. Probably ok.
+        /// </summary>
+        [ProtoMember(1)]
+        private readonly DateTime stamp = DateTime.UtcNow;  //Use .StampInLocalTime() when printing etc.!!! Faster than .Now and also more universal since it counts "tics" from the same Coordinated Universal Time.
+
+        /// <summary>
+        /// Used to distinguish traces, especially if these are pruned off. Will be numerically > 0, and when counter is < 0 it means that the trace is stored in en external file (pruned off).
+        /// When Gekko starts up, the counter starts at a random position between 1 and 99% of long.MaxValue (9e18) and augments by 1 for each new trace.
+        /// If the same Gekko session is used, there can be no collisions realistically, neither any overflow (that would demand > 9e16 calculations).
+        /// With multiple Gekkos running at the same time, collisions would demand same stamp (unlikely) AND same counter (probability around 1e-19).
+        /// Should never happen.
+        /// </summary>
+        [ProtoMember(2)]
+        private readonly long counter = ++Globals.traceCounter;
+
+        public TraceID2_1_1()
+        {
+        }
+        public TraceID2_1_1(DateTime stamp, long counter)
+        {
+            this.stamp = stamp;
+            this.counter = counter;
+        }
+
+        public DateTime StampInLocalTime()
+        {
+            return this.stamp.ToLocalTime();
+        }
+
+        public DateTime GetStamp() 
+        {
+            return this.stamp;
+        }
+
+        public long GetCounter() 
+        {
+            return this.counter;
+        }
+
+        public override bool Equals(object o)
+        {
+            TraceID2_1_1 other = o as TraceID2_1_1;
+            if (other != null && this.stamp == other.stamp && this.counter == other.counter) return true;
+            return false;
+        }
+        public override string ToString()
+        {
+            System.Globalization.CultureInfo ci = System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK);
+            string stamp = this.StampInLocalTime().ToString("d", ci);
+            string stampDetailed = null;
+            try
+            {
+                stampDetailed = this.StampInLocalTime().ToString($"{ci.DateTimeFormat.ShortDatePattern} HH:mm:ss.fffffff", System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK)) + ", #" + this.counter;  //7 digits is 100 ns, which is limit anyway
+                //
+            }
+            catch
+            {
+                stampDetailed = this.StampInLocalTime().ToString("G", System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK)) + ", #" + this.counter;
+            }
+            return stampDetailed;
+            //return this.StampInLocalTime().ToString("d'/'M yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture) + ", #" + this.counter;
+            //return this.StampInLocalTime().ToString("d/M yyyy HH:mm:ss", new System.Globalization.CultureInfo("da-DK")) + "|" + this.counter;
+            //return this.StampInLocalTime().ToString() + "|" + this.counter;  //We want this printed in local time, not UTC time.
+        }
+
+        public override int GetHashCode()
+        {
+            int hash = 17;
+            hash = hash * 31 + this.stamp.GetHashCode();  //No need to use .ToLocalTime() here: we just hash the the global ("true" and common) UTC time.
+            hash = hash * 31 + this.counter.GetHashCode();
+            return hash;
+        }
+    }
+
+    public class TraceHelper_1_1
+    {
+        public ETraceHelper type = ETraceHelper.GetAllMetasAndTraces;
+        public double scramble = double.NaN;  //for scramble() function
+        public int seriesObjectCount = 0; //number of series found (probably often equal to meta count)
+        public List<TimeSeries_1_1> metas = new List<TimeSeries_1_1>();
+        public int depthLimit = -12345;
+        public List<Trace2_1_1> longest = new List<Trace2_1_1>();
+        public Dictionary<Trace2_1_1, Precedents2_1_1> traces = new Dictionary<Trace2_1_1, Precedents2_1_1>();  //value is parent (may be null)
+        public Dictionary<Trace2_1_1, PrecedentsAndDepth_1_1> tracesDepth2 = new Dictionary<Trace2_1_1, PrecedentsAndDepth_1_1>();        
+    }
+    
+    public class PrecedentsAndDepth_1_1
+    {
+        public Precedents2_1_1 precedents = null;
+        public int depth = 0;
+    }
+
+    [Serializable]
+    [ProtoContract]    
+    public class Trace2_1_1
+    {
+
+        [ProtoMember(1)]
+        public Precedents2_1_1 precedents = new Precedents2_1_1();
+
+        [ProtoMember(2)]
+        public readonly ETraceType type = ETraceType.Normal;  //default
+
+        [ProtoMember(3)]
+        public readonly TraceContents2_1_1 traceContents = null;
+
+        public Trace2_1_1()
+        {
+        }
+
+        public Trace2_1_1(ETraceType type, GekkoTime t1, GekkoTime t2)
+        {
+            this.type = type;
+            TraceContents2_1_1 traceContents = new TraceContents2_1_1(t1, t2);
+            this.traceContents = traceContents;
+        }
+
+        public TraceID2_1_1 GetId()
+        {
+            return this.traceContents.id;
+        }
+
+        public static void WalkTraces(Trace2_1_1 parent, int depth, int maxDepth, List<string> traceLines, int type, ref int counter, ref int counterAll) //0 for viewer, 1 for printing
+        {
+            if (depth >= maxDepth) return;
+            int widthRemember = Program.options.print_width;
+            try
+            {
+                Program.options.print_width = int.MaxValue;
+
+                //  -----------------------------
+
+                string prec, name, period, code, file, datafile, id;
+                TracePretty(parent, out prec, out name, out period, out code, out file, out datafile, out id);
+
+                if (depth > 0)
+                {
+                    counterAll++;
+                }
+
+                if (type == 0 && depth > 0)
+                {
+                    string d = "{tce}";
+                    traceLines.Add((depth - 1) + d + name + d + period + d + code + d + prec + d + file + d + datafile + d + id + d + parent.traceContents.name + d + parent.traceContents.period + d + parent.traceContents.text + d + prec + d + parent.traceContents.commandFileAndLine + d + parent.traceContents.dataFile + d + parent.traceContents.id);
+                }
+                else
+                {
+                    if (depth == 1)
+                    {
+                        int max = 3;
+                        if (counter == max)
+                        {
+                            G.Writeln("| ...", System.Drawing.Color.Gray);
+                        }
+                        else if (counter > max)
+                        {
+                            //ignore
+                        }
+                        else
+                        {
+                            G.Writeln("| " + G.Blanks(2 * (depth - 1)) + code, System.Drawing.Color.Gray);
+                        }
+                        counter++;
+                    }
+                }
+
+                if (parent.precedents.storage != null)
+                {
+                    //NOTE: list items are reversed!
+                    foreach (Trace2_1_1 child in parent.precedents.storage.AsEnumerable().Reverse().ToList())
+                    {
+                        WalkTraces(child, depth + 1, maxDepth, traceLines, type, ref counter, ref counterAll);
+                    }
+                }
+            }
+            finally
+            {
+
+                //resetting, also if there is an error
+                Program.options.print_width = widthRemember;
+            }
+        }
+
+        public static void TracePretty(Trace2_1_1 parent, out string prec, out string name, out string period, out string code, out string file, out string datafile, out string id)
+        {
+            prec = null;
+            if (parent.traceContents.precedentsNames != null)
+            {
+                List<string> xx = new List<string>(parent.traceContents.precedentsNames);
+                //xx.RemoveAll(s => string.Equals(s, parent.traceContents.name, StringComparison.OrdinalIgnoreCase));
+                xx.Reverse();
+                prec = string.Join(", ", xx);
+            }
+
+            //These must be short
+            name = parent.traceContents.name;
+            if (name != null && name.Contains(":"))
+            {
+                name = name.Split(':')[1];
+            }
+            period = null;
+            if (parent.traceContents.period.t1.IsNull() || parent.traceContents.period.t2.IsNull())
+            {
+                period = "<no period>";
+            }
+            else
+            {
+                period = parent.traceContents.period.ToString().Split(' ')[0];
+            }
+            code = RemoveNewlines(parent.traceContents.text);
+            file = null;
+            string fileDetailed = null;
+
+            if (!G.NullOrBlanks(parent.traceContents.commandFileAndLine))
+            {
+                string[] ss = parent.traceContents.commandFileAndLine.Split('¤');
+                if (ss.Length == 2)
+                {
+                    file = System.IO.Path.GetFileName(ss[0]) + " line " + ss[1];
+                    fileDetailed = ss[0] + " line " + ss[1];
+                }
+                else
+                {
+                    //fallback, should never happen
+                    file = parent.traceContents.commandFileAndLine;
+                    fileDetailed = parent.traceContents.commandFileAndLine;
+                }
+            }
+
+            if (file != null && file.Contains(":"))
+            {
+                file = System.IO.Path.GetFileName(file);
+            }
+            datafile = parent.traceContents.dataFile;
+            if (datafile != null && datafile.Contains(":"))
+            {
+                datafile = System.IO.Path.GetFileName(datafile);
+            }
+            id = parent.traceContents.id.ToString().Split(' ')[0];
+        }
+
+        public static void GetNumberOfTracesAndDepth(Trace2_1_1 rootNode, out int max, out int n)
+        {
+            TraceHelper_1_1 th = new TraceHelper_1_1(); th.type = ETraceHelper.GetAllMetasAndTraces;
+            rootNode.DeepTrace(th, -1);
+            max = int.MinValue;
+            n = th.tracesDepth2.Count - 1;
+            foreach (KeyValuePair<Trace2_1_1, PrecedentsAndDepth_1_1> kvp2 in th.tracesDepth2)
+            {
+                max = Math.Max(max, kvp2.Value.depth);
+            }
+        }
+
+
+        public static string RemoveNewlines(string input)
+        {
+            //return s.Replace(G.NL, " ").Replace("\r", " ").Replace("\n", " ").Replace("  ", " ").Replace("  ", " ");
+            if (string.IsNullOrEmpty(input)) return input;
+            // 1. \s+ matches any sequence of whitespace (tabs, newlines, spaces)
+            // 2. We replace that entire sequence with a single space " "
+            // 3. Trim() removes any leading or trailing spaces left over
+            return Regex.Replace(input, @"\s+", " ").Trim();
+        }
+
+        public static string Truncate(string s)
+        {
+            if (s == null) return s;
+            int n = 60;
+            string s2 = RemoveNewlines(s);
+            if (s2.Length > n)
+            {
+                s2 = s2.Substring(0, n) + " ...";
+            }
+            return s2;
+        }
+
+        public static TraceHelper_1_1 CollectAllTraces(Databank_1_1 databank, ETraceHelper type)
+        {
+            return CollectAllTraces(databank, type, double.NaN);
+        }
+
+        public static TraceHelper_1_1 CollectAllTraces(Databank_1_1 databank, ETraceHelper type, double scramble)
+        {
+            TraceHelper_1_1 th1 = new TraceHelper_1_1();            
+            th1.type = type;
+            th1.scramble = scramble;        
+
+            int n = 0;
+            foreach (KeyValuePair<string, TimeSeries_1_1> kvp in databank.storage)
+            {                            
+                kvp.Value.DeepTrace(th1);
+            }
+            return th1;
+        }
+
+        public void DeepTrace(TraceHelper_1_1 th, int depth)
+        {
+            if (th.depthLimit != -12345 && depth >= th.depthLimit) return;
+            if (th.type == ETraceHelper.GetAllMetasAndTraces)  //0 corresponds to direct effect from bank variable (e.g. "adambk:"), not indirect effect.
+            {
+                PrecedentsAndDepth_1_1 temp = null; th.tracesDepth2.TryGetValue(this, out temp);
+                if (temp == null)
+                {
+                    th.tracesDepth2.Add(this, new PrecedentsAndDepth_1_1() { precedents = this.precedents, depth = depth });
+                }
+                else
+                {
+                    //has been seen before
+                    temp.depth = Math.Min(temp.depth, depth);
+                    return;
+                }
+
+                if (this.precedents.storage != null)
+                {
+                    if (this.precedents.storage.Count() > 0)
+                    {
+                        foreach (Trace2_1_1 trace in this.precedents.storage)
+                        {
+                            trace.DeepTrace(th, depth + 1);
+                        }
+                    }
+                }
+            }            
+        }
+
+        /// <summary>
+        /// After deserializing a protobuf gbk, this method restores trace connections from flat list (databank.traces).
+        /// </summary>
+        /// <param name="databank"></param>
+        public static void HandleTraceRead1(Databank_1_1 databank)
+        {
+            if (databank.traces != null && databank.traces.Count > 0)  //the .Count > 0 seems to be ok: why do anything if there are no traces?
+            {
+                try
+                {
+                    TraceHelper_1_1 th = Gekko.Trace2_1_1.CollectAllTraces(databank, ETraceHelper.OnlyGetMetas);
+                    Dictionary<TraceID2_1_1, Trace2_1_1> dictInverted = new Dictionary<TraceID2_1_1, Trace2_1_1>();
+                    foreach (Trace2_1_1 trace in databank.traces) dictInverted[trace.GetId()] = trace;
+                    HandleTraceRead2(th.metas, dictInverted);
+                }
+                finally
+                {
+                    if (databank != null) databank.traces = null;  //important!
+                }
+            }
+        }
+
+        /// <summary>
+        /// After deserializing a protobuf gbk, this method restores trace connections from flat list (databank.traces).
+        /// </summary>
+        public static void HandleTraceRead2(List<TimeSeries_1_1> metas, Dictionary<TraceID2_1_1, Trace2_1_1> dict1Inverted)
+        {
+            foreach (TimeSeries_1_1 meta in metas)
+            {
+                meta.FromID(dict1Inverted);
+            }
+            foreach (Trace2_1_1 trace in dict1Inverted.Values)
+            {
+                trace.precedents.FromID(dict1Inverted);
+            }
+        }
+
+        public override string ToString()
+        {
+            return "<" + this.traceContents.period.ToString() + ">" + " " + this.traceContents.text;
+        }
+    }
+
+    [ProtoContract]
+    public class Precedents2_1_1
+    {
+        [ProtoMember(1)]
+        public List<Trace2_1_1> storage = new List<Trace2_1_1>();
+
+        /// <summary>
+        /// Pretty innocuous: using this, we can set .storage = null before protobuf.
+        /// </summary>
+        [ProtoMember(2)]
+        public List<TraceID2_1_1> storageIDTemporary = null;  //used to recreate connections after protobuf. Will not take up space in general. Same size as .storagePeriodsTemporary
+
+        public void FromID(Dictionary<TraceID2_1_1, Trace2_1_1> dict2)
+        {
+            if (this.storageIDTemporary != null && this.storageIDTemporary.Count > 0)
+            {
+                this.storage = new List<Trace2_1_1>();
+                for (int i = 0; i < this.storageIDTemporary.Count; i++)
+                {
+                    TraceID2_1_1 id = this.storageIDTemporary[i];
+                    if (id.GetCounter() < 0) { G.Writeln2("This trace is not stored in the databank, but has been pruned off: " + id.ToString()); throw new GekkoException(); }
+                    Trace2_1_1 trace = null; dict2.TryGetValue(id, out trace);
+                    if (trace == null) { G.Writeln2("Could not find this trace in databank: " + id.ToString()); throw new GekkoException(); }
+                    this.storage.Add(trace);
+                }
+            }
+            this.storageIDTemporary = null;
+        }
+
+        public void ToID()
+        {
+            this.storageIDTemporary = new List<TraceID2_1_1>();
+            //if (this.storage.Count() > 0)
+            if (this.storage != null && this.storage.Count > 0)
+            {
+                foreach (Trace2_1_1 trace in this.storage)
+                {
+                    TraceID2_1_1 temp = null;
+                    GekkoTimeSpansSimple temp2 = new GekkoTimeSpansSimple();  //protobuf cannot handle if an element is == null (for dividers)                    
+                    temp = trace.GetId();
+                    this.storageIDTemporary.Add(temp);
+                }
+            }
+            //this.SetStorage(null);  //breaks the references
+            this.storage = null;
+        }
+
+    }
 
 
     [ProtoContract]
@@ -853,8 +1352,9 @@ namespace Gekko
         [ProtoMember(1)]
         public GekkoDictionary<string, TimeSeries_1_1> storage;
         public string aliasName = null;
-        private string fileNameWithPath = null;  //will be constructed when reading: do not protobuf it        
-
+        private string fileNameWithPath = null;  //will be constructed when reading: do not protobuf it
+                                                 //
+        public List<Trace2_1_1> traces = null; //when writing, this is where all the Trace's go.   
 
         public string FileNameWithPath
         {
@@ -1217,7 +1717,6 @@ namespace Gekko
                         catch
                         {
                             new Error("" + varName + ": could not parse '" + date1 + "' as an int (start year)");
-                            //throw new GekkoException();
                         }
                         try
                         {
@@ -1235,7 +1734,6 @@ namespace Gekko
                         catch
                         {
                             new Error("" + varName + ": could not parse '" + date2 + "' as an int (end year)");
-                            //throw new GekkoException();
                         }
                         try
                         {
@@ -1244,7 +1742,6 @@ namespace Gekko
                         catch
                         {
                             new Error("" + varName + ": could not parse '" + date2sub + "' as an int (end sub-period)");
-                            //throw new GekkoException();
                         }
                         frequency = line.Substring(iiStart + 23, 1).ToLower(); //a or q or m
 
@@ -1408,10 +1905,11 @@ namespace Gekko
 
             if (type == -12345)
             {
-                new Error("Could not find data storage file inside zipped databank file. Troubleshooting, try this page: " + Globals.databankformatUrl);
-                
-                //throw new GekkoException();
+                new Error("Could not find data storage file inside zipped databank file. Troubleshooting, try this page: " + Globals.databankformatUrl);                
             }
+
+            string tracename = null;
+            if (File.Exists(tempTsdxPath + "\\" + "trace.data")) tracename = tempTsdxPath + "\\" + "trace.data";
 
             if (type == 1)
             {
@@ -1436,10 +1934,71 @@ namespace Gekko
                     
 
                 }  //end of using
+
+                if (Globals.traceFrame != null && tracename != null) //Only done when analyzing Gekko 2 traces
+                {
+                    using (FileStream fs = Program.WaitForFileStream(tracename, null, Program.GekkoFileReadOrWrite.Read))
+                    {
+                        try
+                        {
+                            DateTime dt3 = DateTime.Now;
+                            List<Trace2_1_1> traces = Serializer.Deserialize<List<Trace2_1_1>>(fs);
+                            databank.traces = traces;
+                            Trace2_1_1.HandleTraceRead1(databank);
+                            databank.traces = null;                            
+                            try
+                            {
+                                //TODO: Given a set A for relevant ADAM-variables, for each A walk down precedents, excluding
+                                //      any other A's. Find which command files are relevant.
+                                //Then we can link clumps of command files to sets of relevant ADAM-variables.
+                                //
+                                //
+                                TraceHelper_1_1 th1 = Gekko.Trace2_1_1.CollectAllTraces(databank, ETraceHelper.GetAllMetasAndTraces);                                
+                                readInfo.traceFrame = TraceFlow.Analyze(th1.tracesDepth2, readInfo.fileName);
+
+                                if (Globals.traceChunks != null)
+                                {                                    
+                                    foreach (KeyValuePair<Trace2_1_1, PrecedentsAndDepth_1_1> kvp in th1.tracesDepth2)
+                                    {
+                                        if (kvp.Key.type != ETraceType.GluedToSeries)
+                                        {
+                                            string name = G.Chop_GetNameAndFreq(kvp.Key.traceContents.name);
+                                            string commandFile = kvp.Key.traceContents.commandFileAndLine.Split('¤')[0];
+
+                                            if (!Globals.traceChunks.ContainsKey(commandFile))
+                                            {
+                                                GekkoDictionary<string, bool> temp2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                                                temp2.Add(name, false);
+                                                Globals.traceChunks.Add(commandFile, temp2);
+                                            }
+                                            else
+                                            {
+                                                GekkoDictionary<string, bool> temp2 = Globals.traceChunks[commandFile];
+                                                if (!temp2.ContainsKey(name)) temp2.Add(name, false);
+                                            }
+
+                                        }
+                                    }
+                                }                                
+                            }
+                            catch (Exception e)
+                            {
+                                new Writeln("Failed traces on: " + originalFilePath);
+                            }
+                            //readInfo.nTraces = n;
+                            G.WritelnGray("Protobuf Gekko 2 traces deserialize took: " + G.Seconds(dt3));                            
+                        }
+                        catch (Exception e)
+                        {
+                            G.Writeln2("*** ERROR: Unexpected technical error when reading " + Globals.extensionDatabank + " databank traces in version 1.1 format (protobuffers)");
+                            G.Writeln("           Message: " + e.Message, Color.Red);
+                            G.Writeln("           Troubleshooting, try this page: " + Globals.databankformatUrl, Color.Red);
+                            throw new GekkoException();
+                        }
+                    }
+                }
             }
-
             else
-
             {
                 databank = new Databank_1_1(databankName);
                 //string xx1 = file.Replace("Is_a_protobuffer_file", "") + Path.GetFileNameWithoutExtension(originalFilePath) + ".tsd";
