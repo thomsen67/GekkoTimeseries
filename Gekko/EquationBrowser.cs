@@ -359,7 +359,7 @@ namespace Gekko
             }
             else if (Globals.runningOnTTComputer)
             {
-                DialogResult result = MessageBox.Show("Only a few vars?", "Vars", MessageBoxButtons.YesNo, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+                DialogResult result = MessageBox.Show("Only a few vars?", "vars", MessageBoxButtons.YesNo, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
                 if (result == DialogResult.Yes)
                 {
                     vars = new List<string> { "aaa", "fcp", "PHK", "jphk", "fee", "Jfee", "fy", "tg", "peesq", "ktiorn", "tfon" };
@@ -608,7 +608,7 @@ img {border-style: none;
                 HtmlBrowserSettings htmlBrowserSettings = new HtmlBrowserSettings();
                 htmlBrowserSettings.isDanish = isDanish;
                 htmlBrowserSettings.show_source = settings_show_source;
-                List<string> varExpl = Program.GetVariableExplanationAugmented(new DNameSimplest(varnameWithoutFreq), htmlBrowserSettings);
+                List<string> varExpl = Program.GetVariableExplanationAugmented(new DNameSimplest(varnameWithoutFreq), htmlBrowserSettings, false); //#cherrypic: added ", false"
                 foreach (string line in varExpl)
                 {
                     if (line != "")
@@ -1424,6 +1424,8 @@ img {border-style: none;
                 bh.freq = freq;
                 bh.firstColWidth = 200;
                 bh.removeTx0Dollar = true;  //Removes line: "over sets: [t], with $-condition: ((tx0[t]))"
+                //bh.type = EBrowserType.MakroIdentitiesText;
+                bh.type = EBrowserType.Makro;
                 bh.showTraces = false;                
                 bh.text = new StringBuilder();                
             }
@@ -1524,8 +1526,10 @@ img {border-style: none;
                 else if (bh.type == EBrowserType.Makro)
                 {
                     string f = null; if (flush) f = "flush(); ";
-                    Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing";
-                    Program.RunGekkoCommands(f + "reset; read <gdx> previous_deep_calibration.gdx; time 2029 2034; option model gams scalar data = yes; model<gms>deep_dynamic_calibration.zip; " + @"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\GitHub\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());
+                    Program.options.folder_working = @"c:\Thomas\Desktop\gekko\testing";                    
+                    //Program.RunGekkoCommands(f + "reset; read <gdx> previous_deep_calibration.gdx; time 2029 2034; option model gams scalar data = yes; model<gms>deep_dynamic_calibration.zip; " + @"open 'c:\Thomas\Desktop\gekko\testing\MAKRO\GitHub\Data\Makrobk\makrobk.gbk' as traces;", "", 0, new P());
+                    //Program.RunGekkoCommands(f + "reset; read <gdx> baseline_2026May.gdx; time 2029 2034; option model gams scalar data = yes; model<gms>deep_dynamic_calibration_2026May.zip; " + @"open makrobk_2026May.gbk as traces;", "", 0, new P());
+                    Program.RunGekkoCommands(f + "reset; read<gdx> previous_deep_calibration_2025December.gdx; time 2029 2034; model<gms> deep_dynamic_calibration_2025December.zip; " + @"open 'c:\Thomas\Desktop\gekko\testing\makrobk-2025-12-15.gbk' as traces;", "", 0, new P()); //hash: b4d0d93, makrobk fra 15/12 2025.                                     
                 }
                 else if (bh.type == EBrowserType.Greu)
                 {
@@ -1770,7 +1774,7 @@ img {border-style: none;
 
                     html1.AppendLine("<tr>");
                     html1.Append("<td style=`font-weight: bold;`>" + EquationBrowser.HtmlLink(variableName.ToString(bh.dNameFormat), SimplerName(variableName.ToString()) + ".html") + "</td>");
-                    html1.Append("<td style=`color:gray; font-weight: bold;`>" + Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName)) + "</td>");
+                    html1.Append("<td style=`color:gray; font-weight: bold;`>" + Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName, false)) + "</td>"); //#cherrypick, added ", false"
                     html1.AppendLine("</tr>");
 
                     EquationTextHelper helper2 = new EquationTextHelper();
@@ -1785,7 +1789,7 @@ img {border-style: none;
                         if (dict.ContainsKey(varnameWithoutLag)) continue;  //no dubles, for instance if lags.
                         html1.AppendLine("<tr>");
                         html1.Append("<td>" + EquationBrowser.HtmlLink(Program.DName_HACK1(varnameWithoutLag).ToString(bh.dNameFormat), SimplerName(varnameWithoutLag) + ".html") + "</td>");
-                        html1.Append("<td style=`color:gray`>" + Program.SpecialXmlChars(Program.GetVariableExplanation1Line(new DNameSimplest(varnameWithoutLag))) + "</td>");
+                        html1.Append("<td style=`color:gray`>" + Program.SpecialXmlChars(Program.GetVariableExplanation1Line(new DNameSimplest(varnameWithoutLag), false)) + "</td>");  //#cherrypick, added ", false"
                         html1.AppendLine("</tr>");
                         dict.Add(varnameWithoutLag, false);
                     }
@@ -2216,7 +2220,7 @@ img {border-style: none;
             foreach (DName var2 in vars)
             {
                 if (G.StartsWith(var2.GetName(), res)) continue;  //skip res_... variables.
-                string expl = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(var2));
+                string expl = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(var2, false)); //#cherrypick, added ", false"
                 x2.Append("<tr>");
                 x2.Append("<td width = `20%`>");
                 x2.Append(HtmlLink(var2.ToString(bh.dNameFormat), settings_vars_foldername + "/" + SimplerName(var2.ToString()) + ".html"));
@@ -2481,7 +2485,8 @@ img {border-style: none;
                         ope0.labelGiven = new List<string>() { label + extra2 };
                         ope0.labelRecordedPieces = new List<O.RecordedPieces>();
                         Program.GetElementOperators(o0, ope0, out ope0.operatorsFinal, out ope0.operatorsFinalAll);
-                        ope0.variable[0] = O.GetIVariableFromString(kvp.Key.ToString(), O.ECreatePossibilities.NoneReportError) as Series;
+                        ope0.variable[0] = O.GetIVariableFromString(kvp.Key.ToString(), O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                        if (ope0.variable[0] == null) continue;                        
                         o0.prtElements.Add(ope0);
                         try
                         {
@@ -2520,7 +2525,7 @@ img {border-style: none;
             EquationBrowser.SpanHtmlColor(html2, variableName.ToString(bh.dNameFormat));
             html2.Append("</p>");
             //EquationBrowser.WriteHtmlColor(html2, variableName);
-            EquationBrowser.WriteHtmlColorGray(html2, Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName)));            
+            EquationBrowser.WriteHtmlColorGray(html2, Program.SpecialXmlChars(Program.GetVariableExplanation1Line(variableName, false)));  //#cherrypick, added ", false"
             html2.AppendLine("<br style=`line-height: 0.35rem;`>");
             EquationBrowser.WriteHtml(html2, "Select one of the following " + eqsNew.Count + " equations containing " + variableName.ToString(bh.dNameFormat) + ":");
             string table = "<table cellpadding=`5`>";
@@ -2703,7 +2708,7 @@ img {border-style: none;
                             }
                             string sVarsInside = Stringlist.GetListWithCommas(vars).Replace("¤", "");
                             string title = null;
-                            if (uniqueName != null) title += Program.SpecialXmlChars(Program.GetVariableExplanation1Line(uniqueName)) + "&#10;";  //the code gives a newline --> weird but works in Chrome and IE
+                            if (uniqueName != null) title += Program.SpecialXmlChars(Program.GetVariableExplanation1Line(uniqueName, false)) + "&#10;";  //the code gives a newline --> weird but works in Chrome and IE.  //#cherrypick, added ", false"
                             if (!G.NullOrBlanks(sVarsInside)) title += sVarsInside;
                             string titleHtml = null;
                             if (!G.NullOrBlanks(title)) titleHtml = " title=`" + title.Trim() + "`";
@@ -2741,11 +2746,11 @@ img {border-style: none;
                             {
                                 if (n > 1)
                                 {
-                                    imgBlack = "<img class=`img-size` src=`" + "normal.png" + "` style=`opacity:0.3; padding-right: 8px; position: relative; top: 3px` title = `Contains " + n + " aggregated variables`></img>";
+                                    imgBlack = "<img class=`img-size` src=`" + "../normal.png" + "` style=`opacity:0.3; padding-right: 8px; position: relative; top: 3px` title = `Contains " + n + " aggregated variables`></img>";
                                 }
                                 else
                                 {
-                                    imgBlack = "<img class=`img-size` src=`" + "normal.png" + "` style=`opacity:0.0; padding-right: 8px; position: relative; top: 3px` title = `Contains " + n + " aggregated variables`></img>";
+                                    imgBlack = "<img class=`img-size` src=`" + "../normal.png" + "` style=`opacity:0.0; padding-right: 8px; position: relative; top: 3px` title = `Contains " + n + " aggregated variables`></img>";
                                 }
                             }
 
@@ -2803,7 +2808,7 @@ img {border-style: none;
                 TraceItem traceItem = trace.FromTraceToTreeViewItem(gtss);                
                 html.AppendLine(@"<div class=`list-item-content`>");
                 string visibility = null;
-                string image = "normal.png";
+                string image = "../normal.png";
                 string imageExtra = null;
                 if (childrenCount == 0)
                 {
@@ -2814,7 +2819,7 @@ img {border-style: none;
                     if (WalkTracesForHtmlIsPruned(th, depth))
                     {
                         //Has children but is pruned
-                        image = "normal_red.png";
+                        image = "../normal_red.png";
                         imageExtra = " onclick = `alert('Sub-traces at this depth exist, but have been pruned off for space reasons in this html trace viewer.')` ";
                     }
                 }
@@ -2848,7 +2853,7 @@ img {border-style: none;
                         if (depth == 0 && counter == 0)
                         {
                             html.AppendLine(@"<div class=`list-item-content`>");
-                            html.AppendLine(@"<div class=`folder-label`><span class=`folder-icon`><img class=`img-size` src =`normal.png` style =`visibility: hidden; margin-right: " + th.pixelsAfterArrow + "`></span><span style = `font-weight: bold;`>Name</span></div>");
+                            html.AppendLine(@"<div class=`folder-label`><span class=`folder-icon`><img class=`img-size` src =`../normal.png` style =`visibility: hidden; margin-right: " + th.pixelsAfterArrow + "`></span><span style = `font-weight: bold;`>Name</span></div>");
                             html.AppendLine(@"<div style = `font-weight: bold;`>Code</div>");
                             html.AppendLine(@"<div style = `font-weight: bold;`>Active</div>");
                             html.AppendLine(@"<div style = `font-weight: bold;`>Stamp</div>");
@@ -3837,10 +3842,10 @@ img {border-style: none;
             
             // Change folder icon
             if (folder.classList.contains('open')) {
-                this.innerHTML = '<img class=`img-size` src=`checked.png` style =`margin-right: " + pixelsAfterArrow + @"`>';
+                this.innerHTML = '<img class=`img-size` src=`../checked.png` style =`margin-right: " + pixelsAfterArrow + @"`>';
             } else
                                 {
-                                    this.innerHTML = '<img class=`img-size` src =`normal.png`  style =`margin-right: " + pixelsAfterArrow + @"`>';
+                                    this.innerHTML = '<img class=`img-size` src =`../normal.png`  style =`margin-right: " + pixelsAfterArrow + @"`>';
                                 }
 
                                 // Recalculate the column width
