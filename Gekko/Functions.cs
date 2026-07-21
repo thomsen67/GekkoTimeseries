@@ -852,10 +852,160 @@ namespace Gekko
         // ===========================================================================================================================
         public static IVariable rename(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
-            List<IVariable> rowList = O.ConvertToList(x2);
+            return rename(smpl, _t1, _t2, x1, x2, new ScalarString("none"));
+        }
+
+        public static IVariable rename(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2, IVariable x3)
+        {
+            //Cannot get ... , params IVariable[] args to work.... --> unknown reason
+            IVariable[] args = new IVariable[] { x1, x2, x3 };
+
+            bool drop = false; //drop non-touched combos
+            if (args.Length == 0 || args.Length > 3) new Error("Function rename() accepts 1-3 parameters");
+            if (args.Length == 3)
+            {
+                string s = O.ConvertToString(args[2]);
+                if (G.Equal(s, "drop")) drop = true;
+            }
+            List<IVariable> rowList = O.ConvertToList(args[1]);
             if (rowList == null) new Error("Expected list as argument #2");
             if (rowList.Count == 0) new Error("Empty list not allowed");
 
+            List list0 = rowList[0] as List;
+            if (list0 == null) new Error("List sub-elements must be lists, too (nested list)");
+
+            Series y = null;
+
+            if (list0.list.Count == 3)
+            {
+                new Writeln("Calling rename() on a rename-list with 3 'columns' (lengths of the sub-lists)");
+                y = Helper_Rename(args[0], rowList, drop);
+            }
+            else if (list0.list.Count == 4)
+            {
+                new Writeln("Calling rename() on a rename-list with 4 'columns' (lengths of the sub-lists)");
+                y = Helper_Rename_OLD(smpl, _t1, _t2, args[0], rowList); //First 3 args because reorder() is called inside
+            }
+            else
+            {
+                new Error("Expected sub-lists with 3 or 4 elements");
+            }
+            return y;
+        }
+
+        private static Series Helper_Rename(IVariable x1, List<IVariable> rowList, bool drop)
+        {
+            Series ts = x1 as Series;
+            if (ts == null || ts.type != ESeriesType.ArraySuper)
+            {
+                new Error("You must use an array-timeseries variable");
+            }
+
+            List<int> oldDim = new List<int>();
+            List<string> renameFrom = new List<string>();
+            List<string> renameTo = new List<string>();
+            //Note: slot #i in the following list corresponds to dimension number i+1 !
+            List<GekkoDictionary<string, string>> fromTo = new List<GekkoDictionary<string, string>>();
+
+            string cfg = "Config list: ";
+
+            int row = 0;
+            foreach (IVariable iv in rowList)
+            {
+                row++;
+                List colList = iv as List;
+                if (colList == null) new Error(cfg + "Expected list element #" + row + " to be a list of strings");
+                int col = 0;
+                foreach (IVariable ivCol in colList.list)
+                {
+                    col++;
+                    ScalarString ss = ivCol as ScalarString;
+                    if (ss == null) new Error(cfg + "Expected element (row) " + row + ", (col) " + col + " to be a string");
+                    string s = ss.string2;
+                    if (s == null) new Error(cfg + "Expected element (row) " + row + ", (col) " + col + " to be non-null"); //Can this ever happen?
+                    s = s.Trim();
+                    if (col == 1)
+                    {
+                        int i = G.ConvertToInt(s);
+                        if (i == int.MaxValue) new Error(cfg + "Cannot convert string '" + s + "' into an integer");
+                        if (i < 1) new Error("Dimension number " + i + ", must be >= 1");
+                        oldDim.Add(i);
+                    }
+                    else if (col == 2)
+                    {
+                        renameFrom.Add(s);
+                    }
+                    else if (col == 3)
+                    {
+                        renameTo.Add(s);
+                        int n = renameFrom.Count;
+                        //TODO: Checks
+                        //if (fromTo[lastRowCounter - 1].ContainsKey(renameFrom[renameFrom.Count - 1])) new Error(cfg + "In dimension " + lastRowCounter + ", old element '" + renameFrom[renameFrom.Count - 1] + "' appears > 1 time");
+                        //if (fromTo[lastRowCounter - 1].ContainsKey(renameTo[renameTo.Count - 1])) new Error(cfg + "In dimension " + lastRowCounter + ", new element '" + renameTo[renameTo.Count - 1] + "' appears > 1 time");
+                        int rowDim = oldDim[n - 1];
+                        int dif = rowDim - fromTo.Count;  //do not move into loop!
+                        for (int i = 0; i < dif; i++) fromTo.Add(new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase));
+                        if (fromTo[rowDim - 1].ContainsKey(renameFrom[n - 1]))
+                        {
+                            new Error("List element " + row + ": the from name '" + renameFrom[n - 1] + "' already exists");
+                        }
+                        fromTo[rowDim - 1].Add(renameFrom[n - 1], renameTo[n - 1]);
+                    }
+                    else
+                    {
+                        new Error(cfg + "Sublists must have exactly 3 elements");
+                    }
+                }
+            }
+
+            for (int i = 0; i < fromTo.Count; i++)
+            {
+                GekkoDictionary<string, string> d = fromTo[i];
+                string s = Program.HasDuplicateValues(d);
+                if (s != null) new Error("In dimension " + (i + 1) + ", the to name '" + s + "' appears > 1 time");
+            }
+
+            // ================================================
+            // Now we are ready for reordering and renaming
+            // ================================================
+
+            Series z = ts.DeepClone(0, null, null) as Series;
+            Dictionary<MultidimElement, bool> keep = new Dictionary<MultidimElement, bool>();
+            Dictionary<MultidimElement, bool> remove = new Dictionary<MultidimElement, bool>();
+            foreach (KeyValuePair<MultidimElement, IVariable> kvp in z.dimensionsStorage.storage)
+            {
+                MultidimElement map = kvp.Key;
+                for (int i = 0; i < map.storage.Length; i++)
+                {
+                    if (i < fromTo.Count)
+                    {
+                        string to; fromTo[i].TryGetValue(map.storage[i], out to);
+                        if (to != null)
+                        {
+                            map.storage[i] = to;
+                            if (drop && !keep.ContainsKey(map)) keep.Add(map, false);
+                        }
+                    }
+                }
+            }
+
+            if (drop)
+            {
+                foreach (KeyValuePair<MultidimElement, IVariable> kvp in z.dimensionsStorage.storage)
+                {
+                    if (!keep.ContainsKey(kvp.Key)) remove.Add(kvp.Key, false);
+                }
+                foreach (MultidimElement m in remove.Keys)
+                {
+                    z.dimensionsStorage.storage.Remove(m);
+                }
+            }
+
+            return z;
+        }
+
+        private static Series Helper_Rename_OLD(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, List<IVariable> rowList)
+        {
             Series ts = x1 as Series;
             if (ts == null || ts.type != ESeriesType.ArraySuper)
             {
@@ -933,7 +1083,7 @@ namespace Gekko
                     }
                     else
                     {
-                        new Error(cfg + "Sublists must have max 4 elements");
+                        new Error(cfg + "Sublists must have exactly 4 elements");
                     }
                 }
             }
@@ -1043,7 +1193,6 @@ namespace Gekko
             }
 
             Series y = Functions.reorder(smpl, _t1, _t2, z, new List(m)) as Series;
-
             return y;
         }
 
@@ -1674,6 +1823,17 @@ namespace Gekko
             return new ScalarVal(d);
         }
 
+        public static IVariable balance(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable a, IVariable rowSums, IVariable colSums, IVariable rowNames, IVariable colNames)
+        {
+            return balance(smpl, _t1, _t2, a, rowSums, colSums, rowNames, colNames, null);
+        }
+
+        public static IVariable balance(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable a, IVariable rowSums, IVariable colSums, IVariable rowNames, IVariable colNames, IVariable other)
+        {
+            GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+            return Optimize.Optimize1(t1, t2, a, rowSums, colSums, rowNames, colNames, other);
+        }
+
         public static IVariable rows(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
         {
             Matrix m = O.ConvertToMatrix(x1);
@@ -1723,6 +1883,15 @@ namespace Gekko
             return ts;
         }
 
+        public static void create(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
+        {
+            //create('xyz', 3) array-series with 3 dimensions (current frequency)
+            //create('xyz!a', 3) annual array-series with 3 dimensions
+            //create('b:xyz!a', 3) annual array-series with 3 dimensions, in databank b.
+            //Using indexes in name not allowed.
+            helper_seriesAndTimeless("create", x);
+        }
+
         public static void identities(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
         {
             GamsModel.Identities();
@@ -1757,7 +1926,6 @@ namespace Gekko
                     else
                     {
                         new Error("Expected argument 1 in series() to be value or string");
-                        //throw new GekkoException();
                     }
                 }
                 else if (x.Length == 2)
@@ -1772,18 +1940,16 @@ namespace Gekko
                     else
                     {
                         new Error("series() with 2 arguments must have string as first argument");
-                        //throw new GekkoException();
                     }
                 }
                 else
                 {
 
                     new Error("series() does not accept > 2 arguments");
-                    //throw new GekkoException();
                 }
 
             }
-            else
+            else if (type == "timeless")
             {
                 if (x.Length == 0)
                 {
@@ -1804,7 +1970,6 @@ namespace Gekko
                     else
                     {
                         new Error("Expected argument 1 in timeless() to be value or string");
-                        //throw new GekkoException();
                     }
                 }
                 else if (x.Length == 2)
@@ -1819,17 +1984,40 @@ namespace Gekko
                     else
                     {
                         new Error("timeless() with 2 arguments must have string as first argument");
-                        //throw new GekkoException();
                     }
                 }
                 else
                 {
-
-                    new Error("series() does not accept > 2 arguments");
-                    //throw new GekkoException();
+                    new Error("timeless() does not accept > 2 arguments");
                 }
             }
-
+            else if (type == "create")
+            {
+                if (x.Length != 2) new Error("create() only accepts 2 arguments");
+                int i = O.ConvertToInt(x[1]); //dims
+                if (i < 1) new Error("create() must be stated with >= 1 dimensions");
+                List temp1 = new List(); temp1.Add(x[0]);
+                List<string> temp2 = O.Restrict(temp1, true, false, true, false);
+                foreach (string s in temp2)
+                {
+                    if ((Functions.exist(null, null, null, new ScalarString(s)) as ScalarVal).val == 1d)
+                    {
+                        //Do nothing. It may have wrong dimension, but we do not check that here.
+                    }
+                    else
+                    {
+                        IVariable iv = O.GetIVariableFromString(s, O.ECreatePossibilities.Can);
+                        Series ts2 = iv as Series;
+                        if (ts2 == null) new Error("Could not create '" + s + "' with " + i + " dimensions");
+                        ts2.dimensionsStorage = new Multidim();
+                        ts2.dimensions = i;
+                        ts2.type = ESeriesType.ArraySuper;
+                        ts2.meta = new SeriesMetaInformation();
+                        //We do not return ts2: it has been created, and create() is a void method.
+                    }
+                }
+            }
+            else new Error("Illegal series call");
             return ts;
         }
 
@@ -6608,6 +6796,17 @@ namespace Gekko
             }
             //if (Globals.runningOnTTComputer) new Writeln("TTH: Counted " + th.seriesObjectCount + " series, with " + th.metas.Count + " trace starts, " + th.traces.Count + " unique traces, and " + th.traces.Count + " trace combinations.");
             //if (Globals.runningOnTTComputer) new Warning(EWarningType.NoUsing, "TTH: Are depths really ok. We are using depth-first, use breath-first. Maybe should iterate over depth, else a trace found at deep level will end in dict and shadow the depth of a trace of a lower level.");
+        }
+
+        /// <summary>
+        /// Calls GitHooks() on the first \.git folder found as a parent folder
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="_t1"></param>
+        /// <param name="_t2"></param>
+        public static void githooks(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {
+            Program.GitHooks(O.ConvertToString(root(smpl, _t1, _t2, new ScalarString("git"))));
         }
 
         private static string Helper_GetLabel(string s)

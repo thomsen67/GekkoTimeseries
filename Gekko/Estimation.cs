@@ -1016,7 +1016,7 @@ namespace Gekko
             ols.rmse = Math.Sqrt(ols.rss / (double)n);
             ols.see = Math.Sqrt(ols.rss / (double)df);
             ols.usedCovar = null;
-            double[,] ixtx = Program.InvertMatrix(Program.XTransposeX(x), !calledFromRecursive);  //fails with an error, silent
+            bool fail; double[,] ixtx = Program.InvertMatrix(Program.XTransposeX(x), !calledFromRecursive, true, out fail);  //fails with an error, silent
             if (r.GetLength(0) == 0)
             {
                 //covar = sigma^2 * inv(X'X)
@@ -1025,7 +1025,7 @@ namespace Gekko
             else
             {
                 //covar = sigma^2 *( inv(X'X)  -   inv(X'X) * R' inv( R  inv(X'X) R' ) R  inv(X'X) )                
-                double[,] inside = Program.InvertMatrix(Program.MultiplyMatrices(Program.MultiplyMatrices(r, ixtx), Program.Transpose(r)), !calledFromRecursive);  //inv fails with an error, silent
+                bool fail2; double[,] inside = Program.InvertMatrix(Program.MultiplyMatrices(Program.MultiplyMatrices(r, ixtx), Program.Transpose(r)), !calledFromRecursive, true, out fail2);  //inv fails with an error, silent
                 double[,] temp1 = Program.MultiplyMatrices(Program.MultiplyMatrices(Program.MultiplyMatrices(Program.MultiplyMatrices(ixtx, Program.Transpose(r)), inside), r), ixtx);
                 double[,] temp2 = Program.SubtractMatrixMatrix(ixtx, temp1, ixtx.GetLength(0), ixtx.GetLength(1));
                 ols.usedCovar = Program.MultiplyMatrixScalar(temp2, ols.see * ols.see, temp2.GetLength(0), temp2.GetLength(1));
