@@ -38,6 +38,10 @@ namespace Gekko
 
     public class Globals
     {
+        //To find failing tests:
+        public const bool UNITTESTFOLLOWUP_important = false;
+        public const bool UNITTESTFOLLOWUP = false;        
+
         public static bool greu = true;
         public static bool traceFixCopy = true;
         
@@ -164,9 +168,7 @@ namespace Gekko
                 
         public static WarningPool warningPool = new WarningPool();
         public const string internalGekkoWarningString = "Internal Gekko warning";
-        public const string INTERNAL = "INTERNAL";
-
-        public const bool testfail = true;  //To find failing tests
+        public const string INTERNAL = "INTERNAL";        
 
         public const string eqs1 = "------------- scalar -------------";
         public const string eqs2 = "<no raw eqs>";
@@ -458,10 +460,7 @@ namespace Gekko
         public static string protobufFileName3 = "trace.data";
 
         public static List<string> r_fileContent = null;
-        public static List<string> python_fileContent = null;
-
-        public const bool UNITTESTFOLLOWUP = false;
-        public const bool UNITTESTFOLLOWUP_important = false;
+        public static List<string> python_fileContent = null;        
 
         public static string restartSnippet = "reset";
 

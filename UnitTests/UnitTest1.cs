@@ -10366,7 +10366,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Div()
         {
-            if (Globals.testfail) return;
+            if (!Globals.UNITTESTFOLLOWUP_important) return;
             
             I("reset; time 2001 2003;");
             I("x1 = 5;");
@@ -11782,8 +11782,8 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_Sheet_List()
-        {            
-            if (Globals.testfail) return;
+        {
+            if (!Globals.UNITTESTFOLLOWUP_important) return;
             G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\temp';");
             I("reset;");
@@ -16310,7 +16310,7 @@ namespace UnitTests
                         //Only 2002 because the xlsx file is only covering 2002. That seems fair enough, timeless
                         //series must be truncated somehow as it is now. Else we need a xlsx decoration that says that
                         //the data is timeless.                        
-                        if (!Globals.testfail)
+                        if (Globals.UNITTESTFOLLOWUP)
                         {
                             _AssertSeries(First(), "a!a", new string[] { "x1" }, 2000, double.NaN, sharedDelta);
                             _AssertSeries(First(), "a!a", new string[] { "x1" }, 2001, 1100, sharedDelta);
@@ -16348,7 +16348,7 @@ namespace UnitTests
                     I("reset; time 2001 2003;");
                     I("a = series(1);");
                     I("a[x1] = timeless(100);");
-                    if (Globals.testfail && i == 0)
+                    if (!Globals.UNITTESTFOLLOWUP && i == 0)
                     {
                         I("read<merge " + xlsx + ">temp;");
                         if (i == 0)
@@ -16375,7 +16375,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_TraceResurrection()
         {
-            if (Globals.testfail) return;
+            if (!Globals.UNITTESTFOLLOWUP) return;
 
             //Get this in from working folder:
             //read usmec;
@@ -28843,7 +28843,7 @@ print(df2)
             I("time 2000 2000;");
             I("#(listfile i) = a, b;");
             I("x = series(1); x[a] = 1; x[b] = 2;");
-            if (Globals.UNITTESTFOLLOWUP_important)
+            if (Globals.UNITTESTFOLLOWUP)
             {
                 I("y = sum(#(listfile i), x[#(listfile i)]);");  //using listfile in sum(), only simple i accepted.            
                 _AssertSeries(First(), "y", 2000, 3, sharedDelta);
@@ -29893,7 +29893,7 @@ print(df2)
             FAIL("RENAME x1 to y;");
             I("RENAME temp:x1 to y;");  //essentially moving
 
-            if (Globals.UNITTESTFOLLOWUP_important)
+            if (Globals.UNITTESTFOLLOWUP)
             {
                 // === COUNT ===
                 //do it like INDEX
@@ -30848,7 +30848,7 @@ print(df2)
                 DatabanksTestHelper();
                 G.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp", true);
 
-                if (Globals.UNITTESTFOLLOWUP_important)
+                if (Globals.UNITTESTFOLLOWUP)
                 {
                     //Test that completely empty series are not written to bank
 
@@ -32102,7 +32102,7 @@ print(df2)
             _AssertMatrix(First(), "#m", 5, 2, 1d, sharedDelta);
             _AssertMatrix(First(), "#m", 5, 3, 0d, sharedDelta);
 
-            if (Globals.UNITTESTFOLLOWUP_important)
+            if (Globals.UNITTESTFOLLOWUP)
             {
                 I("time 2001 2004;");
                 I("#x = [1; 2; 3];");
