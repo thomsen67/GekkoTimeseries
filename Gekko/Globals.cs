@@ -51,6 +51,14 @@ namespace Gekko
 
         public static bool greuHack = false;  //Year must be YYYY, digits
 
+        // -------------------------------------
+
+        //public static string dlink_programFolderGit = Program.ProgramFolderGit(); //G.CleanupFolderName(@"k:\MAKROBK\" + "tth\\test", false);
+        //public static string dlink_programFolderRunning = Program.ProgramFolderRunning(); // G.CleanupFolderName(dlink_programFolderGit + "\\makrobk_grunddata\\biver", false);
+
+        // -------------------------------------
+
+
         public static bool gdxReaderDebug = false;        
         public const string libraryDriveCheatString = "library___name___";        
         public const string tempFileStart = "tempfile";
@@ -155,6 +163,10 @@ namespace Gekko
         public const bool traceUsesOrMayUseRealDataPeriod = true;  //for some traces, the real data period is used, so missings may truncate it. So if a command has actually run over some period, and it produces missings, its trace may completely disappear. In that case, the user just sees missing for some period, but cannot se the code line "producing" this missing. If this needs to be fixed, the varible acts as a pointer to these places.
         public const bool traceEndoRhsFix1 = true;   //fix hall or mirrors for x[%t] = x[%t] + ...
         public const bool traceEndoRhsFix2 = true;   //fix for  x = 1; x = x + 1; x = x + 1; ...
+        public static TraceFrame traceFrame = null; //deactivated when null
+        public static GekkoDictionary<string, GekkoDictionary<string, bool>> traceChunks = null;
+        public static GekkoDictionary<string, bool> traceChunksRelevant = null;
+
 
         public static bool gbkExtraMetadata = true;
 
@@ -401,7 +413,7 @@ namespace Gekko
 
         public static int decompPerLag = -2;
 
-        public static bool deepTrace = true;
+        //public static bool deepTrace = true;
 
         public static GekkoDictionary<DName, int> precedentsContainer = null;  //used in DECOMP, important that it starts out as null
         public static Dictionary<Series, int> precedentsSeries = null;  //used in SERIES, important that it starts out as null
@@ -528,7 +540,7 @@ namespace Gekko
         public const string fixedTimelessText = "all periods (timeless)";
         public const string fixedParameterText = "everything fixed (parameter)";
 
-        public static string ttPath3 = "GekkoCS";  //or "GekkoCS"
+        //public static string ttPath3 = "GekkoCS";  //or "GekkoCS"
         public static string ttPath2 = @"c:\Thomas\Gekko"; //used when unit testing        
 
         public static List<Action<string, GekkoTime>> predictActions = null;
@@ -545,6 +557,7 @@ namespace Gekko
         public const int timeStringsStart = 1900;
         public const int timeStringsEnd = 2500;
         public static string[] timeStrings = null;  //stores "1900" to "2500" for easy access and reuse
+        public static List<string> alreadyZipped = new List<string>() { "gbk", "xlsx", "parquet" };
 
         public static ConcurrentDictionary<int, bool> browserCompleted = new ConcurrentDictionary<int, bool>();
         public static int browserWatermark = -1;

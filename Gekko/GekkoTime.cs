@@ -18,31 +18,31 @@ namespace Gekko
         //========================================================================================================
         //                          FREQUENCY LOCATION, indicates where to implement more frequencies
         //========================================================================================================
-        A,
-        Q,
-        M,        
-        U,        //Undated, also called 'u' in Eviews, called 'n' in TSP, but undated has no name in AREMOS (uses 'periodic')     
-        None,     //used to signal non-freq variable (usually something failing or not assigned, like "null")
-        D,        //daily        
-        W,        //weekly
-        Lag,      //used for time-lags, where the .super short can be negative.
-        Age,      //used for non-time short integers like age and the like, which can be calculated on (like x[18+1, 2020+1] for the cohort after the 18yo in 2020 (x[18, 2020]).
-        Empty5,   // --------> this and the following can be filled/changed
-        Empty6,
-        Empty7,
-        Empty8,
-        Empty9,
-        Empty10,
-        Empty11,
-        Empty12,
-        Empty13,
-        Empty14,
-        Empty15,
-        Empty16,
-        Empty17,
-        Empty18,
-        Empty19, 
-        Empty20
+        A = 0,
+        Q = 1,
+        M = 2,
+        U = 3,        //Undated, also called 'u' in Eviews, called 'n' in TSP, but undated has no name in AREMOS (uses 'periodic')     
+        None = 4,     //used to signal non-freq variable (usually something failing or not assigned, like "null")
+        D = 5,        //daily        
+        W = 6,        //weekly
+        Lag = 7,      //used for time-lags, where the .super short can be negative.
+        Age = 8,      //used for non-time short integers like age and the like, which can be calculated on (like x[18+1, 2020+1] for the cohort after the 18yo in 2020 (x[18, 2020]).
+        Empty5 = 9,   // --------> this and the following can be filled/changed
+        Empty6 = 10,
+        Empty7 = 11,
+        Empty8 = 12,
+        Empty9 = 13,
+        Empty10 = 14,
+        Empty11 = 15,
+        Empty12 = 16,
+        Empty13 = 17,
+        Empty14 = 18,
+        Empty15 = 19,
+        Empty16 = 20,
+        Empty17 = 21,
+        Empty18 = 22,
+        Empty19 = 23,
+        Empty20 = 24
     }
 
     public enum EHolidayName

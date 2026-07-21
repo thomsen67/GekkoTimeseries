@@ -142,5 +142,11 @@ namespace Gekko
             return;
         }
 
+        public void DeepHash(string name, DeepHashHelper helper)
+        {
+            Hashing.HashEnum1(Hashing.EHashType.Null, helper.hash);
+            Hashing.HashString(name?.ToLowerInvariant(), helper.hash);            
+        }
+
     }
 }

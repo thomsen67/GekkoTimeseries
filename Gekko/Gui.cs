@@ -248,6 +248,13 @@ namespace Gekko
         [STAThread]
         public static void Main(string[] args)
         {
+            if (args.Length == 1 && args[0].StartsWith("-dlink:"))
+            {
+                //MessageBox.Show(Stringlist.GetListWithCommas(args));
+                Program.DLinkCalledFromGitHook(args);
+                return;
+            }
+
             //Code to handle unexpected crashes, for instance after hibernation
             AppDomain currentDomain = AppDomain.CurrentDomain;
             currentDomain.UnhandledException += new UnhandledExceptionEventHandler(CrashHandler);
@@ -684,7 +691,8 @@ namespace Gekko
             try
             {                
                 if (gui == null)
-                {                    
+                {
+                    Program.InitUfunctionsAndArithmeticsAndMore(); //Otherwise, it will not become initialized (unless reset/restart is the first command), since GUI does not start up.
                     Program.RunGekkoCommands(Globals.gekkoExeParameters, "", 0, new P());
                 }
                 else
@@ -1739,7 +1747,7 @@ namespace Gekko
             Globals.numberOfSkippedLines = 0;
             Globals.numberOfDateErrors = 0;
             Globals.numberOfTimeWindowErrors = 0;
-            Globals.traceTime = 0d;
+            //Globals.traceTime = 0d;
 
             Program.AbortingReset();
 
@@ -1950,60 +1958,66 @@ namespace Gekko
                 {
                     //not the end of the world if green light is not set
                 }
-                p.ReportToRunStatus(true);                
+                p.ReportToRunStatus(true);
 
                 List<string> traceList = null;
                 if (Globals.dependencyTracking.Count() > 0)
                 {
-                    traceList = Globals.dependencyTracking.Get();
-                    if (traceList.Count > 0)
+                    Action<GAO> a1 = (gao1) =>
                     {
-                        Table tab = new Table();
-                        tab.CurRow.SetTopBorder(1, 3);
-                        tab.CurRow.SetText(1, "DEPENDENCY TRACKING:");
-                        tab.CurRow.SetBottomBorder(1, 3);         
-                        int sysCalls = 0;
-                        int nonSysCalls = 0;
-                        foreach (string s in traceList)
-                        {                            
-                            string[] ss = s.Split('¤');
-                            if (G.Equal(ss[0], Globals.dependencyTrackingSysNumber.ToString()))
+                        traceList = Globals.dependencyTracking.Get();
+                        if (traceList.Count > 0)
+                        {
+                            Table tab = new Table();
+                            tab.CurRow.SetTopBorder(1, 3);
+                            tab.CurRow.SetText(1, "DEPENDENCY TRACKING:");
+                            tab.CurRow.SetBottomBorder(1, 3);
+                            int sysCalls = 0;
+                            int nonSysCalls = 0;
+                            foreach (string s in traceList)
                             {
-                                sysCalls++;
-                                continue;
+                                string[] ss = s.Split('¤');
+                                if (G.Equal(ss[0], Globals.dependencyTrackingSysNumber.ToString()))
+                                {
+                                    sysCalls++;
+                                    continue;
+                                }
+                                else
+                                {
+                                    nonSysCalls++;
+                                    tab.CurRow.Next();
+                                    tab.CurRow.SetText(1, ss[1]);
+                                    tab.CurRow.SetText(2, Path.GetFileName(ss[2]));
+                                    tab.CurRow.SetText(3, ss[2]);
+                                }
                             }
-                            else
-                            {
-                                nonSysCalls++;
-                                tab.CurRow.Next();
-                                tab.CurRow.SetText(1, ss[1]);
-                                tab.CurRow.SetText(2, Path.GetFileName(ss[2]));
-                                tab.CurRow.SetText(3, ss[2]);
-                            }
-                        }
-                        tab.CurRow.SetBottomBorder(1, 3);
-                        tab.CurRow.SetLeftBorder(1);
-                        tab.CurRow.SetRightBorder(3);
+                            tab.CurRow.SetBottomBorder(1, 3);
+                            tab.CurRow.SetLeftBorder(1);
+                            tab.CurRow.SetRightBorder(3);
 
-                        int widthRemember = Program.options.print_width;
-                        Program.options.print_width = int.MaxValue;
-                        try
-                        {
-                            G.Writeln();
-                            if (nonSysCalls > 0)
+                            int widthRemember = Program.options.print_width;
+                            Program.options.print_width = int.MaxValue;
+                            try
                             {
-                                List<string> ss = tab.Print();
-                                foreach (string s in ss) G.Writeln(s, Color.Gray);
+                                G.Writeln();
+                                if (nonSysCalls > 0)
+                                {
+                                    List<string> ss = tab.Print();
+                                    foreach (string s in ss) G.Writeln(s, Color.Gray);
+                                }
+                                if (sysCalls > 0) G.Writeln("Total number of different SYS calls: " + sysCalls + " (note: SYS calls may read/write files)", Color.Gray);
+                                G.Writeln("Cf. menu 'Options' --> 'Program dependency tracking'", Color.Gray);
                             }
-                            if (sysCalls > 0) G.Writeln("Total number of different SYS calls: " + sysCalls + " (note: SYS calls may read/write files)", Color.Gray);
-                            G.Writeln("Cf. menu 'Options' --> 'Program dependency tracking'", Color.Gray);
+                            finally
+                            {
+                                Program.options.print_width = widthRemember;
+                            }
                         }
-                        finally
-                        {
-                            Program.options.print_width = widthRemember;
-                        }
-                    }
-                }
+                    };
+
+                    G.Writeln2("Dependency tracking: " + G.GetLinkAction("show " + Globals.dependencyTracking.Count() + " files", new GekkoAction(EGekkoActionTypes.Unknown, null, a1)) + "");
+
+                }                
                 Gui.PrintTotalErrors(p);
             }
         }
@@ -2042,7 +2056,7 @@ namespace Gekko
                         //to avoid UFunctions being shown here. Fix better when #980324532985 is done
                         string s1 = null;
                         string s2 = null;
-                        if (Globals.traceTime > 0d) s1 = ", of which data-tracing used " + Math.Round(100d * Globals.traceTime / ms) + "%";
+                        //if (Globals.traceTime > 0d) s1 = ", of which data-tracing used " + Math.Round(100d * Globals.traceTime / ms) + "%";
                         if (G.Equal(Program.options.global_dependency_tracking, "none")) s2 = ". To track file dependencies, see menu 'Options' --> 'Program dependency tracking'.";
                         G.Writeln();
                         G.Writeln("Total elapsed time: " + G.SecondsFormat(ms) + s1 + s2);
