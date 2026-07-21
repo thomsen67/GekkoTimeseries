@@ -4110,7 +4110,15 @@ namespace Gekko
         {
             StringBuilder sb = new StringBuilder();
             string workingFolder = GetWorkingFolder();
-            sb.AppendLine("==================================================================================");
+            string branch = Program.GetBranch();
+            string sBranch = null;
+            if (!G.NullOrBlanks(branch))
+            {
+                if (branch.Contains(":")) sBranch = " (" + branch + ")";
+                else sBranch = " (branch: " + branch + ")";
+            }
+            string wf = workingFolder + sBranch;
+            sb.AppendLine(new string('=', Math.Min(60, wf.Length + 4))); //See #77afakjhf
             if (type == "large")
             {
                 sb.AppendLine(" Gekko Timeseries Software -- timeseries handling and modeling");
@@ -4159,16 +4167,16 @@ namespace Gekko
                 sb.AppendLine("   " + pd + exe);
             }
 
-            string branch = Program.GetBranch();
-            string sBranch = null;
-            if (!G.NullOrBlanks(branch))
-            {
-                if (branch.Contains(":")) sBranch = " (" + branch + ")";
-                else sBranch = " (branch: " + branch + ")";
-            }
+            //string branch = Program.GetBranch();
+            //string sBranch = null;
+            //if (!G.NullOrBlanks(branch))
+            //{
+            //    if (branch.Contains(":")) sBranch = " (" + branch + ")";
+            //    else sBranch = " (branch: " + branch + ")";
+            //}
 
             sb.AppendLine(" Working folder: ");
-            sb.AppendLine("   " + workingFolder + sBranch);
+            sb.AppendLine("   " + wf);
 
             if (type == "large")
             {
@@ -4226,7 +4234,7 @@ namespace Gekko
 
 
             }
-            sb.AppendLine("==================================================================================");
+            sb.AppendLine(new string('=', Math.Min(60, wf.Length + 4))); //See #77afakjhf
             sb.AppendLine();
             if (!silent)
             {
@@ -4403,6 +4411,29 @@ namespace Gekko
                 return FindParent<T>(parentObject);
         }
 
+        public static void WriteIfChanged(string filePath, string content)
+        {
+            bool shouldWrite = true;
+            if (File.Exists(filePath))
+            {
+                try
+                {
+                    string existingContent = File.ReadAllText(filePath);
+                    if (existingContent == content) shouldWrite = false;
+                }
+                catch
+                {
+                }
+            }
+            if (shouldWrite)
+            {
+                using (FileStream fs = Program.WaitForFileStream(filePath, null, Program.GekkoFileReadOrWrite.Write))
+                using (StreamWriter file = G.GekkoStreamWriter(fs))
+                {
+                    file.Write(content);
+                }
+            }
+        }
 
         /// <summary>
         /// Helper for getting installed .NET versions
@@ -5680,8 +5711,14 @@ namespace Gekko
         /// <param name="p2"></param>
         /// <param name="option_strict"></param>
         /// <returns></returns>
-        public static bool CompareFiles(string p1, string p2, bool option_strict)
+        public static bool CompareFiles(string p1, string p2, bool option_strict, bool option_date)
         {
+            if (option_date)
+            {
+                if (G.FilesHaveSameWriteTime(p1, p2)) return true;
+                else return false;
+            }
+
             if ((new FileInfo(p1)).Length != (new FileInfo(p2)).Length) return false;
             if (!option_strict && G.FilesHaveSameWriteTime(p1, p2)) return true;
             //This is about 4x slower than the other way below
@@ -5730,53 +5767,79 @@ namespace Gekko
             //As a benefit we get to tell number of dublets.
 
             string hash = null;
-
-            if (false)
+            using (MD5 md5Instance = MD5.Create())
             {
-                //Old way, same result as new way if salt == null
-                using (MD5 md5Instance = MD5.Create())
+                using (FileStream stream = File.OpenRead(fileNameWithPath))
                 {
-                    using (FileStream stream = File.OpenRead(fileNameWithPath))
+
+                    string salt = extraSalt;
+                    if (salt == null) salt = "";
+                    byte[] saltBytes = System.Text.Encoding.UTF8.GetBytes(salt);
+                    byte[] buffer = new byte[4096]; // Read file in 4KB chunks
+                    int bytesRead;
+
+                    // 1. Feed the Salt into the hash
+                    md5Instance.TransformBlock(saltBytes, 0, saltBytes.Length, null, 0);
+
+                    // 2. Feed the File into the hash in chunks
+                    while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
                     {
-                        byte[] hash2 = md5Instance.ComputeHash(stream);
-                        hash = System.Convert.ToBase64String(hash2).Replace("=", "").Replace("+", "a").Replace("/", "b");
+                        md5Instance.TransformBlock(buffer, 0, bytesRead, null, 0);
                     }
+
+                    // 3. Finalize the hash (must call TransformFinalBlock with an empty array or the last chunk)
+                    md5Instance.TransformFinalBlock(new byte[0], 0, 0);
+
+                    // 4. Get the resulting hash
+                    byte[] hash2 = md5Instance.Hash;
+
+                    // Your custom Base64 formatting
+                    hash = System.Convert.ToBase64String(hash2)
+                                 .Replace("=", "")
+                                 .Replace("+", "a")
+                                 .Replace("/", "b");
                 }
             }
-            else
+            return hash;
+        }
+
+        /// <summary>
+        /// /// Gets a MD5 hash from text. Seems to be the fastest reasonable hash available (faster than SHA). Not parallel though. See G.GetMd5FromFile().
+        /// </summary>
+        /// <param name="inputText"></param>
+        /// <returns></returns>
+        public static string GetMd5FromText(string inputText, string extraSalt)
+        {
+            string hash = null;
+            string salt = extraSalt;
+            if (salt == null) salt = "";
+            // step 1, calculate MD5 hash from input            
+            MD5 md5 = MD5.Create();
+            byte[] inputBytes = Encoding.UTF8.GetBytes(inputText + salt);  //UTF8 seems best choice
+            byte[] hash2 = md5.ComputeHash(inputBytes);
+            // step 2, convert byte array to hex string            
+            hash = System.Convert.ToBase64String(hash2).Replace("=", "").Replace("+", "a").Replace("/", "b");
+            //We remove empty indicator (=), and replace the two non-alphanumeric as well for simplicity.
+            //a Base64-encoding can put 6 bits in each symbol, so that 128 bits become 23 symbols.
+            //This is a little better than hex (32 symbols).
+            return hash;
+        }
+
+        public static string GetSha256FromFile(string filePath)
+        {
+            string hash = null;
+            using (var stream = File.OpenRead(filePath))
             {
-                using (MD5 md5Instance = MD5.Create())
+                using (var sha256 = SHA256.Create())
                 {
-                    using (FileStream stream = File.OpenRead(fileNameWithPath))
+                    byte[] hashBytes = sha256.ComputeHash(stream);
+                    // Convert bytes to a hex string
+                    StringBuilder sb = new StringBuilder();
+                    foreach (byte b in hashBytes)
                     {
-
-                        string salt = extraSalt;
-                        if (salt == null) salt = "";
-                        byte[] saltBytes = System.Text.Encoding.UTF8.GetBytes(salt);
-                        byte[] buffer = new byte[4096]; // Read file in 4KB chunks
-                        int bytesRead;
-
-                        // 1. Feed the Salt into the hash
-                        md5Instance.TransformBlock(saltBytes, 0, saltBytes.Length, null, 0);
-
-                        // 2. Feed the File into the hash in chunks
-                        while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
-                        {
-                            md5Instance.TransformBlock(buffer, 0, bytesRead, null, 0);
-                        }
-
-                        // 3. Finalize the hash (must call TransformFinalBlock with an empty array or the last chunk)
-                        md5Instance.TransformFinalBlock(new byte[0], 0, 0);
-
-                        // 4. Get the resulting hash
-                        byte[] hash2 = md5Instance.Hash;
-
-                        // Your custom Base64 formatting
-                        hash = System.Convert.ToBase64String(hash2)
-                                     .Replace("=", "")
-                                     .Replace("+", "a")
-                                     .Replace("/", "b");
+                        sb.Append(b.ToString("x2"));
                     }
+                    hash = sb.ToString();
                 }
             }
 
@@ -5806,29 +5869,7 @@ namespace Gekko
                 }
             }
             return isBlocked;
-        }
-
-        /// <summary>
-        /// /// Gets a MD5 hash from text. Seems to be the fastest reasonable hash available (faster than SHA). Not parallel though. See G.GetMd5FromFile().
-        /// </summary>
-        /// <param name="inputText"></param>
-        /// <returns></returns>
-        public static string GetMd5FromText(string inputText, string extraSalt)
-        {
-            string hash = null;
-            string salt = extraSalt;
-            if (salt == null) salt = "";
-            // step 1, calculate MD5 hash from input            
-            MD5 md5 = MD5.Create();
-            byte[] inputBytes = Encoding.UTF8.GetBytes(inputText + salt);  //UTF8 seems best choice
-            byte[] hash2 = md5.ComputeHash(inputBytes);
-            // step 2, convert byte array to hex string            
-            hash = System.Convert.ToBase64String(hash2).Replace("=", "").Replace("+", "a").Replace("/", "b");
-            //We remove empty indicator (=), and replace the two non-alphanumeric as well for simplicity.
-            //a Base64-encoding can put 6 bits in each symbol, so that 128 bits become 23 symbols.
-            //This is a little better than hex (32 symbols).
-            return hash;
-        }
+        }        
 
         /// <summary>
         /// Used in DECOMP. Not case sensitive.
@@ -5839,6 +5880,104 @@ namespace Gekko
         public static bool ContainsWord(string s, string word)
         {
             return Regex.Match(s, @"\b" + word + @"\b", RegexOptions.IgnoreCase).Success;
+        }
+
+        /// <summary>
+        /// Normalizes a folder name so it only uses backslashes and does not end with backslash.
+        /// Also optionally checks if the folder exists.
+        /// </summary>
+        /// <param name="f1"></param>
+        /// <returns></returns>
+        public static string CleanupFolderName(string f1, bool check)
+        {
+            if (f1 == null) return f1;
+            f1 = f1.Trim();
+            f1 = f1.Replace("/", "\\");
+            if (f1.EndsWith("\\")) f1 = f1.Substring(0, f1.Length - 1);
+            if (check && !Directory.Exists(f1)) new Error("Folder '" + f1 + "' does not seem to exist");
+            return f1;
+        }
+
+        public static void ReadOnlyRemove(string fileName)
+        {
+            //Remove read-only
+            FileAttributes attributes = File.GetAttributes(fileName);
+            if ((attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
+            {
+                attributes = attributes & ~FileAttributes.ReadOnly;
+                File.SetAttributes(fileName, attributes);
+            }
+        }
+
+        public static void ReadOnlySet(string fileName)
+        {
+            FileAttributes attributes = File.GetAttributes(fileName);
+            if ((attributes & FileAttributes.ReadOnly) != FileAttributes.ReadOnly)
+            {
+                attributes |= FileAttributes.ReadOnly;
+                File.SetAttributes(fileName, attributes);
+            }
+        }
+
+        /// <summary>
+        /// In a path name input, the start f1 is replaced by f2. For instance, if
+        /// input = "c:\a1\a2\a3\a4", f1 = "c:\a1\a2" and f2 = "x:\b1", the output
+        /// will be "x:\b1\a3\a4". Note: for folder names, the input paths must not end with "\" --> then use
+        /// CleanupFolderName() to clean them up first.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="f1"></param>
+        /// <param name="f2"></param>
+        /// <param name="warningIncongruent"></param>
+        /// 
+        /// <returns></returns>
+        public static string DLinkRelativePath(string input, string f1, string f2, string warningIncongruent, bool replace)
+        {
+            string output = null;
+            if (input.StartsWith(f1, StringComparison.OrdinalIgnoreCase))
+            {
+                string temp = G.Substring(input, f1.Length + 1, input.Length - 1);
+                output = Path.Combine(f2, temp);
+                if (replace) output = output.Replace("\\_inddata\\", "\\_inddata" + "_" + Program.options.databank_dlink_name + "\\").Replace("\\_uddata\\", "\\_uddata" + "_" + Program.options.databank_dlink_name + "\\");
+            }
+            else
+            {
+                G.Warning("w45.1", warningIncongruent);
+            }
+            return output;
+        }
+
+        public static T YamlReader<T>(string fileName)
+        {
+            T output = default(T);
+            try
+            {
+                string s = File.ReadAllText(fileName);
+                var deserializer = new YamlDotNet.Serialization.DeserializerBuilder()
+                    .IgnoreUnmatchedProperties()
+                    .Build();
+                output = deserializer.Deserialize<T>(s);
+            }
+            catch
+            {
+                new Error("Yaml reader problem");
+            }
+            return output;
+        }
+
+        public static void YamlWriter<T>(object? obj, string fileName)
+        {
+            try
+            {
+                T input = (T)obj;
+                var serializer = new YamlDotNet.Serialization.SerializerBuilder().ConfigureDefaultValuesHandling(YamlDotNet.Serialization.DefaultValuesHandling.OmitNull).Build();
+                string s = serializer.Serialize(input);
+                File.WriteAllText(fileName, s);
+            }
+            catch
+            {
+                new Error("Yaml writer problem");
+            }
         }
 
         /// <summary>
