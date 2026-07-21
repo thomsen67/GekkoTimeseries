@@ -58,7 +58,7 @@ namespace Gekko
             {"w3.1", "OPEN<ref> problem" },
             {"w3.2", "Missing variable" },
             {"w3.3", "Variable names with '___'" },
-            {"w3.4", "Filed to write a non-editable databank, even though it contents seems changed. You may use UNLOCK to unlock a databank." },
+            {"w3.4", "Skipped writing a databank, even though its contents seems changed. The databank is non-editable: you may use UNLOCK to unlock a databank." },
             // =========================================================
             // =========================================================
             {"w4", "Equation html browser" },

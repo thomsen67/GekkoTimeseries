@@ -300,6 +300,7 @@ namespace Gekko
         public List<double> red = null; //lamps
         public List<List<DName>> black = null;  //expand/collapse arrows
         public Tuple<bool, bool> rowsOrColsSumUp = null;
+        public string invertError = null;
 
         public DecompOutput(Table table, string ignore, List<double> red, List<List<DName>> black)
         {
@@ -1031,6 +1032,10 @@ namespace Gekko
         /// </summary>
         public static DecompOutput DecompMain(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, ref DecompDatas decompDatas, Model model)
         {
+            //See OVERVIEW in DecompGetFuncExpressionsAndRecalc()
+
+            decompOptions2.invertError = null;
+
             GekkoTime gt1, gt2;
             DecompMainInit(out gt1, out gt2, per1, per2, decompOptions2.decompOperator);
 
@@ -1239,6 +1244,7 @@ namespace Gekko
 
             if (Globals.runningOnTTComputer) G.Writeln2("TTH: decomp took " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + ", function evals = " + funcCounter, System.Drawing.Color.Gray);  //using writeln2 to avoid popup
 
+            decompOutput.invertError = decompOptions2.invertError; //transferring this
             return decompOutput;
         }
 
@@ -1561,8 +1567,8 @@ namespace Gekko
 
                 try
                 {
-                    double[,] temp = (double[,])mEndo.Clone();
-                    inverse = Program.InvertMatrix(temp);
+                    double[,] temp = (double[,])mEndo.Clone();                    
+                    bool fail; inverse = Program.InvertMatrix(temp, false, false, out fail);
                 }
                 catch (Exception e)
                 {
@@ -1649,6 +1655,8 @@ namespace Gekko
         /// <param name="parentI"></param>
         public static void DecompMainHelperInvertScalar(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, DecompDatas decompDatas, EContribType operatorOneOf3Types, int parentI, bool refreshObjects, DecompOperator op, ModelGamsScalar modelGamsScalar)
         {
+            //See OVERVIEW in DecompGetFuncExpressionsAndRecalc()
+
             Dictionary<DName, int> endo = new Dictionary<DName, int>(Multidim2Comparer.IgnoreCase);
             Dictionary<DName, int> exo = new Dictionary<DName, int>(Multidim2Comparer.IgnoreCase);
             Dictionary<DName, int> all = new Dictionary<DName, int>(Multidim2Comparer.IgnoreCase); //all variables that are present in 1 or more equations
@@ -1851,7 +1859,9 @@ namespace Gekko
                                         }
 
                                         Series ts = dd.storage[x2];
-                                        double d1 = ts.GetDataSimple(t);
+                                        //double d1 = ts.GetDataSimple(t);
+                                        double d1 = double.NaN;
+                                        if (ts != null) d1 = ts.GetDataSimple(t);
                                         mEndo[row, col] = d1;
 
                                         double d2 = InvertGetGradient(decompDatas.storage[ii][jj], x2, t, operatorOneOf3Types);
@@ -1877,7 +1887,9 @@ namespace Gekko
                                             //exudl, forsøger her at finde en [-2], der er noget rotten
                                             //omkring 2030. Måske lave en liste over de tidsløse
                                         }
-                                        double d = ts.GetDataSimple(t);
+                                        //double d = ts.GetDataSimple(t);
+                                        double d = double.NaN;
+                                        if (ts != null) d = ts.GetDataSimple(t);
                                         mExo[row, col] = d;
                                     }
                                     else
@@ -1921,12 +1933,15 @@ namespace Gekko
             {
                 if (Program.options.bugfix_decomp_jacobi)
                 {
+                    bool fail = false;
                     try
                     {
                         double[,] temp = (double[,])mEndo2.Clone();  //gradients
-                        inverse = Program.InvertMatrix(temp);
+                        inverse = Program.InvertMatrix(temp, false, false, out fail);
                     }
-                    catch (Exception e)
+                    catch { fail = true; }
+
+                    if (fail)
                     {
                         bool nan = false;
                         foreach (double d in mEndo2)
@@ -1937,24 +1952,23 @@ namespace Gekko
                                 break;
                             }
                         }
-                        if (!nan && !Globals.greuHack) //For GREU, the matrix is just == 0
+                        if (!nan)
                         {
                             string extra = null;
-                            if (CheckIfEverythingIsZero(mEndo2)) extra = " Note that the " + mEndo2.GetLength(0) + " x " + mEndo2.GetLength(1) + " Jacobian matrix to invert contains only zeroes, so it seems the endogenous variable(s) do not affect the equation(s), and hence the effects cannot be calculated.";
-                            new Error("Matrix inversion for DECOMP failed for period " + per1.ToString() + "-" + per2.ToString() + "." + extra, false);
-                            throw;
+                            if (CheckIfEverythingIsZero(mEndo2)) extra = " The " + mEndo2.GetLength(0) + " x " + mEndo2.GetLength(1) + " matrix contains only zeroes.";
+                            if (decompOptions2.invertError == null) decompOptions2.invertError = "Matrix inversion failed for period " + per1.ToString() + "-" + per2.ToString() + "." + extra;  //we prefer to show the first error
                         }
-                        else
-                        {
-                            //We allow this, may just be some missing data
-                            inverse = G.CreateArrayDouble(mEndo2.GetLength(0), mEndo2.GetLength(1), double.NaN);
-                        }
+                        //We allow this, may be some missing data (if nan == true)
+                        inverse = G.CreateArrayDouble(mEndo2.GetLength(0), mEndo2.GetLength(1), double.NaN);
                     }
                     effect = Program.MultiplyMatrices(inverse, mExo);  //endo.Count x exo.Count, //the effect matrix is #endo x #exo   
 
                 }
                 else
                 {
+                    //NOT USED
+                    //NOT USED
+                    //NOT USED
                     if (CheckIfEverythingIsZero(mEndo) && CheckIfEverythingIsZero(mExo))
                     {
                         //nothing happens, so we can say that the effect is also zeroes...
@@ -1965,7 +1979,8 @@ namespace Gekko
                         try
                         {
                             double[,] temp = (double[,])mEndo.Clone();
-                            inverse = Program.InvertMatrix(temp);
+                            bool fail;
+                            inverse = Program.InvertMatrix(temp, false, false, out fail);                            
                         }
                         catch (Exception e)
                         {
@@ -2599,7 +2614,59 @@ namespace Gekko
         /// </summary>
         /// <param name="o"></param>
         public static void DecompGetFuncExpressionsAndRecalc(DecompFind decompFind, WindowDecomp windowDecomp)
-        {            
+        {
+            //OVERVIEW, #overview
+            // +++ Fixed that it looks for variable explanations (labels)
+            // +++ Make sure ok regarding domains
+            // 
+            //
+            //DecompGetFuncExpressionsAndRecalc()
+            //  thread: CreateDecompWindow()
+            //    RecalcCellsWithNewType()
+            //      RecalcCellsWithNewTypeHelper()
+            //        DecompMain()
+            //          DecompMainInit()
+            //          PrepareEquations()
+            //          foreach (Link link in decompOptions2.link) //for each equation if they are linked
+            //            foreach (DecompStartHelper dsh in link.GAMS_dsh) //for each uncontrolled #i in x[#i] --> is that used??
+            //              DecompLowLevelScalar()
+            //                foreach (GekkoTime t in new GekkoTimeIterator(gt1, gt2))
+            //                  foreach (PeriodAndVariable dp in modelGamsScalar.precedents[eqNumber].vars) //for each precedent variable
+            //                    //decomposition gradients
+            //                foreach (GekkoTime t2 in new GekkoTimeIterator(gt1, gt2))
+            //                  foreach (string s in vars.Keys)
+            //                    //contributinons, and residuals
+            //              DecompMainMergeOrAdd()
+            //          foreach (GekkoTime gt in new GekkoTimeIterator(per1.Add(deduct), per2)) //no time loop with <dyn>
+            //            DecompMainHelperInvertScalar()
+            //              //figure out endo and exo etc.
+            //              //IN LOOPS, MATRIX VALUES ARE GATHERED, POSSIBLY "STACKED" OVER TIME
+            //              //INVERT MATRIX
+            //              //CALCULATE EFFECTS AFTER INVERTING
+            //          DecompPivotToTable()
+            //
+            // Regarding data, in MaybeLoadDataIntoModel(), the databanks are represented by double[][] arrays. So each
+            // model variable (from the GAMS dict) has a number. If a variable from the model does not exist in the model array,
+            // (for instance, if qM[tot] is present in the model and either qM or qM[tot] does not exist), the variable
+            // "slot" in the model will have missing values.
+            // BUT:     
+            // + For <xn>, DecompMainStoreRawVariable() gets series from db, called from DecompMainHelperInvertScalar(), but only for .isRaw.
+            // + Then afterwards, series from db are gotten from DecompPivotGetDomains() line 5038, both .isRaw and not
+            // + Then afterwards, series from db are gotten from DecompPivotCreateDataframe() line 4575, but only for .isRaw
+            //
+            // Regarding missing values, in the GUI this can be clicked:
+            // this.decompFind.decompOptions2.missingAsZero = true;
+            //
+            //Pivot is probably ok, so where it can go wrong is
+            // (1) missing series or sub-series
+            // (2) matrix inversion
+            //In (1) show as "N" for raw, NaN for decomp
+            //In (2) set matrix values NaN
+            //Make missing=zero work good
+            //Error about missing equation --> truncate time window until ok (perhaps with "N" for such columns in raw, <dyn> is spcielal here)
+            //
+
+
             DecompOptions2 decompOptions2 = decompFind.decompOptions2;
             if (decompFind.model.DecompType() == EModelType.Unknown)
             {
@@ -2720,13 +2787,16 @@ namespace Gekko
         /// </summary>
         /// <param name="o2"></param>
         private static void CreateDecompWindow(object o2)
-        {            
+        {
+            //See OVERVIEW in DecompGetFuncExpressionsAndRecalc()
+
             DecompFind decompFind = o2 as DecompFind;
 
             if (decompFind.decompOptions2.guiIsFlowStatement && decompFind.depth == 0)
             {
                 //Flowgraph, and only if called from statement "FLOW ...;", which will have depth == 0.
                 decompFind.decompOptions2.guiFlowName = decompFind.decompOptions2.new_select[0];
+                decompFind.decompOptions2.guiIsFlowUseEquationName = true; //hack
                 WindowFlow.CallFlowGraph(decompFind);
             }
             else
@@ -3229,6 +3299,8 @@ namespace Gekko
         /// <returns></returns>
         public static DecompData DecompLowLevelScalar(GekkoTime gt1, GekkoTime gt2, DecompStartHelper eqPeriods, DecompOperator op, DName residualName, ref int funcCounter, bool missingAsZero, Model model)
         {
+            //See OVERVIEW in DecompGetFuncExpressionsAndRecalc()
+
             ModelGamsScalar modelGamsScalar = model.modelGamsScalar;
 
             int tZero = 0;
@@ -3619,6 +3691,8 @@ namespace Gekko
 
         public static DecompOutput DecompPivotToTable(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, DecompData decompDataMAINClone, DecompDatas decompDatas, DName lhs, DecompOperator op, EContribType operatorOneOf3Types, DecompOptions2 decompOptions2, Model model)
         {
+            //See OVERVIEW in DecompGetFuncExpressionsAndRecalc()
+
             //string lhs2 = G.HandleBlanksRemove(decompOptions2.link[0].varnames);  //Seems lhs here just is "Expression value"
             DName lhs2 = decompOptions2.link[0].varnames;
             ERowsCols rowsCols = VariablesOnRowsOrCols(decompOptions2);
@@ -4949,17 +5023,7 @@ namespace Gekko
                     Cell c5 = table1.Get(i, 2);
                     //string name2 = c5?.vars_hack?[0];
                     DName name2 = GetVarsHack(c5);
-                    double max = 0d;
-                    for (int j = 2; j <= table1.GetColMaxNumber(); j++)
-                    {
-                        Cell c1 = table1.Get(i, j);
-                        Cell c2 = table1.Get(2, j);
-                        double d = 0d;
-                        if (decompOptions2.decompOperator.isRaw) d = Math.Abs(c1.value_hack);
-                        else d = Math.Abs(c1.value_hack / c2.value_hack * 100d);
-                        if (!G.IsNumericalError(d)) max = Math.Max(max, d);
-                        if (IsDecompResidualName(name2)) c1.backgroundColor = "LightYellow";
-                    }
+                    double max = IgnoreHelper1(table1, decompOptions2, i, name2);
                     sortHelperStart.Add(new SortHelper() { position = i, value = max, name = name2 });
                 }
             }
@@ -4971,17 +5035,7 @@ namespace Gekko
                     //string name2 = c5?.vars_hack?[0];
                     DName name2 = GetVarsHack(c5);
                     if (IsDecompResidualName(name2)) c5.backgroundColor = "LightYellow";
-                    double max = 0d;
-                    for (int i = 2; i <= table1.GetRowMaxNumber(); i++)
-                    {
-                        Cell c1 = table1.Get(i, j);
-                        Cell c2 = table1.Get(i, 2);
-                        double d = 0d;
-                        if (decompOptions2.decompOperator.isRaw) d = Math.Abs(c1.value_hack);
-                        else d = Math.Abs(c1.value_hack / c2.value_hack * 100d);
-                        if (!G.IsNumericalError(d)) max = Math.Max(max, d);
-                        if (IsDecompResidualName(name2)) c1.backgroundColor = "LightYellow";
-                    }
+                    double max = IgnoreHelper2(table1, decompOptions2, j, name2);
                     sortHelperStart.Add(new SortHelper() { position = j, value = max, name = name2 });
                 }
             }
@@ -5158,65 +5212,69 @@ namespace Gekko
             // Show non-existing variables as N, not M
             // ----------------------------------------------
 
-            for (int i = 2; i <= table2.GetRowMaxNumber(); i++)
+
+            if (false) //This has given som problem, so it is now (february 2026 switched off).
             {
-                for (int j = 2; j <= table2.GetColMaxNumber(); j++)
+                for (int i = 2; i <= table2.GetRowMaxNumber(); i++)
                 {
-                    try
+                    for (int j = 2; j <= table2.GetColMaxNumber(); j++)
                     {
-                        Cell c = table2.Get(i, j);
-                        if (c.cellType != CellType.Number) continue;  //should not happen, just for safety
-                        double d = c.number;
-                        if (false)
+                        try
                         {
-                            //TODO
-                            //TODO Activate this to get 'N' instead of 'M' for a missing variable
-                            //TODO
-                            if (double.IsNaN(d))
+                            Cell c = table2.Get(i, j);
+                            if (c.cellType != CellType.Number) continue;  //should not happen, just for safety
+                            double d = c.number;
+                            if (false)
                             {
-                                bool hit = false;
-                                List<DName> xx = c.vars_hack;
-                                if (xx != null)
+                                //TODO
+                                //TODO Activate this to get 'N' instead of 'M' for a missing variable
+                                //TODO
+                                if (double.IsNaN(d))
                                 {
-                                    foreach (DName s in xx)
+                                    bool hit = false;
+                                    List<DName> xx = c.vars_hack;
+                                    if (xx != null)
                                     {
-                                        int a; if (!model.modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(s, out a)) a = -12345;
-                                        if (a == -12345) continue;
-
-                                        bool b1 = decompOptions2.decompOperator.lowLevel == ELowLevel.OnlyQuo || decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef || decompOptions2.decompOperator.lowLevel == ELowLevel.Multiplier;
-                                        bool b2 = decompOptions2.decompOperator.lowLevel == ELowLevel.OnlyRef || decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef || decompOptions2.decompOperator.lowLevel == ELowLevel.Multiplier;
-
-                                        if (b1) //first-position databank checked
+                                        foreach (DName s in xx)
                                         {
-                                            if (model.modelGamsScalar.nonExisting != null && model.modelGamsScalar.nonExisting.ContainsKey(a))
+                                            int a; if (!model.modelGamsScalar.dict_FromVarNameToANumber.TryGetValue(s, out a)) a = -12345;
+                                            if (a == -12345) continue;
+
+                                            bool b1 = decompOptions2.decompOperator.lowLevel == ELowLevel.OnlyQuo || decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef || decompOptions2.decompOperator.lowLevel == ELowLevel.Multiplier;
+                                            bool b2 = decompOptions2.decompOperator.lowLevel == ELowLevel.OnlyRef || decompOptions2.decompOperator.lowLevel == ELowLevel.BothQuoAndRef || decompOptions2.decompOperator.lowLevel == ELowLevel.Multiplier;
+
+                                            if (b1) //first-position databank checked
                                             {
-                                                hit = true;
-                                                goto Lbl1;
+                                                if (model.modelGamsScalar.nonExisting != null && model.modelGamsScalar.nonExisting.ContainsKey(a))
+                                                {
+                                                    hit = true;
+                                                    goto Lbl1;
+                                                }
                                             }
-                                        }
 
-                                        if (b2) //ref databank checked
-                                        {
-                                            if (model.modelGamsScalar.nonExisting_ref != null && model.modelGamsScalar.nonExisting_ref.ContainsKey(a))
+                                            if (b2) //ref databank checked
                                             {
-                                                hit = true;
-                                                goto Lbl1;
+                                                if (model.modelGamsScalar.nonExisting_ref != null && model.modelGamsScalar.nonExisting_ref.ContainsKey(a))
+                                                {
+                                                    hit = true;
+                                                    goto Lbl1;
+                                                }
                                             }
                                         }
                                     }
-                                }
-                            Lbl1:;
-                                if (hit)
-                                {
-                                    //c.number = Globals.missingVariableArtificialNumber;
-                                    c.numberShouldShowAsN = true;
+                                Lbl1:;
+                                    if (hit)
+                                    {
+                                        //c.number = Globals.missingVariableArtificialNumber;
+                                        c.numberShouldShowAsN = true;
+                                    }
                                 }
                             }
                         }
-                    }
-                    catch
-                    {
-                        //if this fails, never mind, just a M instead of a N.
+                        catch
+                        {
+                            //if this fails, never mind, just a M instead of a N.
+                        }
                     }
                 }
             }
@@ -5409,6 +5467,48 @@ namespace Gekko
 
             DecompOutput decompOutput = new DecompOutput(table2, ignoredText, red, black);
             return decompOutput;
+        }
+
+        private static double IgnoreHelper2(Table table1, DecompOptions2 decompOptions2, int j, string name2)
+        {
+            double max = 0d;
+            for (int i = 2; i <= table1.GetRowMaxNumber(); i++)
+            {
+                Cell c1 = table1.Get(i, j);
+                Cell c2 = table1.Get(i, 2);
+                double d = 0d;
+                if (decompOptions2.decompOperator.isRaw) d = Math.Abs(c1.value_hack);
+                else d = Math.Abs(c1.value_hack / c2.value_hack * 100d);
+                if (!G.IsNumericalError(d)) max = Math.Max(max, d);
+                if (IsDecompResidualName(name2)) c1.backgroundColor = "LightYellow";
+            }
+
+            return max;
+        }
+
+        private static double IgnoreHelper1(Table table1, DecompOptions2 decompOptions2, int i, string name2)
+        {
+            double max = 0d;
+            double sum = 0d;
+            for (int j = 2; j <= table1.GetColMaxNumber(); j++)
+            {
+                Cell c1 = table1.Get(i, j);
+                Cell c2 = table1.Get(2, j);
+                double d = 0d;
+                if (decompOptions2.decompOperator.isRaw)
+                {
+                    d = Math.Abs(c1.value_hack);
+                    if (!G.IsNumericalError(c1.value_hack)) sum += c1.value_hack;
+                }
+                else
+                {
+                    d = Math.Abs(c1.value_hack / c2.value_hack * 100d);
+                    if (!G.IsNumericalError(c1.value_hack / c2.value_hack * 100d)) sum += c1.value_hack / c2.value_hack * 100d;
+                }
+                if (!G.IsNumericalError(d)) max = Math.Max(max, d);
+                if (IsDecompResidualName(name2)) c1.backgroundColor = "LightYellow";
+            }
+            return max;
         }
 
         /// <summary>
