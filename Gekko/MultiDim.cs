@@ -104,13 +104,8 @@ namespace Gekko
 
         public override string ToString()
         {
-            //TODO Gekko 4.0: use Stringlist.GetListWithCommas()
             string first = null;
-            foreach (string s in this.storage)
-            {
-                first += s + ",";
-            }
-            if (this.storage.Length > 0) first = first.Substring(0, first.Length - ",".Length);
+            if (this.storage.Length > 0) first = string.Join(",", this.storage);
             return first;
         }
 
@@ -154,6 +149,56 @@ namespace Gekko
             Array.Copy(this.storage, ss, this.storage.Length);
             MultidimElement mmi = new MultidimElement(ss, this.parent);
             return mmi;
+        }
+    }
+
+    /// <summary>
+    /// This is faster sorting for use in data hash
+    /// </summary>
+    public sealed class StringArrayOrdinalIgnoreCaseComparer : IComparer<string[]>
+    {
+        public static readonly StringArrayOrdinalIgnoreCaseComparer Instance = new();
+
+        public int Compare(string[]? x, string[]? y)
+        {
+            if (ReferenceEquals(x, y)) return 0;
+            if (x is null) return -1;
+            if (y is null) return 1;
+
+            int len = Math.Min(x.Length, y.Length);
+
+            for (int i = 0; i < len; i++)
+            {
+                int cmp = CompareOrdinalIgnoreCase(x[i], y[i]);
+                if (cmp != 0)
+                    return cmp;
+            }
+
+            return x.Length.CompareTo(y.Length);
+        }
+
+        private static int CompareOrdinalIgnoreCase(string? a, string? b)
+        {
+            if (ReferenceEquals(a, b)) return 0;
+            if (a is null) return -1;
+            if (b is null) return 1;
+
+            int len = Math.Min(a.Length, b.Length);
+
+            for (int i = 0; i < len; i++)
+            {
+                char ca = a[i];
+                char cb = b[i];
+
+                // fast ASCII case folding (avoids ToUpper/ToLower allocations)
+                if ((uint)(ca - 'a') <= 25) ca = (char)(ca - 32);
+                if ((uint)(cb - 'a') <= 25) cb = (char)(cb - 32);
+
+                if (ca != cb)
+                    return ca.CompareTo(cb);
+            }
+
+            return a.Length.CompareTo(b.Length);
         }
     }
 
@@ -794,8 +839,6 @@ namespace Gekko
             this.separator = separator;
             this.showFreq = showFreq;
         }
-    }
-
-    
+    }    
 
 }
