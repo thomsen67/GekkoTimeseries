@@ -108,6 +108,8 @@ namespace Gekko
 
         void DeepCleanup(TwoInts yearsMinMax);
 
+        void DeepHash(string name, DeepHashHelper helper);
+
         void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, O.Assignment options, params IVariable[] dims);
     }
 }
