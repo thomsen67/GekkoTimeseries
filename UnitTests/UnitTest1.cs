@@ -6415,6 +6415,7 @@ namespace UnitTests
             I("open <edit> m2; clear m2; lock m2;");
             FAIL("copy <frombank = work tobank = m1> x;");  //ignores <tobank> and tries to copy from work to first-pos (m2). But m2 is locked. Before the error there is a warning, too.
             I("copy <frombank = work tobank = m1> x to *;");  //copy from work to b1.
+            I("unlock m2;"); //probably not necessary anymore
         }
 
         [TestMethod]
@@ -16499,7 +16500,7 @@ namespace UnitTests
                 Assert.AreEqual(2002, trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetContents().period.t2.super);
             }
         }
-
+                
         [TestMethod]
         public void _Test_TraceCopyIdIdentity()
         {
@@ -16510,21 +16511,21 @@ namespace UnitTests
             I("x2 <2001 2003> = 3;");
             I("x2 <2002 2002> = 4;");
             I("x3 = x1 + x2;");
-            long x1a = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetId().counter;
+            long x1a = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetId().GetCounter();
             TraceContents2 trace777 = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.traceContents;
-            long x1b = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetId().counter;
-            long x2a = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[3].trace.GetId().counter;
-            long x2b = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[4].trace.GetId().counter;
-            long x3 = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetId().counter;
+            long x1b = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetId().GetCounter();
+            long x2a = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[3].trace.GetId().GetCounter();
+            long x2b = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[4].trace.GetId().GetCounter();
+            long x3 = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetId().GetCounter();
             I("write sletmig;");
             I("reset;");
             I("read sletmig;");
-            long x1a_i = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetId().counter;
+            long x1a_i = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetId().GetCounter();
             TraceContents2 trace777_i = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.traceContents;
-            long x1b_i = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetId().counter;
-            long x2a_i = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[3].trace.GetId().counter;
-            long x2b_i = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[4].trace.GetId().counter;
-            long x3_i = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetId().counter;
+            long x1b_i = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetId().GetCounter();
+            long x2a_i = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[3].trace.GetId().GetCounter();
+            long x2b_i = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[4].trace.GetId().GetCounter();
+            long x3_i = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetId().GetCounter();
             //good test of trace identity after write + read
             if (true)
             {
@@ -16538,12 +16539,12 @@ namespace UnitTests
             Assert.AreEqual(x2b, x2b_i);
             Assert.AreEqual(x3, x3_i);
             I("copy x3 to x4;");
-            long x1a_ii = (O.GetIVariableFromString("x4!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetId().counter;
+            long x1a_ii = (O.GetIVariableFromString("x4!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetId().GetCounter();
             TraceContents2 trace777_ii = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.traceContents;
-            long x1b_ii = (O.GetIVariableFromString("x4!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetId().counter;
-            long x2a_ii = (O.GetIVariableFromString("x4!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[3].trace.GetId().counter;
-            long x2b_ii = (O.GetIVariableFromString("x4!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[4].trace.GetId().counter;
-            long x3_ii = (O.GetIVariableFromString("x4!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetId().counter;
+            long x1b_ii = (O.GetIVariableFromString("x4!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetId().GetCounter();
+            long x2a_ii = (O.GetIVariableFromString("x4!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[3].trace.GetId().GetCounter();
+            long x2b_ii = (O.GetIVariableFromString("x4!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[4].trace.GetId().GetCounter();
+            long x3_ii = (O.GetIVariableFromString("x4!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetId().GetCounter();
             //good test of trace identity after copy            
             Assert.AreEqual(x1a, x1a_ii);
             Assert.AreEqual(x1b, x1b_ii);
@@ -16551,12 +16552,12 @@ namespace UnitTests
             Assert.AreEqual(x2b, x2b_ii);
             Assert.AreEqual(x3, x3_ii);
             I("copy <2001 2002> x3 to x5;");
-            long x1a_iii = (O.GetIVariableFromString("x5!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetId().counter;
+            long x1a_iii = (O.GetIVariableFromString("x5!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetId().GetCounter();
             TraceContents2 trace777_iii = (O.GetIVariableFromString("x3!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.traceContents;
-            long x1b_iii = (O.GetIVariableFromString("x5!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetId().counter;
-            long x2a_iii = (O.GetIVariableFromString("x5!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[3].trace.GetId().counter;
-            long x2b_iii = (O.GetIVariableFromString("x5!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[4].trace.GetId().counter;
-            long x3_iii = (O.GetIVariableFromString("x5!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetId().counter;
+            long x1b_iii = (O.GetIVariableFromString("x5!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[1].trace.GetId().GetCounter();
+            long x2a_iii = (O.GetIVariableFromString("x5!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[3].trace.GetId().GetCounter();
+            long x2b_iii = (O.GetIVariableFromString("x5!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[4].trace.GetId().GetCounter();
+            long x3_iii = (O.GetIVariableFromString("x5!a", ECreatePossibilities.NoneReportError) as Series).meta.trace2.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetPrecedents_BewareOnlyInternalUse()[0].trace.GetId().GetCounter();
             //good test of trace identity after copy            
             Assert.AreEqual(x1a, x1a_iii);
             Assert.AreEqual(x1b, x1b_iii);
@@ -16572,6 +16573,42 @@ namespace UnitTests
                 Assert.IsTrue(Object.ReferenceEquals(trace777_i, trace777_iii));
                 Assert.IsTrue(Object.ReferenceEquals(trace777_ii, trace777_iii));
             }
+        }
+
+        [TestMethod]
+        public void _Test_GdxSetTuples()
+        {
+            //GAMS supports tuples for sets, but nothing more nested. So max 1 Gekko list nesting level.
+            //This is how GAMS is designed. And sub sub-lists must all have the same number
+            //of elements.
+            I("reset;");
+            I("option gams exe folder = 'c:\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
+            I("#m = (('a', 'b', 'c'), ('d', 'e', 'f'));");
+            //I("#m = ((('a', 'b', 'c'), ('d', 'e', 'f')), (('a', 'b', 'c'), ('d', 'e', 'f')));"); Will not be exported
+            I("write <gdx> temp;");
+            I("reset;");
+            I("option gams exe folder = 'c:\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
+            I("read <gdx> temp;");
+            List m = O.GetIVariableFromString("#m", ECreatePossibilities.NoneReportError) as List;
+            List<string> m0 = Stringlist.GetListOfStringsFromIVariable(m.list[0] as List);
+            List<string> m1 = Stringlist.GetListOfStringsFromIVariable(m.list[1] as List);
+            Assert.AreEqual("a", m0[0]); Assert.AreEqual("b", m0[1]); Assert.AreEqual("c", m0[2]);
+            Assert.AreEqual("d", m1[0]); Assert.AreEqual("e", m1[1]); Assert.AreEqual("f", m1[2]);
+            // -------------------------
+            // Flat list
+            I("reset;");
+            I("option gams exe folder = 'c:\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
+            I("#m = ('a', 'b', 'c');");
+            I("write <gdx> temp;");
+            I("reset;");
+            I("option gams exe folder = 'c:\\GAMS\\38';");  //needs to point to a 32-bit GAMS, because unit tests run 32-bit
+            I("read <gdx> temp;");
+            m = O.GetIVariableFromString("#m", ECreatePossibilities.NoneReportError) as List;
+            Assert.AreEqual("a", (m.list[0] as ScalarString).string2);
+            Assert.AreEqual("b", (m.list[1] as ScalarString).string2);
+            Assert.AreEqual("c", (m.list[2] as ScalarString).string2);
         }
 
         [TestMethod]
@@ -22018,6 +22055,60 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_Datahash()
+        {
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+            //BEWARE: i set from 0 to 99!!
+            for (int i = 0; i < 100 + 1; i++)
+            {
+                I("reset;");
+                I("time 2001 2003;");
+                if (i == 0) I("x = 2, 3, 4;");
+                else if (i == 1) I("x = -2, 3, 4;");
+                else if (i == 2) I("x = 2, -3, 4;");
+                else if (i == 3) I("x = 2, 3, -4;");
+                else if (i == 4) I("x = 2, 3, 4; x[2004] = m(); x[2300] = 100; x[2300] = m();");
+                else if (i == 5) I("x <2002 2004> = 2, 3, 4;");
+                else if (i == 6) I("x <2000 2002> = 2, 3, 4;");
+                else if (i == 7) I("x!q <2002q1 2002q3> = 2, 3, 4;");
+                else if (i == 8) I("y = 2, 3, 4;"); //note: y
+                else if (i == 9) I("x <2001 2004> = 2, 3, 4, 5;");
+                else if (i == 10) I("x <2000 2003> = 1, 2, 3, 4;");
+                // ---
+                else if (i == 20) I("#m = map(); #m.x = 2, 3, 4;");
+                else if (i == 21) I("#m = map(); #m.x = -2, 3, 4;");
+                // ---
+                else if (i == 30) I("#m = list(); x = 2, 3, 4; #m.append(x);");
+                else if (i == 31) I("#m = list();  x = -2, 3, 4; #m.append(x);");
+                // ---
+                else if (i == 40) I("%v = 2;");
+                else if (i == 41) I("%v = -2;");
+                // ---
+                else if (i == 50) I("%s = '2';");
+                else if (i == 51) I("%s = '-2';");
+                // ---
+                else if (i == 60) I("%d = 2001q1;");
+                else if (i == 61) I("%d = 2001q2;");
+                else continue;
+                I("write datahash;");
+                Globals.unitTestScreenOutput.Clear();
+                I("read datahash;");
+                string s = Globals.unitTestScreenOutput.ToString();
+                string truth = null;
+                if (i >= 0 && i <= 19) truth = "f74190d4";
+                else if (i >= 20 && i <= 29) truth = "68d44d6f";
+                else if (i >= 30 && i <= 39) truth = "f7d570a2";
+                else if (i >= 40 && i <= 49) truth = "c2cce21a";
+                else if (i >= 50 && i <= 59) truth = "e02e04b1";
+                else if (i >= 60 && i <= 69) truth = "a92e58d1";
+                bool b = s.Contains(" (data-hash: " + truth);
+                if (i == 0 || i == 20 || i == 30 || i == 40 || i == 50 || i == 60) Assert.IsTrue(b);
+                else Assert.IsFalse(b);
+            }
+        }
+
+
+        [TestMethod]
         public void _Test_StackTrace3()
         {
             //libraries, offsetting line-numbers in these
@@ -25089,6 +25180,7 @@ print(df2)
             // ----------------------------------------------------------
             //          - OPEN command, also OPEN<edit>, <first>, <last>, <ref>, etc., also non-existing files.
             //          - CLOSE command
+            //          - OPEN <edit clear>
             //          uses a \temp folder that is deleted first
             // ----------------------------------------------------------
 
@@ -25532,6 +25624,12 @@ print(df2)
                 _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
                 _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
 
+                I("RESET;");
+                I("OPEN <edit clear> temp\\bankTemp;");
+                Assert.IsTrue(Program.databanks.GetDatabank("bankTemp").storage.Count() == 0);
+                I("RESET;");
+                FAIL("OPEN <clear> temp\\bankTemp;");
+
                 //changing REF stuff
                 I("RESET;");
                 // if (i == 0)I("OPTION databank logic = aremos;");
@@ -25756,6 +25854,448 @@ print(df2)
                 //FAIL("OPEN *, *;");
             }
         }
+
+        [TestMethod]
+        public void _Test_balance2()
+        {
+            //The databank ras_datopgek24_2026-04-08.gbk is real data from g:\DatopGek24\ras on DST, using Gekko 2 and manual loops.
+            //So very good to test up against. With i == 0, we test up against a translation of the manual loops into Gekko 3.
+            //With i == 1, we test up against the inbuilt balance()-function with 'ras' option. This yields the same with a lot of
+            //precision, so it verifies that balance('ras') is ok on real data.
+            //With i == 2, we try to exogenize using #exo, rather than by hand.
+            I("option folder working = '" + Globals.ttPath2 + @"\regres\Ras';");
+            for (int i = 0; i <= 2; i++)
+            {
+                //if (i == 1) continue; //For some reason this does not work, probably just some code in kqr.gcm. Never mind, i == 2 tests balance() really well.
+                I("writefile('options.txt', '" + i + "');"); //Just for safety
+                I("sys'del ras.gbk';"); //Just for safety                
+                I("run kqr;");
+                I("read ras;");
+                I("read <ref> 'ras_datopgek24_2026-04-08.gbk';");
+                Globals.unitTestScreenOutput.Clear();
+                I("compare <2023 2025 pch = 0.00000001>;");
+                string s = Globals.unitTestScreenOutput.ToString();
+                Assert.IsTrue(s.Contains("892 common series, 0 differences"));
+            }
+        }
+
+        [TestMethod]
+        public void _Test_balance1()
+        {
+            //TODO: handle pure == 0d.         
+            //TODO: abs() on function? And how do negative cells do?
+            //
+            //Gauss program for ii == 1 and 2:
+            //The following Gauss program that has been tested a lot on Statistics Denmark.
+            //It seems that if all cell and totals values are flipped sign-wise, the Gauss program results also just flip.
+            //
+            //EITHER:
+            //x = {-1 2 3 1, 4 5 6 1, 7 8 9 1};
+            //u = {9, 15, 26};
+            //v = {10, 16, 20, 4};
+            //OR:
+            //x = { -1 2 0 5, -3 - 5 6 0, -2 3 - 5 4};
+            //u = { 3, -5, 0};     //true: {6, -2, 0}
+            //v = { -6, 0, -2, 6};  //true: {-6, 0, 1, 9}
+            //OR:
+            //x = { -1  2  0  5, -3 - 5  6  0, -2  3 - 5  4};
+            //u = { 3, -5, 0};     //true: {6, -2, 0}
+            //v = { -6, 0, -2, 6};  //true: {-6, 0, 1, 9}
+            //x[3, 2] = x[3, 2] - 3; u[3] = u[3] - 3; v[2] = v[2] - 3;
+            //x[2, 1] = x[2, 1] + 3; u[2] = u[2] + 3; v[1] = v[1] + 3;
+
+            //maxiter = 1000;
+            //limit = 0.0000000000000001;
+            //print x;
+            //y = GRAS(x, u, v, maxiter, limit); 
+            //print y;
+            //
+            ////reciprocal col vector put into diagonal
+            //proc invd(y);                                              
+            //  local a;                                                 
+            //  a = diagrv(zeros(rows(y),rows(y)),(y + (y .== 0)).^-1) ;
+            //  retp(a);                                                 
+            //endp;      
+            //
+            //proc GRAS(X0, u, v, maxiter, limit);
+            //local m,nn,P,N,r,s,pr,nr,s1,ss,ps,ns,rr,s2,dif,iter,Maal,X,skriv1,skriv,forskel ;
+            //  forskel = abs(sumc(u)-sumc(v)) ;
+            //  if forskel > 0.000001 ;
+            //    //action...    
+            //  endif ;      
+            //  m = rows(X0) ;
+            //  nn = cols(X0) ;  
+            //  P = X0.*(X0 .>= 0) ;
+            //  N = abs(X0 .* (X0 .< 0)) ;  
+            //  r = ones(rows(X0),1) ;
+            //  s = ones(1,cols(X0)) ;  
+            //  pr = P'*r ;
+            //  nr = N'* invd(r) * ones(m,1) ;  
+            //  s1 = invd(2*pr) * (v + sqrt(v .^ 2 + (4 * pr .* nr)));
+            //  ss = -invd(v) * nr ;  
+            //  s1 = s1 + ss .* (pr .== 0) ;  
+            //  ps = P * s1 ;
+            //  ns = N * invd(s1) * ones(nn,1) ;  
+            //  r  =  invd(2*ps) * (u + sqrt(u .^ 2 + (4 * ps .* ns)));
+            //  rr = -invd(u) * ns ;  
+            //  r = r + rr .* (ps .== 0) ; 
+            //  pr = P' * r ;
+            //  nr = N' * invd(r) * ones(m,1) ;  
+            //  s2 = invd(2*pr) * (v + sqrt(v .^ 2 + (4 * pr .* nr))) ;
+            //  ss = -invd(v) * nr ;  
+            //  s2 = s2 + ss .* (pr .== 0) ;  
+            //  dif = s2 - s1 ;  
+            //  iter = 1 ;    
+            //  Maal = maxc(abs(dif)) ;  
+            //  do while Maal > limit and iter < maxiter ;    
+            //    s1 = s2 ;
+            //    ps = P * s1 ;
+            //    ns = N * invd(s1) * ones(nn,1) ;  
+            //    r = invd(2*ps) * (u + sqrt(u .^ 2 + (4 * ps .* ns)));
+            //    rr = -invd(u) * ns ;  
+            //    r = r + rr .* (ps .== 0) ;  
+            //    pr = p'*r ;
+            //    nr = N'* invd(r) * ones(m,1) ;  
+            //    s2 = invd(2*pr) * (v + sqrt(v .^ 2 + (4 * pr .* nr)));  /* s2*= s1 */
+            //    ss = -invd(v) * nr ;  
+            //    s2 = s2 + ss .* (pr .== 0) ;      
+            //    dif = s2 - s1 ;    
+            //    iter = iter + 1 ;  
+            //    Maal = maxc(abs(dif)) ;    
+            //  endo ;
+            //  
+            //  s = s2 ;
+            //  ps = P * s ;
+            //  ns = N * invd(s) * ones(nn,1) ;  
+            //  r = invd(2*ps) * (u + sqrt(u .^ 2 + (4 * ps .* ns)));
+            //  rr = -invd(u) * ns ;  
+            //  r = r + rr .* (ps .== 0) ;  
+            //  X = diagrv(zeros(m,m),r) * P * diagrv(zeros(nn,nn),s) - invd(r) * N * invd(s) ;  
+            //  if iter < maxiter-1 ;
+            //    print; print "ok, iterations = " iter;
+            //  else ;
+            //    print; print "fail, iterations = " iter;
+            //  endif ;  
+            //  retp(X) ;
+            //endp ;
+
+            for (int ii = 0; ii < 3; ii++)
+            {
+                double deltaHere = 0.0001d;  //!! adjust this if convergence criteria change!!
+                int year = 2020;
+                double sum = 60d;
+                List<string> rows = new List<string>() { "a", "b", "c" };
+                List<string> cols = new List<string>() { "a", "b", "c", "d" };
+                I("reset;");
+                I("time " + year + " " + year + ";");
+                I("io = series(2);");
+                I("#rownames = " + Stringlist.GetListWithCommas(rows) + ";");
+                I("#colnames = " + Stringlist.GetListWithCommas(cols) + ";");
+                if (ii == 0)
+                {
+                    I("io[a,a] = 10;"); I("io[a,b] = 20;"); I("io[a,c] = 30;"); I("io[a,d] = 7;");
+                    I("io[b,a] = 50;"); I("io[b,b] = 60;"); I("io[b,c] = 70;"); I("io[b,d] = 17;");
+                    I("io[c,a] = 90;"); I("io[c,b] = 80;"); I("io[c,c] = 70;"); I("io[c,d] = 27;");
+                    I("rowsum = series(1);");
+                    I("rowsum[a]= 87;"); I("rowsum[b]= 147;"); I("rowsum[c]= 287;");
+                    I("colsum = series(1);");
+                    I("colsum[a]= 160;"); I("colsum[b]= 170;"); I("colsum[c]= 140;"); I("colsum[d]= 51;");
+                }
+                else if (ii == 1)
+                {
+                    //Just 1 negative
+                    I("io[a,a] = -1;"); I("io[a,b] = 2;"); I("io[a,c] = 3;"); I("io[a,d] = 1;");
+                    I("io[b,a] = 4;"); I("io[b,b] = 5;"); I("io[b,c] = 6;"); I("io[b,d] = 1;");
+                    I("io[c,a] = 7;"); I("io[c,b] = 8;"); I("io[c,c] = 9;"); I("io[c,d] = 1;");
+                    I("rowsum = series(1);");
+                    I("rowsum[a]= 9;"); I("rowsum[b]= 15;"); I("rowsum[c]= 26;");
+                    I("colsum = series(1);");
+                    I("colsum[a]= 10;"); I("colsum[b]= 16;"); I("colsum[c]= 20;"); I("colsum[d]= 4;");
+                    //
+                    // Gauss: x = {-1 2 3 1, 4 5 6 1, 7 8 9 1}; u = { 9, 15, 26}; v = { 10, 16, 20, 4};
+                    //
+                }
+                else if (ii == 2)
+                {
+                    //Very sick                    
+                    I("io[a,a] = -1;"); I("io[a,b] = 2;"); I("io[a,c] = 0;"); I("io[a,d] = 5;");
+                    I("io[b,a] = -3;"); I("io[b,b] = -5;"); I("io[b,c] = 6;"); I("io[b,d] = 0;");
+                    I("io[c,a] = -2;"); I("io[c,b] = 3;"); I("io[c,c] = -5;"); I("io[c,d] = 4;");
+                    I("rowsum = series(1);");
+                    I("rowsum[a]= 3;"); I("rowsum[b]= -5;"); I("rowsum[c]= 0;");
+                    I("colsum = series(1);");
+                    I("colsum[a]= -6;"); I("colsum[b]= 0;"); I("colsum[c]= -2;"); I("colsum[d]= 6;");
+                    //
+                    // Gauss: x = {-1 2 0 5, -3 -5 6 0, -2 3 -5 4}; u = { 3, -5, 0}; v = { -6, 0, -2, 6};
+                }
+
+                if (ii == 0)
+                {
+                    I("prt <n> io;");
+                    I("#constraints1 = (  (  ('a','a',-1), ('a','b',1), 0  ),  (  ('b','d',2) ,('c','d',2), " + (2 * sum) + "  )  );");  //[a,a]==[a,b] and [b,d]+[c,d]=50.
+                    I("#constraints2 = (  (  ('a','a'), 10  ),  );");
+                    I("#exo = (  ('a','a'),  );");
+
+                    I("io0a_ras = balance(io, rowsum, colsum, #rownames, #colnames, (%type = 'ras'));");
+                    I("prt <n> io0a_ras;");
+
+                    if (true)
+                    {
+                        //Only testing special cases
+                        I("#exow0 = (  ('a','a', 0.00),  );"); //0% fixed, same as no #exo
+                        I("io0a_rasw0 = balance(io, rowsum, colsum, #rownames, #colnames, (#exo = #exow0, %type = 'ras'));");
+                        I("prt <n> io0a_rasw0;");
+                        // ---
+                        I("#exow1 = (  ('a','a', 1.00),  );"); //100% fixed, same as #exo
+                        I("io0a_rasw1 = balance(io, rowsum, colsum, #rownames, #colnames, (#exo = #exow1, %type = 'ras'));");
+                        I("prt <n> io0a_rasw1;");
+                    }
+
+                    I("io0a_entropy = balance(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy'));");
+                    I("prt <n> io0a_entropy;");
+
+                    I("io0a_entropy2003 = balance(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy2003'));");
+                    I("prt <n> io0a_entropy2003;");
+
+                    I("io0a_gras = balance(io, rowsum, colsum, #rownames, #colnames, (%type = 'gras'));");
+                    I("prt <n> io0a_gras;");
+
+                    I("io0a_sqdif = balance(io, rowsum, colsum, #rownames, #colnames, (%type = 'sqdif'));");
+                    I("prt <n> io0a_sqdif;");
+
+                    I("io0a_sqrel = balance(io, rowsum, colsum, #rownames, #colnames, (%type = 'sqrel'));");
+                    I("prt <n> io0a_sqrel;");
+
+                    I("io0a_distdif = balance(io, rowsum, colsum, #rownames, #colnames, (%type = 'distdif'));");
+                    I("prt <n> io0a_distdif;");
+
+                    I("io0a_distrel = balance(io, rowsum, colsum, #rownames, #colnames, (%type = 'distrel'));");
+                    I("prt <n> io0a_distrel;");
+
+                    // -----
+
+                    I("io0b_entropy = balance(io, rowsum, colsum, #rownames, #colnames, (#constraints = #constraints1, %type = 'entropy'));");
+                    I("prt <n> io0b_entropy;");
+
+                    // -----
+
+                    I("io0c_entropy = balance(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'entropy'));"); //#exo does not work?                                
+                    I("prt <n> io0c_entropy;");
+
+                    I("io0c_ras = balance(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'ras'));");
+                    I("prt <n> io0c_ras;");
+
+                    I("io0c_gras = balance(io, rowsum, colsum, #rownames, #colnames, (#exo = #exo, %type = 'gras'));");
+                    I("prt <n> io0c_ras;");
+
+                    // -----
+
+                    I("io0d_entropy = balance(io, rowsum, colsum, #rownames, #colnames, (#constraints = #constraints2, %type = 'entropy'));");
+                    I("prt <n> io0d_entropy;");
+                }
+
+                if (ii == 1)
+                {
+                    I("io1a_gras = balance(io, rowsum, colsum, #rownames, #colnames, (%type = 'gras', %tol = 0.0000000000000001));");
+                    I("prt <n> io1a_gras;");
+                }
+
+                if (ii == 2)
+                {
+                    I("#exo2 = (  ('c','b'), ('b','a')  );");
+
+                    I("io2a_gras = balance(io, rowsum, colsum, #rownames, #colnames, (%type = 'gras', %tol = 0.0000000000000001));");
+                    I("prt <n> io2a_gras;");
+
+                    I("io2a_entropy = balance(io, rowsum, colsum, #rownames, #colnames, (%type = 'entropy', %tol = 0.0001));");
+                    I("prt <n> io2a_entropy;"); //This one is BAD, does not converge with status 7...
+
+                    I("io2b_gras = balance(io, rowsum, colsum, #rownames, #colnames, (%type = 'gras', #exo = #exo2, %tol = 0.0000000000000001));");
+                    I("prt <n> io2b_gras;");
+
+                }
+
+                foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, year, 1), new GekkoTime(EFreq.A, year, 1)))
+                {
+                    if (ii == 0)
+                    {
+                        Helper_CompareCells("io0a_ras", "io0a_entropy", deltaHere, rows, cols, t);
+                        Helper_CompareCells("io0a_ras", "io0a_rasw0", deltaHere, rows, cols, t);
+                        Helper_CompareCells("io0c_ras", "io0a_rasw1", deltaHere, rows, cols, t);
+                        Helper_CompareCells("io0a_ras", "io0a_gras", deltaHere, rows, cols, t);
+                        Helper_CompareCells("io0d_entropy", "io0c_ras", deltaHere, rows, cols, t);
+                        Helper_CompareCells("io0d_entropy", "io0c_gras", 5d * deltaHere, rows, cols, t); //has to augment
+                        //Test the 2 restrictions
+                        Assert.AreEqual((O.GetIVariableFromString("io0b_entropy[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t),
+                                        (O.GetIVariableFromString("io0b_entropy[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                        Assert.AreEqual((O.GetIVariableFromString("io0b_entropy[b,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t) +
+                                        (O.GetIVariableFromString("io0b_entropy[c,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), sum, deltaHere);
+
+                    }
+                    else if (ii == 1)
+                    {
+                        double deltaHere2 = 0.0000001d;
+                        Assert.AreEqual(-0.65964417, (O.GetIVariableFromString("io1a_gras[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(3.1093591, (O.GetIVariableFromString("io1a_gras[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(4.7803250, (O.GetIVariableFromString("io1a_gras[a,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(1.7699601, (O.GetIVariableFromString("io1a_gras[a,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(3.6140556, (O.GetIVariableFromString("io1a_gras[b,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(4.6329270, (O.GetIVariableFromString("io1a_gras[b,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(5.6981252, (O.GetIVariableFromString("io1a_gras[b,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(1.0548921, (O.GetIVariableFromString("io1a_gras[b,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(7.0455885, (O.GetIVariableFromString("io1a_gras[c,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(8.2577139, (O.GetIVariableFromString("io1a_gras[c,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(9.5215498, (O.GetIVariableFromString("io1a_gras[c,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(1.1751477, (O.GetIVariableFromString("io1a_gras[c,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                    }
+                    else
+                    {
+                        //See Gauss program above
+                        double deltaHere2 = 0.0000001d;
+                        Assert.AreEqual(-1.2294873, (O.GetIVariableFromString("io2a_gras[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(1.6048915, (O.GetIVariableFromString("io2a_gras[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(0d, (O.GetIVariableFromString("io2a_gras[a,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(2.6245958, (O.GetIVariableFromString("io2a_gras[a,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(-3.2409029, (O.GetIVariableFromString("io2a_gras[b,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(-5.4748857, (O.GetIVariableFromString("io2a_gras[b,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(3.7157886, (O.GetIVariableFromString("io2a_gras[b,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(0d, (O.GetIVariableFromString("io2a_gras[b,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(-1.5296098, (O.GetIVariableFromString("io2a_gras[c,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(3.8699942, (O.GetIVariableFromString("io2a_gras[c,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(-5.7157886, (O.GetIVariableFromString("io2a_gras[c,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(3.3754042, (O.GetIVariableFromString("io2a_gras[c,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+
+                        //See Gauss program above, and add for io[c,b] and io[b,a]
+                        //In the Gauss program, the cells are removed by setting them = 0, and the values removed from totals.
+                        //In the Gekko program, this is easier.
+                        deltaHere2 = 0.0000001d;
+                        Assert.AreEqual(-1.4519130, (O.GetIVariableFromString("io2b_gras[a,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(2.0524897, (O.GetIVariableFromString("io2b_gras[a,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(0d, (O.GetIVariableFromString("io2b_gras[a,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(2.3994233, (O.GetIVariableFromString("io2b_gras[a,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(-3d, (O.GetIVariableFromString("io2b_gras[b,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(-5.0524897, (O.GetIVariableFromString("io2b_gras[b,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(3.0524897, (O.GetIVariableFromString("io2b_gras[b,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(0d, (O.GetIVariableFromString("io2b_gras[b,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(-1.5480870, (O.GetIVariableFromString("io2b_gras[c,a]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(3d, (O.GetIVariableFromString("io2b_gras[c,b]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(-5.0524897, (O.GetIVariableFromString("io2b_gras[c,c]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+                        Assert.AreEqual(3.6005767, (O.GetIVariableFromString("io2b_gras[c,d]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere2);
+
+                        //Helper_CompareCells("io2a_entropy", "io2a_gras", deltaHere, rows, cols, t);
+                    }
+                }
+            }
+        }
+
+        private static void Helper_CompareCells(string goal, string trial, double deltaHere, List<string> rows, List<string> cols, GekkoTime t)
+        {
+            foreach (string i in rows)
+            {
+                foreach (string j in cols)
+                {
+                    Assert.AreEqual((O.GetIVariableFromString("" + goal + "[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), (O.GetIVariableFromString("" + trial + "[" + i + "," + j + "]", ECreatePossibilities.NoneReturnNullAlways) as Series).GetDataSimple(t), deltaHere);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void _Test_RenameFunction()
+        {
+            I("reset; option folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
+            I("x = series(3);");
+            I("x[a, b, d] <2001 2001> = 1.2;");
+            I("x[a, c, d] <2001 2001> = 3.4;");
+            I("x[a, b, d] <2002 2002> = 5.6;");
+            I("x[a, c, d] <2002 2002> = 7.8;");
+            _AssertSeries(First(), "x!a", new string[] { "a", "b", "d" }, 2001, 1.2d, sharedDelta);
+            _AssertSeries(First(), "x!a", new string[] { "a", "c", "d" }, 2001, 3.4d, sharedDelta);
+            _AssertSeries(First(), "x!a", new string[] { "a", "b", "d" }, 2002, 5.6d, sharedDelta);
+            _AssertSeries(First(), "x!a", new string[] { "a", "c", "d" }, 2002, 7.8d, sharedDelta);
+
+            // ---
+
+            I("z1 = x.rename(#(listfile xnew1_cfg.csv));");
+            I("z1.flatten('_');");
+            _AssertSeries(First(), "z1!a", new string[] { "aa", "bb", "dd" }, 2001, 1.2d, sharedDelta);
+            _AssertSeries(First(), "z1!a", new string[] { "aa", "cc", "dd" }, 2001, 3.4d, sharedDelta);
+            _AssertSeries(First(), "z1!a", new string[] { "aa", "bb", "dd" }, 2002, 5.6d, sharedDelta);
+            _AssertSeries(First(), "z1!a", new string[] { "aa", "cc", "dd" }, 2002, 7.8d, sharedDelta);
+            _AssertSeries(First(), "z1_aa_bb_dd!a", 2001, 1.2d, sharedDelta);
+            _AssertSeries(First(), "z1_aa_cc_dd!a", 2001, 3.4d, sharedDelta);
+            _AssertSeries(First(), "z1_aa_bb_dd!a", 2002, 5.6d, sharedDelta);
+            _AssertSeries(First(), "z1_aa_cc_dd!a", 2002, 7.8d, sharedDelta);
+
+            // ---
+
+            I("z2 = x.rename(#(listfile xnew2_cfg.csv));");
+            I("z2.flatten('');");
+            _AssertSeries(First(), "z2!a", new string[] { "aa", "bb", "dd" }, 2001, 1.2d, sharedDelta);
+            _AssertSeries(First(), "z2!a", new string[] { "aa", "", "dd" }, 2001, 3.4d, sharedDelta);
+            _AssertSeries(First(), "z2!a", new string[] { "aa", "bb", "dd" }, 2002, 5.6d, sharedDelta);
+            _AssertSeries(First(), "z2!a", new string[] { "aa", "", "dd" }, 2002, 7.8d, sharedDelta);
+            _AssertSeries(First(), "z2aabbdd!a", 2001, 1.2d, sharedDelta);
+            _AssertSeries(First(), "z2aadd!a", 2001, 3.4d, sharedDelta);
+            _AssertSeries(First(), "z2aabbdd!a", 2002, 5.6d, sharedDelta);
+            _AssertSeries(First(), "z2aadd!a", 2002, 7.8d, sharedDelta);
+
+            // ---
+
+            I("y = series(3);");
+            I("y[a, '', d] <2001 2001> = 1.2;");
+            I("y[a, c, d] <2001 2001> = 3.4;");
+            I("y[a, '', d] <2002 2002> = 5.6;");
+            I("y[a, c, d] <2002 2002> = 7.8;");
+            I("z3 = y.rename(#(listfile xnew3_cfg.csv));");
+            _AssertSeries(First(), "z3!a", new string[] { "aa", "bb2", "dd" }, 2001, 1.2d, sharedDelta);
+            _AssertSeries(First(), "z3!a", new string[] { "aa", "", "dd" }, 2001, 3.4d, sharedDelta);
+            _AssertSeries(First(), "z3!a", new string[] { "aa", "bb2", "dd" }, 2002, 5.6d, sharedDelta);
+            _AssertSeries(First(), "z3!a", new string[] { "aa", "", "dd" }, 2002, 7.8d, sharedDelta);
+
+            // ---            
+
+            for (int i = 0; i < 2; i++)
+            {
+
+                I("z = series(3);");
+                I("z[a, b, d] <2001 2001> = 1.2;");
+                I("z[a, c, d] <2001 2001> = 3.4;");
+                I("z[a, b, d] <2002 2002> = 5.6;");
+                I("z[a, c, d] <2002 2002> = 7.8;");
+                I("z[x, b, d] <2002 2002> = 9.0;");
+                I("z[a, y, d] <2002 2002> = 11.2;");
+                I("z[a, b, z] <2002 2002> = 13.4;");
+                I("z[h, i, j] <2002 2002> = 15.6;");
+                I("z[h, i, k] <2002 2002> = 17.8;");
+                if (i == 0) I("z4 = z.rename(#(listfile xnew1_cfg.csv));");
+                else I("z4 = z.rename(#(listfile xnew1_cfg.csv), 'drop');");
+
+                _AssertSeries(First(), "z!a", new string[] { "a", "b", "d" }, 2001, 1.2d, sharedDelta);
+                _AssertSeries(First(), "z!a", new string[] { "a", "c", "d" }, 2001, 3.4d, sharedDelta);
+                _AssertSeries(First(), "z!a", new string[] { "a", "b", "d" }, 2002, 5.6d, sharedDelta);
+                _AssertSeries(First(), "z!a", new string[] { "a", "c", "d" }, 2002, 7.8d, sharedDelta);
+                _AssertSeries(First(), "z4!a", new string[] { "aa", "bb", "dd" }, 2001, 1.2d, sharedDelta);
+                _AssertSeries(First(), "z4!a", new string[] { "aa", "cc", "dd" }, 2001, 3.4d, sharedDelta);
+                _AssertSeries(First(), "z4!a", new string[] { "aa", "bb", "dd" }, 2002, 5.6d, sharedDelta);
+                _AssertSeries(First(), "z4!a", new string[] { "aa", "cc", "dd" }, 2002, 7.8d, sharedDelta);
+                Assert.IsNotNull(O.GetIVariableFromString("z4!a[aa,bb,dd]", ECreatePossibilities.NoneReturnNullAlways));
+                Assert.IsNotNull(O.GetIVariableFromString("z4!a[aa,cc,dd]", ECreatePossibilities.NoneReturnNullAlways));
+                Assert.IsNotNull(O.GetIVariableFromString("z4!a[x,bb,dd]", ECreatePossibilities.NoneReturnNullAlways));
+                Assert.IsNotNull(O.GetIVariableFromString("z4!a[aa,y,dd]", ECreatePossibilities.NoneReturnNullAlways));
+                Assert.IsNotNull(O.GetIVariableFromString("z4!a[aa,bb,z]", ECreatePossibilities.NoneReturnNullAlways));
+                if (i == 0)
+                {
+                    Assert.IsNotNull(O.GetIVariableFromString("z4!a[h,i,j]", ECreatePossibilities.NoneReturnNullAlways));
+                    Assert.IsNotNull(O.GetIVariableFromString("z4!a[h,i,k]", ECreatePossibilities.NoneReturnNullAlways));
+                }
+                else
+                {
+                    Assert.IsNull(O.GetIVariableFromString("z4!a[h,i,j]", ECreatePossibilities.NoneReturnNullAlways));
+                    Assert.IsNull(O.GetIVariableFromString("z4!a[h,i,k]", ECreatePossibilities.NoneReturnNullAlways));
+                }
+            }
+        }
+
 
         [TestMethod]
         public void _Test_Cls()
@@ -34961,7 +35501,154 @@ print(df2)
 
         [TestMethod]
         public void _Test_PriceIndexFunctions()
-        {            
+        {
+            if (false)
+            {
+                //kaedepris2() emulator. At some point this unit test can be killed off (starts up Gekko 2 GUIs)
+
+                string s1 = @"
+
+reset; mode data;
+function series kaedepris2(series _lbd, series _frg, date _p1, date _p2, date _p3);
+  delete _p_;
+  for date t = %_p1+1 to %_p2;
+    series <%t %t> vakst = 1;
+    if (_lbd[%t] <> 0 AND _frg[%t] <> 0 );
+      series <%t %t> vakst = _lbd/_frg;
+    end;
+    if (_lbd[%t] == 0 AND _frg[%t] <> 0 );
+      series <%t %t> vakst = 0.01;
+    end;
+    if (_lbd[%t] <> 0 AND _frg[%t] == 0 );
+      series <%t %t> vakst = 100;
+    end;
+  end;
+  series <%_p1 %_p1> p_ = 1;
+  series <%_p1+1 %_p2> p_ = p_[-1]*vakst;
+  series _p_ = p_/p_[%_p3] ;
+  return _p_;
+end;
+";
+                string s2 = @"
+time 2001 2005;
+series <2000 2006> c = 555, 102, 103, 104, 105, 106, 555;
+series <2000 2006> d = 666, 101.5, 102.1, 103.7, 104.3, 105.4, 666;
+series <2000 2006> p = 777 rep *;
+series <2000 2006> f = 888 rep *;
+<insert>
+create _p_ = kaedepris2(c, d, 2001, 2005, 2004);
+series <2001 2005> p = _p_;
+series <2001 2005> f = c/p;
+write kp;
+exit;
+";
+                for (int i1 = 0; i1 < 3; i1++)
+                {
+                    for (int i2 = 0; i2 < 3; i2++)
+                    {
+                        for (int i3 = 0; i3 < 3; i3++)
+                        {
+                            for (int i4 = 0; i4 < 3; i4++)
+                            {
+                                string ss = null;
+                                if (i1 == 2)
+                                {
+                                    ss += "series c[2001] = m();" + G.NL;
+                                }
+                                else if (i1 == 1)
+                                {
+                                    ss += "series c[2001] = 0;" + G.NL;
+                                }
+                                else if (i1 == 0)
+                                {
+                                    ss += "series c[2001] = 50;" + G.NL;
+                                }
+                                else new Error("Hov");
+                                // ---------------------
+                                if (i2 == 2)
+                                {
+                                    ss += "series c[2002] = m();" + G.NL;
+                                }
+                                else if (i2 == 1)
+                                {
+                                    ss += "series c[2002] = 0;" + G.NL;
+                                }
+                                else if (i2 == 0)
+                                {
+                                    ss += "series c[2002] = 51;" + G.NL;
+                                }
+                                else new Error("Hov");
+                                // -----------------------
+                                if (i3 == 2)
+                                {
+                                    ss += "series d[2001] = m();" + G.NL;
+                                }
+                                else if (i3 == 1)
+                                {
+                                    ss += "series d[2001] = 0;" + G.NL;
+                                }
+                                else if (i3 == 0)
+                                {
+                                    ss += "series d[2001] = 40;" + G.NL;
+                                }
+                                else new Error("Hov");
+                                // ---------------------
+                                if (i4 == 2)
+                                {
+                                    ss += "series d[2002] = m();" + G.NL;
+                                }
+                                else if (i4 == 1)
+                                {
+                                    ss += "series d[2002] = 0;" + G.NL;
+                                }
+                                else if (i4 == 0)
+                                {
+                                    ss += "series d[2002] = 41;" + G.NL;
+                                }
+                                else new Error("Hov");
+                                // -----------------------------                            
+                                string s = "reset;" + G.NL + s1 + G.NL + s2;
+                                s = s.Replace("<insert>", ss);
+                                File.WriteAllText(Globals.ttPath2 + @"\regres\Databanks\kp.gcm", s);
+                                I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks" + "';");
+                                I("SYS 'c:\\Thomas\\Gekko\\Exe\\2_5_2_64bit\\gekko.exe run kp.gcm;' working = '" + Globals.ttPath2 + @"\regres\Databanks';");
+                                I("reset; time 2001 2005;");
+                                I("read <ref> kp.gbk;"); //c, d, p, f     
+                                I("option bugfix laspchain emulate = 'kaedepris2';" + G.NL);
+                                I("series <2000 2006> c = 555, 102, 103, 104, 105, 106, 555;" + G.NL);
+                                I("series <2000 2006> d = 666, 101.5, 102.1, 103.7, 104.3, 105.4, 666;" + G.NL);
+                                I("series <2000 2006> p = 777 rep *;" + G.NL);
+                                I("series <2000 2006> f = 888 rep *;" + G.NL);
+                                I(ss);
+                                I("p <2001 2005> = laspchain(c, d, 2004).p;" + G.NL);
+                                I("f <2001 2005> = c / p;" + G.NL);
+                                Series _c = Ref().GetIVariable("c!a") as Series;
+                                Series c = First().GetIVariable("c!a") as Series;
+                                Series _d = Ref().GetIVariable("d!a") as Series;
+                                Series d = First().GetIVariable("d!a") as Series;
+                                Series _p = Ref().GetIVariable("p!a") as Series;
+                                Series p = First().GetIVariable("p!a") as Series;
+                                Series _f = Ref().GetIVariable("f!a") as Series;
+                                Series f = First().GetIVariable("f!a") as Series;
+                                foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime(EFreq.A, 2000, 1), new GekkoTime(EFreq.A, 2006, 1)))
+                                {
+                                    double xc = c.GetDataSimple(t); double x_c = _c.GetDataSimple(t);
+                                    double xd = d.GetDataSimple(t); double x_d = _d.GetDataSimple(t);
+                                    double xp = p.GetDataSimple(t); double x_p = _p.GetDataSimple(t);
+                                    double xf = f.GetDataSimple(t); double x_f = _f.GetDataSimple(t);
+                                    _AssertHelperTwoDoubles(xc, x_c, sharedDelta);
+                                    _AssertHelperTwoDoubles(xd, x_d, sharedDelta);
+                                    _AssertHelperTwoDoubles(xp, x_p, sharedDelta);
+                                    _AssertHelperTwoDoubles(xf, x_f, sharedDelta);
+
+                                }
+                            }
+                        }
+                    }
+                }
+            Label1:;
+            }
+
             // Quarterly
             // Quarterly
             // Quarterly
@@ -35179,15 +35866,8 @@ print(df2)
             I("SERIES <1998 2002> fIb = data(' 122568.000000  119988.000000  128727.000000  125635.000000  121152.000000');");
             I("list #p= pibp, pibo, pibh;");
             I("list #x=fIbp, fIbo, work:fIbh;");
-            //I("SERIES <98 2002> (xx_p, xx_x) = laspchain(#p, #x, 2000);");
-            //TODO TODO TODO
-            //TODO TODO TODO
-            //TODO TODO TODO  think about how to indicate time in tuples
-            //TODO TODO TODO
-            //TODO TODO TODO
             I("OPEN<edit>temp;");
             I("TIME 98 2002;");
-            //I("(SERIES xx_p, SERIES xx_x) = laspchain(#p, #x, 2000);");  //these have to be searched for in Work databank, but it is ok since we use data mode.
             I("MAP #m = laspchain(#p, #x, 2000);");  //these have to be searched for in Work databank, but it is ok since we use data mode.
             I("xx_p = #m.p;");
             I("xx_x = #m.q;");
@@ -35197,6 +35877,7 @@ print(df2)
             I("CREATE dif_p, dif_x;");
             I("SERIES dif_p = pib/xx_p;");
             I("SERIES dif_x = fib/xx_x;");
+            I("prt <97 2003> pib, xx_p, fib, xx_x;");
             for (int i = 1998; i <= 2002; i++)
             {
                 u = Data("dif_p", i, "a"); _AssertHelperTwoDoubles(u.w, 1.0d, 0.0001d);  //0.01% difference accepted (some loss of precision when reading ADAM data)
@@ -35232,7 +35913,6 @@ print(df2)
             I("SERIES <1998 2002> fE =  data('478868.906250  534380.875000  602351.125000  621238.312500  646970.000000 ') ;");
             I("SERIES <1998 2002> py =  data('0.954835  0.970887  1.000000  1.024961  1.048567 ') ;");
             I("SERIES <1998 2002> fY =  data('1218658.000000  1249862.000000  1293965.000000  1303086.000000  1309156.000000 ') ;");
-            //I("SERIES <98 2002> (xx_p, xx_x) = laspchain(#pris, #mgd, 2000);");
 
             I("TIME 98 2002;");
 
@@ -35331,7 +36011,7 @@ print(df2)
             //2022         1.0168      0.84        26.0808      9.58
 
             I("reset;");
-            I("time 2018 2022;");            
+            I("time 2018 2022;");
             I("p1 = 1.02, 1.03, 1.04, 1.05, 1.06;");
             I("p2 = 1.22, 1.23, 1.24, 1.25, 1.26;");
             I("q1 = 2, 3, 4, 5, 6;");
@@ -35340,12 +36020,12 @@ print(df2)
             I("p = laspchain(('p1', 'p2'), ('q1', 'q2'), 2020).p;");
             I("prt p1, p2, q1, q2;");
             I("prt p, q;");
-            _AssertSeries(First(), "p!a", 2018, 0.9833, sharedTableDelta);            
+            _AssertSeries(First(), "p!a", 2018, 0.9833, sharedTableDelta);
             _AssertSeries(First(), "q!a", 2018, 16.9629, sharedTableDelta);
-            _AssertSeries(First(), "p!a", 2019, 0.9916, sharedTableDelta); 
+            _AssertSeries(First(), "p!a", 2019, 0.9916, sharedTableDelta);
             _AssertSeries(First(), "q!a", 2019, 19.2409, sharedTableDelta);
             _AssertSeries(First(), "p!a", 2022, 1.0168, sharedTableDelta);
-            _AssertSeries(First(), "q!a", 2022, 26.0808, sharedTableDelta);            
+            _AssertSeries(First(), "q!a", 2022, 26.0808, sharedTableDelta);
 
             //Same results as above
             I("reset;");
@@ -35410,42 +36090,72 @@ print(df2)
             // ======================================================================================
 
             //This function is also known as "kaedepris2".
-                        
-            I("reset;");
-            I("time 2018 2022;");
-            I("x = 10, 12, 11, 15, 4;");
-            I("d = 8, 13, 10, 14, 7;");            
-            I("q = laspchain(x, d, 2020).q;");
-            I("p = laspchain(x, d, 2020).p;");
-            //The following numbers are created in a spreadsheet
-            _AssertSeries(First(), "p!a", 2018, 0.9848d, sharedTableDelta);
-            _AssertSeries(First(), "q!a", 2018, 10.1539d, sharedTableDelta);
-            _AssertSeries(First(), "p!a", 2019, 0.9091, sharedTableDelta); 
-            _AssertSeries(First(), "q!a", 2019, 13.2, sharedTableDelta); 
-            _AssertSeries(First(), "p!a", 2020, 1d, sharedTableDelta);  
-            _AssertSeries(First(), "q!a", 2020, 11d, sharedTableDelta); 
-            _AssertSeries(First(), "p!a", 2021, 1.0714, sharedTableDelta);
-            _AssertSeries(First(), "q!a", 2021, 14d, sharedTableDelta);
-            _AssertSeries(First(), "p!a", 2022, 0.6122, sharedTableDelta);
-            _AssertSeries(First(), "q!a", 2022, 6.5333, sharedTableDelta);
 
             I("reset;");
             I("time 2018 2022;");
             I("x = 10, 12, 11, 15, 4;");
-            I("d = m(), 13, 10, 14, 7;");
+            I("d = 8, 13, 10, 14, 7;");
             I("q = laspchain(x, d, 2020).q;");
             I("p = laspchain(x, d, 2020).p;");
-            _AssertSeries(First(), "p!a", 2018, 0.9848d, sharedTableDelta);  //The thing is that x[2018] ad d[2018] are not used at all for price index!
-            _AssertSeries(First(), "q!a", 2018, 10.1539d, sharedTableDelta); //We have x[2018], so it can be computed
-            _AssertSeries(First(), "p!a", 2019, 0.9091, sharedTableDelta); 
-            _AssertSeries(First(), "q!a", 2019, 13.2, sharedTableDelta); 
-            _AssertSeries(First(), "p!a", 2020, 1d, sharedTableDelta);  
+            //The following numbers are created and tested in a spreadsheet
+            _AssertSeries(First(), "p!a", 2017, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2017, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2018, 0.9848d, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2018, 10.1539d, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2019, 0.9091, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2019, 13.2, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2020, 1d, sharedTableDelta);
             _AssertSeries(First(), "q!a", 2020, 11d, sharedTableDelta);
             _AssertSeries(First(), "p!a", 2021, 1.0714, sharedTableDelta);
             _AssertSeries(First(), "q!a", 2021, 14d, sharedTableDelta);
             _AssertSeries(First(), "p!a", 2022, 0.6122, sharedTableDelta);
             _AssertSeries(First(), "q!a", 2022, 6.5333, sharedTableDelta);
 
+            //Same, with missing value for D in first year
+            I("reset;");
+            I("time 2018 2022;");
+            I("x = 10, 12, 11, 15, 4;");
+            I("d = m(), 13, 10, 14, 7;");
+            I("q = laspchain(x, d, 2020).q;");
+            I("p = laspchain(x, d, 2020).p;");
+            _AssertSeries(First(), "p!a", 2017, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2017, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2018, 0.9848d, sharedTableDelta);  //The thing is that x[2018] ad d[2018] are not used at all for price index!
+            _AssertSeries(First(), "q!a", 2018, 10.1539d, sharedTableDelta); //We have x[2018], so it can be computed
+            _AssertSeries(First(), "p!a", 2019, 0.9091, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2019, 13.2, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2020, 1d, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2020, 11d, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2021, 1.0714, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2021, 14d, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2022, 0.6122, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2022, 6.5333, sharedTableDelta);
+
+            //Same, with 0 for D in first year. This ought to compute just as if the value was missing instead of 0.
+            //The 0 ends up in the denominator in the first part of the chain, and therefore the whole chain becomes
+            //missing value (or infinity).
+            //This is the fix Grane Høegh asked for in March 2026.
+            I("reset;");
+            I("time 2018 2022;");
+            I("x = 10, 12, 11, 15, 4;");
+            I("d = 0, 13, 10, 14, 7;");
+            //I("option bugfix series chain = yes;");
+            I("q = laspchain(x, d, 2020).q;");
+            I("p = laspchain(x, d, 2020).p;");
+            _AssertSeries(First(), "p!a", 2017, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2017, double.NaN, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2018, 0.9848d, sharedTableDelta);  //The thing is that x[2018] and d[2018] are not used at all for price index!
+            _AssertSeries(First(), "q!a", 2018, 10.1539d, sharedTableDelta); //We have x[2018], so it can be computed
+            _AssertSeries(First(), "p!a", 2019, 0.9091, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2019, 13.2, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2020, 1d, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2020, 11d, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2021, 1.0714, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2021, 14d, sharedTableDelta);
+            _AssertSeries(First(), "p!a", 2022, 0.6122, sharedTableDelta);
+            _AssertSeries(First(), "q!a", 2022, 6.5333, sharedTableDelta);
+
+            //Same, with missing value for value in first year (and a "hole" in D)
             I("reset;");
             I("time 2018 2022;");
             I("x = m(), 12, 11, 15, 4;");
@@ -35456,7 +36166,7 @@ print(df2)
             _AssertSeries(First(), "q!a", 2018, double.NaN, sharedTableDelta);
             _AssertSeries(First(), "p!a", 2019, 0.9091, sharedTableDelta);
             _AssertSeries(First(), "q!a", 2019, 13.2, sharedTableDelta);
-            _AssertSeries(First(), "p!a", 2020, 1d, sharedTableDelta); 
+            _AssertSeries(First(), "p!a", 2020, 1d, sharedTableDelta);
             _AssertSeries(First(), "q!a", 2020, 11d, sharedTableDelta);
             _AssertSeries(First(), "p!a", 2021, 1.0714, sharedTableDelta);
             _AssertSeries(First(), "q!a", 2021, 14d, sharedTableDelta);
@@ -35479,6 +36189,88 @@ print(df2)
             _AssertSeries(First(), "q!a", 2021, double.NaN, sharedTableDelta);
             _AssertSeries(First(), "p!a", 2022, double.NaN, sharedTableDelta);
             _AssertSeries(First(), "q!a", 2022, double.NaN, sharedTableDelta);
+
+            // ======= Here we are testing missing values in C and D (d-prices)
+            //         Is handled by the new ChainLoop() logic
+            //         These 5 variants have been checked manually, to see where missings appear.
+            //         Note: even if d[2001] is missing, 
+            for (int i = 0; i < 5; i++)
+            {
+                I("reset;");
+                I("c <2001 2003> = 10, 20, 30;");
+                I("d <2001 2003> = 8, 17, 26;");
+                if (i == 1) I("c[2001] = m();");
+                else if (i == 2) I("d[2001] = m();");
+                else if (i == 3) I("c[2003] = m();");
+                else if (i == 4) I("d[2003] = m();");
+                I("p <2000 2004> = laspchain(c, d, 2002).p;");
+                I("q <2000 2004> = laspchain(c, d, 2002).q;");
+                if (i == 0)
+                {
+                    _AssertSeries(First(), "p!a", 2000, 0.68000d, sharedTableDelta); //Because d contains prices from 2000!
+                    _AssertSeries(First(), "p!a", 2001, 0.85000d, sharedTableDelta);
+                    _AssertSeries(First(), "p!a", 2002, 1d, sharedTableDelta);
+                    _AssertSeries(First(), "p!a", 2003, 1.15385d, sharedTableDelta);
+                    _AssertSeries(First(), "p!a", 2004, double.NaN, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2000, double.NaN, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2001, 11.76470588d, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2002, 20d, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2003, 26d, sharedTableDelta); //The year after index year has q = c !
+                    _AssertSeries(First(), "q!a", 2004, double.NaN, sharedTableDelta);
+                }
+                else if (i == 1) //c[2001] = m()
+                {
+                    _AssertSeries(First(), "p!a", 2000, double.NaN, sharedTableDelta); //differs from i==0 !
+                    _AssertSeries(First(), "p!a", 2001, 0.85000d, sharedTableDelta);
+                    _AssertSeries(First(), "p!a", 2002, 1d, sharedTableDelta);
+                    _AssertSeries(First(), "p!a", 2003, 1.15385d, sharedTableDelta);
+                    _AssertSeries(First(), "p!a", 2004, double.NaN, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2000, double.NaN, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2001, double.NaN, sharedTableDelta); //differs from i==0 !
+                    _AssertSeries(First(), "q!a", 2002, 20d, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2003, 26d, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2004, double.NaN, sharedTableDelta);
+                }
+                else if (i == 2) //d[2001] = m()
+                {
+                    _AssertSeries(First(), "p!a", 2000, double.NaN, sharedTableDelta); //differs from i==0 !
+                    _AssertSeries(First(), "p!a", 2001, 0.85000d, sharedTableDelta);
+                    _AssertSeries(First(), "p!a", 2002, 1d, sharedTableDelta);
+                    _AssertSeries(First(), "p!a", 2003, 1.15385d, sharedTableDelta);
+                    _AssertSeries(First(), "p!a", 2004, double.NaN, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2000, double.NaN, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2001, 11.76470588d, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2002, 20d, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2003, 26d, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2004, double.NaN, sharedTableDelta);
+                }
+                else if (i == 3) //c[2003] = m()
+                {
+                    _AssertSeries(First(), "p!a", 2000, 0.68000d, sharedTableDelta);
+                    _AssertSeries(First(), "p!a", 2001, 0.85000d, sharedTableDelta);
+                    _AssertSeries(First(), "p!a", 2002, 1d, sharedTableDelta);
+                    _AssertSeries(First(), "p!a", 2003, double.NaN, sharedTableDelta); //differs from i==0 !
+                    _AssertSeries(First(), "p!a", 2004, double.NaN, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2000, double.NaN, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2001, 11.76470588d, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2002, 20d, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2003, 26d, sharedTableDelta); //Can actually be calculated, because q in laspeyres quantity is d/c.1, so current c is not used at all for q.
+                    _AssertSeries(First(), "q!a", 2004, double.NaN, sharedTableDelta);
+                }
+                else if (i == 4) //d[2003] = m()
+                {
+                    _AssertSeries(First(), "p!a", 2000, 0.68000d, sharedTableDelta);
+                    _AssertSeries(First(), "p!a", 2001, 0.85000d, sharedTableDelta);
+                    _AssertSeries(First(), "p!a", 2002, 1d, sharedTableDelta);
+                    _AssertSeries(First(), "p!a", 2003, double.NaN, sharedTableDelta); //differs from i==0 !
+                    _AssertSeries(First(), "p!a", 2004, double.NaN, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2000, double.NaN, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2001, 11.76470588d, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2002, 20d, sharedTableDelta);
+                    _AssertSeries(First(), "q!a", 2003, double.NaN, sharedTableDelta); //differs from i==0 !
+                    _AssertSeries(First(), "q!a", 2004, double.NaN, sharedTableDelta);
+                }
+            }
 
             //
             // Symmetry regarding lists vs. series
@@ -35509,7 +36301,7 @@ print(df2)
                     I("q2 = 12, 13, 14, 15;");
                 }
                 else if (ii == 3)
-                {                   
+                {
                     I("p1 = 1.02, m(), 1.04, 1.05;");
                     I("p2 = 1.12, 1.13, 1.14, 1.15;");
                     I("q1 = 2, 3, 4, 5;");
@@ -35561,6 +36353,14 @@ print(df2)
                     double v2 = aq_b.GetDataSimple(new GekkoTime(EFreq.A, i, 1));
                     Assert.IsTrue(G.Equals(v1, v2));
                 }
+            }
+        }
+
+        private static void NaNComparer(double xc, double x_c)
+        {
+            if (G.IsNumericalError(xc) || G.IsNumericalError(x_c))
+            {
+
             }
         }
 

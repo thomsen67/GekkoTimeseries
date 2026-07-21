@@ -1,6 +1,6 @@
 # Functions that are directly callable
 
-__version__ = "3.3.3rc1" # always increment with new upload to PyPI, put for instance 3.3.3rc1 for a 3.3.3 pre-release 1.
+__version__ = "3.3.3" # always increment with new upload to PyPI, put for instance 3.3.3rc1 for a 3.3.3 pre-release 1.
 
 from . import type_checks
 from .interface import run, threads, wait, stdout
