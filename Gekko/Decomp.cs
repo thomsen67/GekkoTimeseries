@@ -6690,8 +6690,17 @@ namespace Gekko
             foreach (KeyValuePair<string, double> kvp in poolingFrom)
             {
                 FlowItem flowItem = new FlowItem();
-                flowItem.from = Program.DName_HACK1(kvp.Key);
-                flowItem.to = Program.DName_HACK1(flowInfo.variableName);
+                if (true)
+                {
+                    flowItem.from = Program.DName_HACK1NOLAG(kvp.Key);
+                    flowItem.to = Program.DName_HACK1NOLAG(flowInfo.variableName);
+                }
+                else
+                {
+                    flowItem.from = Program.DName_HACK1(kvp.Key);
+                    flowItem.to = Program.DName_HACK1(flowInfo.variableName);
+                }
+                
                 flowItem.v = kvp.Value;
                 flowInfo.children.Add(flowItem);
             }

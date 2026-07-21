@@ -268,7 +268,21 @@ namespace Gekko
                 statusTextBox.Background = new SolidColorBrush(G.Lighter(Globals.GekkoModeYellow, 0.70));
                 statusTextBox.Opacity = 1.0;
                 var drawingNode = (Node)node.DrawingObject;
-                string label = Program.GetVariableExplanation1Line(Program.DName_HACK1(drawingNode.Label.Text));
+
+                string label;
+
+                if (true)
+                {
+                    label = Program.GetVariableExplanation1Line(Program.DName_HACK1(drawingNode.Label.Text));
+                }
+                else
+                {
+                    //If the node names have lags
+
+                    //A bit of a hack, since we only store node names as flat plaintext                    
+                    DName dname2 = Program.DName_HACK1NOLAG(drawingNode.Label.Text);                  
+                    label = Program.GetVariableExplanation1Line(dname2);
+                }
                 statusTextBox.Text = label;
             }
             else
@@ -288,7 +302,7 @@ namespace Gekko
                 }
             }
         }
-
+        
 
         private void SetupToolbar()
         {

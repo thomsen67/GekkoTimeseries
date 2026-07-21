@@ -2930,6 +2930,38 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Hacky. Only removes if it is a lag that appears like a normal dimensions as say string "-1".
+        /// Also removes a lead with plus, like "+1".
+        /// </summary>
+        /// <param name="s1"></param>
+        /// <returns></returns>
+        public static DName DName_HACK1NOLAG(string s1)
+        {            
+            string s2 = s1.Replace("][", ",").Replace("] [", ","); //From x[a,b][-1] to x[a,b,-1].
+
+            DName dname = Program.DName_HACK1(s2);
+
+            bool b = false;
+            StringOrTime[] xx = dname.GetIndexesExceptTime();
+            if (xx != null && xx.Length > 0)
+            {
+                if (xx[xx.Length - 1].IsString())
+                {
+                    string s = xx[xx.Length - 1].GetString();
+                    int i = -12345; int.TryParse(s, out i);
+                    if (i != -12345)
+                    {
+                        if (i < 0) b = true;
+                        else if (i > 0 && s.StartsWith("+")) b = true; //So x[0] or x[18] will not count
+                    }
+                }
+            }
+            DName dname2 = dname;
+            if (b) dname2 = dname.RemoveLastIndex();
+            return dname2;
+        }
+
+        /// <summary>
         /// TELL statement.
         /// </summary>
         /// <param name="text"></param>
