@@ -11661,7 +11661,6 @@ namespace Gekko
                     else
                     {
                         new Error("Could not find matrix " + s);
-                        //throw new GekkoException();
                     }
                 }
             }
@@ -11682,7 +11681,6 @@ namespace Gekko
                 if (fileContent == null)
                 {
                     new Error("the " + programName.ToUpper() + "_FILE is empty");
-                    //throw new GekkoException();
                 }
                 foreach (string line in fileContent)
                 {
@@ -11707,7 +11705,6 @@ namespace Gekko
                 if (hit == false)
                 {
                     new Error("Could not find statement 'gekkoimport " + target + "' in the " + programName + " file");
-                    //throw new GekkoException();
                 }
 
                 fileContent.Clear();
@@ -19646,7 +19643,7 @@ namespace Gekko
         {
             //Three possibilities:
             //1. MODEL adam.frm;        EModelType.Gekko           --> Normal Gekko model, .frm extension is default
-            //2. MODEL<gms> makro.gms;  EModelType.GAMSRaw         --> GAMS model, .gms extension is default. Tries to translate equations GAMS --> Gekko.
+            //2. !!DEPRECATED!! --> MODEL<gms> makro.gms;  EModelType.GAMSRaw         --> GAMS model, .gms extension is default. Tries to translate equations GAMS --> Gekko.
             //3. MODEL<gms> makro.zip;  EModelType.GAMSScalarModel --> GAMS model, files are in a zip file (and config.json describes files). Equations are excact, because unfolded GAMS eqs are transferred.
 
             bool isGms = G.Equal(o.opt_gms, "yes");  //later on, Program.options.model_type is set to "default" or "gams" depending upon this value.
@@ -19813,10 +19810,13 @@ namespace Gekko
                 try 
                 {
                     //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
-                    DateTime dt1 = DateTime.Now;
-                    if (model.modelGamsScalar != null) GamsModel.GAMSScalarModelHelper(false, model.modelGamsScalar);
-                    //TODO what about last argument ms?                    
-                    Program.WriteParallelModel(Program.options.system_threads, ffh.realPathAndFileName, modelHash, 0, model);
+                    if (modelType != EModelType.GAMSRaw)
+                    {
+                        DateTime dt1 = DateTime.Now;
+                        if (model.modelGamsScalar != null) GamsModel.GAMSScalarModelHelper(false, model.modelGamsScalar);
+                        //TODO what about last argument ms?                    
+                        Program.WriteParallelModel(Program.options.system_threads, ffh.realPathAndFileName, modelHash, 0, model);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -25540,11 +25540,11 @@ namespace Gekko
 
                 if (removed.save == false)
                 {
-                    G.Writeln2("Databank '" + removed.name + "' closed, changes not written to file");
+                    G.Writeln2("Databank '" + removed.name + "' closed: changes not written to file");
                 }
                 else if (!removed.editable)
-                {
-                    new Error("Internal error #872543: a non-editable bank '" + removed.name + "' should not be possible to alter. You may use UNLOCK to make it editable before it is written.");
+                {                    
+                    G.Warning("w3.4", "Databank '" + removed.name + "' not written");                 
                 }
                 else
                 {

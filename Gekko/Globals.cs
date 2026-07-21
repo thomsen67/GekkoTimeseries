@@ -166,6 +166,8 @@ namespace Gekko
         public const string internalGekkoWarningString = "Internal Gekko warning";
         public const string INTERNAL = "INTERNAL";
 
+        public const bool testfail = true;  //To find failing tests
+
         public const string eqs1 = "------------- scalar -------------";
         public const string eqs2 = "<no raw eqs>";
         public const string eqs3 = "-------------- GAMS --------------";

@@ -664,6 +664,11 @@ namespace Gekko
             bool isGekko = false; if (model.modelCommon.GetModelSourceType() == EModelType.Gekko) isGekko = true;
             bool isGamsRaw = false; if (model.modelCommon.GetModelSourceType() == EModelType.GAMSRaw) isGamsRaw = true;
 
+            if (isGamsRaw)
+            {
+                new Error("Gekko 3.3.4+ no longer supports the decomposition of GAMS raw models. Please use a GAMS scalar model instead (model<gms>scalarmodel.zip;).");
+            }
+
             if (G.NullOrEmpty(o.opt_prtcode)) o.opt_prtcode = "xn";
 
             if (!isGekko && o.from.Count == 0)
