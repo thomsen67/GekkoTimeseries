@@ -437,6 +437,7 @@
     <Compile Include="GuiDialogMakeBatfile.Designer.cs">
       <DependentUpon>GuiDialogMakeBatfile.cs</DependentUpon>
     </Compile>
+    <Compile Include="Hashing.cs" />
     <Compile Include="IBank.cs" />
     <Compile Include="GuiInputBox.cs" />
     <Compile Include="IVariable.cs" />
@@ -464,6 +465,7 @@
     <Compile Include="O.cs" />
     <Compile Include="OnlineDatabanks.cs" />
     <Compile Include="Operators.cs" />
+    <Compile Include="Optimize.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="Parser\ASTNode.cs" />
     <Compile Include="Parser\ASTNodeSimple.cs" />
@@ -517,6 +519,9 @@
     </Compile>
     <Compile Include="WindowFlow.xaml.cs">
       <DependentUpon>WindowFlow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WindowInfluences.xaml.cs">
+      <DependentUpon>WindowInfluences.xaml</DependentUpon>
     </Compile>
     <Compile Include="WindowPlot.xaml.cs">
       <DependentUpon>WindowPlot.xaml</DependentUpon>
@@ -718,6 +723,10 @@
     <Page Include="WindowFlow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WindowInfluences.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="WindowIntellisense.xaml">
       <SubType>Designer</SubType>
