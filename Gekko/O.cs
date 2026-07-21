@@ -953,7 +953,7 @@ namespace Gekko
                 }
                 else if (Program.options.missing == ESeriesMissing.Error)
                 {
-                    //This sets their default values, like when Gekko starts up, of after RESET/RESTART.
+                    //This sets their default values, like when Gekko starts up, or after RESET/RESTART.
                     Program.options.decomp_array_calc_missing = ESeriesMissing.M;  //We do not use .Error here, too confusing with popup error windows in the GUI. Af something is missing, people will try to print it anyway.
                     Program.options.decomp_data_missing = ESeriesMissing.M;
                     Program.options.series_array_calc_missing = ESeriesMissing.Error;
@@ -3442,11 +3442,8 @@ namespace Gekko
                 if (Program.options.databank_trace)
                 {
                     try
-                    {
-                        //NOTE: nothing really to put into Globals.traceTime, so commented out!
-                        //DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
-                        Globals.traceContainer = new ListUnique<IVariable>();
-                        //Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
+                    {                        
+                        Globals.traceContainer = new ListUnique<IVariable>();                     
                     }
                     catch
                     {
@@ -7102,7 +7099,7 @@ namespace Gekko
                     offset.namecell = this.opt_namecell;
                     offset.datecell = this.opt_datecell;
 
-                    Program.OpenOrRead(offset, wipeDatabankBeforeInsertingData, oRead, open, readInfos, false, this.p);
+                    Program.OpenOrRead(offset, wipeDatabankBeforeInsertingData, oRead, open, readInfos, false, false, this.p);
                     Program.ReadInfo readInfo = readInfos[0];
                     readInfo.shouldMerge = oRead.Merge;
 
@@ -7424,7 +7421,7 @@ namespace Gekko
                 {
                     try
                     {
-                        DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
+                        //DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
                         Trace2 trace = new Trace2(ETraceType.Normal, lhs.GetRealDataPeriodFirst(), lhs.GetRealDataPeriodLast(), true);
                         trace.GetContents().text = this.gekkocode + ";";
                         trace.GetContents().name = lhs.GetNameAndParentDatabank();
@@ -7432,7 +7429,7 @@ namespace Gekko
                         trace.AddRangeFromSeries2(lhs, rhs);
                         //trace can only have null period if lhs has all missing values
                         Gekko.Trace2.PushIntoSeries(lhs, trace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
-                        Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
+                        //Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                     }
                     catch
                     {
@@ -7479,7 +7476,7 @@ namespace Gekko
                 {
                     try
                     {
-                        DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
+                        //DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
                         Trace2 trace = new Trace2(ETraceType.Normal, ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast(), true);
                         trace.GetContents().name = ts_lhs.GetNameAndParentDatabank();
                         trace.GetContents().commandFileAndLine = this.p?.GetExecutingGcmFile(ERunningGcm.IncludeProcFunc);
@@ -7496,7 +7493,7 @@ namespace Gekko
                         trace.GetContents().text = this.gekkocode + ";";
                         //trace can only have null period if lhs has all missing values
                         Gekko.Trace2.PushIntoSeries(ts_lhs, trace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
-                        Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
+                        //Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                     }
                     catch
                     {
@@ -8276,6 +8273,7 @@ namespace Gekko
             public double opt_pos = double.NaN;
             public string opt_create = null;  //may use OPEN b1, where b1.gbk does not exist (like OPEN<edit>b1).
             public string opt_trace = "yes"; //default
+            public string opt_clear = null;
             public P p = null;
 
             public void Exe()
@@ -8298,10 +8296,10 @@ namespace Gekko
                 ReadOpenMulbkHelper oRead = new ReadOpenMulbkHelper();  //This is a bit confusing, using an old object to store the stuff.
 
                 bool create = false;
-                if (G.Equal(opt_create, "yes"))
-                {
-                    create = true;
-                }
+                if (G.Equal(opt_create, "yes")) create = true;
+
+                bool clear = false;
+                if (G.Equal(opt_clear, "yes")) clear = true;
 
                 oRead.openFileNames = new List<List<string>>();
 
@@ -8389,7 +8387,7 @@ namespace Gekko
                 CellOffset offset = new CellOffset();
 
                 List<Program.ReadInfo> readInfos = new List<Program.ReadInfo>();
-                Program.OpenOrRead(offset, false, oRead, true, readInfos, create, this.p);
+                Program.OpenOrRead(offset, false, oRead, true, readInfos, create, clear, this.p);
 
                 foreach (Program.ReadInfo readInfo in readInfos)
                 {
@@ -8616,14 +8614,14 @@ namespace Gekko
                     {
                         try
                         {
-                            DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
+                            //DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
                             Trace2 trace = new Trace2(ETraceType.Normal, this.t1, this.t2);
                             trace.GetContents().text = this.gekkocode + ";";
                             trace.GetContents().name = ts.GetNameAndParentDatabank();
                             trace.GetContents().commandFileAndLine = this.p?.GetExecutingGcmFile(ERunningGcm.IncludeProcFunc);
                             //trace can only have null period if TRUNCATE is call with null period --> not possible
                             Gekko.Trace2.PushIntoSeries(ts, trace, ETracePushType.NewParent, false);
-                            Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
+                            //Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                         }
                         catch
                         {
@@ -8880,6 +8878,7 @@ namespace Gekko
                     Gekko.Model model = Program.model;
                     DecompOptions2 decompOptions2 = new DecompOptions2();
                     Decomp.SetSomeDecompOptions(decompOptions2, this.oDecomp);
+                    if (this.oDecomp.isFlowStatement) decompOptions2.guiIsFlowStatement = true;
                     this.decompFind = new DecompFind(EDecompFindNavigation.Find, 0, decompOptions2, null, model);                    
 
                     this.decompFind.decompOptions2.t1 = this.t1;
@@ -9012,6 +9011,7 @@ namespace Gekko
             public List names = null;
             public bool question = false;
             public double opt_replace = double.NaN;
+            public string opt_ref = null;
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);
@@ -9556,14 +9556,14 @@ namespace Gekko
                     {                        
                         try
                         {
-                            DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
+                            //DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
                             Trace2 trace = new Trace2(ETraceType.Normal, tsNew.GetRealDataPeriodFirst(), tsNew.GetRealDataPeriodLast(), true);
                             trace.GetContents().text = this.gekkocode + ";";                            
                             trace.GetContents().name = tsNew.GetNameAndParentDatabank();
                             trace.GetContents().commandFileAndLine = this.p?.GetExecutingGcmFile(ERunningGcm.IncludeProcFunc);
                             //trace can only have null period if lhs has all missing values
                             Gekko.Trace2.PushIntoSeries(tsNew, trace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
-                            Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
+                            //Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                         }
                         catch
                         {
