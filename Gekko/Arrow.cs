@@ -29,11 +29,58 @@ using Microsoft.Data.Analysis;
 using System.Threading.Tasks;
 using Parquet;
 using Parquet.Data;
+using Parquet.Schema;
 using System.Globalization;
 
 
 namespace Gekko
 {
+    public class ParquetHelper
+    {
+        /// <summary>
+        /// Before, it was .GetAwaiter().GetResult(), which fails because of parallelism. This seems to fix that.
+        /// </summary>
+        /// <param name="col"></param>
+        public static void WriteCol(ParquetRowGroupWriter group, DataColumn col)
+        {
+            group.WriteColumnAsync(col).ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+
+        public static void WriteParquetPeriodStart(GekkoTime gt1, out DateTime? pq_date_starts, out string pq_period_starts)
+        {
+            pq_date_starts = null;
+            pq_period_starts = null;
+            if (!gt1.IsNull())
+            {
+                try { pq_date_starts = GekkoTime.FromGekkoTimeToDateTime(gt1, O.GetDateChoices.FlexibleStart); } catch { } //Non-utc, but if using .ToUniversalTime(), it messes up the hours
+                pq_period_starts = DateStringFormat(gt1);
+            }
+        }
+
+        public static void WriteParquetPeriodEnd(GekkoTime gt2, out DateTime? pq_date_ends, out string pq_period_ends)
+        {
+            pq_date_ends = null;
+            pq_period_ends = null;
+            if (!gt2.IsNull())
+            {
+                try { pq_date_ends = GekkoTime.FromGekkoTimeToDateTime(gt2, O.GetDateChoices.FlexibleStart); } catch { } //Non-utc, but if using .ToUniversalTime(), it messes up the hours                    
+                pq_period_ends = DateStringFormat(gt2);
+            }
+        }
+
+        public static string DateStringFormat(GekkoTime gt1)
+        {
+            //Output
+            return gt1.ToString();
+        }
+
+        public static GekkoTime DateStringFormat(string s)
+        {
+            //Input
+            return GekkoTime.FromStringToGekkoTime(s, true);
+        }
+    }
+    
     public class ArrowDataRow
     {
         public string Name { get; set; }
@@ -347,25 +394,7 @@ namespace Gekko
                             gt = GekkoTime.FromStringToGekkoTime(period, true, true, false);
                         }
                         catch { Error("Rowgroup 1 row " + i2 + ": Could not parse period '" + period + "'", errors); }
-
-                        if (false)
-                        {
-                            //TODO
-                            //TODO
-                            //TODO Make an option to test for this
-                            //TODO
-                            //TODO
-                            try
-                            {
-                                if (date != null && freq != null)
-                                {
-                                    GekkoTime gt2 = GekkoTime.FromDateTimeToGekkoTime(G.ConvertFreq(freq), (DateTime)date);
-                                    if (!gt.Equals(gt2)) dateWarnings1++;
-                                }
-                            }
-                            catch { } //Do not fail on this
-                        }
-
+                        
                         ts.SetData(gt, d); dataCounter++;
 
                         yearMin = Math.Min(yearMin, gt.super);
@@ -700,13 +729,6 @@ namespace Gekko
 
             Arrow.WriteArrow(recordBatch1, pathAndFilename); //Doesn't the call need await??
 
-            if (false)
-            {
-                RecordBatch recordBatch2 = Arrow.ReadArrowOld(Globals.ttPath2 + @"\regres\Databanks\jul05.arrow");
-                DataFrame df2 = DataFrame.FromArrowRecordBatch(recordBatch2);
-                Databank db2 = new Databank(null);
-            }
-
             string s = null; if (hasSubSeries) s = " (including array-subseries)";
             new Writeln("Wrote " + seriesCounter + " series" + s + " to arrow file with " + rowCounter + " rows in " + G.Seconds(dt));
 
@@ -766,7 +788,7 @@ namespace Gekko
 
             // ================================================
 
-            Parquet.Schema.ParquetSchema schema = WriteParquetDatabankSchema(ndims);
+            ParquetSchema schema = WriteParquetDatabankSchema(ndims);
             Dictionary<string, string> metadata = WriteParquetDatabankMetadata(ndims, hdg, gekkoParquetVersion);
                         
             bool hasSubSeries = false;            
@@ -860,11 +882,11 @@ namespace Gekko
                 stamps.Add(pq_timestamp);
 
                 DateTime? pq_date_starts; string pq_period_starts;
-                WriteParquetDatabankPeriodStart(gt1, out pq_date_starts, out pq_period_starts);
+                ParquetHelper.WriteParquetPeriodStart(gt1, out pq_date_starts, out pq_period_starts);
                 date_starts.Add(pq_date_starts); period_starts.Add(pq_period_starts);
 
                 DateTime? pq_date_ends; string pq_period_ends;
-                WriteParquetDatabankPeriodEnd(gt2, out pq_date_ends, out pq_period_ends);
+                ParquetHelper.WriteParquetPeriodEnd(gt2, out pq_date_ends, out pq_period_ends);
                 date_ends.Add(pq_date_ends); period_ends.Add(pq_period_ends);
 
                 if (gt1.IsNull() || gt2.IsNull())
@@ -887,7 +909,7 @@ namespace Gekko
                     {                        
                         ids2.Add(fullName);
                         dates.Add(GekkoTime.FromGekkoTimeToDateTime(t, O.GetDateChoices.FlexibleStart));
-                        periods.Add(DateStringFormat(t));
+                        periods.Add(ParquetHelper.DateStringFormat(t));
                         values.Add(ts.GetDataSimple(t));
                     }
                 }
@@ -929,7 +951,7 @@ namespace Gekko
 
             // ================================================
 
-            Parquet.Schema.ParquetSchema schema = WriteParquetDatabankSchema(ndims);
+            ParquetSchema schema = WriteParquetDatabankSchema(ndims);
             Dictionary<string, string> metadata = WriteParquetDatabankMetadata(ndims, hdg, gekkoParquetVersion);                        
                         
             for (int i = 0; i < plotTable.variables.Count; i++)
@@ -964,11 +986,11 @@ namespace Gekko
                 stamps.Add(pq_timestamp);
 
                 DateTime? pq_date_starts; string pq_period_starts;
-                WriteParquetDatabankPeriodStart(gt1, out pq_date_starts, out pq_period_starts);
+                ParquetHelper.WriteParquetPeriodStart(gt1, out pq_date_starts, out pq_period_starts);
                 date_starts.Add(pq_date_starts); period_starts.Add(pq_period_starts);
 
                 DateTime? pq_date_ends; string pq_period_ends;
-                WriteParquetDatabankPeriodEnd(gt2, out pq_date_ends, out pq_period_ends);
+                ParquetHelper.WriteParquetPeriodEnd(gt2, out pq_date_ends, out pq_period_ends);
                 date_ends.Add(pq_date_ends); period_ends.Add(pq_period_ends);
                 
                 for (int j = 0; j < plotTable.variables[i].data.Count; j++)
@@ -976,37 +998,14 @@ namespace Gekko
                     GekkoTime t = plotTable.variables[i].data[j].dateGekkoTime;
                     ids2.Add(xName);
                     dates.Add(GekkoTime.FromGekkoTimeToDateTime(t, O.GetDateChoices.FlexibleStart));
-                    periods.Add(DateStringFormat(t));
+                    periods.Add(ParquetHelper.DateStringFormat(t));
                     values.Add(plotTable.variables[i].data[j].value);
                 }
             }
 
             WriteParquetDatabankFile(ids1, ids2, banks, names, freqs, ndims, dims, null, labels, sources, units, timelesss, date_starts, date_ends, period_starts, period_ends, stamps, dates, periods, values, pathAndFilename, schema, metadata);
             new Writeln("PLOT created file " + pathAndFilename + " with " + ids1.Count + " expression" + G.S(ids1.Count) + " and " + (ids1.Count + ids2.Count) + " rows in two rowgroups in " + G.Seconds(dt));
-
         }        
-
-        private static void WriteParquetDatabankPeriodEnd(GekkoTime gt2, out DateTime? pq_date_ends, out string pq_period_ends)
-        {
-            pq_date_ends = null;
-            pq_period_ends = null;
-            if (!gt2.IsNull())
-            {
-                try { pq_date_ends = GekkoTime.FromGekkoTimeToDateTime(gt2, O.GetDateChoices.FlexibleStart); } catch { } //Non-utc, but if using .ToUniversalTime(), it messes up the hours                    
-                pq_period_ends = DateStringFormat(gt2);
-            }
-        }
-
-        private static void WriteParquetDatabankPeriodStart(GekkoTime gt1, out DateTime? pq_date_starts, out string pq_period_starts)
-        {
-            pq_date_starts = null;
-            pq_period_starts = null;
-            if (!gt1.IsNull())
-            {
-                try { pq_date_starts = GekkoTime.FromGekkoTimeToDateTime(gt1, O.GetDateChoices.FlexibleStart); } catch { } //Non-utc, but if using .ToUniversalTime(), it messes up the hours
-                pq_period_starts = DateStringFormat(gt1);
-            }
-        }
 
         private static DateTime? WriteParquetDatabankGetTimestamp(string xtimestamp)
         {
@@ -1041,7 +1040,7 @@ namespace Gekko
         /// <summary>
         /// Physically write the parquet file (group 0 and 1)
         /// </summary>        
-        private static void WriteParquetDatabankFile(List<string> ids1, List<string> ids2, List<string> banks, List<string> names, List<string> freqs, int ndims, List<int?> dims, List<List<string>> dimss, List<string> labels, List<string> sources, List<string> units, List<bool?> timelesss, List<DateTime?> date_starts, List<DateTime?> date_ends, List<string> period_starts, List<string> period_ends, List<DateTime?> stamps, List<DateTime?> dates, List<string> periods, List<double?> values, string pathAndFilename, Parquet.Schema.ParquetSchema schema, Dictionary<string, string> metadata)
+        private static void WriteParquetDatabankFile(List<string> ids1, List<string> ids2, List<string> banks, List<string> names, List<string> freqs, int ndims, List<int?> dims, List<List<string>> dimss, List<string> labels, List<string> sources, List<string> units, List<bool?> timelesss, List<DateTime?> date_starts, List<DateTime?> date_ends, List<string> period_starts, List<string> period_ends, List<DateTime?> stamps, List<DateTime?> dates, List<string> periods, List<double?> values, string pathAndFilename, ParquetSchema schema, Dictionary<string, string> metadata)
         {
             //Note: All this ConfigureAwait(false).GetAwaiter().GetResult() stuff is because Excel-Dna will
             //      not work without it. Without it it either only writes 1 column, or scrambles the columns.
@@ -1062,32 +1061,32 @@ namespace Gekko
                     int rowCount = ids1.Count;
                     int i = -1;
 
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], ids1.ToArray()));
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], banks.ToArray()));
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], names.ToArray()));
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], freqs.ToArray()));
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], dims.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], ids1.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], banks.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], names.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], freqs.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], dims.ToArray()));
 
                     // ndims dynamic dimension labels
                     for (int ii = 0; ii < ndims; ii++)
                     {
-                        WriteCol(group, new DataColumn(schema.DataFields[++i], dimss[ii].ToArray()));
+                        ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], dimss[ii].ToArray()));
                     }
 
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], labels.ToArray()));
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], sources.ToArray()));
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], units.ToArray()));
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], timelesss.ToArray()));
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], date_starts.ToArray()));
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], date_ends.ToArray()));
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], period_starts.ToArray()));
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], period_ends.ToArray()));
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], stamps.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], labels.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], sources.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], units.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], timelesss.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], date_starts.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], date_ends.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], period_starts.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], period_ends.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], stamps.ToArray()));
 
                     // null columns
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<double?>(null, rowCount).ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<double?>(null, rowCount).ToArray()));
                 }
 
 
@@ -1099,33 +1098,33 @@ namespace Gekko
                     int rowCount = ids2.Count;
                     int i = -1;
 
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], ids2.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], ids2.ToArray()));
 
                     // null-filled metadata columns for the values group
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<int?>(null, rowCount).ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<int?>(null, rowCount).ToArray()));
 
                     for (int ii = 0; ii < ndims; ii++)
                     {
-                        WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                        ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
                     }
 
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<bool?>(null, rowCount).ToArray()));
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<bool?>(null, rowCount).ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<string>(null, rowCount).ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], Enumerable.Repeat<DateTime?>(null, rowCount).ToArray()));
 
                     // actual values columns
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], dates.ToArray()));
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], periods.ToArray()));
-                    WriteCol(group, new DataColumn(schema.DataFields[++i], values.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], dates.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], periods.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], values.ToArray()));
                 }
             }
         }
@@ -1135,32 +1134,32 @@ namespace Gekko
         /// </summary>
         /// <param name="ndims"></param>
         /// <returns></returns>
-        private static Parquet.Schema.ParquetSchema WriteParquetDatabankSchema(int ndims)
+        private static ParquetSchema WriteParquetDatabankSchema(int ndims)
         {
-            List<Parquet.Schema.DataField> m = new List<Parquet.Schema.DataField>();
-            m.Add(new Parquet.Schema.DataField<string>("id"));
-            m.Add(new Parquet.Schema.DataField<string>("bank"));
-            m.Add(new Parquet.Schema.DataField<string>("name"));
-            m.Add(new Parquet.Schema.DataField<string>("freq"));
-            m.Add(new Parquet.Schema.DataField<int?>("dims"));
+            List<DataField> m = new List<DataField>();
+            m.Add(new DataField<string>("id"));
+            m.Add(new DataField<string>("bank"));
+            m.Add(new DataField<string>("name"));
+            m.Add(new DataField<string>("freq"));
+            m.Add(new DataField<int?>("dims"));
             for (int ii = 0; ii < ndims; ii++)
             {
-                m.Add(new Parquet.Schema.DataField<string>("dim" + (ii + 1)));
+                m.Add(new DataField<string>("dim" + (ii + 1)));
             }
-            m.Add(new Parquet.Schema.DataField<string>("label"));
-            m.Add(new Parquet.Schema.DataField<string>("source"));
-            m.Add(new Parquet.Schema.DataField<string>("unit"));
-            m.Add(new Parquet.Schema.DataField<bool?>("is_timeless"));
-            m.Add(new Parquet.Schema.DateTimeDataField("date_start", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true));
-            m.Add(new Parquet.Schema.DateTimeDataField("date_end", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true));
-            m.Add(new Parquet.Schema.DataField<string>("period_start"));
-            m.Add(new Parquet.Schema.DataField<string>("period_end"));
-            m.Add(new Parquet.Schema.DateTimeDataField("stamp", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true));
+            m.Add(new DataField<string>("label"));
+            m.Add(new DataField<string>("source"));
+            m.Add(new DataField<string>("unit"));
+            m.Add(new DataField<bool?>("is_timeless"));
+            m.Add(new DateTimeDataField("date_start", DateTimeFormat.DateAndTime, isNullable: true));
+            m.Add(new DateTimeDataField("date_end", DateTimeFormat.DateAndTime, isNullable: true));
+            m.Add(new DataField<string>("period_start"));
+            m.Add(new DataField<string>("period_end"));
+            m.Add(new DateTimeDataField("stamp", DateTimeFormat.DateAndTime, isNullable: true));
             // ----                
-            m.Add(new Parquet.Schema.DateTimeDataField("date", Parquet.Schema.DateTimeFormat.DateAndTime, isNullable: true)); //Probably milliseconds, which with 64-bit can take a crazy big range of years.                
-            m.Add(new Parquet.Schema.DataField<string>("period"));
-            m.Add(new Parquet.Schema.DataField<double?>("value"));
-            Parquet.Schema.ParquetSchema schema = new Parquet.Schema.ParquetSchema(m);
+            m.Add(new DateTimeDataField("date", DateTimeFormat.DateAndTime, isNullable: true)); //Probably milliseconds, which with 64-bit can take a crazy big range of years.                
+            m.Add(new DataField<string>("period"));
+            m.Add(new DataField<double?>("value"));
+            ParquetSchema schema = new ParquetSchema(m);
             return schema;
         }
 
@@ -1202,29 +1201,7 @@ namespace Gekko
             metadata.Add("column.period.comment", "The period corresponding to the current data value. String.");
             metadata.Add("column.value.comment", "The data value. Numeric floating-point.");
             return metadata;
-        }
-
-
-        /// <summary>
-        /// Before, it was .GetAwaiter().GetResult(), which fails because of parallelism. This seems to fix that.
-        /// </summary>
-        /// <param name="col"></param>
-        public static void WriteCol(ParquetRowGroupWriter group, DataColumn col)
-        {
-            group.WriteColumnAsync(col).ConfigureAwait(false).GetAwaiter().GetResult();
-        }
-
-        private static string DateStringFormat(GekkoTime gt1)
-        {
-            //Output
-            return gt1.ToString();
-        }
-
-        private static GekkoTime DateStringFormat(string s)
-        {
-            //Input
-            return GekkoTime.FromStringToGekkoTime(s, true);
-        }
+        }                
 
         public static async void WriteArrow(RecordBatch recordBatch, string fileName)
         {
@@ -1242,5 +1219,127 @@ namespace Gekko
                 stream.WriteTo(fileStream);
             }
         }     
+    }
+
+    public class ParquetTypeAndName
+    {
+        public string name;
+        public Type type;
+        //public List<string> m_string = null;
+        //public List<DateTime> m_datetime = null;
+        //public List<int> m_int = null;
+        //public List<long> m_long = null;
+        System.Array data;
+        
+        public ParquetTypeAndName(string name, Type type)
+        {
+            this.name = name;
+            this.type = type;
+        }
+    }
+
+    public class TraceFrameParquetHelper
+    {
+        public static List<ParquetTypeAndName> names = new List<ParquetTypeAndName>()
+        {
+            //Must correspond to #qwldak7dad
+            new ParquetTypeAndName("counter", typeof(long)),
+            new ParquetTypeAndName("stamp", typeof(DateTime)),
+            new ParquetTypeAndName("period_start", typeof(string)),
+            new ParquetTypeAndName("period_end", typeof(string)),
+            new ParquetTypeAndName("date_start", typeof(DateTime?)),
+            new ParquetTypeAndName("date_end", typeof(DateTime?)),
+            new ParquetTypeAndName("name", typeof(string)),
+            new ParquetTypeAndName("text", typeof(string)),
+            new ParquetTypeAndName("precedentsNames", typeof(string)),
+            new ParquetTypeAndName("commandFile", typeof(string)),
+            new ParquetTypeAndName("commandLine", typeof(int)),
+            new ParquetTypeAndName("dataFile", typeof(string)),
+            new ParquetTypeAndName("databankFile", typeof(string)),
+            new ParquetTypeAndName("databankFileCounter", typeof(int)),
+            new ParquetTypeAndName("depth", typeof(int))
+        };
+    }
+
+    public class TraceFrameParquet
+    {
+        public static void GetSchemaHelper(List<DataField> m, ParquetTypeAndName nameAndType)
+        {
+            if (nameAndType.type == typeof(string)) m.Add(new DataField<string>(nameAndType.name));
+            else if (nameAndType.type == typeof(DateTime)) m.Add(new DataField<DateTime>(nameAndType.name));
+            else if (nameAndType.type == typeof(DateTime?)) m.Add(new DataField<DateTime?>(nameAndType.name));
+            else if (nameAndType.type == typeof(int)) m.Add(new DataField<int>(nameAndType.name));
+            else if (nameAndType.type == typeof(long)) m.Add(new DataField<long>(nameAndType.name));
+            else new Error("Type is not supported");
+        }
+
+        private static ParquetSchema GetSchema(List<ParquetTypeAndName> names)
+        {
+            List<DataField> m = new List<DataField>();
+            foreach (ParquetTypeAndName name in names) GetSchemaHelper(m, name);
+            ParquetSchema schema = new ParquetSchema(m);
+            return schema;
+        }
+
+        public static TraceFrame ReadParquetTraceFrame(string filePath)
+        {
+            TraceFrame traceFrame = new TraceFrame();
+            using (Stream fileStream = File.OpenRead(filePath))
+            using (ParquetReader reader = ParquetReader.CreateAsync(fileStream).GetAwaiter().GetResult())
+            {
+                using (ParquetRowGroupReader group = reader.OpenRowGroupReader(0))
+                {
+                    ////Must correspond to #qwldak7dad
+                    int i = -1;
+                    traceFrame.counter = ((long[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "counter")).GetAwaiter().GetResult()).Data).ToList();
+                    traceFrame.stamp = ((DateTime[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "stamp")).GetAwaiter().GetResult()).Data).ToList();
+                    traceFrame.period_start = ((string[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "period_start")).GetAwaiter().GetResult()).Data).ToList();
+                    traceFrame.period_end = ((string[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "period_end")).GetAwaiter().GetResult()).Data).ToList();
+                    traceFrame.date_start = ((DateTime?[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "date_start")).GetAwaiter().GetResult()).Data).ToList();
+                    traceFrame.date_end = ((DateTime?[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "date_end")).GetAwaiter().GetResult()).Data).ToList();
+                    traceFrame.name = ((string[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "name")).GetAwaiter().GetResult()).Data).ToList();
+                    traceFrame.text = ((string[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "text")).GetAwaiter().GetResult()).Data).ToList();
+                    traceFrame.precedentsNames = ((string[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "precedentsNames")).GetAwaiter().GetResult()).Data).ToList();
+                    traceFrame.commandFile = ((string[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "commandFile")).GetAwaiter().GetResult()).Data).ToList();
+                    traceFrame.commandLine = ((int[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "commandLine")).GetAwaiter().GetResult()).Data).ToList();
+                    traceFrame.dataFile = ((string[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "dataFile")).GetAwaiter().GetResult()).Data).ToList();
+                    traceFrame.databankFile = ((string[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "databankFile")).GetAwaiter().GetResult()).Data).ToList();
+                    traceFrame.databankFileCounter = ((int[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "databankFileCounter")).GetAwaiter().GetResult()).Data).ToList();
+                    traceFrame.depth = ((int[])(group.ReadColumnAsync(reader.Schema.GetDataFields().First(f => f.Name == "depth")).GetAwaiter().GetResult()).Data).ToList();
+                }
+            }
+            return traceFrame;
+        }
+    
+
+        public static void WriteParquetTraceFrame(string pathAndFilename, TraceFrame traceFrame)
+        {
+            List<ParquetTypeAndName> parquetFields = TraceFrameParquetHelper.names;
+            ParquetSchema schema = GetSchema(parquetFields);
+            using (FileStream fileStream = Program.WaitForFileStream(pathAndFilename, null, Program.GekkoFileReadOrWrite.Write))
+            using (ParquetWriter writer = ParquetWriter.CreateAsync(schema, fileStream).ConfigureAwait(false).GetAwaiter().GetResult())
+            {                
+                using (ParquetRowGroupWriter group = writer.CreateRowGroup())
+                {
+                    //Must correspond to #qwldak7dad
+                    int i = -1;            
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], traceFrame.counter.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], traceFrame.stamp.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], traceFrame.period_start.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], traceFrame.period_end.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], traceFrame.date_start.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], traceFrame.date_end.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], traceFrame.name.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], traceFrame.text.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], traceFrame.precedentsNames.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], traceFrame.commandFile.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], traceFrame.commandLine.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], traceFrame.dataFile.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], traceFrame.databankFile.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], traceFrame.databankFileCounter.ToArray()));
+                    ParquetHelper.WriteCol(group, new DataColumn(schema.DataFields[++i], traceFrame.depth.ToArray()));
+                }
+            }
+        }        
     }
 }
