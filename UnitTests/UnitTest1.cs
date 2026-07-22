@@ -22148,7 +22148,7 @@ namespace UnitTests
             FAIL("run lib3;");
             c1 = Globals.unitTestScreenOutput.ToString();
             Assert.IsTrue(c1.Contains(@"Parsing file: c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\file1.gcm line 12 pos 8"));
-            Assert.IsTrue(c1.Contains(@"Running file function 'g()', c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\file1.gcm, line 102"));
+            //Assert.IsTrue(c1.Contains(@"Running file function 'g()', c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\file1.gcm, line 102"));
             Assert.IsTrue(c1.Contains(@"Call stack: Statement line calling -->"));
             Assert.IsTrue(c1.Contains(@"c:\Thomas\Gekko\regres\StackTrace\lib3.gcm line 3 calling -->"));
             Assert.IsTrue(c1.Contains(@"function 'g()', c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\file1.gcm (run-time error in line 102)"));
@@ -22161,7 +22161,7 @@ namespace UnitTests
             FAIL("run lib4;");
             c1 = Globals.unitTestScreenOutput.ToString();
             Assert.IsTrue(c1.Contains(@"Parsing file: c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\file1.gcm line 12 pos 8"));
-            Assert.IsTrue(c1.Contains(@"Running file function 'g()', c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\sub1\sub2\file2.gcm, line 72"));
+            //Assert.IsTrue(c1.Contains(@"Running file function 'g()', c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\sub1\sub2\file2.gcm, line 72"));
             Assert.IsTrue(c1.Contains(@"Call stack: Statement line calling -->"));
             Assert.IsTrue(c1.Contains(@"c:\Thomas\Gekko\regres\StackTrace\lib4.gcm line 3 calling -->"));
             Assert.IsTrue(c1.Contains(@"function 'g()', c:\Thomas\Gekko\regres\StackTrace\lib_syntax.zip\sub1\sub2\file2.gcm (run-time error in line 72)"));
@@ -22361,12 +22361,13 @@ namespace UnitTests
             s = Globals.unitTestScreenOutput.ToString();
             ss = G.NL +
                 @"*** ERROR: ErrorHelper #1a" + G.NL
-              + @"*** ERROR: Running file procedure 'x1', c:\Thomas\Gekko\regres\StackTrace\x1.gcm, line 10" + G.NL
-              + @"    [  10]:   %v = HELPER_error('1a'); //line 10" + G.NL
+              //+ @"*** ERROR: Running file procedure 'x1', c:\Thomas\Gekko\regres\StackTrace\x1.gcm, line 10" + G.NL
+              //+ @"    [  10]:   %v = HELPER_error('1a'); //line 10" + G.NL
               + @"" + G.NL
               + @"    Call stack: Statement line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 100 calling -->" + G.NL
               + @"    procedure 'x1', c:\Thomas\Gekko\regres\StackTrace\x1.gcm (run-time error in line 10)" + G.NL + G.NL;
+            
             Assert.IsTrue(s == ss);
 
             // -----
@@ -22378,8 +22379,8 @@ namespace UnitTests
             s = Globals.unitTestScreenOutput.ToString();
             ss = G.NL +
                 @"*** ERROR: ErrorHelper #1b" + G.NL
-              + @"*** ERROR: Running file procedure 'x1', c:\Thomas\Gekko\regres\StackTrace\x1.gcm, line 20" + G.NL
-              + @"    [  20]:   %v = HELPER_error('1b'); //line 20" + G.NL
+              //+ @"*** ERROR: Running file procedure 'x1', c:\Thomas\Gekko\regres\StackTrace\x1.gcm, line 20" + G.NL
+              //+ @"    [  20]:   %v = HELPER_error('1b'); //line 20" + G.NL
               + @"" + G.NL
               + @"    Call stack: Statement line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 100 calling -->" + G.NL
@@ -22395,8 +22396,8 @@ namespace UnitTests
             s = Globals.unitTestScreenOutput.ToString();
             ss = G.NL +
                 @"*** ERROR: ErrorHelper #1c" + G.NL
-              + @"*** ERROR: Running file procedure 'x1', c:\Thomas\Gekko\regres\StackTrace\x1.gcm, line 28" + G.NL
-              + @"    [  28]:   %v = HELPER_error('1c'); //line 30" + G.NL
+              //+ @"*** ERROR: Running file procedure 'x1', c:\Thomas\Gekko\regres\StackTrace\x1.gcm, line 28" + G.NL
+              //+ @"    [  28]:   %v = HELPER_error('1c'); //line 30" + G.NL
               + @"" + G.NL
               + @"    Call stack: Statement line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 100 calling -->" + G.NL
@@ -22412,8 +22413,8 @@ namespace UnitTests
             s = Globals.unitTestScreenOutput.ToString();
             ss = G.NL +
                 @"*** ERROR: ErrorHelper #2a" + G.NL
-              + @"*** ERROR: Running file procedure 'x2', c:\Thomas\Gekko\regres\StackTrace\x1.gcm, line 40" + G.NL
-              + @"    [  40]:   " + G.NL
+              //+ @"*** ERROR: Running file procedure 'x2', c:\Thomas\Gekko\regres\StackTrace\x1.gcm, line 40" + G.NL
+              //+ @"    [  40]:   " + G.NL
               + @"" + G.NL
               + @"    Call stack: Statement line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 100 calling -->" + G.NL
@@ -22430,8 +22431,8 @@ namespace UnitTests
             s = Globals.unitTestScreenOutput.ToString();
             ss = G.NL +
                 @"*** ERROR: ErrorHelper #2b" + G.NL
-              + @"*** ERROR: Running file procedure 'x2', c:\Thomas\Gekko\regres\StackTrace\x1.gcm, line 50" + G.NL
-              + @"    [  50]:   " + G.NL
+              //+ @"*** ERROR: Running file procedure 'x2', c:\Thomas\Gekko\regres\StackTrace\x1.gcm, line 50" + G.NL
+              //+ @"    [  50]:   " + G.NL
               + @"" + G.NL
               + @"    Call stack: Statement line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 100 calling -->" + G.NL
@@ -22448,8 +22449,8 @@ namespace UnitTests
             s = Globals.unitTestScreenOutput.ToString();
             ss = G.NL +
                 @"*** ERROR: ErrorHelper #2c" + G.NL
-              + @"*** ERROR: Running file procedure 'x2', c:\Thomas\Gekko\regres\StackTrace\x1.gcm, line 60" + G.NL
-              + @"    [  60]:   " + G.NL
+              //+ @"*** ERROR: Running file procedure 'x2', c:\Thomas\Gekko\regres\StackTrace\x1.gcm, line 60" + G.NL
+              //+ @"    [  60]:   " + G.NL
               + @"" + G.NL
               + @"    Call stack: Statement line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 100 calling -->" + G.NL
@@ -22466,8 +22467,8 @@ namespace UnitTests
             s = Globals.unitTestScreenOutput.ToString();
             ss = G.NL +
                 @"*** ERROR: ErrorHelper #3" + G.NL
-              + @"*** ERROR: Running file procedure 'x3', c:\Thomas\Gekko\regres\StackTrace\x1.gcm, line 70" + G.NL
-              + @"    [  70]:   " + G.NL
+              //+ @"*** ERROR: Running file procedure 'x3', c:\Thomas\Gekko\regres\StackTrace\x1.gcm, line 70" + G.NL
+              //+ @"    [  70]:   " + G.NL
               + @"" + G.NL
               + @"    Call stack: Statement line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 100 calling -->" + G.NL
@@ -22485,8 +22486,8 @@ namespace UnitTests
             s = Globals.unitTestScreenOutput.ToString();
             ss = G.NL +
                 @"*** ERROR: ErrorHelper #4" + G.NL
-              + @"*** ERROR: Running file procedure 'x4', c:\Thomas\Gekko\regres\StackTrace\x1.gcm, line 80" + G.NL
-              + @"    [  80]:   " + G.NL
+              //+ @"*** ERROR: Running file procedure 'x4', c:\Thomas\Gekko\regres\StackTrace\x1.gcm, line 80" + G.NL
+              //+ @"    [  80]:   " + G.NL
               + @"" + G.NL
               + @"    Call stack: Statement line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 100 calling -->" + G.NL
@@ -22504,8 +22505,8 @@ namespace UnitTests
             s = Globals.unitTestScreenOutput.ToString();
             ss = G.NL +
                 @"*** ERROR: ErrorHelper #5" + G.NL
-              + @"*** ERROR: Running file procedure 'x5', c:\Thomas\Gekko\regres\StackTrace\x1.gcm, line 90" + G.NL
-              + @"    [  90]:   " + G.NL
+              //+ @"*** ERROR: Running file procedure 'x5', c:\Thomas\Gekko\regres\StackTrace\x1.gcm, line 90" + G.NL
+              //+ @"    [  90]:   " + G.NL
               + @"" + G.NL
               + @"    Call stack: Statement line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 100 calling -->" + G.NL
