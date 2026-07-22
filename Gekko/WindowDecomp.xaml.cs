@@ -2926,15 +2926,27 @@ namespace Gekko
             WindowDecomp windowParentDecomp = dfParentDecomp.window as WindowDecomp;
             
             List<DName> varsParent = GetDecompedVariables(windowParentDecomp.decompDatas, dfParentDecomp.decompOptions2);
+
+            List<DName> varsNew2 = null;
+
             List<DName> varsThis = GetDecompedVariables(this.decompDatas, this.decompFind.decompOptions2);
-            List<DName> varsNew = varsThis.Except(varsParent).ToList();
-            List<DName> varsNew2 = new List<DName>();
-            varsNew.AddRange(varsNew.OrderBy(x => x, new MultidimSortComparer(true)));            
-            foreach (DName s in varsNew)
+            if (false)
+            {                
+                List<DName> varsNew = varsThis.Except(varsParent).ToList();
+                //List<DName> varsNew2 = new List<DName>();
+                //varsNew2.AddRange(varsNew.OrderBy(x => x, new MultidimSortComparer(true)));
+                //List<DName> varsNew2 = new List<DName>();
+                varsNew2 = varsNew.OrderBy(x => x, new MultidimSortComparer(true)).ToList();
+                //foreach (DName s in varsNew)
+                //{
+                //    //TODO: there must be a method for this...
+                //    //varsNew2.Add(s.Replace(Decomp.DecompFirst() + ":", "").Replace("¤[0]", ""));  //keep the ¤ for lags
+                //    varsNew2.Add(s);
+                //}
+            }
+            else
             {
-                //TODO: there must be a method for this...
-                //varsNew2.Add(s.Replace(Decomp.DecompFirst() + ":", "").Replace("¤[0]", ""));  //keep the ¤ for lags
-                varsNew2.Add(s);
+                varsNew2 = varsThis.Except(varsParent).OrderBy(x => x, new MultidimSortComparer(true)).ToList();
             }
             dfParentDecomp.decompOptions2.mergeNewVariables = varsNew2;
             windowParentDecomp.Activate();  //nice that this is near top so it gets focused fast, and the user can see the table change live.            

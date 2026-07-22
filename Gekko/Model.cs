@@ -197,7 +197,8 @@ namespace Gekko
                     if (eqName == null) continue;  //probably not necessary
                     if (!G.StartsWith(eqName.GetName(), Globals.gekkoEquationPrefix)) continue;
                     string s1 = null;
-                    EquationHelper eh = Program.FindEquationByMeansOfVariableName(new DNameSimplest(eqName.GetName().Substring(Globals.gekkoEquationPrefix.Length)));
+                    var xx = new DNameSimplest(eqName.GetName().Substring(Globals.gekkoEquationPrefix.Length));
+                    EquationHelper eh = Program.FindEquationByMeansOfVariableName(xx);
                     if (eh != null) s1 = eh.equationText + G.NL + G.NL;
                     sb1.Append(s1);
                     string s2 = null;

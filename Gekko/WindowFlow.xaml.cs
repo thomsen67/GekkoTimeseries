@@ -411,7 +411,9 @@ namespace Gekko
                         List<EqInfoSimple> temp = GamsModel.GetSortedEquations(Program.DName_HACK1(name), GekkoTime.tNull, this.decompFind.model, false, false, false);
                         string eqName = temp[0].eqName.RemoveTime().ToString();
                         decompFindHereChild.decompOptions2.new_select = new List<DName> { Program.DName_HACK1(name) };
-                        decompFindHereChild.decompOptions2.new_from = new List<DName>() { Program.DName_HACK1(eqName) };
+                        DName dnameLag = Program.DName_HACK1(eqName);
+                        dnameLag = dnameLag.AddLag(0);
+                        decompFindHereChild.decompOptions2.new_from = new List<DName>() { dnameLag };
                         decompFindHereChild.decompOptions2.new_endo = new List<DName>() { Program.DName_HACK1(name) };
                         Decomp.DecompGetFuncExpressionsAndRecalc(decompFindHereChild, null);
                     }

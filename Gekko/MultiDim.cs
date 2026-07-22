@@ -742,6 +742,11 @@ namespace Gekko
             return new DName(s + this.GetName(), this.GetFreq(), this.GetIndexes(), -1);
         }
 
+        public DName SetNameSuffix(string s)
+        {
+            return new DName(this.GetName() + s, this.GetFreq(), this.GetIndexes(), -1);
+        }
+
         private static StringOrTime[] Construct(string name, EFreq freq, StringOrTime[] indexes, int posTimeOrLag)
         {
             int offset = DName._posIndex;

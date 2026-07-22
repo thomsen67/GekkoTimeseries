@@ -10824,7 +10824,8 @@ namespace Gekko
         {
 
             int r = -12345;
-            if (Program.model?.modelGekko?.fromVariableToEquationNumber != null && Program.model.modelGekko.fromVariableToEquationNumber.TryGetValue(lhsName.RemoveTime(), out r))
+            DName lhsNameWithTurtle = lhsName.SetNameSuffix("¤0");  //HACK
+            if (Program.model?.modelGekko?.fromVariableToEquationNumber != null && Program.model.modelGekko.fromVariableToEquationNumber.TryGetValue(lhsNameWithTurtle.RemoveTime(), out r))
             {
                 //r will get a value
             }
