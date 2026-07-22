@@ -223,7 +223,7 @@ namespace Gekko
 
         public void FindSetLabel(DName variableName)
         {
-            List<string> ss = Program.GetVariableExplanation(variableName, true, true, this.decompFind.decompOptions2.t1, this.decompFind.decompOptions2.t2, null);
+            List<string> ss = Program.GetVariableExplanation(variableName, true, true, this.decompFind.decompOptions2.t1, this.decompFind.decompOptions2.t2, null, false);  //#cherrypick: ", false" added
             string s7 = Stringlist.ExtractTextFromLines(ss).ToString();
             WindowDecomp.RichSetText(windowEquationBrowserLabel, Decomp.GetColoredEquations(s7));
         }

@@ -88,6 +88,12 @@ namespace Gekko
                 WalkInfo walkInfo = new WalkInfo();
                 walkInfo.t1 = this.decompFind.decompOptions2.t1;
                 walkInfo.t2 = this.decompFind.decompOptions2.t1;  //Note: using t1 here too!
+                if (Program.options.bugfix_flow_use_full_period)
+                {
+                    walkInfo.t2 = this.decompFind.decompOptions2.t2;
+                }
+                //walkInfo.t1 = new GekkoTime(EFreq.A, 2032, 1);
+                //walkInfo.t2 = new GekkoTime(EFreq.A, 2032, 1);
                 walkInfo.visitedDepths = new Dictionary<DName, FlowInfo>(Multidim2Comparer.IgnoreCase);
                 walkInfo.nodeNames = new Dictionary<DName, DName>(Multidim2Comparer.IgnoreCase);
                 walkInfo.maxDepth = this.decompFind.decompOptions2.flowgraphDepth;
@@ -101,6 +107,42 @@ namespace Gekko
                 walkInfo.ignoreLags = true;
                 DName varName = this.decompFind.decompOptions2.guiFlowName;
                 int depth = 0;
+
+                if (false)
+                {
+                    //TODO: If decomp is called with a certain equation, and the user then clicks [Flow].
+                    //The following was made between 31/1 2026 and 22/7 2026, with the old string name representation (no DName).
+                    //#flowgraphproblem
+                    
+                    //string eqName = null;
+                    //if (this.decompFind.decompOptions2.guiIsFlowUseEquationName)
+                    //{
+                    //    try
+                    //    {
+                    //        eqName = G.Chop_DimensionRemoveLast_FASTER(this.decompFind.decompOptions2.new_from[0]);
+                    //    }
+                    //    catch { }
+                    //}
+
+                    //if (eqName == null)
+                    //{
+                    //    try
+                    //    {
+                    //        List<EqInfoSimple> temp = GamsModel.GetSortedEquations(varName, GekkoTime.tNull, Program.model, false, false, false);
+                    //        if (temp.Count > 0) //if .Count == 0, the window will be empty but not crash...
+                    //        {
+                    //            eqName = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
+                    //        }
+                    //    }
+                    //    catch { }
+                    //}
+
+                    //if (!G.NullOrBlanks(eqName))
+                    //{
+                    //    WalkNodes(depth, graph, varName, eqName, walkInfo); //if problems, the window will be empty but not crash...
+                    //}
+                }
+
                 List<EqInfoSimple> temp = GamsModel.GetSortedEquations(varName, GekkoTime.tNull, Program.model, false, false, false);
                 //
                 //
@@ -138,8 +180,16 @@ namespace Gekko
             if (!walkInfo.visitedDepths.ContainsKey(varName))
             {                
                 hasBeenSeenAlready = false;
-                arrowsFromTo = Decomp.GetFlowInfoFromDecomp(walkInfo.t1, walkInfo.t2, varName, eqName, walkInfo);                
-                walkInfo.visitedDepths.Add(varName, arrowsFromTo);
+                try
+                {
+                    arrowsFromTo = Decomp.GetFlowInfoFromDecomp(walkInfo.t1, walkInfo.t2, varName, eqName, walkInfo);
+                    walkInfo.visitedDepths.Add(varName, arrowsFromTo);
+                }
+                catch
+                {
+                    //No need to die on decomp error here
+                    return;
+                }
             }
             else if (depth < walkInfo.visitedDepths[varName].depth)
             {
@@ -273,7 +323,7 @@ namespace Gekko
 
                 if (true)
                 {
-                    label = Program.GetVariableExplanation1Line(Program.DName_HACK1(drawingNode.Label.Text));
+                    label = Program.GetVariableExplanation1Line(Program.DName_HACK1(drawingNode.Label.Text), false);  //#cherrypick: ", false" added
                 }
                 else
                 {
@@ -281,7 +331,7 @@ namespace Gekko
 
                     //A bit of a hack, since we only store node names as flat plaintext                    
                     DName dname2 = Program.DName_HACK1NOLAG(drawingNode.Label.Text);                  
-                    label = Program.GetVariableExplanation1Line(dname2);
+                    label = Program.GetVariableExplanation1Line(dname2, false); //#cherrypick: ", false" added
                 }
                 statusTextBox.Text = label;
             }
@@ -372,6 +422,7 @@ namespace Gekko
                             DecompFind decompFindHere = this.decompFind;
                             DecompFind decompFindHereChild = decompFindHere.CreateChild(decompFindHere.decompOptions2.Clone(false), EDecompFindNavigation.Decomp, null, decompFindHere.model);
                             decompFindHereChild.decompOptions2.guiFlowName = Program.DName_HACK1(name);
+                            decompFindHereChild.decompOptions2.guiIsFlowUseEquationName = false; //hack
                             CallFlowGraph(decompFindHereChild);                            
                         }
                     }
