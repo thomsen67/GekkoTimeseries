@@ -13034,11 +13034,11 @@ namespace Gekko
         /// </summary>
         /// <param name="varnameMaybeWithFreq"></param>
         /// <returns></returns>
-        public static string GetVariableExplanation1Line(string varnameMaybeWithFreq, bool mayGiveExceptionError)
+        public static string GetVariableExplanation1Line(DName varnameMaybeWithFreq, bool mayGiveExceptionError)
         {
             if (varnameMaybeWithFreq == null) return null;
             string label = null;
-            List<string> expls = Program.GetVariableExplanation(G.Chop_RemoveFreq(varnameMaybeWithFreq), varnameMaybeWithFreq, false, false, GekkoTime.tNull, GekkoTime.tNull, null, mayGiveExceptionError);
+            List<string> expls = Program.GetVariableExplanation(varnameMaybeWithFreq, false, false, GekkoTime.tNull, GekkoTime.tNull, null, mayGiveExceptionError);
             if (expls != null && expls.Count > 0) label = expls[0];
             return label;
         }
@@ -17227,6 +17227,26 @@ namespace Gekko
                     G.Writeln();
                 }
             }
+        }
+
+        public static List<DName> ModelInfluences(DName varnameWithoutFreq)
+        {
+            List<DName> d4 = new List<DName>();
+            if (Program.model?.modelGekko?.dependents != null && Program.model.modelGekko.dependents.ContainsKey(varnameWithoutFreq))
+            {
+                Dictionary<DName, DName> d2 = Program.model.modelGekko.dependents[varnameWithoutFreq].storage;
+                if (d2 != null)
+                {
+                    foreach (DName d3 in d2.Keys)
+                    {
+                        d4.Add(d3);
+                    }
+                }
+                //d4.Sort(StringComparer.InvariantCulture);
+                d4 = d4.OrderBy(x => x, new MultidimSortComparer(true)).ToList();
+            }
+
+            return d4;
         }
 
         /// <summary>

@@ -1776,26 +1776,38 @@ namespace Gekko
                 DName var = Decomp.HiddenVariableHelper(c2, false);
 
                 if (isInfluences)
-                {
-                    List<string> myNames = new List<string>();
+                {                    
                     try
                     {
                         if (var == null) return;
+                        List<string> myNames3 = new List<string>();
+                        List<string> myTooltips = new List<string>();
                         if (Program.model.modelCommon.GetModelSourceType() == EModelType.Gekko)
                         {
+                            List<DName> myNames = new List<DName>();
                             myNames = Program.ModelInfluences(var);
+                            foreach (DName name in myNames)
+                            {
+                                myNames3.Add(name.ToString());
+                            }
+                            foreach (DName s in myNames)
+                            {
+                                myTooltips.Add(s + G.NL + Program.GetVariableExplanation1Line(s, false));
+                            }
                         }
                         else
                         {
+                            List<string> myNames2 = new List<string>();
                             List<EqInfoSimple> eqsContainingVariable = GamsModel.GetSortedEquations(var, Program.model.modelGamsScalar.GetDecompT(), Program.model, false, false, false);
-                            myNames = Program.FindDependentVars(var, Program.model, Program.model.modelGams, Program.model.modelGamsScalar, eqsContainingVariable);
+                            myNames2 = Program.FindDependentVars(var.ToString(), Program.model, Program.model.modelGams, Program.model.modelGamsScalar, eqsContainingVariable);                            
+                            foreach (string s in myNames2)
+                            {
+                                myTooltips.Add(s + G.NL + Program.GetVariableExplanation1Line(Program.DName_HACK1(s), false));
+                            }
+                            myNames3 = myNames2;
                         }
-                        List<string> myTooltips = new List<string>();
-                        foreach (string s in myNames)
-                        {
-                            myTooltips.Add(s + G.NL + Program.GetVariableExplanation1Line(s, false));
-                        }
-                        WindowInfluences popup = new WindowInfluences(myNames, myTooltips, this.decompFind);
+                        
+                        WindowInfluences popup = new WindowInfluences(myNames3, myTooltips, this.decompFind);
                         popup.Owner = this;
                         popup.Title = "Influences (" + var + ")";
                         popup.ShowDialog();

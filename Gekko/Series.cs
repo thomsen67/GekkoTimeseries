@@ -3314,7 +3314,37 @@ namespace Gekko
                 Program.GetYearMinMax(this, yearMinMax);
             }
         }
-        
+
+        public void DeepHash(string name, DeepHashHelper helper)
+        {
+            if (this.type == ESeriesType.ArraySuper)
+            {
+                Hashing.HashEnum1(Hashing.EHashType.SeriesArray, helper.hash);
+                Hashing.HashString(name?.ToLowerInvariant(), helper.hash);
+                Hashing.HashInteger(this.dimensionsStorage.storage.Count, helper.hash);
+                foreach (var kvp in this.dimensionsStorage.storage.OrderBy(kvp => kvp.Key.storage, StringArrayOrdinalIgnoreCaseComparer.Instance))
+                {
+                    Series subSeries = kvp.Value as Series;
+                    subSeries.DeepHash(kvp.Key.GetName(), helper); //will hash the key (name)                   
+                }
+            }
+            else
+            {
+                Hashing.HashEnum1(Hashing.EHashType.SeriesNormal, helper.hash);
+                Hashing.HashString(name?.ToLowerInvariant(), helper.hash);
+                Hashing.HashDate(this.GetRealDataPeriodFirst(), helper.hash); //ought to be fast when done after truncating arrays -- and good for safety
+                Hashing.HashDoubleArray(this.data.GetDataArray_ONLY_INTERNAL_USE(), helper.hash);
+                if (helper.includeMetadata)
+                {
+                    Hashing.HashEnum1(Hashing.EHashType.SeriesMetadata, helper.hash);
+                    Hashing.HashString(this.meta.label, helper.hash); //no .ToLower() here!
+                    Hashing.HashString(this.meta.source, helper.hash); //no .ToLower() here!
+                    Hashing.HashString(this.meta.units, helper.hash); //no .ToLower() here!
+                    Hashing.HashStringArray(this.meta.domains, helper.hash); //no .ToLower() here!
+                }
+            }
+        }
+
         private static void ConnectArraysSeriesWithSubSeries(Series arraySeries, Series subSeries, MultidimElement mmi)
         {
             mmi.parent = arraySeries;  //The mmi item points to the array-series
@@ -3450,37 +3480,7 @@ namespace Gekko
             rv.anchorPeriodPositionInArray = this.anchorPeriodPositionInArray;
             rv.anchorPeriod = this.anchorPeriod;  //immutable, so safe to point to
             return rv;
-        }
-
-        public void DeepHash(string name, DeepHashHelper helper)
-        {
-            if (this.type == ESeriesType.ArraySuper)
-            {
-                Hashing.HashEnum1(Hashing.EHashType.SeriesArray, helper.hash);
-                Hashing.HashString(name?.ToLowerInvariant(), helper.hash);
-                Hashing.HashInteger(this.dimensionsStorage.storage.Count, helper.hash);
-                foreach (var kvp in this.dimensionsStorage.storage.OrderBy(kvp => kvp.Key.storage, StringArrayOrdinalIgnoreCaseComparer.Instance))
-                {
-                    Series subSeries = kvp.Value as Series;
-                    subSeries.DeepHash(kvp.Key.GetName(), helper); //will hash the key (name)                   
-                }
-            }
-            else
-            {
-                Hashing.HashEnum1(Hashing.EHashType.SeriesNormal, helper.hash);
-                Hashing.HashString(name?.ToLowerInvariant(), helper.hash);
-                Hashing.HashDate(this.GetRealDataPeriodFirst(), helper.hash); //ought to be fast when done after truncating arrays -- and good for safety
-                Hashing.HashDoubleArray(this.data.GetDataArray_ONLY_INTERNAL_USE(), helper.hash);
-                if (helper.includeMetadata)
-                {
-                    Hashing.HashEnum1(Hashing.EHashType.SeriesMetadata, helper.hash);
-                    Hashing.HashString(this.meta.label, helper.hash); //no .ToLower() here!
-                    Hashing.HashString(this.meta.source, helper.hash); //no .ToLower() here!
-                    Hashing.HashString(this.meta.units, helper.hash); //no .ToLower() here!
-                    Hashing.HashStringArray(this.meta.domains, helper.hash); //no .ToLower() here!
-                }
-            }
-        }
+        }        
 
     }    
 

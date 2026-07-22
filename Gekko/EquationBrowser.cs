@@ -1811,7 +1811,7 @@ img {border-style: none;
                         bool first2 = true;
                         foreach (string s in dependentVarsList)
                         {
-                            string tooltip = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(new DNameSimplest(s)));
+                            string tooltip = Program.SpecialXmlChars(Program.GetVariableExplanation1Line(new DNameSimplest(s), false));
                             string s2 = Program.DName_HACK1(s).ToString(bh.dNameFormat);
                             string link = EquationBrowser.HtmlLink(s2, SimplerName(s) + ".html", tooltip);
                             if (!first2) s8 += ", ";

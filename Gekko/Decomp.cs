@@ -5469,7 +5469,7 @@ namespace Gekko
             return decompOutput;
         }
 
-        private static double IgnoreHelper2(Table table1, DecompOptions2 decompOptions2, int j, string name2)
+        private static double IgnoreHelper2(Table table1, DecompOptions2 decompOptions2, int j, DName dname2)
         {
             double max = 0d;
             for (int i = 2; i <= table1.GetRowMaxNumber(); i++)
@@ -5480,13 +5480,13 @@ namespace Gekko
                 if (decompOptions2.decompOperator.isRaw) d = Math.Abs(c1.value_hack);
                 else d = Math.Abs(c1.value_hack / c2.value_hack * 100d);
                 if (!G.IsNumericalError(d)) max = Math.Max(max, d);
-                if (IsDecompResidualName(name2)) c1.backgroundColor = "LightYellow";
+                if (IsDecompResidualName(dname2)) c1.backgroundColor = "LightYellow";
             }
 
             return max;
         }
 
-        private static double IgnoreHelper1(Table table1, DecompOptions2 decompOptions2, int i, string name2)
+        private static double IgnoreHelper1(Table table1, DecompOptions2 decompOptions2, int i, DName dname2)
         {
             double max = 0d;
             double sum = 0d;
@@ -5506,7 +5506,7 @@ namespace Gekko
                     if (!G.IsNumericalError(c1.value_hack / c2.value_hack * 100d)) sum += c1.value_hack / c2.value_hack * 100d;
                 }
                 if (!G.IsNumericalError(d)) max = Math.Max(max, d);
-                if (IsDecompResidualName(name2)) c1.backgroundColor = "LightYellow";
+                if (IsDecompResidualName(dname2)) c1.backgroundColor = "LightYellow";
             }
             return max;
         }
@@ -6657,7 +6657,7 @@ namespace Gekko
                 //#6irhwakery7
                 string name = G.Chop_DimensionAddLag(modelGamsScalar.GetVariableAndPeriod(f.pv).Item1.ToString(), modelGamsScalar.Maybe2000GekkoTime(t0), modelGamsScalar.GetVariableAndPeriod(f.pv).Item2, b, b, "");
 
-                string label = Program.GetVariableExplanation1Line(new DNameSimplest(name));
+                string label = Program.GetVariableExplanation1Line(new DNameSimplest(name), false);
 
                 string lbl = null;
                 if (!G.NullOrEmpty(label)) lbl = " (" + label + ")";
