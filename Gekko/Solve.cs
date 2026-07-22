@@ -2149,14 +2149,14 @@ namespace Gekko
                     {
                         try
                         {
-                            DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
+                            //DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
                             Trace2 trace = new Trace2(ETraceType.Normal, tStart, tEnd);
                             trace.GetContents().text = src;
                             trace.GetContents().name = ts.GetNameAndParentDatabank();
                             trace.GetContents().commandFileAndLine = p?.GetExecutingGcmFile(ERunningGcm.IncludeProcFunc);
                             //trace can only have null period if SIM period is null --> not possible
                             Gekko.Trace2.PushIntoSeries(ts, trace, ETracePushType.Sibling, false);
-                            Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
+                            //Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                         }
                         catch
                         {

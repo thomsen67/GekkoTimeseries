@@ -54,9 +54,13 @@ namespace Gekko
         public bool bugfix_plot = true;            //not mentioned in help, set false for old PLOT        
         //public bool bugfix_plot_copy = true;           //not mentioned in help, set false to make PLOT window "Copy link" work exactly as in Gekko 3.1.24
         public bool bugfix_score_even_with_res_vars = false;
+        public bool bugfix_flow_use_full_period = true;
         public bool bugfix_decomp_lagsleads = false;
         public bool bugfix_dates_fast = true;  //not mentioned in help, set false to use old date parser (on "2020", "2020q01", "2020m1d1", "2020u09" etc. etc.
-        public bool bugfix_subseries_stamp = true; //not mentioned in help, gets stamp and other meta information from series statement.
+        public bool bugfix_subseries_stamp = true; //not mentioned in help, gets stamp and other meta information from series statement.        
+        public string bugfix_laspchain_emulate = "none"; //none|kaedepris2. Works for both laspchain variants and will do a special version of ChainLoop(), where the kaedepris() function is emulated. 
+        public bool bugfix_laspchain_fix1 = true; //Should always be true, only if something unexpected hapens. Using ChainLoop() for both variants of laspchain().
+        public bool bugfix_laspchain_fix2 = true; //Should always be true, only if something unexpected hapens. Backwards and forwards loop
 
         // ---
         //method options could look like the 2 following:
@@ -65,13 +69,21 @@ namespace Gekko
         // ---        
         public bool copy_respect = false;  //yes|no
         // ---        
-        public bool databank_create_auto = true;
+        public bool databank_create_auto = true;        
         public string databank_file_cache = "all"; //[all | nonbgk | none] --> will cache databank files for faster (re)read.
         public bool databank_file_copylocal = true;
         public bool databank_file_gbk_compress = true;        
         public string databank_file_gbk_internal = "databank.data";
         public bool databank_file_gbk_underscore = false; //if set to true, when reading a Gekko 2.x gbk databank, a variable like x___a___b is understood as an array-series x[a,b].
+        public bool databank_file_gbk_datahash = true; //calculate data hash code for .gbk files
+        public bool databank_file_gbk_datahash_trace = true; //includes a "flag" to distingusih if there are 0 traces or > 0 traces.
+        public bool databank_file_gbk_datahash_meta = false; //includes metadata for series, except stamps
         public bool databank_search = true;
+
+        public bool databank_dlink = false;
+        public string databank_dlink_name = "dlink";
+        public string databank_dlink_folder_data = "k:\\MAKROBK_KILDE\\2025_10_01";
+        public string databank_dlink_folder_blobs = "k:\\MAKROBK_KILDE\\blobs";
 
         public bool databank_trace = true;
         public bool databank_trace_dublets = false; //
@@ -235,6 +247,10 @@ namespace Gekko
         public bool? series_dyn = null;  //must be able to attain null value. After an error, null is set. And after a BLOCK series dyn; ... ; END;, it will also be null.
         public bool series_dyn_check = true;
         public bool series_failsafe = false;  //with 'yes', will abort with error if a missing value is put into a series
+        public string series_laspchain_type = "none";
+        public double series_laspchain_zeros_a = double.NaN;
+        public double series_laspchain_zeros_b = double.NaN;
+        public double series_laspchain_zeros_c = double.NaN;
         //
         public ESeriesMissing series_normal_table_missing = ESeriesMissing.M;
         public ESeriesMissing series_array_table_missing = ESeriesMissing.Error;          //not used at the moment
@@ -408,6 +424,11 @@ namespace Gekko
             Add("BUGFIX DECOMP LAGSLEADS", Globals.xbool);
             Add("BUGFIX DATES FAST", Globals.xbool);
             Add("BUGFIX SUBSERIES STAMP", Globals.xbool);
+            //Add("BUGFIX SERIES CHAIN", Globals.xbool);            
+            Add("BUGFIX LASPCHAIN FIX1", Globals.xbool);
+            Add("BUGFIX LASPCHAIN FIX2", Globals.xbool);
+            Add("BUGFIX LASPCHAIN EMULATE", Globals.xnameOrString, "none", "kaedepris2");
+            Add("BUGFIX FLOW USE FULL PERIOD", Globals.xbool);
 
             Add("COLLAPSE METHOD", Globals.xnameOrString, "total", "avg", "first", "last");
             Add("COLLAPSE MISSING D", Globals.xnameOrString, "strict", "flex");
@@ -418,7 +439,16 @@ namespace Gekko
             Add("DATABANK FILE GBK COMPRESS", Globals.xbool);
             Add("DATABANK FILE GBK INTERNAL", Globals.xnameOrStringOrFilename);                        
             Add("DATABANK FILE GBK UNDERSCORE", Globals.xbool);
-            Add("DATABANK SEARCH", Globals.xbool);
+            Add("DATABANK FILE GBK DATAHASH", Globals.xbool);
+            Add("DATABANK FILE GBK DATAHASH META", Globals.xbool);
+            Add("DATABANK FILE GBK DATAHASH TRACE", Globals.xbool);
+
+            Add("DATABANK SEARCH", Globals.xbool);            
+
+            Add("DATABANK DLINK", Globals.xbool);
+            Add("DATABANK DLINK NAME", Globals.xnameOrString, "dlink");
+            Add("DATABANK DLINK FOLDER DATA", Globals.xnameOrString, "dlink");
+            Add("DATABANK DLINK FOLDER BLOBS", Globals.xnameOrString, "dlink");
 
             Add("DATABANK TRACE", Globals.xbool);
             Add("DATABANK TRACE DUBLETS", Globals.xbool); 
@@ -577,7 +607,12 @@ namespace Gekko
             Add("SERIES DYN", Globals.xbool);
             Add("SERIES DYN CHECK", Globals.xbool);
             Add("SERIES FAILSAFE", Globals.xbool);
-            
+
+            Add("SERIES LASPCHAIN TYPE", Globals.xnameOrString, "none");
+            Add("SERIES LASPCHAIN ZEROS A", Globals.xval);
+            Add("SERIES LASPCHAIN ZEROS B", Globals.xval);
+            Add("SERIES LASPCHAIN ZEROS C", Globals.xval);
+
             Add("SERIES NORMAL TABLE MISSING", Globals.xoptionSeriesMissing, "ERROR", "M", "ZERO", "SKIP");    //#ljfdssdfgsh
             Add("SERIES ARRAY PRINT MISSING", Globals.xoptionSeriesMissing, "ERROR", "M", "ZERO", "SKIP");     //#ljfdssdfgsh
             Add("SERIES ARRAY CALC MISSING", Globals.xoptionSeriesMissing, "ERROR", "M", "ZERO");              //#ljfdssdfgsh

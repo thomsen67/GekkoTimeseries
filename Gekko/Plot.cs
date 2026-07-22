@@ -975,22 +975,45 @@ namespace Gekko
             return plotFileName;
         }
 
+        public static string TrimQuotesInsideQuotedStrings(string input)
+        {
+            //I do not trust regex for this! The Tokenizer is battle-tested.                    
+            StringBuilder sb = new StringBuilder();
+            TokenList tokens = StringTokenizer.GetTokensWithLeftBlanks(input);
+            for (int i = 0; i < tokens.storage.Count; i++)
+            {
+                bool done = false;
+                TokenHelper token = tokens[i];
+                if (i > 0 && token.type == ETokenType.QuotedString && tokens[i - 1].s == "=")
+                {
+                    if ((tokens[i].s.StartsWith("\"") && tokens[i].s.EndsWith("\"")) || (tokens[i].s.StartsWith("'") && tokens[i].s.EndsWith("'")))  //Must always be so, but 
+                    {                        
+                        char quote = tokens[i].s[0];
+                        string content = tokens[i].s.Substring(1, tokens[i].s.Length - 2); //Is ok with for instance "''".
+                        tokens[i].s = quote + content.Trim() + quote;
+                    }
+                }
+                sb.Append(tokens[i].ToString());
+            }
+            return sb.ToString();
+        }
+
         private static void SvgFix(double zoomDpi, double decompSvgOverallWidth, double decompSvgOverallHeight, string plotFileName)
         {
+            double w2 = decompSvgOverallWidth * zoomDpi; //
+            double h2 = decompSvgOverallHeight * zoomDpi;
+            string s = TrimQuotesInsideQuotedStrings(Program.GetTextFromFileWithWait(plotFileName));            
             if (zoomDpi < 0.999 || zoomDpi > 1.001)
             {
-                double w2 = decompSvgOverallWidth * zoomDpi; //
-                double h2 = decompSvgOverallHeight * zoomDpi;
-                string s = Program.GetTextFromFileWithWait(plotFileName);
                 //alternatively: for a viewbox 0 0 100 200, doubling it to 0 0 200 400 would shrink the plot, no? But may not be good, could create empty space...
                 s = G.ReplaceFirstOccurrence(s, "width=\"" + (int)decompSvgOverallWidth + "\"", "width=\"" + (int)w2 + "\"");
                 s = G.ReplaceFirstOccurrence(s, "height=\"" + (int)decompSvgOverallHeight + "\"", "height=\"" + (int)h2 + "\"");
-                using (FileStream fs = Program.WaitForFileStream(plotFileName, null, Program.GekkoFileReadOrWrite.Write))
-                using (StreamWriter sw = G.GekkoStreamWriter(fs))
-                {
-                    sw.Write(s);
-                    sw.Flush();
-                }
+            }
+            using (FileStream fs = Program.WaitForFileStream(plotFileName, null, Program.GekkoFileReadOrWrite.Write))
+            using (StreamWriter sw = G.GekkoStreamWriter(fs))
+            {
+                sw.Write(s);
+                sw.Flush();
             }
         }
 
@@ -1328,7 +1351,14 @@ namespace Gekko
             }
             else if (G.IsUnitTestingOrNotShowingGUI())
             {
-                process.StartInfo.FileName = Globals.ttPath2 + "\\" + Globals.ttPath3 + @"\Gekko\bin\Debug\gnuplot\" + exe;
+                if (G.IsUnitTesting())
+                {
+                    process.StartInfo.FileName = Globals.ttPath2 + "\\" + "GekkoCS" + @"\Gekko\bin\Debug\gnuplot\" + exe;
+                }
+                else
+                {                    
+                    process.StartInfo.FileName = G.GekkoExeFolder() + "\\gnuplot\\" + exe;
+                }
             }
             else
             {

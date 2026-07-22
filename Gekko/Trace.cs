@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows;
 using System.Threading;
 using System.Text;
+using Microsoft.Data.Analysis;
 
 // Simplificed overview
 //
@@ -16,11 +17,11 @@ using System.Text;
 //      + List<GekkoTimeSpanSimple>
 //      + Trace2
 //        + TraceContents2
-//        + Lis <TraceAndPeriods2>                   <---- precedents
+//        + List <TraceAndPeriods2>                   <---- precedents
 
 //So each trace has contents (like command line) and n precedents. Each precedent is a (trace, timespans), so a precedent
 //is not "just" another trace, but a (trace, timespans) combination.Because the same previous trace may be time-shadowed
-//in different ways in different places.
+//in different ways in different places. In the precedents there may be dividers.
 
 //When protobuffed, the precedents (List<TraceAndPeriods2>) are cut off and replaced with ID's. So if there are n precedents,
 //.storageIDTemporary and .storagePeriodsTemporary will each get n elements, where the former is a traceID consisting of a
@@ -390,7 +391,7 @@ namespace Gekko
                 //Traces do not point back to their series objects: if they did, object equality could be used.
                 return false;  
             }
-            if (Math.Abs(lastTrace.GetContents().id.counter - newTrace.GetContents().id.counter) > 1000000) return false;
+            if (Math.Abs(lastTrace.GetContents().id.GetCounter() - newTrace.GetContents().id.GetCounter()) > 1000000) return false;
             if (lastTrace.GetContents().text != newTrace.GetContents().text) return false;
             if (lastTrace.GetContents().commandFileAndLine != newTrace.GetContents().commandFileAndLine) return false;
             return true;
@@ -931,9 +932,9 @@ namespace Gekko
         
         public string PrintStamp()
         {
-            string s = null;     
+            string s = null;
             //The stamp is in UTC time, so we ask for it in local time for printing on screen.
-            s += this.GetId().StampInLocalTime().ToString("dd/MM/yyyy HH:mm:ss") + "|" + this.GetId().counter;
+            s += this.GetId().StampInLocalTime().ToString("dd/MM/yyyy HH:mm:ss") + "|" + this.GetId().GetCounter();
             return s;
         }
 
@@ -1617,12 +1618,12 @@ namespace Gekko
             try
             {
                 //stampDetailed = id.StampInLocalTime().ToString("yyyy-MM-dd HH:mm:ss.fffffff", System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK)) + ", #" + id.counter;  //7 digits is 100 ns, which is limit anyway                
-                stampDetailed = id.StampInLocalTime().ToString($"{ci.DateTimeFormat.ShortDatePattern} HH:mm:ss.fffffff", System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK)) + ", #" + id.counter;  //7 digits is 100 ns, which is limit anyway
+                stampDetailed = id.StampInLocalTime().ToString($"{ci.DateTimeFormat.ShortDatePattern} HH:mm:ss.fffffff", System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK)) + ", #" + id.GetCounter();  //7 digits is 100 ns, which is limit anyway
                 //
             }
             catch
             {
-                stampDetailed = id.StampInLocalTime().ToString("G", System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK)) + ", #" + id.counter;
+                stampDetailed = id.StampInLocalTime().ToString("G", System.Globalization.CultureInfo.GetCultureInfo(Globals.languageDaDK)) + ", #" + id.GetCounter();
             }
         }
 
@@ -1774,7 +1775,7 @@ namespace Gekko
         /// Should never happen.
         /// </summary>
         [ProtoMember(2)]
-        public readonly long counter = ++Globals.traceCounter;
+        private readonly long counter = ++Globals.traceCounter;
 
         public TraceID2()
         {
@@ -1789,6 +1790,12 @@ namespace Gekko
         {
             return this.stamp.ToLocalTime();
         }
+
+        public long GetCounter()
+        {
+            return this.counter;
+        }
+
 
         public override bool Equals(object o)
         {
@@ -2014,13 +2021,13 @@ namespace Gekko
                     TraceID2 id = this.storageIDTemporary[i];
                     GekkoTimeSpansSimple periods = this.storagePeriodsTemporary[i];
 
-                    if (id.counter == long.MinValue)
+                    if (id.GetCounter() == long.MinValue)
                     {
                         this.storage.Add(new TraceAndPeriods2(new Trace2(ETraceType.Divider, true), Globals.traceNullPeriods));
                     }
                     else
                     {
-                        if (id.counter < 0) new Error("This trace is not stored in the databank, but has been pruned off: " + id.ToString());
+                        if (id.GetCounter() < 0) new Error("This trace is not stored in the databank, but has been pruned off: " + id.ToString());
                         Trace2 trace = null; dict2.TryGetValue(id, out trace);
                         if (trace == null) new Error("Could not find this trace in databank: " + id.ToString());
                         this.storage.Add(new TraceAndPeriods2(trace, periods));
@@ -2207,8 +2214,8 @@ namespace Gekko
             else if (x.t.EqualsGekkoTime(y.t))
             {
                 //add some salt
-                if (x.tap.trace.GetId().counter == y.tap.trace.GetId().counter) return 0; //will probably not happen because of ReferenceEquals() at the top
-                if (x.tap.trace.GetId().counter > y.tap.trace.GetId().counter) return 1; //just random, could just as well be inverse
+                if (x.tap.trace.GetId().GetCounter() == y.tap.trace.GetId().GetCounter()) return 0; //will probably not happen because of ReferenceEquals() at the top
+                if (x.tap.trace.GetId().GetCounter() > y.tap.trace.GetId().GetCounter()) return 1; //just random, could just as well be inverse
                 else return -1; //just random, could just as well be inverse
             }
             else
@@ -2220,5 +2227,142 @@ namespace Gekko
                 return -i; //GekkoTimes are in reverse order
             }
         }
-    }    
+    }
+
+
+    /// <summary>
+    /// Column based so we can later use Microsoft.data.analysis
+    /// </summary>
+    public class TraceFrame
+    {
+        //Must correspond to #qwldak7dad
+        public List<long> counter = new List<long>();
+        public List<DateTime> stamp = new List<DateTime>();
+        public List<string> period_start = new List<string>();
+        public List<string> period_end = new List<string>();
+        public List<DateTime?> date_start = new List<DateTime?>();
+        public List<DateTime?> date_end = new List<DateTime?>();
+        public List<string> name = new List<string>();
+        public List<string> text = new List<string>();
+        public List<string> precedentsNames = new List<string>();
+        public List<string> commandFile = new List<string>();
+        public List<int> commandLine = new List<int>();
+        public List<string> dataFile = new List<string>();
+        public List<string> databankFile = new List<string>();
+        public List<int> databankFileCounter = new List<int>();
+        public List<int> depth = new List<int>();
+
+        public void AddRange(TraceFrame x)
+        {
+            //Must correspond to #qwldak7dad
+            this.counter.AddRange(x.counter);
+            this.stamp.AddRange(x.stamp);
+            this.period_start.AddRange(x.period_start);
+            this.period_end.AddRange(x.period_end);
+            this.date_start.AddRange(x.date_start);
+            this.date_end.AddRange(x.date_end);
+            this.name.AddRange(x.name);
+            this.text.AddRange(x.text);
+            this.precedentsNames.AddRange(x.precedentsNames);
+            this.commandFile.AddRange(x.commandFile);
+            this.commandLine.AddRange(x.commandLine);
+            this.dataFile.AddRange(x.dataFile);
+            this.databankFile.AddRange(x.databankFile);
+            this.databankFileCounter.AddRange(x.databankFileCounter);
+            this.depth.AddRange(x.depth);
+        }
+        public void Add(TraceFrame traceFrame, int i)
+        {
+            //Must correspond to #qwldak7dad
+            this.counter.Add(traceFrame.counter[i]);
+            this.stamp.Add(traceFrame.stamp[i]);
+            this.period_start.Add(traceFrame.period_start[i]);
+            this.period_end.Add(traceFrame.period_end[i]);
+            this.date_start.Add(traceFrame.date_start[i]);
+            this.date_end.Add(traceFrame.date_end[i]);
+            this.name.Add(traceFrame.name[i]);
+            this.text.Add(traceFrame.text[i]);
+            this.precedentsNames.Add(traceFrame.precedentsNames[i]);
+            this.commandFile.Add(traceFrame.commandFile[i]);
+            this.commandLine.Add(traceFrame.commandLine[i]);
+            this.dataFile.Add(traceFrame.dataFile[i]);
+            this.databankFile.Add(traceFrame.databankFile[i]);
+            this.databankFileCounter.Add(traceFrame.databankFileCounter[i]);
+            this.depth.Add(traceFrame.depth[i]);
+        }
+    }
+
+    public class TraceDict
+    {
+        public GekkoDictionary<string, int> dict_commandFileAndLine = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        public GekkoDictionary<string, int> dict_names = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        public GekkoDictionary<int, int> dict_t1 = new GekkoDictionary<int, int>();
+        public GekkoDictionary<int, int> dict_t2 = new GekkoDictionary<int, int>();
+
+        public void Add1(GekkoDictionary<string, int> dict, string s)
+        {
+            if (!dict.ContainsKey(s)) dict.Add(s, 1);
+            else dict[s]++;
+        }
+
+        public void Add1(GekkoDictionary<int, int> dict, int i)
+        {
+            if (!dict.ContainsKey(i)) dict.Add(i, 1);
+            else dict[i]++;
+        }
+    }
+
+    public class TraceFlow
+    {
+        public static TraceFrame Analyze(Dictionary<Trace2_1_1, PrecedentsAndDepth_1_1> traces, string fileNameWithPath)
+        {
+            TraceFrame df = new TraceFrame();
+            foreach (KeyValuePair<Trace2_1_1, PrecedentsAndDepth_1_1> kvp in traces)
+            {
+                //Must correspond to #qwldak7dad
+                Trace2_1_1 trace = kvp.Key;
+                int depth = kvp.Value.depth;
+                if (trace.type == ETraceType.GluedToSeries) continue;
+                df.counter.Add(trace.traceContents.id.GetCounter());
+                df.stamp.Add(trace.traceContents.id.GetStamp());
+                string[] ss = trace.traceContents.commandFileAndLine.Split('¤');
+                df.commandFile.Add(ss[0]);
+                if (ss.Length > 1) df.commandLine.Add(int.Parse(ss[1]));
+                else df.commandLine.Add(-1);
+                df.name.Add(trace.traceContents.name);
+                DateTime? pq_date_starts; string pq_period_starts;
+                ParquetHelper.WriteParquetPeriodStart(trace.traceContents.period.t1, out pq_date_starts, out pq_period_starts);
+                DateTime? pq_date_ends; string pq_period_ends;
+                ParquetHelper.WriteParquetPeriodEnd(trace.traceContents.period.t2, out pq_date_ends, out pq_period_ends);
+                df.period_start.Add(pq_period_starts);
+                df.period_end.Add(pq_period_ends);
+                df.date_start.Add(pq_date_starts);
+                df.date_end.Add(pq_date_ends);
+                df.text.Add(trace.traceContents.text);
+                df.dataFile.Add(trace.traceContents.dataFile);
+                df.databankFile.Add(fileNameWithPath);
+                df.precedentsNames.Add(Stringlist.GetListWithCommas(trace.traceContents.precedentsNames));
+                df.depth.Add(depth);
+            }
+            return df;
+        }
+    }
+
+    public class TraceFlowElement
+    {
+        public readonly TraceID2 id = new TraceID2();
+        public GekkoTimeSpanSimple period = null;
+        public string text = null;
+        public string name = null;  //with bank and freq
+        public string commandFileAndLine = null;
+        public string dataFile = null;
+        public List<string> precedentsNames = null; //Elements are with bank and freq, but also starts with a type like "4¤..." to indicate info on databank, freq, and if the name has traces. See #9khsigra7ioau
+        public List<TraceFlowDatabankStamp> foundInWhichDatabanks = new List<TraceFlowDatabankStamp>();
+    }
+
+    public class TraceFlowDatabankStamp
+    {
+        public string databankName = null;
+        public DateTime utcTime = DateTime.MinValue;
+    }
 }

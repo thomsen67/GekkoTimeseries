@@ -1183,6 +1183,26 @@ namespace Gekko
             }
 
             border.Child = textBlock;
+            if (true && type == GekkoTableTypes.UpperLeft)
+            {
+                TextBlock infl = new TextBlock();
+                infl.HorizontalAlignment = HorizontalAlignment.Left;
+                infl.VerticalAlignment = VerticalAlignment.Center;
+                infl.FontFamily = Globals.decompFontFamily;
+                infl.FontSize = Globals.decompFontSize - 0;
+                int padding = 0;
+                double opa = 0.4;
+                infl.Padding = new Thickness(padding, 2, 4, 3);
+                infl.MouseDown += Mouse_Down;
+                Brush originalColor = Brushes.Black;
+                infl.Foreground = originalColor;
+                infl.MouseEnter += (s, e) => { infl.Foreground = Brushes.Blue; infl.Opacity = 1.0; };
+                infl.MouseLeave += (s, e) => { infl.Foreground = originalColor; infl.Opacity = opa; };
+                infl.ToolTip = "Click to see which variables are influenced by the dependent variable";
+                infl.Text = "[Infl.]";
+                infl.Opacity = opa;
+                dockPanel.Children.Add(infl);
+            }
             dockPanel.Children.Add(border);
             dockPanel.SetValue(Grid.ColumnProperty, j);
             dockPanel.SetValue(Grid.RowProperty, i);
@@ -1733,13 +1753,16 @@ namespace Gekko
             //#98732498724
             //Click in FIND: #8fdskfesdfw
 
-            bool isCtrl = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
+            //bool isCtrl = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
 
             TextBlock tb = (TextBlock)sender;
             DockPanel dp = G.FindParent<DockPanel>(tb);
 
             int col = (int)dp.GetValue(Grid.ColumnProperty);
             int row = (int)dp.GetValue(Grid.RowProperty);
+
+            bool isInfluences = false;
+            if (row == 0 && col == 0) isInfluences = true;
 
             Cell c, c2;
             GetTwoCells(row, col, out c, out c2);
@@ -1751,29 +1774,64 @@ namespace Gekko
                 // ---------------------------------------
 
                 DName var = Decomp.HiddenVariableHelper(c2, false);
+
+                if (isInfluences)
+                {
+                    List<string> myNames = new List<string>();
+                    try
+                    {
+                        if (var == null) return;
+                        if (Program.model.modelCommon.GetModelSourceType() == EModelType.Gekko)
+                        {
+                            myNames = Program.ModelInfluences(var);
+                        }
+                        else
+                        {
+                            List<EqInfoSimple> eqsContainingVariable = GamsModel.GetSortedEquations(var, Program.model.modelGamsScalar.GetDecompT(), Program.model, false, false, false);
+                            myNames = Program.FindDependentVars(var, Program.model, Program.model.modelGams, Program.model.modelGamsScalar, eqsContainingVariable);
+                        }
+                        List<string> myTooltips = new List<string>();
+                        foreach (string s in myNames)
+                        {
+                            myTooltips.Add(s + G.NL + Program.GetVariableExplanation1Line(s, false));
+                        }
+                        WindowInfluences popup = new WindowInfluences(myNames, myTooltips, this.decompFind);
+                        popup.Owner = this;
+                        popup.Title = "Influences (" + var + ")";
+                        popup.ShowDialog();
+                    }
+                    catch { }
+                    return;
+                }
+
                 if (var == null)
                 {                    
                     new Error(Decomp.Text1(1));
                 }
 
                 _activeVariable = var.ToString();
-
-                if (!isCtrl && decompFind.model.modelCommon.GetModelSourceType() == EModelType.Gekko)
-                {
-                    decompFind.decompOptions2.iv = new List(new List<IVariable>() { new ScalarString(var.ToString()) });
-                    WindowFind.CallDecompHelper(Globals.decompGekkoEquationPrefix + var, decompFind, decompFind.model);
-                }
-                else
-                {
-                    O.Find o = new O.Find(this.decompFind);
-                    List m = new List(new List<string>() { var.ToString() });
-                    o.iv = m;
-                    o.Exe();
-                }
+                DecompLinkClicked(_activeVariable, this.decompFind);                
             }
             else
             {
                 new Error("Unexpected link error");
+            }
+        }
+
+        public static void DecompLinkClicked(string var, DecompFind decompFind)
+        {
+            bool isCtrl = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
+            if (!isCtrl && decompFind.model.modelCommon.GetModelSourceType() == EModelType.Gekko)
+            {
+                decompFind.decompOptions2.iv = new List(new List<IVariable>() { new ScalarString(var) });
+                WindowFind.CallDecompHelper(Globals.decompGekkoEquationPrefix + var, decompFind, decompFind.model);
+            }
+            else
+            {
+                O.Find o = new O.Find(decompFind);
+                List m = new List(new List<string>() { var });
+                o.iv = m;
+                o.Exe();
             }
         }
 
@@ -1968,7 +2026,7 @@ namespace Gekko
                                     }
                                     else
                                     {
-                                        List<string> ss = Program.GetVariableExplanation(var7, true, true, this.decompFind.decompOptions2.t1, this.decompFind.decompOptions2.t2, null);
+                                        List<string> ss = Program.GetVariableExplanation(var7, true, true, this.decompFind.decompOptions2.t1, this.decompFind.decompOptions2.t2, null, false); //#cherrypick: ", false" added
                                         string txt = Stringlist.ExtractTextFromLines(ss).ToString() + Program.SetBlanks();
                                         RichSetText(equation, Decomp.GetColoredEquations(txt));
                                     }
@@ -2049,6 +2107,8 @@ namespace Gekko
         /// <param name="refresh"></param>
         public void RecalcCellsWithNewType(Model model)
         {
+            //See OVERVIEW in DecompGetFuncExpressionsAndRecalc()
+
             if (false)
             {
                 //See #f8kd8sfdgksldgjf
@@ -2103,6 +2163,8 @@ namespace Gekko
 
         public void RecalcCellsWithNewTypeHelper(Model model)
         {
+            //See OVERVIEW in DecompGetFuncExpressionsAndRecalc()
+
             this.decompFind.decompOptions2.code = this.decompFind.decompOptions2.ToCode();
             SetRadioButtonsDefaults();
 
@@ -2444,6 +2506,7 @@ namespace Gekko
             {
                 this.windowDecompStatusBar.Text = Globals.windowDecompStatusBarText3;
             }
+            if (decompOptions.invertError != null) this.windowDecompStatusBar.Text = decompOptions.invertError;
         }        
 
         private void radioButton1_Checked(object sender, RoutedEventArgs e)
@@ -3108,6 +3171,7 @@ namespace Gekko
             if (!isInitializing)
             {
                 decompFind.decompOptions2.guiFlowName = decompFind.decompOptions2.new_select[0];
+                decompFind.decompOptions2.guiIsFlowUseEquationName = true; //hack
                 WindowFlow.CallFlowGraph(this.decompFind);
             }
         }        
@@ -3177,6 +3241,7 @@ namespace Gekko
         public List<DName> new_endo = new List<DName>();
         public List<string> rows = new List<string>();
         public List<string> cols = new List<string>();
+        public string invertError = null;
         //--------------------------------------------------------------- 
 
         public bool groupAge = false;
@@ -3223,6 +3288,7 @@ namespace Gekko
         public string modelHash = null;
         // ---
         public bool guiIsFlowStatement = false; //True for "FLOW qBNP ...;", and will activate flowgraph but only for depth==0!
+        public bool guiIsFlowUseEquationName = true; //Complete hack to handle calling from FLOW command or clicking [Flow] in the decomp window (but not for clicking on a node in the flow window).
         public DName guiFlowName = null;
         public bool guiFlowRotate = false;        
         public bool guiFlowLagsOrLeadsWereEncountered = false;
@@ -3343,6 +3409,7 @@ namespace Gekko
 
             d.flowgraphDepth = this.flowgraphDepth;
             d.guiIsFlowStatement = this.guiIsFlowStatement;
+            d.guiIsFlowUseEquationName = this.guiIsFlowUseEquationName; //hack
             d.guiFlowName = this.guiFlowName;            
 
             foreach (string s in this.subst)
@@ -3467,6 +3534,12 @@ namespace Gekko
 
             return d;
         }
+    }
+
+    public class HyperlinkItem
+    {
+        public string Name { get; set; }
+        public string ToolTip { get; set; }
     }
 
 }

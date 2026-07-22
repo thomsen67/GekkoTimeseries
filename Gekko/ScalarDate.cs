@@ -191,5 +191,12 @@ namespace Gekko
         {
             //do nothing
         }
+
+        public void DeepHash(string name, DeepHashHelper helper)
+        {
+            Hashing.HashEnum1(Hashing.EHashType.ScalarDate, helper.hash);
+            Hashing.HashString(name?.ToLowerInvariant(), helper.hash);
+            Hashing.HashDate(this.date, helper.hash);
+        }
     }
 }

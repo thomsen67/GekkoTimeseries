@@ -393,6 +393,12 @@ namespace Gekko
             //do nothing
         }
 
+        public void DeepHash(string name, DeepHashHelper helper)
+        {
+            Hashing.HashEnum1(Hashing.EHashType.ScalarString, helper.hash);
+            Hashing.HashString(name?.ToLowerInvariant(), helper.hash);
+            Hashing.HashString(this.string2, helper.hash); //no .ToLower() here!
+        }
     }
 
 }

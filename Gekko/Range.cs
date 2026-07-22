@@ -127,6 +127,11 @@ namespace Gekko
             //do nothing
         }
 
+        public void DeepHash(string name, DeepHashHelper helper)
+        {
+            //do nothing
+        }
+
     }
 }
 

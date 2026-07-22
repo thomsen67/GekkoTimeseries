@@ -53,6 +53,23 @@ namespace Gekko
         //    og rigtige links ser ud til at VIRKE!!
         private static IntPtr moduleHandle;
 
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == (Keys.Control | Keys.C))
+            {
+                string s = this.SelectedText;
+                s = System.Text.RegularExpressions.Regex.Replace(s, @"#action:\d+", "");
+                s = System.Text.RegularExpressions.Regex.Replace(s, @"#disp:[A-Za-z_][A-Za-z0-9_]*", "");
+                s = System.Text.RegularExpressions.Regex.Replace(s, @"#disp2:[A-Za-z_][A-Za-z0-9_]*", "");
+                s = System.Text.RegularExpressions.Regex.Replace(s, @"#disp3:[A-Za-z_][A-Za-z0-9_]*", "");
+                s = System.Text.RegularExpressions.Regex.Replace(s, @"#outputtab:\d+", "");
+                Clipboard.SetText(s);
+                return true;
+            }
+
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
         protected override CreateParams CreateParams
         {            
             get
