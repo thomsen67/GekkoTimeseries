@@ -6821,8 +6821,7 @@ namespace Gekko
             {
                 try
                 {                    
-                    //HMMMM: Should this traceTime not be removed??
-                    DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
+                    //DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
                                                            //When arriving here, it is a READ/IMPORT, not OPEN.
                                                            //There are these combinations:
                                                            //
@@ -6969,7 +6968,7 @@ namespace Gekko
                             Gekko.Trace2.PushIntoSeries(tsImported, trace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
                         }
                     }
-                    Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
+                    //Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                 }
                 catch
                 {
