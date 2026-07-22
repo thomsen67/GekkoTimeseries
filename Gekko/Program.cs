@@ -207,6 +207,12 @@ namespace Gekko
         Unknown
     }
 
+    public class DeepHashHelper
+    {
+        public SHA256 hash = SHA256.Create();
+        public bool includeMetadata = false;
+    }
+
     public class CheckboxImageConverter : System.Windows.Data.IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
@@ -657,9 +663,9 @@ namespace Gekko
             this.storage = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         }
 
-        public void Add(int priority, string type, bool isReading, string input)
+        public string Add(int priority, string type, bool isReading, string input)
         {
-            if (priority != Globals.dependencyTrackingSysNumber && !G.IsAbsolutePath(input)) return; //should not be possible... (also checks for null)
+            if (priority != Globals.dependencyTrackingSysNumber && !G.IsAbsolutePath(input)) return input; //should not be possible... (also checks for null)
 
             this.CheckFence(input, priority == Globals.dependencyTrackingSysNumber, isReading);
 
@@ -671,6 +677,8 @@ namespace Gekko
                 string s = priority + "¤" + type + "¤" + fileNameTrim;
                 if (!this.storage.ContainsKey(s)) this.storage.Add(s, null);
             }
+
+            return input; //for blobs
         }
 
         public void CheckFence(string fileName3, bool isSys, bool isReading)
@@ -2970,23 +2978,18 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer)
             {
+                Program.ProgramFolderRunning();
+                Program.ProgramFolderGit();
+                Program.ProgramFolderRunningRelative();
 
-                //List<DName> xx = new List<DName>();
-                //xx.Add(new DName("bb", new StringOrTime[] { "b", "a", "c" }));
-                //xx.Add(new DName("bb", new StringOrTime[] { "b", "a", "b" }));
-                //xx.Add(new DName("bb", new StringOrTime[] { "a", "x", "z" }));
-                //xx.Add(new DName("bb", new StringOrTime[] { "a", "x", "y" }));
-                //xx.Add(new DName("aa", new StringOrTime[] { "b", "a", "c" }));
-                //xx.Add(new DName("aa", new StringOrTime[] { "b", "a", "b" }));
-                //xx.Add(new DName("aa", new StringOrTime[] { "a", "x", "z" }));
-                //xx.Add(new DName("aa", new StringOrTime[] { "a", "x", "y" }));
-                //List<DName> vars = xx.OrderBy(k => k, new MultidimSortComparer(true)).ToList();
-
-
-                //new Writeln("-1.96 --> " + M.Errorf(-1.96d));
-                //new Writeln("0 --> " + M.Errorf(0d));
-                //new Writeln("1.96 --> " + M.Errorf(1.96d));
-                //                
+                // -----------------------------------------------------------
+                // Kør tell't1', tell't2', tell't3'.
+                // Der var noget med, at obk_202603261643.gbk ikke dannede traces
+                //   på DST, så traces fra denne blev dannet på TTH pc. Her var
+                //   traces1.parquet så filen fra DST, mens traces2.parquet var
+                //   fra TTH pc.
+                // -----------------------------------------------------------
+                                
 
                 if (Globals.runningOnTTComputer)
                 {
@@ -3515,6 +3518,434 @@ namespace Gekko
             if (nocr) G.Write(text);
             else G.Writeln(text);
         }
+
+        private static void RelevantDatopGek24()
+        {
+            List<string> temp = new List<string>()
+                    {
+                    "BAFD", "bivbp", "bivbp0", "bivbpw", "bivbu", "bivmp", "bivmp0", "bivmp1",
+"bivmu", "BKS", "BOIL", "BSPZAB_XA", "BSPZAB_XB", "BSPZAB_XE", "BSPZAB_XH",
+"BSPZAB_XNE", "BSPZAB_XNF", "BSPZAB_XNG", "BSPZAB_XNZ", "BSPZAB_XO", "BSPZAB_XQF",
+"BSPZAB_XQS", "BSPZAM_XA", "BSPZAM_XB", "BSPZAM_XE", "BSPZAM_XH", "BSPZAM_XNE",
+"BSPZAM_XNF", "BSPZAM_XNG", "BSPZAM_XNZ", "BSPZAM_XO", "BSPZAM_XQF", "BSPZAM_XQS",
+"BSPZAUD_XA", "BSPZAUD_XB", "BSPZAUD_XE", "BSPZAUD_XH", "BSPZAUD_XNE", "BSPZAUD_XNF",
+"BSPZAUD_XNG", "BSPZAUD_XNZ", "BSPZAUD_XO", "BSPZAUD_XQF", "BSPZAUD_XQS", "BSPZCO2_XA",
+"BSPZCO2_XB", "BSPZCO2_XE", "BSPZCO2_XH", "BSPZCO2_XNE", "BSPZCO2_XNF", "BSPZCO2_XNG",
+"BSPZCO2_XNZ", "BSPZCO2_XO", "BSPZCO2_XQF", "BSPZCO2_XQS", "BSPZEJ_XA", "BSPZEJ_XB",
+"BSPZEJ_XE", "BSPZEJ_XH", "BSPZEJ_XNE", "BSPZEJ_XNF", "BSPZEJ_XNG", "BSPZEJ_XNZ",
+"BSPZEJ_XO", "BSPZEJ_XQF", "BSPZEJ_XQS", "BSPZUL_XA", "BSPZUL_XB", "BSPZUL_XE",
+"BSPZUL_XH", "BSPZUL_XNE", "BSPZUL_XNF", "BSPZUL_XNG", "BSPZUL_XNZ", "BSPZUL_XO",
+"BSPZUL_XQF", "BSPZUL_XQS", "BSPZV_XA", "BSPZV_XB", "BSPZV_XE", "BSPZV_XH",
+"BSPZV_XNE", "BSPZV_XNF", "BSPZV_XNG", "BSPZV_XNZ", "BSPZV_XO", "BSPZV_XQF",
+"BSPZV_XQS", "btpatpo", "buakbi", "buakbr", "buaki", "buakly", "buakry", "buaks",
+"bulaku", "BYRHH", "cb", "ce", "cf", "cg", "ch", "co", "COI", "CP", "cs",
+"ct", "cv", "D8291", "E", "e01", "e2", "e3", "e59", "e7y", "ENL", "esq",
+"ess", "Est", "et", "Ev", "ewdk", "EWEU", "EWUS", "fcb", "fce", "fcf", "fcg",
+"fch", "fco", "FCOGL", "fCoz", "fCozgl", "fcp", "fcs", "fct", "fcv", "fe",
+"fE01", "fE2", "fE3", "fE59", "fE7y", "FESQ", "fess", "fest", "fEt", "fev",
+"fi", "fIb", "FIBA", "FIBB", "FIBE", "FIBH", "FIBNE", "FIBNF", "FIBNG", "FIBNZ",
+"FIBO", "FIBP1", "FIBQF", "FIBQS", "FIBQZ", "FIFO1", "FIFO1NY", "FIFP1XH",
+"fIfro1ny", "fIkn", "fIl", "FILO1", "fIm", "FIMA", "FIMB", "FIME", "FIMNE",
+"FIMNF", "FIMNG", "FIMNZ", "FIMO", "FIMQF", "FIMQS", "FIMQZ", "FINVBA", "FINVBB",
+"FINVBE", "FINVBH", "FINVBNE", "FINVBNF", "FINVBNG", "FINVBNZ", "FINVBO", "FINVBQF",
+"FINVBQS", "FINVBQZ", "fIt", "FKNBA", "FKNBB", "FKNBE", "FKNBH", "FKNBHE",
+"FKNBHL", "FKNBNE", "FKNBNF", "FKNBNG", "FKNBNZ", "FKNBO", "FKNBO1", "FKNBQF",
+"FKNBQS", "FKNBQZ", "fKncb", "FKNMA", "FKNMB", "FKNME", "FKNMNE", "FKNMNF",
+"FKNMNG", "FKNMNZ", "FKNMO", "FKNMO1", "FKNMQF", "FKNMQS", "FKNMQZ", "FM", "fM01",
+"fM2", "fM3", "fM3K", "fM3Q", "fM3R", "fM59", "fM7B", "fM7Y", "fMS", "fmst",
+"fMT", "fmv", "FSPZ_XO1", "FVEA", "FVEB", "FVEE", "FVEH", "FVENE", "FVENF",
+"FVENG", "FVENZ", "FVEO", "FVEQF", "FVEQS", "FVEQZ", "FVMA", "FVMB", "FVME",
+"FVMH", "FVMNE", "FVMNF", "FVMNG", "FVMNZ", "FVMO", "FVMQF", "FVMQS", "FVMQZ",
+"FVO1", "fxa", "fxb", "fxe", "fxh", "fxne", "fxnf", "fxng", "fxnz", "fxo",
+"FXO1", "FXO1GL", "FXO1I", "fxqf", "fxqs", "fxqz", "fye", "fYst", "fytr",
+"fYtrxil", "fYwo1gl", "HA", "HGA", "HGB", "HGE", "HGH", "HGNE", "HGNF", "HGNG",
+"HGNZ", "HGO", "HGQF", "HGQS", "HGQZ", "HGWA", "HGWB", "HGWE", "HGWH", "HGWNE",
+"HGWNF", "HGWNG", "HGWNZ", "HGWO", "HGWQF", "HGWQS", "HGWQZ", "HQ", "HQA",
+"HQB", "HQE", "HQH", "HQNE", "HQNF", "HQNG", "HQNZ", "HQO", "HQO1", "HQQF",
+"HQQS", "HQQZ", "I", "ib", "IBO1", "IBP1", "IFO1NY", "IFP1XH", "Ifro1ny",
+"IF_H", "ikn", "IKN_H", "Il", "ILO1", "IL_H", "im", "IMDP1", "IMO1", "impxd1",
+"INVBA", "INVBB", "INVBE", "INVBH", "INVBNE", "INVBNF", "INVBNG", "INVBNZ",
+"INVBO", "INVBO1", "INVBQF", "INVBQS", "INVBQZ", "INVMO1", "INVO1", "IO1",
+"IO__M01_CB", "IO__M01_CE", "IO__M01_CF", "IO__M01_CG", "IO__M01_CH", "IO__M01_CO",
+"IO__M01_CS", "IO__M01_CT", "IO__M01_CV", "IO__M01_E01", "IO__M01_E2", "IO__M01_E3",
+"IO__M01_E59", "IO__M01_E7Y", "IO__M01_esq", "IO__M01_ess", "IO__M01_ET", "IO__M01_IB",
+"IO__M01_IKN", "IO__M01_IL", "IO__M01_IM", "IO__M01_IT", "IO__m01_vma", "IO__m01_vmb",
+"IO__m01_vme", "IO__m01_vmh", "IO__m01_vmne", "IO__m01_vmnf", "IO__m01_vmng",
+"IO__m01_vmnz", "IO__m01_vmo", "IO__m01_vmqf", "IO__m01_vmqs", "IO__m01_vmqz",
+"IO__M2_CB", "IO__M2_CE", "IO__M2_CF", "IO__M2_CG", "IO__M2_CH", "IO__M2_CO",
+"IO__M2_CS", "IO__M2_CT", "IO__M2_CV", "IO__M2_E01", "IO__M2_E2", "IO__M2_E3",
+"IO__M2_E59", "IO__M2_E7Y", "IO__M2_esq", "IO__M2_ess", "IO__M2_ET", "IO__M2_IB",
+"IO__M2_IKN", "IO__M2_IL", "IO__M2_IM", "IO__M2_IT", "IO__m2_vma", "IO__m2_vmb",
+"IO__m2_vme", "IO__m2_vmh", "IO__m2_vmne", "IO__m2_vmnf", "IO__m2_vmng", "IO__m2_vmnz",
+"IO__m2_vmo", "IO__m2_vmqf", "IO__m2_vmqs", "IO__m2_vmqz", "IO__M3K_CB", "IO__M3K_CE",
+"IO__M3K_CF", "IO__M3K_CG", "IO__M3K_CH", "IO__M3K_CO", "IO__M3K_CS", "IO__M3K_CT",
+"IO__M3K_CV", "IO__M3K_E01", "IO__M3K_E2", "IO__M3K_E3", "IO__M3K_E59", "IO__M3K_E7Y",
+"IO__M3K_esq", "IO__M3K_ess", "IO__M3K_ET", "IO__M3K_IB", "IO__M3K_IKN", "IO__M3K_IL",
+"IO__M3K_IM", "IO__M3K_IT", "IO__m3k_vea", "IO__m3k_veb", "IO__m3k_vee", "IO__m3k_veh",
+"IO__m3k_vene", "IO__m3k_venf", "IO__m3k_veng", "IO__m3k_venz", "IO__m3k_veo",
+"IO__m3k_veqf", "IO__m3k_veqs", "IO__m3k_veqz", "IO__M3Q_CB", "IO__M3Q_CE",
+"IO__M3Q_CF", "IO__M3Q_CG", "IO__M3Q_CH", "IO__M3Q_CO", "IO__M3Q_CS", "IO__M3Q_CT",
+"IO__M3Q_CV", "IO__M3Q_E01", "IO__M3Q_E2", "IO__M3Q_E3", "IO__M3Q_E59", "IO__M3Q_E7Y",
+"IO__M3Q_esq", "IO__M3Q_ess", "IO__M3Q_ET", "IO__M3Q_IB", "IO__M3Q_IKN", "IO__M3Q_IL",
+"IO__M3Q_IM", "IO__M3Q_IT", "IO__m3q_vea", "IO__m3q_veb", "IO__m3q_vee", "IO__m3q_veh",
+"IO__m3q_vene", "IO__m3q_venf", "IO__m3q_veng", "IO__m3q_venz", "IO__m3q_veo",
+"IO__m3q_veqf", "IO__m3q_veqs", "IO__m3q_veqz", "IO__M3R_CB", "IO__M3R_CE",
+"IO__M3R_CF", "IO__M3R_CG", "IO__M3R_CH", "IO__M3R_CO", "IO__M3R_CS", "IO__M3R_CT",
+"IO__M3R_CV", "IO__M3R_E01", "IO__M3R_E2", "IO__M3R_E3", "IO__M3R_E59", "IO__M3R_E7Y",
+"IO__M3R_esq", "IO__M3R_ess", "IO__M3R_ET", "IO__M3R_IB", "IO__M3R_IKN", "IO__M3R_IL",
+"IO__M3R_IM", "IO__M3R_IT", "IO__m3r_vea", "IO__m3r_veb", "IO__m3r_vee", "IO__m3r_veh",
+"IO__m3r_vene", "IO__m3r_venf", "IO__m3r_veng", "IO__m3r_venz", "IO__m3r_veo",
+"IO__m3r_veqf", "IO__m3r_veqs", "IO__m3r_veqz", "IO__M59_CB", "IO__M59_CE",
+"IO__M59_CF", "IO__M59_CG", "IO__M59_CH", "IO__M59_CO", "IO__M59_CS", "IO__M59_CT",
+"IO__M59_CV", "IO__M59_E01", "IO__M59_E2", "IO__M59_E3", "IO__M59_E59", "IO__M59_E7Y",
+"IO__M59_esq", "IO__M59_ess", "IO__M59_ET", "IO__M59_IB", "IO__M59_IKN", "IO__M59_IL",
+"IO__M59_IM", "IO__M59_IT", "IO__m59_vma", "IO__m59_vmb", "IO__m59_vme", "IO__m59_vmh",
+"IO__m59_vmne", "IO__m59_vmnf", "IO__m59_vmng", "IO__m59_vmnz", "IO__m59_vmo",
+"IO__m59_vmqf", "IO__m59_vmqs", "IO__m59_vmqz", "IO__M7B_CB", "IO__M7B_CE",
+"IO__M7B_CF", "IO__M7B_CG", "IO__M7B_CH", "IO__M7B_CO", "IO__M7B_CS", "IO__M7B_CT",
+"IO__M7B_CV", "IO__M7B_E01", "IO__M7B_E2", "IO__M7B_E3", "IO__M7B_E59", "IO__M7B_E7Y",
+"IO__M7B_esq", "IO__M7B_ess", "IO__M7B_ET", "IO__M7B_IB", "IO__M7B_IKN", "IO__M7B_IL",
+"IO__M7B_IM", "IO__M7B_IT", "IO__m7b_vma", "IO__m7b_vmb", "IO__m7b_vme", "IO__m7b_vmh",
+"IO__m7b_vmne", "IO__m7b_vmnf", "IO__m7b_vmng", "IO__m7b_vmnz", "IO__m7b_vmo",
+"IO__m7b_vmqf", "IO__m7b_vmqs", "IO__m7b_vmqz", "IO__M7Y_CB", "IO__M7Y_CE",
+"IO__M7Y_CF", "IO__M7Y_CG", "IO__M7Y_CH", "IO__M7Y_CO", "IO__M7Y_CS", "IO__M7Y_CT",
+"IO__M7Y_CV", "IO__M7Y_E01", "IO__M7Y_E2", "IO__M7Y_E3", "IO__M7Y_E59", "IO__M7Y_E7Y",
+"IO__M7Y_esq", "IO__M7Y_ess", "IO__M7Y_ET", "IO__M7Y_IB", "IO__M7Y_IKN", "IO__M7Y_IL",
+"IO__M7Y_IT", "IO__m7y_vma", "IO__m7y_vmb", "IO__m7y_vme", "IO__m7y_vmh",
+"IO__m7y_vmne", "IO__m7y_vmnf", "IO__m7y_vmng", "IO__m7y_vmnz", "IO__m7y_vmo",
+"IO__m7y_vmqf", "IO__m7y_vmqs", "IO__m7y_vmqz", "IO__MS_CB", "IO__MS_CE", "IO__MS_CF",
+"IO__MS_CG", "IO__MS_CH", "IO__MS_CO", "IO__MS_CS", "IO__MS_CT", "IO__MS_CV",
+"IO__MS_E01", "IO__MS_E2", "IO__MS_E3", "IO__MS_E59", "IO__MS_E7Y", "IO__Ms_esq",
+"IO__Ms_ess", "IO__MS_ET", "IO__MS_IB", "IO__MS_IKN", "IO__MS_IL", "IO__MS_IM",
+"IO__MS_IT", "IO__ms_vma", "IO__ms_vmb", "IO__ms_vme", "IO__ms_vmh", "IO__ms_vmne",
+"IO__ms_vmnf", "IO__ms_vmng", "IO__ms_vmnz", "IO__ms_vmo", "IO__ms_vmqf", "IO__ms_vmqs",
+"IO__ms_vmqz", "IO__MT_CB", "IO__MT_CE", "IO__MT_CF", "IO__MT_CG", "IO__MT_CH",
+"IO__MT_CO", "IO__MT_CS", "IO__MT_CT", "IO__MT_CV", "IO__MT_E01", "IO__MT_E2",
+"IO__MT_E3", "IO__MT_E59", "IO__MT_E7Y", "IO__MT_esq", "IO__MT_ess", "IO__MT_ET",
+"IO__MT_IB", "IO__MT_IKN", "IO__MT_IL", "IO__MT_IT", "IO__mt_vma", "IO__mt_vmb",
+"IO__mt_vme", "IO__mt_vmh", "IO__mt_vmne", "IO__mt_vmnf", "IO__mt_vmng", "IO__mt_vmnz",
+"IO__mt_vmo", "IO__mt_vmqf", "IO__mt_vmqs", "IO__mt_vmqz", "IO__SPG_CB", "IO__SPG_CE",
+"IO__SPG_CF", "IO__SPG_CG", "IO__SPG_CH", "IO__SPG_CO", "IO__SPG_CS", "IO__SPG_CT",
+"IO__SPG_CV", "IO__SPG_E01", "IO__SPG_E2", "IO__SPG_E3", "IO__SPG_E59", "IO__SPG_E7Y",
+"IO__SPG_ET", "IO__SPG_IB", "IO__SPG_IKN", "IO__SPG_IL", "IO__SPG_IM", "IO__SPG_IT",
+"IO__SPM_CB", "IO__SPM_CE", "IO__SPM_CF", "IO__SPM_CG", "IO__SPM_CH", "IO__SPM_CO",
+"IO__SPM_CS", "IO__SPM_CT", "IO__SPM_CV", "IO__SPM_E01", "IO__SPM_E2", "IO__SPM_E3",
+"IO__SPM_E59", "IO__SPM_E7Y", "IO__SPM_ES", "IO__SPM_ET", "IO__SPM_IB", "IO__SPM_IKN",
+"IO__SPM_IL", "IO__SPM_IM", "IO__SPM_IT", "IO__SPP_CB", "IO__SPP_CE", "IO__SPP_CF",
+"IO__SPP_CG", "IO__SPP_CH", "IO__SPP_CO", "IO__SPP_CS", "IO__SPP_CT", "IO__SPP_CV",
+"IO__SPP_E01", "IO__SPP_E2", "IO__SPP_E3", "IO__SPP_E59", "IO__SPP_E7Y", "IO__SPP_ES",
+"IO__SPP_ET", "IO__SPP_IB", "IO__SPP_IKN", "IO__SPP_IL", "IO__SPP_IM", "IO__SPP_IT",
+"IO__SPZ_IL", "IO__SPZ_XA", "IO__SPZ_XB", "IO__SPZ_XE", "IO__SPZ_XH", "IO__SPZ_XNE",
+"IO__SPZ_XNF", "IO__SPZ_XNG", "IO__SPZ_XNZ", "IO__SPZ_XO", "IO__SPZ_XQF", "IO__SPZ_XQS",
+"IO__SPZ_XQZ", "IO__XA_CB", "IO__XA_CE", "IO__XA_CF", "IO__XA_CG", "IO__XA_CH",
+"IO__XA_CO", "IO__XA_CS", "IO__XA_CT", "IO__XA_CV", "IO__XA_E01", "IO__XA_E2",
+"IO__XA_E3", "IO__XA_E59", "IO__XA_E7Y", "IO__XA_esq", "IO__XA_ess", "IO__XA_ET",
+"IO__XA_IB", "IO__XA_IKN", "IO__XA_IL", "IO__XA_IM", "IO__XA_IT", "IO__xa_vma",
+"IO__xa_vmb", "IO__xa_vme", "IO__xa_vmh", "IO__xa_vmne", "IO__xa_vmnf", "IO__xa_vmng",
+"IO__xa_vmnz", "IO__xa_vmo", "IO__xa_vmqf", "IO__xa_vmqs", "IO__xa_vmqz", "IO__XB_CB",
+"IO__XB_CE", "IO__XB_CF", "IO__XB_CG", "IO__XB_CH", "IO__XB_CO", "IO__XB_CS",
+"IO__XB_CT", "IO__XB_CV", "IO__XB_E01", "IO__XB_E2", "IO__XB_E3", "IO__XB_E59",
+"IO__XB_E7Y", "IO__XB_esq", "IO__XB_ess", "IO__XB_ET", "IO__XB_IB", "IO__XB_IKN",
+"IO__XB_IL", "IO__XB_IM", "IO__XB_IT", "IO__xb_vma", "IO__xb_vmb", "IO__xb_vme",
+"IO__xb_vmh", "IO__xb_vmne", "IO__xb_vmnf", "IO__xb_vmng", "IO__xb_vmnz", "IO__xb_vmo",
+"IO__xb_vmqf", "IO__xb_vmqs", "IO__xb_vmqz", "IO__XE_CB", "IO__XE_CE", "IO__XE_CF",
+"IO__XE_CG", "IO__XE_CH", "IO__XE_CS", "IO__XE_CT", "IO__XE_CV", "IO__XE_E01",
+"IO__XE_E2", "IO__XE_E3", "IO__XE_E59", "IO__XE_E7Y", "IO__XE_esq", "IO__XE_ess",
+"IO__XE_ET", "IO__XE_IB", "IO__XE_IKN", "IO__XE_IL", "IO__XE_IM", "IO__XE_IT",
+"IO__xe_vea", "IO__xe_veb", "IO__xe_vee", "IO__xe_veh", "IO__xe_vene", "IO__xe_venf",
+"IO__xe_veng", "IO__xe_venz", "IO__xe_veo", "IO__xe_veqf", "IO__xe_veqs", "IO__xe_veqz",
+"IO__XH_CB", "IO__XH_CE", "IO__XH_CF", "IO__XH_CG", "IO__XH_CH", "IO__XH_CO",
+"IO__XH_CS", "IO__XH_CT", "IO__XH_CV", "IO__XH_E01", "IO__XH_E2", "IO__XH_E3",
+"IO__XH_E59", "IO__XH_E7Y", "IO__XH_esq", "IO__XH_ess", "IO__XH_ET", "IO__XH_IB",
+"IO__XH_IKN", "IO__XH_IL", "IO__XH_IM", "IO__XH_IT", "IO__xh_vma", "IO__xh_vmb",
+"IO__xh_vme", "IO__xh_vmh", "IO__xh_vmne", "IO__xh_vmnf", "IO__xh_vmng", "IO__xh_vmnz",
+"IO__xh_vmo", "IO__xh_vmqf", "IO__xh_vmqs", "IO__xh_vmqz", "IO__XNE_CB", "IO__XNE_CE",
+"IO__XNE_CF", "IO__XNE_CG", "IO__XNE_CH", "IO__XNE_CO", "IO__XNE_CS", "IO__XNE_CT",
+"IO__XNE_CV", "IO__XNE_E01", "IO__XNE_E2", "IO__XNE_E3", "IO__XNE_E59", "IO__XNE_E7Y",
+"IO__XNE_esq", "IO__XNE_ess", "IO__XNE_ET", "IO__XNE_IB", "IO__XNE_IKN", "IO__XNE_IL",
+"IO__XNE_IM", "IO__XNE_IT", "IO__xne_vea", "IO__xne_veb", "IO__xne_vee", "IO__xne_veh",
+"IO__xne_vene", "IO__xne_venf", "IO__xne_veng", "IO__xne_venz", "IO__xne_veo",
+"IO__xne_veqf", "IO__xne_veqs", "IO__xne_veqz", "IO__XNF_CB", "IO__XNF_CE",
+"IO__XNF_CF", "IO__XNF_CG", "IO__XNF_CH", "IO__XNF_CO", "IO__XNF_CS", "IO__XNF_CT",
+"IO__XNF_CV", "IO__XNF_E01", "IO__XNF_E2", "IO__XNF_E3", "IO__XNF_E59", "IO__XNF_E7Y",
+"IO__XNF_esq", "IO__XNF_ess", "IO__XNF_ET", "IO__XNF_IB", "IO__XNF_IKN", "IO__XNF_IL",
+"IO__XNF_IM", "IO__XNF_IT", "IO__xnf_vma", "IO__xnf_vmb", "IO__xnf_vme", "IO__xnf_vmh",
+"IO__xnf_vmne", "IO__xnf_vmnf", "IO__xnf_vmng", "IO__xnf_vmnz", "IO__xnf_vmo",
+"IO__xnf_vmqf", "IO__xnf_vmqs", "IO__xnf_vmqz", "IO__XNG_CB", "IO__XNG_CE",
+"IO__XNG_CF", "IO__XNG_CG", "IO__XNG_CH", "IO__XNG_CO", "IO__XNG_CS", "IO__XNG_CT",
+"IO__XNG_CV", "IO__XNG_E01", "IO__XNG_E2", "IO__XNG_E3", "IO__XNG_E59", "IO__XNG_E7Y",
+"IO__XNG_esq", "IO__XNG_ess", "IO__XNG_ET", "IO__XNG_IB", "IO__XNG_IKN", "IO__XNG_IL",
+"IO__XNG_IM", "IO__XNG_IT", "IO__xng_vea", "IO__xng_veb", "IO__xng_vee", "IO__xng_veh",
+"IO__xng_vene", "IO__xng_venf", "IO__xng_veng", "IO__xng_venz", "IO__xng_veo",
+"IO__xng_veqf", "IO__xng_veqs", "IO__xng_veqz", "IO__XNZ_CB", "IO__XNZ_CE",
+"IO__XNZ_CF", "IO__XNZ_CG", "IO__XNZ_CH", "IO__XNZ_CO", "IO__XNZ_CS", "IO__XNZ_CT",
+"IO__XNZ_CV", "IO__XNZ_E01", "IO__XNZ_E2", "IO__XNZ_E3", "IO__XNZ_E59", "IO__XNZ_E7Y",
+"IO__XNZ_esq", "IO__XNZ_ess", "IO__XNZ_ET", "IO__XNZ_IB", "IO__XNZ_IKN", "IO__XNZ_IL",
+"IO__XNZ_IM", "IO__XNZ_IT", "IO__xnz_vma", "IO__xnz_vmb", "IO__xnz_vme", "IO__xnz_vmh",
+"IO__xnz_vmne", "IO__xnz_vmnf", "IO__xnz_vmng", "IO__xnz_vmnz", "IO__xnz_vmo",
+"IO__xnz_vmqf", "IO__xnz_vmqs", "IO__xnz_vmqz", "IO__XO_CB", "IO__XO_CE", "IO__XO_CF",
+"IO__XO_CG", "IO__XO_CH", "IO__XO_CO", "IO__XO_CS", "IO__XO_CT", "IO__XO_CV",
+"IO__XO_E01", "IO__XO_E2", "IO__XO_E3", "IO__XO_E59", "IO__XO_E7Y", "IO__XO_esq",
+"IO__XO_ess", "IO__XO_ET", "IO__XO_IB", "IO__XO_IKN", "IO__XO_IL", "IO__XO_IM",
+"IO__XO_IT", "IO__xo_vma", "IO__xo_vmb", "IO__xo_vme", "IO__xo_vmh", "IO__xo_vmne",
+"IO__xo_vmnf", "IO__xo_vmng", "IO__xo_vmnz", "IO__xo_vmo", "IO__xo_vmqf", "IO__xo_vmqs",
+"IO__xo_vmqz", "IO__XQF_CB", "IO__XQF_CE", "IO__XQF_CF", "IO__XQF_CG", "IO__XQF_CH",
+"IO__XQF_CO", "IO__XQF_CS", "IO__XQF_CT", "IO__XQF_CV", "IO__XQF_E01", "IO__XQF_E2",
+"IO__XQF_E3", "IO__XQF_E59", "IO__XQF_E7Y", "IO__XQF_esq", "IO__XQF_ess", "IO__XQF_ET",
+"IO__XQF_IB", "IO__XQF_IKN", "IO__XQF_IL", "IO__XQF_IM", "IO__XQF_IT", "IO__xqf_vma",
+"IO__xqf_vmb", "IO__xqf_vme", "IO__xqf_vmh", "IO__xqf_vmne", "IO__xqf_vmnf",
+"IO__xqf_vmng", "IO__xqf_vmnz", "IO__xqf_vmo", "IO__xqf_vmqf", "IO__xqf_vmqs",
+"IO__xqf_vmqz", "IO__XQS_CB", "IO__XQS_CE", "IO__XQS_CF", "IO__XQS_CG", "IO__XQS_CH",
+"IO__XQS_CO", "IO__XQS_CS", "IO__XQS_CT", "IO__XQS_CV", "IO__XQS_E01", "IO__XQS_E2",
+"IO__XQS_E3", "IO__XQS_E59", "IO__XQS_E7Y", "IO__Xqs_esq", "IO__Xqs_ess", "IO__XQS_ET",
+"IO__XQS_IB", "IO__XQS_IKN", "IO__XQS_IL", "IO__XQS_IM", "IO__XQS_IT", "IO__xqs_vma",
+"IO__xqs_vmb", "IO__xqs_vme", "IO__xqs_vmh", "IO__xqs_vmne", "IO__xqs_vmnf",
+"IO__xqs_vmng", "IO__xqs_vmnz", "IO__xqs_vmo", "IO__xqs_vmqf", "IO__xqs_vmqs",
+"IO__xqs_vmqz", "IO__XQZ_CB", "IO__XQZ_CE", "IO__XQZ_CF", "IO__XQZ_CG", "IO__XQZ_CH",
+"IO__XQZ_CO", "IO__XQZ_CS", "IO__XQZ_CT", "IO__XQZ_CV", "IO__XQZ_E01", "IO__XQZ_E2",
+"IO__XQZ_E3", "IO__XQZ_E59", "IO__XQZ_E7Y", "IO__Xqz_esq", "IO__Xqz_ess", "IO__XQZ_ET",
+"IO__XQZ_IB", "IO__XQZ_IKN", "IO__XQZ_IL", "IO__XQZ_IM", "IO__XQZ_IT", "IO__xqz_vma",
+"IO__xqz_vmb", "IO__xqz_vme", "IO__xqz_vmh", "IO__xqz_vmne", "IO__xqz_vmnf",
+"IO__xqz_vmng", "IO__xqz_vmnz", "IO__xqz_vmo", "IO__xqz_vmqf", "IO__xqz_vmqs",
+"IO__xqz_vmqz", "IO__YR_IL", "IO__YW_IL", "it", "iuwse", "Ivbps", "Ivmps", "iw3m",
+"IWB30", "IWBEU", "IWBFLX", "iwbid", "IWBOS", "IWBOSU", "iwbus", "IWBZ", "IWDE",
+"IWDI", "IWEU", "IWLO", "IWMM", "IZN_H", "IZN_O", "JTyrkr", "KNBA", "KNBB",
+"KNBE", "KNBH", "KNBHK_H", "KNBNE", "KNBNF", "KNBNG", "KNBNZ", "KNBO", "KNBO1",
+"KNBQF", "KNBQS", "KNBQZ", "KNMA", "KNMB", "KNME", "KNMNE", "KNMNF", "KNMNG",
+"KNMNZ", "KNMO", "KNMO1", "KNMQF", "KNMQS", "KNMQZ", "KTPC_F", "LNA", "lnda",
+"M", "m01", "m2", "M3", "m3k", "m3q", "m3r", "m59", "m7b", "m7y", "m7y_im",
+"ms", "Mst", "mt", "MV", "NBS", "owbcp_z_cf", "OWbd_os_z", "OWbe_os_z",
+"owbm_cf_z", "owbp_z_cf", "owbp_z_h", "owB_Z_OS", "owcp_cf_e", "Owcp_cf_h",
+"OWG_E_CF", "ownbr_cf", "ownbr_h", "owNB_CR", "owNB_E", "owNB_OK", "ownb_oo",
+"owNQ_E", "OWN_E", "OWN_H", "OWN_O", "OWPCO1_BF", "owpco1_LD", "OWPCO2_BF",
+"owpco2_LD", "OWPCR_ATP", "OWPCR_BF", "OWPCR_DMP", "OWPCR_SP", "OWPIO1_BF",
+"OWPIO2_BF", "OWPIR_BF", "owP_CF_E", "owP_CF_H", "owscp_d_cf", "owscp_e_cf",
+"owsp_d_cf", "owsp_d_h", "owsp_e_cf", "owsp_e_h", "owsr_d_cf", "owsr_d_h",
+"owsr_e_cf", "owsr_e_h", "owS_CF_Z", "owS_CR_Z", "Ows_d_cr", "OWS_D_OK", "OWS_D_OO",
+"OWS_D_OS", "Ows_e_cr", "Ows_e_ok", "OWS_E_OO", "OWS_E_OS", "owS_E_Z", "owS_Z_E",
+"pcb", "pce", "pcf", "pcg", "pch", "pco", "pcp", "PCRS", "pcs", "pct", "pcv",
+"pe", "pE01", "pE2", "pE3", "pE59", "pE7y", "PEE3R", "PEET", "PESQ", "pess",
+"pest", "pEt", "pev", "PFP", "PFPB", "PFPE", "PFPF", "PFPG", "PFPH", "PFPS",
+"PFPV", "PHK", "PHP", "PHV", "pi", "pIb", "PIBA", "PIBB", "PIBE", "PIBH",
+"PIBNE", "PIBNF", "PIBNG", "PIBNZ", "PIBO", "PIBO1", "PIBP1", "PIBQF", "PIBQS",
+"PIBQZ", "PIFO1", "PIFO1NY", "PIFP1XH", "pifro1ny", "pIkn", "pIl", "PILO", "pIm",
+"PIMA", "PIMB", "PIME", "PIMNE", "PIMNF", "PIMNG", "PIMNZ", "PIMO", "PIMO1",
+"PIMQF", "PIMQS", "PIMQZ", "PINVBO1", "PINVMO1", "PINVO1", "pIt", "PKNBA",
+"PKNBB", "PKNBE", "PKNBH", "PKNBNE", "PKNBNF", "PKNBNG", "PKNBNZ", "PKNBO",
+"PKNBO1", "PKNBQF", "PKNBQS", "PKNBQZ", "PKNMA", "PKNMB", "PKNME", "PKNMNE",
+"PKNMNF", "PKNMNG", "PKNMNZ", "PKNMO", "PKNMO1", "PKNMQF", "PKNMQS", "PKNMQZ",
+"PM", "pM01", "pM2", "pM3", "pM3K", "pM3Q", "pM3R", "pM59", "pM7B", "pM7Y",
+"pMS", "pmst", "pMT", "pmv", "PNP", "PNPB", "PNPE", "PNPF", "PNPG", "PNPH",
+"PNPS", "PNPV", "PSPZ_XO1", "PTTYL", "pttyo", "PTTYP", "PVEA", "PVEB", "PVEE",
+"PVEH", "PVENE", "PVENF", "PVENG", "PVENZ", "PVEO", "PVEQF", "PVEQS", "PVEQZ",
+"PVMA", "PVMB", "PVME", "PVMH", "PVMNE", "PVMNF", "PVMNG", "PVMNZ", "PVMO",
+"PVMQF", "PVMQS", "PVMQZ", "PVO1", "pxa", "pxb", "pxe", "pxh", "pxne", "pxnf",
+"pxng", "pxnz", "pxo", "PXO1", "PXO1GL", "pxo1i", "pxqf", "pxqs", "pxqz",
+"pYst", "pytr", "pYtrxil", "pywo1gl", "Q", "QA", "QB", "QE", "QH", "QLTF",
+"Qltf2", "QLTJD", "QLTJK", "Qltjki", "QLTR", "QLTS", "QM", "QMB", "QMS", "QMXA",
+"QMXB", "QMXE", "QMXH", "QMXNE", "QMXNF", "QMXNG", "QMXNZ", "QMXO", "QMXO1",
+"QMXQF", "QMXQS", "QMXQZ", "QNE", "QNF", "QNG", "QNZ", "QO", "QO1", "QPFO",
+"QPFP", "QPSP", "QPTP", "QQF", "QQS", "QQZ", "QWA", "QWB", "QWE", "QWH",
+"QWNE", "QWNF", "QWNG", "QWNZ", "QWO", "QWQF", "QWQS", "QWQZ", "SAQW", "SASR",
+"SK_H_O", "spg", "Spg_CB", "Spg_CE", "Spg_CF", "Spg_CG", "Spg_CH", "Spg_CO",
+"Spg_CS", "Spg_CV", "Spg_IB", "SPG_IBH", "Spg_ibo1", "Spg_ibp1", "Spg_IKN",
+"Spg_IL", "Spg_im", "Spg_imo1", "Spg_imp1", "Spg_Xa", "Spg_Xb", "Spg_Xe", "Spg_Xh",
+"Spg_Xne", "Spg_Xnf", "Spg_Xng", "Spg_Xnz", "Spg_Xo", "Spg_Xqf", "Spg_Xqs",
+"Spg_Xqz", "spm", "spm_xa", "spm_xb", "spm_xe", "spm_xh", "spm_xne", "spm_xnf",
+"spm_xng", "spm_xnz", "spm_xo", "spm_xqf", "spm_xqs", "spm_xqz", "SPP", "SPPTEU",
+"SPPU", "SPPUPSO", "SPP_IBH", "Spp_ibo1", "Spp_ibp1", "Spp_imo1", "Spp_imp1",
+"SPP_VMA", "SPP_VMNF", "SPR", "SPR_CB", "SPR_CO", "spr_imp1", "SPTEU", "SPT_O",
+"SPUEU", "SPU_O", "spz", "SPZAB", "SPZAM", "SPZAUD", "SPZCO2", "SPZEJH",
+"SPZEJXH", "SPZU", "SPZUL", "SPZUPSO", "SPZU_XO1", "SPZV", "Spz_Xa", "Spz_Xb",
+"Spz_Xe", "Spz_Xh", "Spz_Xne", "Spz_Xnf", "Spz_Xng", "Spz_Xnz", "Spz_Xo", "SPZ_XO1",
+"Spz_Xqf", "Spz_Xqs", "Spz_Xqz", "SSY", "SSYA", "SSYD", "SSYEJ", "SSYS1", "SSYS2",
+"SSYS3", "SSYSP1", "SSYSP2", "SSYSP3", "SSYV", "STPT", "STP_O", "SYA", "SYC",
+"Syc_e", "SYC_H", "SYK", "SYM", "SYN_E", "SYP", "SYPR", "SYV", "SYWP",
+"SYWPCO1_BF", "sywpco1_LD", "SYWPCO2_BF", "sywpco2_LD", "SYWPCR_ATP", "SYWPCR_BF",
+"SYWPCR_DMP", "SYWPCR_SP", "SYWPIO1_BF", "SYWPIO2_BF", "SYWPIR_BF", "SY_O",
+"TFLM_CF_CF", "TFLM_CR_CF", "TFLM_E_CF", "TFLM_H_CF", "tflm_ok_cf", "tfnq_cf",
+"tfnq_cr", "tfnq_h", "tfnq_ok", "tfnq_oo", "tfnq_os", "TFN_CF", "TFN_CR", "TFN_E",
+"TFN_H", "TFN_O", "tfs_cf_z", "tfs_cr_z", "TF_O_Z", "TF_Z_O", "TG", "TIID_OS_Z",
+"TIIE_OS_Z", "tiim_cf_x", "TIIN_CF", "TIIN_CR", "tiin_e", "tiin_h", "TIIN_OK",
+"TIIN_OO", "TII_Z_OS", "TIN_E", "TIN_H", "TIN_O", "TIOII", "TIPCO1_BF", "tipco1_LD",
+"TIPCO2_BF", "tipco2_LD", "TIPCR_ATP", "TIPCR_BF", "TIPCR_DMP", "TIPCR_SP",
+"TIPIO1_BF", "TIPIO2_BF", "TIPIR_BF", "tipppsu", "Tip_cf_h", "TIP_CF_Z", "TIRE_O",
+"TIRK", "TIRN_O", "TIRO", "Tiue_z_os", "TIUO_Z_O", "TIU_CF_Z", "TIU_CR_Z",
+"TIU_E_Z", "TIU_Z_CF", "TIU_Z_CR", "TIU_Z_E", "TIU_Z_H", "TIU_Z_OK", "TIU_Z_OO",
+"TIU_Z_OS", "TI_OK_Z", "TI_OO_Z", "TI_O_Z", "TI_Z_O", "TKNR_H", "TKS", "TK_E_O",
+"TK_HC_O", "TK_O_C", "TK_O_E", "TK_O_H", "TPAF", "tpatpo", "TPCO1_BF", "tpco1_LD",
+"TPCO2_BF", "tpco2_LD", "TPCR_ATP", "TPCR_BF", "TPCR_DMP", "TPCR_SP", "TPC_E_Z",
+"TPC_FATP", "TPC_H_CF", "TPC_H_E", "TPEF", "TPIO1_BF", "TPIO2_BF", "TPIR_BF", "TPR",
+"TPT_O", "TP_H_O", "TRG_O_EU", "TRKS", "TRN_H", "TRR_HC_O", "TRR_O_E", "TRR_O_EU",
+"Trr_o_h", "TRY_O_EU", "TR_ER_O", "TR_EU_O", "TR_O_E", "TR_O_EF", "TR_O_EG",
+"tr_o_h", "tr_o_hnpis", "TSDL", "TSPZEJ", "TSSYEJ", "TSUIH", "TSYA", "TSYC",
+"TSYP", "TSYS1", "TSYS2", "TSYSP1", "TSYSP2", "TSYSP3", "TSYWP", "TVEA", "TVEB",
+"TVEE", "TVEH", "TVENE", "TVENF", "TVENG", "TVENZ", "TVEO", "TVEQF", "TVEQS",
+"TVEQZ", "TVMB", "TVME", "TVMH", "TVMNE", "TVMNG", "TVMNZ", "TVMO", "TVMQF",
+"TVMQS", "TVMQZ", "TYD", "TYMB", "TYMLF", "TYMO", "TYMR", "TYMS", "TYPCO1_BF",
+"typco1_LD", "TYPCO2_BF", "typco2_LD", "TYPCR_ATP", "TYPCR_BF", "TYPCR_DMP",
+"TYPCR_SP", "TYPC_CF_E", "TYPC_CF_H", "TYPC_E_H", "TYPEF", "TYPFO", "TYPFO_E",
+"TYPFP", "TYPFP_E", "TYPFY", "TYPI", "TYPIO1_BF", "TYPIO2_BF", "TYPIR_BF", "TYPOV",
+"TYPPT", "TYPQ", "Typsp", "Typsp_e", "TYPT", "Typtp", "Typtp_e", "TYRBF", "TYRGC",
+"TYRHS", "TYRHY", "Tyrkf", "TYRKI", "TYRKK", "TYRKRR", "TYRKRS", "TYRKU", "TYRMC",
+"TYRRE", "TYRRR", "TYRRS", "TYUADA", "Tyuadj", "TYUADR", "TYUAK", "TYULY",
+"TYURY", "TYUSU", "TY_O", "TY_O_H", "U", "UA", "UAD", "Uaki", "UAKK", "Uakly",
+"Uakr", "Uakry", "Uaks", "UAKU", "UKI", "Ukiy", "UKR", "UL", "ULB", "ULD",
+"ULF", "ULK", "ULKI", "ULY", "Ulyy", "UMBXA", "UMO", "UMR", "UMSXA", "Umsy",
+"UPEF", "UPFO", "UPFOU", "UPFP", "UPFPU", "UPFY", "UPOV", "UPSP", "UPSPU",
+"UPT", "UPTP", "UPTPU", "URY", "Uryy", "USU", "VEA", "VEB", "VEE", "VEH",
+"VENE", "VENF", "VENG", "VENZ", "VEO", "Veo1", "VEQF", "VEQS", "VEQZ", "VMA",
+"VMB", "VME", "VMH", "VMNE", "VMNF", "VMNG", "VMNZ", "VMO", "Vmo1", "VMQF",
+"VMQS", "VMQZ", "VO1", "wbcp_z_cf", "wbd_os_z", "Wbe_os_z", "wbm_cf_z", "wbp_z_cf",
+"wbp_z_h", "wb_o_x", "wb_x_o", "wcp_cf_e", "wcp_cf_h", "wFPB", "wFPE", "wFPF",
+"wFPG", "wFPH", "wFPS", "wFPV", "wg_e_cf", "wHPB", "wHPE", "wHPF", "wHPG",
+"wHPH", "wHPS", "wHPV", "wlm_cf_cf", "wlm_cr_cf", "wlm_e_cf", "wlm_h_cf",
+"wlm_ok_cf", "wnbr_cf", "wnbr_h", "wnb_cf", "wnb_cr", "wnb_e", "wnb_h", "wnb_ok",
+"wnb_oo", "wnb_os", "wNPB", "wNPE", "wNPF", "wNPG", "wNPH", "wNPS", "wNPV",
+"wnq_cf", "wnq_cr", "wnq_e", "wnq_h", "wnq_ok", "wnq_oo", "wnq_os", "wn_cf",
+"wn_cr", "wn_e", "wn_h", "wn_o", "Wn_osslog", "WP", "WPCO1_BF", "wpco1_LD",
+"WPCO2_BF", "Wpco2_LD", "WPCR_ATP", "WPCR_BF", "WPCR_DMP", "WPCR_SP", "wpc_bf",
+"WPIO1_BF", "WPIO2_BF", "WPIR_BF", "wp_cf_e", "wp_cf_h", "wq_z_h", "wscp_d_cf",
+"wscp_e_cf", "wsp_d_cf", "wsp_d_h", "wsp_e_cf", "wsp_e_h", "wsr_d_cf", "wsr_d_h",
+"Wsr_e_cf", "wsr_e_h", "ws_cf_z", "ws_cr_z", "ws_d_cr", "ws_d_o", "ws_d_ok",
+"WS_D_OO", "WS_D_OS", "ws_e_cr", "ws_e_o", "ws_e_ok", "WS_E_OO", "WS_E_OS",
+"ws_e_z", "ws_z_e", "WZZOMUXA", "w_O_X", "w_X_O", "xa", "xb", "xe", "xh", "xne",
+"xnf", "xng", "xnz", "xo", "XO1", "XO1I", "XO1_P", "xqf", "xqs", "xqz",
+"YD_H", "YI", "Yk", "Yl", "Ylwas", "Ylwqs", "yr", "Yra", "Yrb", "Yre", "Yrh",
+"Yrne", "Yrnf", "Yrng", "Yrnz", "Yro", "Yrqf", "Yrqs", "Yrqz", "YR_H", "YS",
+"YSP", "Yst", "Ytr", "Ytrxil", "yw", "Ywa", "Ywb", "Ywe", "Ywh", "Ywne",
+"Ywnf", "Ywng", "Ywnz", "YWN_E", "Ywo", "YWO1", "Ywqf", "Ywqs", "Ywqz"
+                };
+            Globals.traceChunksRelevant = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            foreach (string s in temp) Globals.traceChunksRelevant.Add(s, false);
+        }
+
+        private static List<TraceFrame> TraceAnalyzeUsers(TraceFrame traceFrame, bool onlyObk, long big)
+        {
+            List<TraceFrame> traceFrames = new List<TraceFrame>();
+            long counterCurrent = -1;
+            for (int i = 0; i < traceFrame.counter.Count; i++)
+            {
+                if (onlyObk)
+                {
+                    if (!G.Equal(Path.GetFileName(traceFrame.databankFile[i]), "obk.gbk"))
+                    {
+                        continue;
+                    }
+                }
+                long counteri = traceFrame.counter[i];
+                long dif = counteri - counterCurrent;
+                if (Math.Abs(dif) > big)
+                {
+                    traceFrames.Add(new TraceFrame());
+                }
+                traceFrames[traceFrames.Count - 1].Add(traceFrame, i);
+                counterCurrent = counteri;
+            }
+            return traceFrames;
+        }
+
+        private static List<TraceFrame> TraceAnalyzeSessions(List<TraceFrame> traceFramesInput, double gap)
+        {
+            List<TraceFrame> traceFrames = new List<TraceFrame>();
+            long counterCurrent = -1;
+            DateTime stampCurrent = DateTime.MinValue;
+            foreach (TraceFrame traceFrame in traceFramesInput)
+            {
+                traceFrames.Add(new TraceFrame());
+                stampCurrent = traceFrame.stamp[0];
+                for (int i = 0; i < traceFrame.counter.Count; i++)
+                {
+                    long counteri = traceFrame.counter[i];
+                    DateTime stampi = traceFrame.stamp[i];
+
+                    double dif = (stampi - stampCurrent).TotalSeconds;
+                    if (i > 0 && dif < 0d)
+                    {
+                        new Error("Hov");
+                    }
+                    if (Math.Abs(dif) > gap)
+                    {
+                        traceFrames.Add(new TraceFrame());
+                    }
+
+                    traceFrames[traceFrames.Count - 1].Add(traceFrame, i);
+
+                    counterCurrent = counteri;
+                    stampCurrent = stampi;
+                }
+            }
+            return traceFrames;
+        }
+
+        private static List<List<string>> TraceAnalyzeShadow(List<TraceFrame> traceFramesInput, bool onlyObk, double gap)
+        {
+            List<TraceFrame> traceFrames = new List<TraceFrame>();
+            long counterCurrent = -1;
+            DateTime stampCurrent = DateTime.MinValue;
+            List<GekkoDictionary<string, bool>> dict = new List<GekkoDictionary<string, bool>>();
+            foreach (TraceFrame traceFrame in traceFramesInput)
+            {
+                dict.Add(new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase));
+                for (int i = 0; i < traceFrame.counter.Count; i++)
+                {
+                    string commandFilei = traceFrame.commandFile[i];
+                    if (!dict[dict.Count - 1].ContainsKey(commandFilei)) dict[dict.Count - 1].Add(commandFilei, false);
+                }
+            }
+            int counter = -1;
+
+            for (int i1 = 0; i1 < dict.Count; i1++)
+            {
+                bool ignore = false;
+                for (int i2 = i1 + 1; i2 < dict.Count; i2++)
+                {
+                    bool allKeysPresent = dict[i1].Keys.All(dict[i2].ContainsKey);
+                    if (allKeysPresent)
+                    {
+                        ignore = true;
+                        break;
+                    }
+                }
+                if (!ignore) traceFrames.Add(traceFramesInput[i1]);
+            }
+
+            List<List<string>> gcms = new List<List<string>>();
+            foreach (TraceFrame traceFrame in traceFrames)
+            {
+                GekkoDictionary<string, bool> dict3 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                for (int i = 0; i < traceFrame.counter.Count; i++)
+                {
+                    if (!traceFrame.name[i].Contains("!a"))
+                    {
+                    }
+                    string namei = G.Chop_GetName(traceFrame.name[i]);
+                    if (!dict3.ContainsKey(namei) && Globals.traceChunksRelevant.ContainsKey(namei))
+                    {
+                        dict3.Add(namei, false);
+                    }
+                }
+                List<string> vars = dict3.Keys.OrderBy(x => x).ToList();
+                GekkoDictionary<string, bool> dict2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                gcms.Add(new List<string>());
+                for (int i = 0; i < traceFrame.counter.Count; i++)
+                {
+                    string commandFilei = traceFrame.commandFile[i];
+                    if (!dict2.ContainsKey(commandFilei))
+                    {
+                        if (!commandFilei.Contains("[Unknown file and line]"))
+                        {
+                            gcms[gcms.Count - 1].Add(commandFilei + " " + G.Blanks(80 - commandFilei.Length) + traceFrame.stamp[i].ToString("dd'/'MM yyyy HH:mm") + " --- " + traceFrame.counter[i]);
+                        }
+                        dict2.Add(commandFilei, false);
+                    }
+                }
+                gcms[gcms.Count - 1].Add(Stringlist.GetListWithCommas(vars));
+            }
+
+            return gcms;
+        }
+
 
         private static double Sum_numbers()
         {
@@ -5729,9 +6160,11 @@ namespace Gekko
         /// <param name="open"></param>
         /// <param name="readInfos"></param>
         /// <param name="create"></param>
-        public static void OpenOrRead(CellOffset offset, bool wipeDatabankBeforeInsertingData, ReadOpenMulbkHelper oRead, bool open, List<ReadInfo> readInfos, bool create, P p)
+        public static void OpenOrRead(CellOffset offset, bool wipeDatabankBeforeInsertingData, ReadOpenMulbkHelper oRead, bool open, List<ReadInfo> readInfos, bool create, bool clear, P p)
         {
-            //open = true if called with OPEN statement              
+            //open = true if called with OPEN statement
+
+            if (clear && oRead.openType != EOpenType.Edit) new Error("You can only use the 'clear' option together with the 'edit' option, for instance 'open <edit clear>'");
 
             int n = 1;
             List<int> list = new List<int>();
@@ -5892,6 +6325,8 @@ namespace Gekko
                 //                   |   maybe editable          |      createBrandNew             |
                 // ------------------+---------------------------+---------------------------------+
                 //
+                // Note: with 'clear', the bank is cleared at the end of the method.
+                //       with 'clear' and not already open and fileExists, the file is not read (would be a waste of time)
                 // Note: regarding databank name there is the complication that this may given as '*'
                 //       and also that ... AS ... may be used. In general, the resulting 'real' databank
                 //       name (not file name) as shown in the F2 window is readInfo.dbName
@@ -5906,7 +6341,7 @@ namespace Gekko
                     return;  //from READ * cancelling
                 }
 
-                Globals.dependencyTracking.Add(1, "Read", true, ffh.prettyPathAndFileName);
+                string blob = Globals.dependencyTracking.Add(1, "Read", true, ffh.prettyPathAndFileName);
 
                 bool category2_fileExists = false;
                 if (file == null)
@@ -5997,33 +6432,37 @@ namespace Gekko
                 // ---------------------------------------------------------------------------------
 
                 string hash = null;
-
                 bool copyLocal2 = copyLocal && Globals.batchType != EBatchType.Gekcel;
 
                 if (!open || (open && !category1_alreadyOpen && category2_fileExists))
                 {
-                    if (copyLocal2)
+                    if (!clear) //If 'clear', there is also 'edit', so always OPEN <edit clear>, and 'clear' can never happen with READ/IMPORT. With OPEN <edit clear>, it would be wasteful to read the file, and then delete the contents just below.
                     {
-                        //TODO
-                        //TODO
-                        //TODO copying is a waste of time if we have a zip path, no?
-                        //TODO
-                        //TODO
-
-                        DateTime t0 = DateTime.Now;
-                        localFileThatShouldBeDeletedPathAndFilename = GetTempTsdFilePath(extension);
-                        WaitForFileCopy(file, localFileThatShouldBeDeletedPathAndFilename);
-                        G.WritelnGray("Local copying: " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds));
-                        file = localFileThatShouldBeDeletedPathAndFilename;
-                    }
-
-                    databankTemp = GetDatabankFromFile(offset, oRead, readInfo, file, originalFilePath, ffh.prettyPathAndFileName, oRead.dateformat, oRead.datetype, oRead.bankName, p, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
-                    if (open)
-                    {
-                        if (!file.Contains(Globals.isAProto))  //probably does not happen anymore
+                        if (copyLocal2)
                         {
-                            hash = Program.GetMD5Hash(GetTextFromFileWithWait(file), null, null, null);
+                            //TODO
+                            //TODO
+                            //TODO copying is a waste of time if we have a zip path, no?
+                            //TODO
+                            //TODO
+                            DateTime t0 = DateTime.Now;
+                            localFileThatShouldBeDeletedPathAndFilename = GetTempTsdFilePath(extension);
+                            WaitForFileCopy(file, localFileThatShouldBeDeletedPathAndFilename);
+                            G.WritelnGray("Local copying: " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds));
+                            file = localFileThatShouldBeDeletedPathAndFilename;
                         }
+
+                        databankTemp = GetDatabankFromFile(offset, oRead, readInfo, file, originalFilePath, ffh.prettyPathAndFileName, oRead.dateformat, oRead.datetype, oRead.bankName, p, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
+                        if (open)
+                        {
+                            if (!file.Contains(Globals.isAProto))  //probably does not happen anymore
+                            {
+                                hash = Program.GetMD5Hash(GetTextFromFileWithWait(file), null, null, null);
+                            }
+                        }
+                    }
+                    else
+                    {
                     }
                 }
                 else
@@ -6048,6 +6487,10 @@ namespace Gekko
                     {
                         databank.editable = true;
                         databank.isDirty = true;  //13-1-2026: The dirty logic has caused too much pain, so now we set it on any open<edit> databank. If nothing is changed, it is re-written, but so be it. See also #8yewefjkda.
+                        if (clear)
+                        {
+                            databank.Clear(); //It may be a bank that is already open and is "moved" in the databank list -- and in that case we clear it.
+                        }
                     }
                     databank.name = readInfo.dbName;
                 }
@@ -6361,6 +6804,12 @@ namespace Gekko
                         }
                     }
                 }
+                else
+                {
+                    //READ. We cannot handle OPEN here, because an OPENed databank may be edited before CLOSE.
+                    //      So CLOSE handles this.
+                    Blob(blob, databank.storage.Count());
+                }
             }  //for each bank in list
 
             return;
@@ -6372,6 +6821,7 @@ namespace Gekko
             {
                 try
                 {                    
+                    //HMMMM: Should this traceTime not be removed??
                     DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
                                                            //When arriving here, it is a READ/IMPORT, not OPEN.
                                                            //There are these combinations:
@@ -6587,6 +7037,7 @@ namespace Gekko
                         readInfo.databankVersion = databankTemp2.cacheParameters.databankVersion;
                         readInfo.info1 = databankTemp2.cacheParameters.info1;
                         readInfo.date = databankTemp2.cacheParameters.date;
+                        readInfo.dataHash = databankTemp2.cacheParameters.dataHash;
                         readInfo.nTraces = databankTemp2.cacheParameters.nTraces;
                         readInfo.modelName = databankTemp2.cacheParameters.modelName;
                         readInfo.modelInfo = databankTemp2.cacheParameters.modelInfo;
@@ -6999,7 +7450,7 @@ namespace Gekko
             FindFileHelper ffh = Program.FindFile(fileName, null, true, true, true, true, o.p);
             fileName = ffh.realPathAndFileName;
 
-            Globals.dependencyTracking.Add(1, "Read", true, ffh.prettyPathAndFileName);
+            string blob = Globals.dependencyTracking.Add(1, "Read", true, ffh.prettyPathAndFileName);
 
             TableLight inputTable = null;
             if (fileType == EDataFormat.Csv || fileType == EDataFormat.Prn)
@@ -7207,6 +7658,7 @@ namespace Gekko
                 O.AddIVariableWithOverwriteFromString(collectionName, output);
                 G.Writeln2("Imported " + type.ToString().ToLower() + " " + collectionName + " (" + rr + "x" + cc + " elements)");
             }
+            Blob(blob, null);
         }
 
         /// <summary>
@@ -7369,6 +7821,13 @@ namespace Gekko
                 foreach (XmlNode date in dates5) //should be only 1 in this loop
                 {
                     readInfo.date = date.InnerText.Trim();
+                }
+
+                XmlNodeList dataHashes = doc.GetElementsByTagName("DataHash");
+                foreach (XmlNode dataHash in dataHashes) //should be only 1 in this loop
+                {
+                    readInfo.dataHash = dataHash.InnerText.Trim();
+                    if (!G.NullOrBlanks(readInfo.dataHash)) readInfo.dataHash = readInfo.dataHash.Length > 8 ? readInfo.dataHash.Substring(0, 8) : readInfo.dataHash;
                 }
 
                 XmlNodeList modelNames = doc.GetElementsByTagName("ModelName");
@@ -7541,6 +8000,7 @@ namespace Gekko
                 cacheParameters.databankVersion = readInfo.databankVersion;
                 cacheParameters.info1 = readInfo.info1;
                 cacheParameters.date = readInfo.date;
+                cacheParameters.dataHash = readInfo.dataHash;
                 cacheParameters.nTraces = readInfo.nTraces;
 
                 if (Globals.gbkExtraMetadata)
@@ -7596,10 +8056,10 @@ namespace Gekko
             if (databank_1_1.storage.Count == 0)
             {
                 new Error("Old databank in " + readInfo.databankVersion + " format has 0 variables");
-                //throw new GekkoException();
             }
             deserializedDatabank = new Databank(databank.name);
 
+            readInfo.traceFrame = readInfo_oldbank.traceFrame;
             readInfo.startPerInFile = readInfo_oldbank.startPerInFile;
             readInfo.endPerInFile = readInfo_oldbank.endPerInFile;
             readInfo.variables = readInfo_oldbank.variables;
@@ -9615,7 +10075,7 @@ namespace Gekko
                     {
                         try
                         {
-                            DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
+                            //DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
                             if (downloadHelper != null)
                             {
                                 Trace2 trace = new Trace2(ETraceType.Normal, gt_start, gt_end);
@@ -9626,7 +10086,7 @@ namespace Gekko
                                 //trace can only have null period if px date range is null, not possible
                                 Gekko.Trace2.PushIntoSeries(ts, trace, ETracePushType.NewParent, false);
                             }
-                            Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
+                            //Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                         }
                         catch
                         {
@@ -9677,7 +10137,7 @@ namespace Gekko
                     {
                         try
                         {
-                            DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
+                            //DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
                             if (downloadHelper != null)
                             {
                                 Trace2 trace = new Trace2(ETraceType.Normal, gt_start, gt_end);
@@ -9688,7 +10148,7 @@ namespace Gekko
                                 //trace can only have null period if px file has null period --> not possible
                                 Gekko.Trace2.PushIntoSeries(ts, trace, ETracePushType.NewParent, false);
                             }
-                            Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
+                            //Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                         }
                         catch
                         {
@@ -10580,6 +11040,19 @@ namespace Gekko
             }
         }
 
+        public static string HasDuplicateValues(GekkoDictionary<string, string> dict)
+        {
+            var seenValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (string s in dict.Values)
+            {
+                if (!seenValues.Add(s))
+                {
+                    return s;
+                }
+            }
+            return null;
+        }
+
         private static void RecordRestorInfo()
         {
             //after the statement is done -- even if an error occurs
@@ -10644,7 +11117,7 @@ namespace Gekko
             {
                 try
                 {
-                    DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
+                    //DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
                     bool onlyTraceSeries = false;
                     string x_lhs = "";
                     if (isLhs) x_lhs = "LHS";
@@ -10655,7 +11128,7 @@ namespace Gekko
                     {
                         Globals.traceContainer.Add(iv);  //uses dictionary internally
                     }
-                    Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
+                    //Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                 }
                 catch
                 {
@@ -11209,6 +11682,7 @@ namespace Gekko
         public static void WriteErrorMessage(int lineNumber, string problemLine, string text, string fileName)
         {
             if (Globals.threadIsInProcessOfAborting) return;
+            if (P.IsFunctionOrProcedure(fileName)) return; //the line will not make sense for that case
             G.Writeln(text, Color.Red, true);  //will also be red for a STOP statement, but without counting as an error
             G.Writeln("    " + "[" + G.IntFormat(lineNumber, 4) + "]:" + "   " + G.ReplaceGlueSymbols(problemLine), Color.Blue, true);
         }
@@ -12253,7 +12727,14 @@ namespace Gekko
                 }
                 else if (G.IsUnitTestingOrNotShowingGUI())
                 {
-                    startup = Globals.ttPath2 + "\\" + Globals.ttPath3 + "\\Gekko\\bin\\Debug";
+                    if (G.IsUnitTesting())
+                    {
+                        startup = Globals.ttPath2 + "\\" + "GekkoCS" + "\\Gekko\\bin\\Debug";
+                    }
+                    else
+                    {
+                        startup = G.GekkoExeFolder();
+                    }
                 }
                 else
                 {
@@ -12547,18 +13028,18 @@ namespace Gekko
             br.BaseStream.Position += 0x12;
             return (br.ReadInt16() & IMAGE_FILE_LARGE_ADDRESS_AWARE) == IMAGE_FILE_LARGE_ADDRESS_AWARE;
         }
-        
+
 
         /// <summary>
         /// Calls GetVariableExplanation(), but fetches only first line (if any). May return null.
         /// </summary>
         /// <param name="varnameMaybeWithFreq"></param>
         /// <returns></returns>
-        public static string GetVariableExplanation1Line(DName varname)
+        public static string GetVariableExplanation1Line(string varnameMaybeWithFreq, bool mayGiveExceptionError)
         {
-            if (varname == null) return null;
+            if (varnameMaybeWithFreq == null) return null;
             string label = null;
-            List<string> expls = Program.GetVariableExplanation(varname, false, false, GekkoTime.tNull, GekkoTime.tNull, null);
+            List<string> expls = Program.GetVariableExplanation(G.Chop_RemoveFreq(varnameMaybeWithFreq), varnameMaybeWithFreq, false, false, GekkoTime.tNull, GekkoTime.tNull, null, mayGiveExceptionError);
             if (expls != null && expls.Count > 0) label = expls[0];
             return label;
         }
@@ -12572,7 +13053,7 @@ namespace Gekko
         /// <param name="tStart"></param>
         /// <param name="tEnd"></param>
         /// <returns></returns>
-        public static List<string> GetVariableExplanation(DName varname, bool printName, bool printData, GekkoTime tStart, GekkoTime tEnd, HtmlBrowserSettings htmlBrowserSettings)
+        public static List<string> GetVariableExplanation(DName varname, bool printName, bool printData, GekkoTime tStart, GekkoTime tEnd, HtmlBrowserSettings htmlBrowserSettings, bool mayGiveExceptionError)
         {
             //For Gekko 4.0, clean up the two first parameters (should be just 1).
             //For Gekko 4.0, think about using G.ReplaceWhitespaceWith1Blank() on each line in return list rv.
@@ -12582,7 +13063,13 @@ namespace Gekko
             if (htmlBrowserSettings != null && htmlBrowserSettings.isDanish) danish = true;
 
             List<string> rv = new List<string>();
-            IVariable iv = O.GetIVariableFromString(varname.ToString(), O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries, false);
+            IVariable iv = null;
+            if (mayGiveExceptionError) iv = O.GetIVariableFromString(varname.ToString(), O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries, false);
+            else
+            {
+                iv = O.GetIVariableFromString(varname.ToString(), O.ECreatePossibilities.NoneReturnNullAlways, false);
+                if (iv == null) return rv;
+            }
             Series ts = null;
             if (iv != null) ts = iv as Series;
             if (printName)
@@ -12690,12 +13177,12 @@ namespace Gekko
         /// </summary>
         /// <param name="variableNameWithOrWithoutLag"></param>
         /// <returns></returns>
-        public static List<string> GetVariableExplanationAugmented(DName varname, HtmlBrowserSettings htmlBrowserSettings)
+        public static List<string> GetVariableExplanationAugmented(DName varname, HtmlBrowserSettings htmlBrowserSettings, bool mayGiveExceptionError)
         {
             string ss = "";
             //string var2 = G.Chop_RemoveLagOrLead_OLD(variableNameWithOrWithoutLag, Globals.leftParenthesisIndicator);
             //List<string> ss2 = Program.GetVariableExplanation(G.Chop_RemoveFreq(var2), var2, true, false, GekkoTime.tNull, GekkoTime.tNull, htmlBrowserSettings);
-            List<string> ss2 = Program.GetVariableExplanation(varname.RemoveTime(), true, false, GekkoTime.tNull, GekkoTime.tNull, htmlBrowserSettings);
+            List<string> ss2 = Program.GetVariableExplanation(varname.RemoveTime(), true, false, GekkoTime.tNull, GekkoTime.tNull, htmlBrowserSettings, mayGiveExceptionError);
             return ss2;
         }        
 
@@ -13921,89 +14408,7 @@ namespace Gekko
                         //not intended for "normal" Gekko users.
                         MakeBatFileForAremos();
                     }
-                    break;
-                case "--deploy":
-                    {
-                        //Deploy
-                        G.Writeln2("Use 'deploy' from Total Commander prompt");
-                        G.Writeln(@"Also see c:\Thomas\Gekko\GekkoCS\Deploy\!seher");
-                    }
-                    break;
-                case "--testsim":
-                    {
-                        int n = 1000;
-                        double[] abs = new double[3000];  //years
-                        double[] rel = new double[3000];  //years
-                        string[] absVar = new string[3000];  //years
-                        string[] relVar = new string[3000];  //years
-
-                        double[] absVs = new double[3000];  //years
-                        double[] relVs = new double[3000];  //years
-
-                        double[] absHs = new double[3000];  //years
-                        double[] relHs = new double[3000];  //years
-
-                        int min = int.MaxValue;
-                        int max = int.MinValue;
-                        List<string> list = Stringlist.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "endo"));
-                        int x = list.Count;
-                        G.Writeln("Testing " + x + " endogenous vars");
-                        for (int i = 0; i < x; i += n)
-                        {
-                            G.Writeln("Testing " + i + " up to " + (i + n - 1));
-                            List<string> res = TestSim(list, i, i + n - 1);
-                            foreach (string s in res)
-                            {
-                                string[] s3 = s.Split('¤');
-                                string type = s3[0];
-                                int year = int.Parse(s3[1]);
-                                string var = s3[2];
-                                bool bval = false;
-                                double val = G.ParseIntoDouble(s3[3], out bval);
-                                bool bvs = false;
-                                double vs = G.ParseIntoDouble(s3[4], out bvs);
-                                bool bhs = false;
-                                double hs = G.ParseIntoDouble(s3[5], out bhs);
-                                if (year < min) min = year;
-                                if (year > max) max = year;
-                                if (type == "abs")
-                                {
-                                    if (val > abs[year])
-                                    {
-                                        abs[year] = val;
-                                        absVar[year] = var;
-                                        absVs[year] = vs;
-                                        absHs[year] = hs;
-                                    }
-                                }
-                                else
-                                {
-                                    if (val > rel[year])
-                                    {
-                                        rel[year] = val;
-                                        relVar[year] = var;
-                                        relVs[year] = vs;
-                                        relHs[year] = hs;
-                                    }
-                                }
-                            }
-                        }
-
-                        G.Writeln();
-                        for (int y = min; y <= max; y++)
-                        {
-                            G.Writeln("rel% " + y + " " + relVar[y] + " " + rel[y] + "%     left " + relVs[y] + " right " + relHs[y]);
-                        }
-
-                        G.Writeln();
-                        for (int y = min; y <= max; y++)
-                        {
-                            G.Writeln("abs " + y + " " + absVar[y] + " " + abs[y] + "     left " + absVs[y] + " right " + absHs[y]);
-                        }
-
-
-                    }
-                    break;
+                    break;                
                 case "--lex":
                     {
                         //show raw tokens
@@ -14034,21 +14439,7 @@ namespace Gekko
                     {
                         Program.TestRam(false);
                     }
-                    break;
-                case "--tracewalk":
-                    {
-                        if (Globals.traceWalkAllCombinations)
-                        {
-                            Globals.traceWalkAllCombinations = false;
-                            new Writeln("Does not walk all traces");
-                        }
-                        else
-                        {
-                            Globals.traceWalkAllCombinations = true;
-                            new Writeln("Walks all traces");
-                        }
-                    }
-                    break;
+                    break;                
                 case "--nopause":
                     {
                         if (Globals.pausePopup)
@@ -14105,8 +14496,10 @@ namespace Gekko
                     {
                         //
                         //rem without Xconversiontimeout it will only compile 10 % of the times. 120000 probably means 120 sec.
-                        //rem Takes about 1 minute 15 s, june 2019.The 1.5 GB setting makes compilation possible, and does not cost extra time.                        
-                        string antlrFile = "c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g";
+                        //rem Takes about 1 minute 15 s, june 2019.The 1.5 GB setting makes compilation possible, and does not cost extra time.                                               
+                        string path = "c:\\Thomas\\Gekko\\GekkoCS";
+                        MessageBox.Show("Uses: " + path);
+                        string antlrFile = path + "\\ANTLR\\Cmd3.g";
                         string antlrFile4 = antlrFile.Replace("Cmd3.g", "Cmd4.g");
                         string javaPath = "c:\\Thomas\\Software\\Java\\jre6\\bin\\java.exe";
                         string classPath = "c:\\Thomas\\Software\\ANTLR\\antlr-3.1.3.jar";
@@ -14155,23 +14548,7 @@ namespace Gekko
                         else Globals.printGrayLinesForDebugging = true;
                         G.Writeln("Gray printing (debug) is set to: " + Globals.printGrayLinesForDebugging);
                     }
-                    break;
-                case "--traceseed":
-                    {
-                        Globals.traceCounter = 0;
-                        G.Writeln("Trace counter set = 0");
-                    }
-                    break;
-                case "--prune":
-                    {
-                        string[] ss2 = sub.Split(' ');
-                        bool b = false;
-                        double prune = G.ParseIntoDouble(ss2[1].Trim(), out b);
-                        Globals.pruneDecomp = prune;
-                        G.Writeln("Flowchart prune set to: " + Globals.pruneDecomp);
-                        G.Writeln();
-                    }
-                    break;
+                    break;                
                 case "--killexcel":
                     {
                         DialogResult result = MessageBox.Show("Delete all processes with 'excel' in their names? CLOSE EXCEL SHEETS BEFOREHAND!!", "Gekko helper", MessageBoxButtons.YesNo, MessageBoxIcon.None, MessageBoxDefaultButton.Button2, MessageBoxOptions.DefaultDesktopOnly);
@@ -14629,7 +15006,7 @@ namespace Gekko
                     {
                         foreach (string s7 in names)
                         {
-                            string ss = Stringlist.ExtractTextFromLines(Program.GetVariableExplanation(new DNameSimplest(s7), false, false, GekkoTime.tNull, GekkoTime.tNull, null)).ToString();
+                            string ss = Stringlist.ExtractTextFromLines(Program.GetVariableExplanation(new DNameSimplest(s7), false, false, GekkoTime.tNull, GekkoTime.tNull, null, false)).ToString();
                             rv2.Add(new TwoStrings(s7, ss));
                         }
                     }
@@ -14746,7 +15123,7 @@ namespace Gekko
 
                     foreach (string s7 in names)
                     {
-                        string ss = Stringlist.ExtractTextFromLines(Program.GetVariableExplanation(new DNameSimplest(s7), false, false, GekkoTime.tNull, GekkoTime.tNull, null)).ToString();
+                        string ss = Stringlist.ExtractTextFromLines(Program.GetVariableExplanation(new DNameSimplest(s7), false, false, GekkoTime.tNull, GekkoTime.tNull, null, false)).ToString();
                         rv2.Add(new TwoStrings(s7, ss));
                     }
                 }
@@ -16342,48 +16719,48 @@ namespace Gekko
                 SearchHelper1 helper = Program.SearchAllBanksAllFreqs(true, o.iv, null, EVariableType.Var);
                 if (helper.allBanks.count > 0)
                 {
+                    m = new List<IVariable>();
+                    names = new List<string>();
+                    foreach (string s in helper.allBanks.list)
+                    {
+                        string ss = G.Chop_AddFreq(G.Chop_AddBank(s, Program.databanks.GetFirst().GetName()), Program.options.freq);
+                        names.Add(ss);
+                        m.Add(O.GetIVariableFromString(ss, O.ECreatePossibilities.NoneReportError)); //cannot error here
+                    }
                     Action<GAO> a = (gao) =>
                     {
-                        m = new List<IVariable>();
-                        names = new List<string>();
-                        foreach (string s in helper.allBanks.list)
-                        {
-                            string ss = G.Chop_AddFreq(G.Chop_AddBank(s, Program.databanks.GetFirst().GetName()), Program.options.freq);
-                            names.Add(ss);
-                            m.Add(O.GetIVariableFromString(ss, O.ECreatePossibilities.NoneReportError)); //cannot error here
-                        }
                         DispHelper(tStart, tEnd, m, list, names, o.iv, showDetailed, showAllPeriods, clickedLink, ref nonSeries, ref seriesCounter);
                     };
                     G.Writeln("Note: " + helper.allBanks.name + " instead of " + helper.allBanks.nameOriginal + " --> " + G.GetLinkAction(helper.allBanks.count + " matches", new GekkoAction(EGekkoActionTypes.Unknown, null, a)));
                 }
                 if (helper.allFreqs.count > 0)
                 {
+                    m = new List<IVariable>();
+                    names = new List<string>();
+                    foreach (string s in helper.allFreqs.list)
+                    {
+                        string ss = G.Chop_AddFreq(G.Chop_AddBank(s, Program.databanks.GetFirst().GetName()), Program.options.freq);
+                        names.Add(ss);
+                        m.Add(O.GetIVariableFromString(ss, O.ECreatePossibilities.NoneReportError)); //cannot error here
+                    }
                     Action<GAO> a = (gao) =>
                     {
-                        m = new List<IVariable>();
-                        names = new List<string>();
-                        foreach (string s in helper.allFreqs.list)
-                        {
-                            string ss = G.Chop_AddFreq(G.Chop_AddBank(s, Program.databanks.GetFirst().GetName()), Program.options.freq);
-                            names.Add(ss);
-                            m.Add(O.GetIVariableFromString(ss, O.ECreatePossibilities.NoneReportError)); //cannot error here
-                        }
                         DispHelper(tStart, tEnd, m, list, names, o.iv, showDetailed, showAllPeriods, clickedLink, ref nonSeries, ref seriesCounter);
                     };
                     G.Writeln("Note: " + helper.allFreqs.name + " instead of " + helper.allFreqs.nameOriginal + " --> " + G.GetLinkAction(helper.allFreqs.count + " matches", new GekkoAction(EGekkoActionTypes.Unknown, null, a)));
                 }
                 if (helper.allBanksAndFreqs.count > helper.allBanks.count + helper.allFreqs.count)
                 {
+                    m = new List<IVariable>();
+                    names = new List<string>();
+                    foreach (string s in helper.allBanksAndFreqs.list)
+                    {
+                        string ss = G.Chop_AddFreq(G.Chop_AddBank(s, Program.databanks.GetFirst().GetName()), Program.options.freq);
+                        names.Add(ss);
+                        m.Add(O.GetIVariableFromString(ss, O.ECreatePossibilities.NoneReportError)); //cannot error here
+                    }
                     Action<GAO> a = (gao) =>
                     {
-                        m = new List<IVariable>();
-                        names = new List<string>();
-                        foreach (string s in helper.allBanksAndFreqs.list)
-                        {
-                            string ss = G.Chop_AddFreq(G.Chop_AddBank(s, Program.databanks.GetFirst().GetName()), Program.options.freq);
-                            names.Add(ss);
-                            m.Add(O.GetIVariableFromString(ss, O.ECreatePossibilities.NoneReportError)); //cannot error here
-                        }
                         DispHelper(tStart, tEnd, m, list, names, o.iv, showDetailed, showAllPeriods, clickedLink, ref nonSeries, ref seriesCounter);
                     };
                     G.Writeln("Note: " + helper.allBanksAndFreqs.name + " instead of " + helper.allBanksAndFreqs.nameOriginal + " --> " + G.GetLinkAction(helper.allBanksAndFreqs.count + " matches", new GekkoAction(EGekkoActionTypes.Unknown, null, a)));
@@ -16693,7 +17070,7 @@ namespace Gekko
                     }
                 }
 
-                List<string> expls = Program.GetVariableExplanation(new DNameSimplest(varnameWithoutFreq), false, false, GekkoTime.tNull, GekkoTime.tNull, null);
+                List<string> expls = Program.GetVariableExplanation(new DNameSimplest(varnameWithoutFreq), false, false, GekkoTime.tNull, GekkoTime.tNull, null, false);
                 foreach (string expl in expls) G.Writeln(expl);
 
                 if (ts.meta.trace2 != null)
@@ -17603,14 +17980,15 @@ namespace Gekko
                             G.Writeln(")");
                         }
                         else
-                        {
-                            //G.WriteLink("show", "disp3:" + ts.GetName());
+                        {                            
+                            string xname = ts.GetParentDatabank().name; //Otherwise BAD memory leak!!
+                            string yname = ts.GetName();
                             // ---------                
                             Action<GAO> a = (gao) =>
                             {
                                 Globals.guiHomeMainEnabled = true;
                                 List<string> temp = new List<string>();
-                                string varnameWithBankAndFreq = ts.GetParentDatabank().name + Globals.symbolBankColon + ts.GetName();
+                                string varnameWithBankAndFreq = xname + Globals.symbolBankColon + yname;
                                 temp.Add(varnameWithBankAndFreq);
                                 Program.Disp(ConvertFreqs(tStart, tEnd, ts.freq).t1, ConvertFreqs(tStart, tEnd, ts.freq).t2, temp, false, true, true, null);
                             };
@@ -17915,7 +18293,7 @@ namespace Gekko
                 {
                     try
                     {
-                        DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
+                        //DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
                         //We don't want the parent trace to have null-time.                                                            
                         Trace2 trace = new Trace2(ETraceType.Normal, ts.GetRealDataPeriodFirst(), ts.GetRealDataPeriodLast(), true);
                         trace.GetContents().text = o.gekkocode + ";";
@@ -17927,7 +18305,7 @@ namespace Gekko
                             trace.GetContents().precedentsNames.Add(traceNameHelper);
                         }
                         Gekko.Trace2.PushIntoSeries(ts, trace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
-                        Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
+                        //Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                     }
                     catch
                     {
@@ -18071,14 +18449,14 @@ namespace Gekko
                                 try
                                 {
                                     //injecting
-                                    DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
+                                    //DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
                                     Trace2 trace = new Trace2(ETraceType.Normal, truncateTemp.t1, truncateTemp.t2, true);
                                     trace.GetContents().text = o.gekkocode + ";";
                                     trace.GetContents().name = existing_series.GetNameAndParentDatabank();
                                     trace.GetContents().commandFileAndLine = o.p?.GetExecutingGcmFile(ERunningGcm.IncludeProcFunc);                                    
                                     trace.AddRangeFromSeries2(existing_series, iv_series);
                                     Gekko.Trace2.PushIntoSeries(existing_series, trace, ETracePushType.Sibling, false);
-                                    Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
+                                    //Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                                 }
                                 catch (Exception e)
                                 {
@@ -18100,7 +18478,7 @@ namespace Gekko
                     {
                         try
                         {
-                            DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
+                            //DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
 
                             GekkoTime xt1 = ts_clone.GetRealDataPeriodFirst();
                             GekkoTime xt2 = ts_clone.GetRealDataPeriodLast();
@@ -18120,7 +18498,7 @@ namespace Gekko
                                 newTrace.GetContents().precedentsNames.Add(Trace2.TraceGetNameDecorated(iv as Series, (iv as Series)?.meta?.trace2 != null));
                             }                            
                             Gekko.Trace2.PushIntoSeries(ts_clone, newTrace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
-                            Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
+                            //Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                         }
                         catch
                         {
@@ -21496,28 +21874,23 @@ namespace Gekko
 
             DateTime t0 = DateTime.Now;
 
-            f1 = f1.Trim();
-            f2 = f2.Trim();
-
-            f1 = f1.Replace("/", "\\");
-            f2 = f2.Replace("/", "\\");
-
-            if (f1.EndsWith("\\")) f1 = f1.Substring(0, f1.Length - 1);
-            if (f2.EndsWith("\\")) f2 = f2.Substring(0, f2.Length - 1);
-            
-            if (!Directory.Exists(f1)) new Error("Folder '" + f1 + "' does not seem to exist");
-            if (!Directory.Exists(f2)) new Error("Folder '" + f2 + "' does not seem to exist");     
+            f1 = G.CleanupFolderName(f1, true);
+            f2 = G.CleanupFolderName(f2, true);
 
             var xd1 = Directory.EnumerateFiles(f1, "*", SearchOption.AllDirectories).Where(p => !G.Contains(p, omit)).Select(Path.GetFullPath).Select(x => G.Replace(x, f1, "", StringComparison.OrdinalIgnoreCase, 0)).OrderBy(x => x);
             var xd2 = Directory.EnumerateFiles(f2, "*", SearchOption.AllDirectories).Where(p => !G.Contains(p, omit)).Select(Path.GetFullPath).Select(x => G.Replace(x, f2, "", StringComparison.OrdinalIgnoreCase, 0)).OrderBy(x => x);
 
             bool option_text = false;
             bool option_strict = false;
+            bool option_date = false;
             if (!G.NullOrBlanks(f4))
             {
                 if (G.ContainsWord(f4, "text")) option_text = true;
                 if (G.ContainsWord(f4, "strict")) option_strict = true;
+                if (G.ContainsWord(f4, "date")) option_date = true;
             }
+
+            if (option_strict && option_date) new Error("You cannot use 'strict' and 'date' at the same time");
 
             List<string> black = new List<string>();
             List<string> white = new List<string>();
@@ -21592,7 +21965,7 @@ namespace Gekko
                 string p1 = f1 + "\\" + s;
                 string p2 = f2 + "\\" + s;
 
-                bool identical = G.CompareFiles(p1, p2, option_strict);  //could speed up more by parallelizing the whole intersect list.
+                bool identical = G.CompareFiles(p1, p2, option_strict, option_date);  //could speed up more by parallelizing the whole intersect list.
 
                 if (!identical)
                 {
@@ -21752,6 +22125,13 @@ namespace Gekko
                 {
                     txt.MainAdd("Option 'strict': files dates not used in file comparison");
                     sb2.AppendLine("Option 'strict': files dates not used in file comparison");
+                    txt.MainNewLineTight();
+                }
+
+                if (option_date)
+                {
+                    txt.MainAdd("Option 'date': files dates rather than contents are used to compare files");
+                    sb2.AppendLine("Option 'date': files dates rather than contents are used to compare files");
                     txt.MainNewLineTight();
                 }
 
@@ -22425,7 +22805,7 @@ namespace Gekko
 
             file = G.AddExtension(file, "." + Globals.extensionCommand);
             string pathAndFilename = CreateFullPathAndFileNameFromFolder(file, Program.options.folder_working);
-            Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
+            string blob = Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
 
             if (File.Exists(pathAndFilename) && G.Equal(Path.GetExtension(pathAndFilename), "." + Globals.extensionCommand))
             {
@@ -22649,6 +23029,651 @@ namespace Gekko
                 //}
             }
             G.Writeln2("Exported " + list2.Count + " series to file " + pathAndFilename);
+            Blob(blob, list2.Count);
+        }
+
+        /// <summary>
+        /// DLink() must be fed with a list of .dlink files to update. The list comes from Git via a Git hook. In principle, Gekko
+        /// could look at all .dlink files, but some of these may be irrelevant and not versioned.
+        /// </summary>
+        /// <param name="args"></param>
+        public static void DLinkCalledFromGitHook(string[] args)
+        {
+            //Versionering af data
+
+            // -----------------------------------
+            // TESTING on TTH pc
+            // -----------------------------------
+            // + Create new repo on https://github.com/thomsen67, for instance Blobs2
+            // + On c:\Tools, create \Makrobk and \Makrobk_kilde
+            // + In c:\Tools\Makrobk\tth\test, clone Blobs2 so \.git ends at c:\Tools\Makrobk\tth\test\.git
+            // + In \.git\config put this line in [core] if not already there: hooksPath = makrobk_grunddata/_utilities/githooks
+            // + Create c:\Tools\Makrobk_kilde\2025_10_01\_blobs and 
+            //   c:\Tools\Makrobk_kilde\2025_10_01\tth\test\biver\_uddata
+            // + In c:\Tools\Makrobk_kilde\2025_10_01\_blobs\_blobs, put a blobsroot.ini
+            // + From c:\Tools\Hooks copy the \makrobk_grunddata folder to c:\Tools\Makrobk\tth\test                                    
+            // In Globals.cs, set these:
+            //     public static string dlink_programFolderGit = G.CleanupFolderName(@"c:\Tools\Makrobk\tth\test\", false);
+            //     public static string dlink_programFolderRoot = G.CleanupFolderName(@"c:\Tools\Makrobk\tth\test\makrobk_grunddata\", false);
+            //     public static string dlink_programFolderRunning = G.CleanupFolderName(@"c:\Tools\Makrobk\tth\test\makrobk_grunddata\biver", false);
+            //     public static string dlink_dataFolder = G.CleanupFolderName(@"c:\Tools\Makrobk_kilde\2025_10_01\tth\test\biver", false);
+            //     public static string dlink_blobsFolder = G.CleanupFolderName(@"c:\Tools\Makrobk_kilde\2025_10_01\_blobs", false);            
+            // + Start Gekko 3 in folder c:\Tools\Makrobk\tth\test\makrobk_grunddata\biver\_progs, and run run_modul.gcm.
+            //     - This produces c:\Tools\Makrobk\tth\test\makrobk_grunddata\biver\_uddata_dlink\x1.csv.dlink
+            //     - Git-add run_modul.gcm and x1.csv.dlink
+            //     - Git-commit
+            // + Now there should be a file in: c:\Tools\Makrobk_kilde\2025_10_01\_blobs somewhere (with csv == 101 insisde)
+            // +   and also c:\Tools\Makrobk_kilde\2025_10_01\tth\test\biver\_uddata\x1.csv == 101.
+            // + Now change in run_modul.gcm from 101 to 202, run the file, commit .gcm and .dlink.
+            // +   check the .csv, .csv.dlink and a new file in \_blobs.
+            // + Check out the previous commit, where x1 was set to 101.
+            // + The .csv.dlink file should revert, and the .csv file too!
+            //
+            // TODO: Make githooks() method being called, adding hooks            
+            // TODO: .dlink: tilføj antal serier fordelt på frekvens, dataperioder for hver frekvens, "tabel". Tabel for array og subseries.
+            // TODO: Med en ny gbk med samme hash og ældre dato, læg den nye ind (pga. metadata). Eller hvad?
+            // TODO: Stier hvordan ?
+            // TODO: Man skal kunne aborte mht. indlæggelse af ændrede datafiler
+
+            // -----
+            string cacheIndexDlinkFile = Path.Combine(Program.ProgramFolderGit(), ".git", "index_dlink");
+            string gitConfigFile = Path.Combine(Program.ProgramFolderGit(), ".git", "config");
+            string s2 = args[0].Substring("dlink:".Length);
+            MatchCollection matches = Regex.Matches(s2, @"'([^']*)'");
+            List<string> dlinkFiles = new List<string>();
+            string type = matches[0].Groups[1].Value;
+            for (int i = 1; i < matches.Count; i++)
+            {
+                string s = matches[i].Groups[1].Value;
+                if (G.NullOrBlanks(s)) continue; //First time, it can have a '' as the first element
+                dlinkFiles.Add(s);
+            }
+            List<string> filesNew = new List<string>();
+            List<string> filesOverwritten = new List<string>();
+
+            CacheIndexDlink cacheIndexDlink = new CacheIndexDlink(); //empty
+            if (File.Exists(cacheIndexDlinkFile))
+            {
+                try
+                {
+                    cacheIndexDlink = ProtobufRead<CacheIndexDlink>(cacheIndexDlinkFile);
+                }
+                catch
+                {
+                    if (Program.ProgramFolderGit().Contains("\\tth\\")) MessageBox.Show("Loading " + cacheIndexDlinkFile + " failed");
+                }
+            }
+
+            GekkoDictionary<string, bool> datafiles = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            foreach (string dlinkFile2 in dlinkFiles) //Could probably be parallelized
+            {
+                string dlinkFile = G.CleanupFolderName(dlinkFile2, false);
+                string dLinkFileWithPath = Path.Combine(Program.ProgramFolderGit(), dlinkFile);
+                if (!File.Exists(dLinkFileWithPath))
+                {
+                    MessageBox.Show("This ." + Program.options.databank_dlink_name + " file does not exist: '" + dLinkFileWithPath + "'");
+                    new Error();
+                }
+                DlinkFile dlinkFileData = G.YamlReader<DlinkFile>(dLinkFileWithPath);
+                string dataFile2 = G.DLinkRelativePath(dLinkFileWithPath, Program.ProgramFolderRunning(), G.CleanupFolderName(Program.options.databank_dlink_folder_data, false) + "\\tth\\test\\biver", "The file '" + dLinkFileWithPath + "' does not reside inside the folder '" + Program.ProgramFolderGit() + "'", false);
+                string dataFile = Path.ChangeExtension(dataFile2, null).Replace("\\_inddata_dlink\\", "\\_inddata\\").Replace("\\_uddata_dlink\\", "\\_uddata\\");
+                datafiles.Add(dataFile, false); //for cleanup purposes
+                if (G.NullOrBlanks(dataFile))
+                {
+                    MessageBox.Show("Datafile string is null"); new Error();
+                }
+
+                FileInfo fi1 = new FileInfo(dataFile); //File may not exist
+                RealFile realFile = new RealFile(fi1.FullName, null, fi1.Length, fi1.LastWriteTimeUtc, fi1.Exists);
+
+                // --------------------------------------------------------------------------------------------------
+                //                              datafile exists
+                //                             yes            no
+                //  ----------------------------------------------------------
+                //  .dlink exists    yes       A              B
+                //                   no        C              D
+                //  ----------------------------------------------------------
+                //  A: Check that they correspond etc. --> but only if .dlink file has been already added/committed.
+                //  B: Try to get file from blobs      --> but only if .dlink file has been already added/committed.
+                //  C: May just be a datafile copied into datafiles, not being read by Gekko yet
+                //  D: Not relevant
+                //  Note: were are obvisously in A or B here, since we are handling a .dlink file.
+                // --------------------------------------------------------------------------------------------------                
+                CacheIndexDlinkElement cacheIndexDlinkElement = null;
+                cacheIndexDlink.storage.TryGetValue(realFile.name, out cacheIndexDlinkElement);
+                //After this method call, realFile may change regarding .hash and .exists fields (and only those)
+                bool isDataFileOk = IsDLlinkHelperFileOk(realFile.name, dlinkFileData, cacheIndexDlinkElement, ref realFile); //regarding last two args: either both non-null or both null
+                if (isDataFileOk)
+                {
+                    //Check that we have the file in blobs folder, else add it there
+                    Program.BlobsFile(false, realFile.name, dlinkFileData.hash, G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), filesNew, filesOverwritten);
+                    //Force-update the cache entry
+                    cacheIndexDlink.storage[realFile.name] = new CacheIndexDlinkElement(realFile.name, realFile.hash, realFile.size, realFile.stamp);
+                }
+                else
+                {
+                    //Get it from blobs (A or B)
+                    Program.BlobsFile(true, realFile.name, dlinkFileData.hash, G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), filesNew, filesOverwritten);
+                    FileInfo fi2 = new FileInfo(realFile.name);
+                    //We update the realFile, because its contents have changed
+                    realFile = new RealFile(realFile.name, dlinkFileData.hash, fi2.Length, fi2.LastWriteTimeUtc, true);
+                    //Force-update the cache entry              
+                    cacheIndexDlink.storage[realFile.name] = new CacheIndexDlinkElement(realFile.name, dlinkFileData.hash, realFile.size, realFile.stamp);
+                }
+            }
+
+            List<string> filesToRemove = cacheIndexDlink.storage.Keys.Where(key => !datafiles.ContainsKey(key)).ToList();
+            foreach (var fileToRemove in filesToRemove) cacheIndexDlink.storage.Remove(fileToRemove); //Else the storage will always grow
+            try
+            {
+                ProtobufWrite(cacheIndexDlink, cacheIndexDlinkFile); //always refresh the file
+            }
+            catch
+            {
+                if (Program.ProgramFolderGit().Contains("\\tth\\")) MessageBox.Show("Writing " + cacheIndexDlinkFile + " failed");
+            }
+
+            DLinkCalledFromGitHookReporting(type, filesNew, filesOverwritten);
+        }
+
+        /// <summary>
+        /// Returns true if file is ok, else it must be fetched from blobs
+        /// </summary>
+        /// <param name="dataFile"></param>
+        /// <param name="syncTimeUtc"></param>
+        /// <param name="dlinkFileData"></param>
+        /// <param name="fi"></param>
+        /// <returns></returns>
+        public static bool IsDLlinkHelperFileOk(string dataFile, DlinkFile dlinkFileData, CacheIndexDlinkElement cacheIndexDlinkElement, ref RealFile realFile)
+        {
+            if (!realFile.exists) return false; //In that case, realFile.stamp etc. are null too
+            if (realFile.size != dlinkFileData.size) return false;
+            //Here we know that the data file exists and is of the right size. Now we check stamp.
+            double krit = 2d; //2s: Krit can be quite small: it is taken from the acutual timestamp in the user folder (with \.git folder), on the same server. If the files are copied somewhere else, some precision may be lost, so therefore 2s.
+            string realHash;
+            if (cacheIndexDlinkElement != null && cacheIndexDlinkElement.size == realFile.size && cacheIndexDlinkElement.stamp != null && Math.Abs(((DateTime)realFile.stamp - (DateTime)cacheIndexDlinkElement.stamp).TotalSeconds) < krit)
+            {
+                //EASY way
+                //dataFileSha256 is ok as taken from index_dlink file, but the hash must still be checked against the .dlink file hash
+                realHash = cacheIndexDlinkElement.hash;
+            }
+            else
+            {
+                //HARD way
+                //We now need to calc the sha256 physically.                
+                realHash = Program.BlobsHash(dataFile, true);
+            }
+            realFile = new RealFile(realFile.name, realHash, realFile.size, realFile.stamp, true);
+            if (dlinkFileData.hash != realHash) return false;
+            return true;
+        }
+
+        /// <summary>
+        /// When called, parentPath will be the folder wherein the folder \.git resides, and
+        /// rhs will be == "makrobk_grunddata/_utilities/githooks".
+        /// </summary>
+        /// <param name="parentOfGitFolder"></param>
+        public static void GitHooks(string parentOfGitFolder)
+        {
+            string hooksFolder = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), "_utilities", "githooks").Replace("\\", "/");
+            string configFile = Path.Combine(parentOfGitFolder, ".git", "config");
+            MessageBox.Show("GitHooks() called with " + parentOfGitFolder + ", " + hooksFolder + ", configfile=" + configFile);
+            if (!File.Exists(configFile))
+            {
+                MessageBox.Show("Git config file '" + configFile + "' does not exist");
+                new Error();
+            }
+
+            try
+            {
+
+                bool writeFile = true;
+                var lines = File.ReadAllLines(configFile);
+
+                bool insideCoreSection = false;
+                bool hasHooksPathLine = false;
+                bool hooksPathIsCorrect = false;
+                int targetLineIndex = -1;
+                int endOfCoreIndex = -1;
+
+                // --- PASS 1: Analyze the file structure ---
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    string trimmedLine = lines[i].Trim();
+                    string cleanValue = trimmedLine.Replace(" ", "").Replace("\t", "");
+                    if (trimmedLine.StartsWith("[") && trimmedLine.EndsWith("]"))
+                    {
+                        if (insideCoreSection)
+                        {
+                            // We are leaving [core] and entering a new section. 
+                            // Mark where the [core] section naturally ended.
+                            endOfCoreIndex = i;
+                            insideCoreSection = false;
+                        }
+                        if (G.Equal(trimmedLine, "[core]"))
+                        {
+                            insideCoreSection = true;
+                        }
+                    }
+                    else if (insideCoreSection)
+                    {
+                        // Track the last valid line index inside [core] in case we need to append
+                        if (!string.IsNullOrWhiteSpace(trimmedLine))
+                        {
+                            endOfCoreIndex = i + 1;
+                        }
+
+                        // Check if a hooksPath directive already exists here
+                        if (cleanValue.StartsWith("hooksPath=", StringComparison.OrdinalIgnoreCase))
+                        {
+                            hasHooksPathLine = true;
+                            targetLineIndex = i; // Save exactly where it sits                        
+                            if (G.Equal(cleanValue, "hooksPath=" + hooksFolder + ""))
+                            {
+                                hooksPathIsCorrect = true;
+                            }
+                        }
+                    }
+                }
+
+                // Handle the edge case where [core] is at the very bottom of the file
+                if (insideCoreSection && endOfCoreIndex == -1)
+                {
+                    endOfCoreIndex = lines.Length;
+                }
+
+                // --- PASS 2: Determine if changes are needed ---
+
+                // Scenario A: It already exists and it's exactly what you want. Do absolutely nothing!
+                if (hasHooksPathLine && hooksPathIsCorrect)
+                {
+                    writeFile = false;
+                }
+
+                var outputLines = new List<string>(lines);
+
+                // Scenario B: The line exists, but it points to the wrong directory.
+                // Overwrite it in place without moving it.
+                if (hasHooksPathLine && !hooksPathIsCorrect)
+                {
+                    outputLines[targetLineIndex] = "\thooksPath = " + hooksFolder + "";
+                }
+                // Scenario C: The line doesn't exist at all.
+                // Insert it safely at the very end of the [core] section.
+                else if (!hasHooksPathLine && endOfCoreIndex != -1)
+                {
+                    outputLines.Insert(endOfCoreIndex, "\thooksPath = " + hooksFolder + "");
+                }
+                // Scenario D: Extreme edge-case where [core] section doesn't exist in the file at all.
+                else
+                {
+                    outputLines.Insert(0, "[core]");
+                    outputLines.Insert(1, "\thooksPath = " + hooksFolder + "");
+                }
+
+                if (writeFile)
+                {
+                    // Commit changes to disk
+                    File.WriteAllLines(configFile, outputLines);
+                }
+            }
+            catch
+            {
+                MessageBox.Show("Failed to write to Git config file '" + configFile + "'");
+                new Error();
+            }
+
+            GitHooksFiles(parentOfGitFolder, hooksFolder);
+        }
+
+        public static void GitHooksFiles(string parentPath, string hooksFolder)
+        {
+            MessageBox.Show("parentPath = " + parentPath + ", hooksFolder = " + hooksFolder);
+
+            try
+            {
+                // ----------------------------------------------------------------------------------------------------------                            
+                string parentPath2 = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), "_utilities", "githooks").Replace("\\", "/");
+                string gekkoExePath = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), "_utilities", "Gekko", "Gekko.exe").Replace("\\", "/");
+                string _common = @$"
+#!/bin/sh
+ROOT_DIR=""$GIT_DIR""
+STAGED_FILES=$(git -C ""{{ROOT_DIR}}"" ls-files --cached -- ':(icase)*.dlink')
+FORMATTED_FILES=$(echo ""$STAGED_FILES"" | sed ""s/^/'/;s/$/'/"" | paste -sd, -)
+powershell.exe -Command ""(New-Object -ComObject WScript.Shell).Popup('... ' + $FORMATTED_FILES, 0, 'Message', 64)""
+cmd.exe //c ""{gekkoExePath}"" ""-dlink:'$1',$FORMATTED_FILES""
+";
+                // ----------------------------------------------------------------------------------------------------------
+                string post_checkout = $@"
+#!/bin/sh
+bash ""$(dirname ""$0"")/_common"" ""post-checkout""
+";
+                // ----------------------------------------------------------------------------------------------------------
+                string post_merge = $@"
+#!/bin/sh
+bash ""$(dirname ""$0"")/_common"" ""post-merge""
+";
+                // ----------------------------------------------------------------------------------------------------------
+                string pre_commit = $@"
+#!/bin/sh
+bash ""$(dirname ""$0"")/_common"" ""pre-commit""
+";
+                // ----------------------------------------------------------------------------------------------------------
+                string pre_push = $@"
+#!/bin/sh
+# Only for extra safety, not strictly necessary
+bash ""$(dirname ""$0"")/_common"" ""pre-push""
+";
+                // ----------------------------------------------------------------------------------------------------------
+
+                var hooks = new Dictionary<string, string>
+            {
+                { "_common", _common },
+                { "post-checkout", post_checkout },
+                { "post-merge", post_merge },
+                { "pre-commit", pre_commit },
+                { "pre-push", pre_push }
+            };
+
+                foreach (var hook in hooks)
+                {
+                    string filePath = Path.Combine(parentPath2, hook.Key);
+                    string contentToWrite = hook.Value;
+                    G.WriteIfChanged(filePath, contentToWrite);
+                }
+            }
+            catch
+            {
+                MessageBox.Show("Failed to write Git hooks files");
+                new Error();
+            }
+        }
+
+        private static void DLinkCalledFromGitHookReporting(string type, List<string> filesNew, List<string> filesOverwritten)
+        {
+            string s = null;
+            if (filesNew.Count + filesOverwritten.Count > 0)
+            {
+                s = "Gekko/Git data versioning: ";
+                string s2a = "are"; if (filesNew.Count < 2) s2a = "is";
+                string s2b = "are"; if (filesOverwritten.Count < 2) s2b = "is";
+                if (filesNew.Count > 0 && filesOverwritten.Count == 0)
+                {
+                    s += "in the datafile folder, " + filesNew.Count + " new file" + G.S(filesNew.Count) + " " + s2a + " added ";
+                }
+                else if (filesNew.Count == 0 && filesOverwritten.Count > 0)
+                {
+                    s += "in the datafile folder, " + filesOverwritten.Count + " file" + G.S(filesOverwritten.Count) + " " + s2b + " overwritten ";
+                }
+                else
+                {
+                    s += "in the datafile folder, " + filesNew.Count + " new file" + G.S(filesNew.Count) + " " + s2a + " added, and " + filesOverwritten.Count + " file" + G.S(filesOverwritten.Count) + " " + s2b + " overwritten ";
+                }
+                s += " (" + type + ")";
+                s += G.NL + G.NL;
+                foreach (string f in filesNew)
+                {
+                    s += f + " (added)";
+                }
+                foreach (string f in filesOverwritten)
+                {
+                    s += f + " (overwritten)";
+                }
+            }
+            else
+            {
+                s = "Gekko/Git data versioning was called: no data files changed";
+                s += G.NL + G.NL;
+                s += "(For now, this message is kept --> may be omitted when data versioning has matured).";
+            }
+
+            WindowMessageBox w = new WindowMessageBox(EMessageBox.Normal);
+            w.Height = 300;
+            w.Width = 600;
+            w.textBox1.VerticalScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility.Visible;
+            w.textBox1.HorizontalScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility.Visible;
+            w.textBox1.TextWrapping = System.Windows.TextWrapping.NoWrap;
+            w.textBox1.Text = s;
+            w.textBox1.FontFamily = new System.Windows.Media.FontFamily("Courier New");
+            w.textBox1.FontSize = 11;
+            w.ShowDialog();
+        }
+
+        /// <summary>
+        /// Handles blobs, for .dlink
+        /// </summary>
+        /// <param name="fileNameAndPath"></param>
+        private static void Blob(string fileNameAndPath, long? nVariables)
+        {
+            string hash = null;
+            long? size = null;
+            DateTime? stamp = null;
+            if (Program.options.databank_dlink)
+            {
+                //Note: just because a .dlink file is constructed, this it not the same
+                //      as that it has to go into blobs storage.
+                string f1 = G.CleanupFolderName(G.CleanupFolderName(Program.options.databank_dlink_folder_data, false) + "\\tth\\test\\biver", false); //.gbk original, 'c:\Tools\Blobs\tth\staging'
+                string f2 = G.CleanupFolderName(Program.ProgramFolderRunning(), false); //.dlink file, c:\Thomas\Gekko\BlobsTest\tth\staging                                            
+                string blobFileNameAndPath1 = G.DLinkRelativePath(fileNameAndPath, f1, f2, "Regarding ." + Program.options.databank_dlink_name + " file, the folder '" + f1 + "' does not seem to be part of '" + fileNameAndPath + "'", true);
+                if (blobFileNameAndPath1 == null)
+                {
+                    //Do nothing: may be a databank on some other drive
+                }
+                else
+                {
+                    if (File.Exists(fileNameAndPath))
+                    {
+                        hash = BlobsHash(fileNameAndPath, true); //TODO: WithWait or WaitFor...
+                    }
+                    size = (new FileInfo(fileNameAndPath)).Length;
+                    string blobFileNameAndPath2 = blobFileNameAndPath1 + "." + Program.options.databank_dlink_name;
+                    if (!Directory.Exists(Path.GetDirectoryName(blobFileNameAndPath2)))
+                    {
+                        if (true)
+                        {
+                            MessageBox.Show("The folder '" + Path.GetDirectoryName(blobFileNameAndPath2) + "' is created");
+                            Directory.CreateDirectory(Path.GetDirectoryName(blobFileNameAndPath2));
+                        }
+                        else
+                        {
+                            MessageBox.Show("The folder '" + Path.GetDirectoryName(blobFileNameAndPath2) + "' does not exist for ." + Program.options.databank_dlink_name + " file writing");
+                            new Error();
+                        }
+                    }
+                    DlinkFile blobInfo = new DlinkFile(hash, size, stamp, nVariables, null);
+                    G.YamlWriter<DlinkFile>(blobInfo, blobFileNameAndPath2);
+                }
+            }
+        }
+
+        public static string ProgramFolderRunning()
+        {
+            string s = O.ConvertToString(Functions.runfolder(null, null, null));
+            MessageBox.Show("ProgramFolderRunning(): " + s);
+            return s;
+        }
+
+        public static string ProgramFolderGit()
+        {
+            string s = O.ConvertToString(Functions.root(null, null, null, new ScalarString("git")));
+            MessageBox.Show("ProgramFolderGit(): " + s);
+            return s;
+        }
+
+        public static string ProgramFolderRunningRelative()
+        {
+            string s = O.ConvertToString(Functions.runfolder(null, null, null, new ScalarString("rel")));
+            MessageBox.Show("ProgramFolderRunningRelative(): " + s);
+            return s;
+        }
+
+        public static string BlobsHash(string filePath, bool specialFlagForTraces)
+        {
+            //
+            // TODO: here we could do datahash for .gbk files instead (and handle specialFlagForTraces too)
+            // If we can loop through all IVariables, while sorting dict keys before calling children, we
+            // can use an incremental sha256 engine. For series, we need to stamp/inject the first observation as
+            // a freq + super + sub + subsub. We need to rempace G.IsNumericalError() with double.NaN.
+            // Also, scalars and matrices and maps. Labels for matrices? Should we truncate precision?
+            //
+            string hash = G.GetSha256FromFile(filePath);
+
+            bool hasTraces = false;
+            bool isGbk = false;
+            if (specialFlagForTraces && G.Equal(Path.GetExtension(filePath), "gbk"))
+            {
+                try
+                {
+                    using (System.IO.Compression.ZipArchive archive = System.IO.Compression.ZipFile.OpenRead(filePath))
+                    {
+                        foreach (System.IO.Compression.ZipArchiveEntry entry in archive.Entries)
+                        {
+                            isGbk = true;
+                            if (G.Equal(entry.Name, Globals.protobufFileName3))
+                            {
+                                hasTraces = true;
+                                break;
+                            }
+                        }
+                    }
+
+                }
+                catch
+                {
+                }
+            }
+
+            //We are going to use "datahash" for .gbk. Below it is ensured that two files with same datahash, but where
+            //there are traces in one file and not in another will have different hashes.
+            if (isGbk && hasTraces)
+            {
+                hash = hash.Substring(0, hash.Length - 1) + "1"; //always ends with 1
+            }
+            else if (isGbk)
+            {
+                hash = hash.Substring(0, hash.Length - 1) + "0"; //always ends with 0
+            }
+            return hash;
+        }
+
+        public static void BlobsFile(bool isGet, string fileName, string sha256, string blobsFolder, List<string> filesNew, List<string> filesOverwritten)
+        {
+            // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+            // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+            // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO            
+            // -----------------------------------------------------------
+            // ==== Think about atomic writes and simultaneous threads
+            // -----------------------------------------------------------
+            // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+            // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+            // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+            if (!Directory.Exists(blobsFolder))
+            {
+                MessageBox.Show("Folder '" + blobsFolder + "' does not exist for file blobs/storage");
+                new Error();
+            }
+            if (!File.Exists(Path.Combine(blobsFolder, "blobsroot.ini")))
+            {
+                MessageBox.Show("File '" + Path.Combine(blobsFolder, "blobsroot.ini") + "' does not exist. This is a safety precaution: you may add an empty file with that name.");
+                new Error();
+            }
+            string shapart1 = sha256.Substring(0, 2);
+            //string shapart2 = sha256.Substring(2);
+            string shapart2 = sha256; //We do not want file "abcdefg" to become "\ab\cdefg", but prefer it to become "\ab\abcdefg". Easier to search for etc. even though Git does the former.
+            if (isGet)
+            {
+                // ------------------------------------
+                // Getting
+                // ------------------------------------
+                if (!File.Exists(Path.Combine(blobsFolder, shapart1, shapart2)))
+                {
+                    MessageBox.Show("For '" + fileName + "', could not find blob file '" + Path.Combine(blobsFolder, shapart1, shapart2) + "'");
+                    new Error();
+                }
+                else
+                {
+                    if (File.Exists(fileName)) filesOverwritten.Add(fileName);
+                    else filesNew.Add(fileName);
+                    BlobsFileGet(fileName, Path.Combine(blobsFolder, shapart1, shapart2));
+                }
+            }
+            else
+            {
+                // ------------------------------------
+                // Putting
+                // ------------------------------------
+                string blobsFile = Path.Combine(blobsFolder, shapart1, shapart2);
+                if (!Directory.Exists(Path.Combine(blobsFolder, shapart1)))
+                {
+                    Directory.CreateDirectory(Path.Combine(blobsFolder, shapart1));
+                    BlobsFilePut(fileName, blobsFile);
+                }
+                else
+                {
+                    if (File.Exists(Path.Combine(blobsFolder, shapart1, shapart2)))
+                    {
+                        //No need to copy it: same file is already there
+                        //TODO TODO TODO
+                        //TODO TODO TODO
+                        //TODO TODO TODO ---> if a gbk is newer but with same datahash, we could add the new one (may have better meta information)
+                        //TODO TODO TODO
+                        //TODO TODO TODO
+                    }
+                    else
+                    {
+                        BlobsFilePut(fileName, blobsFile);
+                    }
+                }
+            }
+        }
+
+        private static void BlobsFileGet(string fileName, string blobsFile)
+        {
+            //TODO
+            //TODO
+            //TODO Maybe check that the sha hash is correct after fetching the file.
+            //TODO
+            //TODO
+            if (Globals.alreadyZipped.Contains(Path.GetExtension(fileName), StringComparer.OrdinalIgnoreCase))
+            {
+                File.Copy(blobsFile, fileName, true); //Allows overwrite, TODO UNZIPPING                    
+            }
+            else
+            {
+                using (ZipArchive archive = ZipFile.OpenRead(blobsFile))
+                {
+                    ZipArchiveEntry entry = archive.GetEntry("storage");
+                    if (entry != null)
+                    {
+                        entry.ExtractToFile(fileName, true);
+                    }
+                }
+            }
+            G.ReadOnlyRemove(fileName);
+        }
+
+        private static void BlobsFilePut(string fileName, string blobsFile)
+        {
+            if (Globals.alreadyZipped.Contains(Path.GetExtension(fileName), StringComparer.OrdinalIgnoreCase))
+            {
+                File.Copy(fileName, blobsFile);
+            }
+            else
+            {
+                using (FileStream zipToOpen = new FileStream(blobsFile, FileMode.Create, FileAccess.Write))
+                {
+                    using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Create))
+                    {
+                        ZipArchiveEntry readmeEntry = archive.CreateEntry(Path.GetFileName("storage"));
+                        using (Stream writer = readmeEntry.Open())
+                        using (FileStream fs = File.OpenRead(fileName))
+                        {
+                            fs.CopyTo(writer);
+                        }
+                    }
+                }
+            }
+            G.ReadOnlySet(blobsFile);
         }
 
         /// <summary>
@@ -22773,62 +23798,116 @@ namespace Gekko
 
                 if (G.Equal(function, "laspchain"))
                 {
-                    //
-                    // Laspeyres chain used to be computed via R = (p1[-1]*q1 + p2[-1]*q2) / (p1[-1]*q1[-1] + p2[-1]*q2[-1]),
-                    // giving the quantity. But if one or more micro-quantities are missing in the first year, we
-                    // cannot get the aggregated quantity and thus aggregated pris.
-                    // We CAN do this with R = (p1*q1 + p2*q2) / (p1[-1]*q1 + p2[-1]*q2) for the aggregated price.
-                    // So now we are first calculating prices.
-                    // These R's can be accumulated/chained. So the development in q's is weighted together at lagged prices.
-                    // From the chain (efter adjusting for base period), we get quantitites. Prices are then just costs / quantities.                    
-                    //
-                    double index = 1d;
-                    xx[4, start] = 1d;  //quantity
-                    xx[5, start] = 1d;  //price
-                    for (int i = start; i < obs; i++)
+                    if (Program.options.bugfix_laspchain_fix1)
                     {
-                        double sum = 0d;  //normal values/costs.
-                        double sum1 = 0d; //at lagged prices (d-values)
-                        for (int j = 0; j < n; j++)
+                        //NOTE NOTE NOTE
+                        //NOTE NOTE NOTE
+                        //NOTE NOTE NOTE --> early return from method here!
+                        //NOTE NOTE NOTE
+                        //NOTE NOTE NOTE                        
+                        Series c = new Series(EFreq.A, "c!a");
+                        Series d = new Series(EFreq.A, "d!a");
+                        foreach (GekkoTime t in new GekkoTimeIterator(EFreq.A, tStart, tEnd))
                         {
-                            sum += aX[j, i] * aP[j, i];
-                            if (i > start) sum1 += aX[j, i] * aP[j, i - 1];
-                        }
-                        xx[0, i] = sum;   //total cost                            
-                        if (i > start)
-                        {
-                            xx[1, i] = sum1;  //total cost at previous period prices
-                            double r = G.HandleNumericalError(xx[0, i] / xx[1, i]);
+                            int n5;
+                            if (list1 != null)
+                            {
+                                n5 = tempP.Count;
+                            }
+                            else
+                            {
+                                n5 = list1_data.Count;
+                            }
 
-                            if (opt.zeros1)
+                            c.SetData(t, 0d); //Current prices
+                            d.SetData(t, 0d); //D-prices
+                            for (int i = 0; i < n5; i++)
                             {
-                                if (xx[0, i] == 0d)
+                                double factor = 1d;
+                                SeriesAndBool sb1;
+                                SeriesAndBool sb2;
+                                if (list1 != null)
                                 {
-                                    r = 1d;
+                                    sb1 = tempP[i]; //prices
+                                    sb2 = tempX[i]; //quantities                                       
                                 }
+                                else
+                                {
+                                    sb1 = list1_data[i]; //prices
+                                    sb2 = list2_data[i]; //quantities                                 
+                                }
+                                if (sb2.b) factor = -1d;
+                                c.SetData(t, c.GetDataSimple(t) + factor * sb1.ts.GetDataSimple(t) * sb2.ts.GetDataSimple(t)); //Current prices
+                                d.SetData(t, d.GetDataSimple(t) + factor * sb1.ts.GetDataSimple(t.Add(-1)) * sb2.ts.GetDataSimple(t)); //D-prices
                             }
-                            else if (opt.zeros2)
+                        }
+
+                        Series p5, q5; ChainLoop(out p5, out q5, tStart, tEnd, c, d, opt, indexYear);
+                        m = new Map();
+                        m.AddIVariable("p!a", p5);
+                        m.AddIVariable("q!a", q5);
+                        return m;
+
+                    }
+                    else
+                    {
+
+                        //
+                        // Laspeyres chain used to be computed via R = (p1[-1]*q1 + p2[-1]*q2) / (p1[-1]*q1[-1] + p2[-1]*q2[-1]),
+                        // giving the quantity. But if one or more micro-quantities are missing in the first year, we
+                        // cannot get the aggregated quantity and thus aggregated pris.
+                        // We CAN do this with R = (p1*q1 + p2*q2) / (p1[-1]*q1 + p2[-1]*q2) for the aggregated price.                    
+                        // From the chained prices (efter adjusting for base period), we get quantitites.
+                        // Aggregated prices are then just costs/quantities.
+                        //
+                        double index = 1d;
+                        xx[4, start] = 1d;  //quantity
+                        xx[5, start] = 1d;  //price
+                        for (int i = start; i < obs; i++)
+                        {
+                            double sum = 0d;  //normal values/costs.
+                            double sum1 = 0d; //at lagged prices (d-values)
+                            for (int j = 0; j < n; j++)
                             {
-                                if (xx[0, i] == 0d && xx[1, i] == 0d)
-                                {
-                                    r = 1d;
-                                }
+                                sum += aX[j, i] * aP[j, i];
+                                if (i > start) sum1 += aX[j, i] * aP[j, i - 1];
                             }
-                            else if (Globals.handleZero)  //search this Globals var to see the other place the following logic is used
+                            xx[0, i] = sum;   //total cost                            
+                            if (i > start)
                             {
-                                if (xx[0, i] == 0d && xx[1, i] != 0d)
+                                xx[1, i] = sum1;  //total cost at previous period prices
+                                double r = G.HandleNumericalError(xx[0, i] / xx[1, i]);
+
+                                if (opt.zeros1)
                                 {
-                                    r = 1 / Globals.factorZero;
-                                    G.Warning("w29.2", null);
+                                    if (xx[0, i] == 0d)
+                                    {
+                                        r = 1d;
+                                    }
                                 }
-                                else if (xx[0, i] != 0d && xx[1, i] == 0d)
+                                else if (opt.zeros2)
                                 {
-                                    r = Globals.factorZero;
-                                    G.Warning("w29.2", null);
+                                    if (xx[0, i] == 0d && xx[1, i] == 0d)
+                                    {
+                                        r = 1d;
+                                    }
                                 }
+                                else if (Globals.handleZero)  //search this Globals var to see the other place the following logic is used
+                                {
+                                    if (xx[0, i] == 0d && xx[1, i] != 0d)
+                                    {
+                                        r = 1 / Globals.factorZero;
+                                        G.Warning("w29.2", null);
+                                    }
+                                    else if (xx[0, i] != 0d && xx[1, i] == 0d)
+                                    {
+                                        r = Globals.factorZero;
+                                        G.Warning("w29.2", null);
+                                    }
+                                }
+                                index = index * r;
+                                xx[5, i] = index;
                             }
-                            index = index * r;
-                            xx[5, i] = index;
                         }
                     }
                 }
@@ -22976,68 +24055,252 @@ namespace Gekko
         /// <returns></returns>
         private static Map LaspeyresChainSeries(string function, Series value, Series valueAtLaggedPrices, GekkoTime indexYear, GekkoTime tStart, GekkoTime tEnd, LaspeyresOptions opt)
         {
-            //Is using R = (p1*q1 + p2*q2) / (p1[-1]*q1 + p2[-1]*q2) for the price index.            
+            //Is using R = (p1*q1 + p2*q2) / (p1[-1]*q1 + p2[-1]*q2) for the price index chain. Divide costs (p1*q1 + p2*q2) with R accumulated, and
+            //  we obtain a quantity. The lagged prices in the denominator in the first period do not matter, since R accumulated is adjusted anyway.
+            //We might instead us R = (p1[-1]*q1 + p2[-1]*q2) / (p1[-1]*q1[-1] + p2[-1]*q2[-1]) for the quantity chain. Divide costs (p1*q1 + p2*q2) with R accumulated, and
+            //  we obtain a price.
+            //
+            // p2020 =  (p1[2020]*q1[2020] + p2[2020]*q2[2020]) / (p1[2019]*q1[2020] + p2[2019]*q2[2020])
+            //
+            // p2021 =  (p1[2020]*q1[2020] + p2[2020]*q2[2020]) / (p1[2019]*q1[2020] + p2[2019]*q2[2020])
+            //        * (p1[2021]*q1[2021] + p2[2021]*q2[2021]) / (p1[2020]*q1[2021] + p2[2020]*q2[2021])
+            //
+            // p2022 =  (p1[2020]*q1[2020] + p2[2020]*q2[2020]) / (p1[2019]*q1[2020] + p2[2019]*q2[2020])
+            //        * (p1[2021]*q1[2021] + p2[2021]*q2[2021]) / (p1[2020]*q1[2021] + p2[2020]*q2[2021])
+            //        * (p1[2022]*q1[2022] + p2[2022]*q2[2022]) / (p1[2021]*q1[2022] + p2[2021]*q2[2022])
+            //
+            // Dette divideres så med basisåret, enten p2020, p2021 eller p2022. Ligegyldigt hvilken, vil p1[2019] og p2[2019] ikke indgå i den
+            // korrigerede pris.
             // -----                       
 
             if (value.freq != valueAtLaggedPrices.freq) new Error(function + "(): The two input series have different frequencies");
             if (value.type == ESeriesType.ArraySuper || valueAtLaggedPrices.type == ESeriesType.ArraySuper) new Error(function + "(): Array-series input is not allowed (pick dimensions with x[...]).");
-            GekkoTime tStart_real = GekkoTime.tNull;
-            foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
-            {
-                if (!G.IsNumericalError(value.GetDataSimple(t)) && !G.IsNumericalError(valueAtLaggedPrices.GetDataSimple(t)))
-                {
-                    //if both are non-missing
-                    tStart_real = t;
-                    break;
-                }
-            }
-            if (tStart_real.IsNull()) tStart_real = tStart;  //then we just get missing values later on
-            Series p = new Series(EFreq.A, "p!a");
-            Series q = new Series(EFreq.A, "q!a");
-            p.SetData(tStart_real.Add(-1), 1d);
-            foreach (GekkoTime t in new GekkoTimeIterator(tStart_real, tEnd))
-            {
-                //Note: ts1 or ts2 not used in period tStart_real.
-                //But tStart_real+1 contains prices from tStart_real, soimplicitly the period is used.
-                double v1 = value.GetDataSimple(t);
-                double v2 = valueAtLaggedPrices.GetDataSimple(t);
-                double r = G.HandleNumericalError(v1 / v2);
-
-                if (opt.zeros1)
-                {
-                    if (v1 == 0d)
-                    {
-                        r = 1d;
-                    }
-                }
-                else if (opt.zeros2)
-                {
-                    if (v1 == 0d && v2 == 0d)
-                    {
-                        r = 1d;
-                    }
-                }
-                else if (Globals.handleZero)
-                {
-                    if (v1 == 0d && v2 != 0d) r = 1 / Globals.factorZero;
-                    else if (v1 != 0d && v2 == 0d) r = Globals.factorZero;
-                }
-                p.SetData(t, p.GetDataSimple(t.Add(-1)) * r);  //Could be faster directly on arrays, but never mind
-            }
-            double indexValue = p.GetDataSimple(indexYear);
-            Series p2 = new Series(EFreq.A, "p2!a");
-            Series q2 = new Series(EFreq.A, "q2!a");
-            foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
-            {
-                p2.SetData(t, G.HandleNumericalError(p.GetDataSimple(t) / indexValue));
-                //Note: below is value divided by price. If value has missing in tStart, the quantity will always be missing (even though the price may be computable)
-                q2.SetData(t, G.HandleNumericalError(value.GetDataSimple(t) / p2.GetDataSimple(t)));
-            }
+            Series p2, q2; ChainLoop(out p2, out q2, tStart, tEnd, value, valueAtLaggedPrices, opt, indexYear);
             Map m = new Map();
-            m.AddIVariable(p.GetName(), p2);
-            m.AddIVariable(q.GetName(), q2);
+            m.AddIVariable("p!a", p2);
+            m.AddIVariable("q!a", q2);
             return m;
         }
+
+        private static void ChainLoop(out Series p, out Series q, GekkoTime t1, GekkoTime t2, Series c, Series d, LaspeyresOptions opt, GekkoTime ti)
+        {
+            p = new Series(EFreq.A, "p!a"); //Could be light series...
+            q = new Series(EFreq.A, "q!a"); //Could be light series...
+            if (G.Equal(Program.options.bugfix_laspchain_emulate, "kaedepris2"))
+            {
+                //At some point, perhaps in 2027, this option can be removed.
+                //First obs or pchain will have value 1.
+                //For second obs and on, r is multiplied on pchain[-1]
+                //                              v2
+                //                       ==0          <>0
+                //                  +--------------------------+
+                //      v1     ==0  |     1           0.01     |
+                //             <>0  |   100           v1/v2    |
+                //                  +--------------------------+
+                //
+                //Missings will become missings in r.
+                //At the end pchain is adjusted with ti.
+                //Note: v1 corresponds to c, v2 to d.
+                //
+                p.SetData(t1, 1d);
+                foreach (GekkoTime t in new GekkoTimeIterator(t1.Add(1), t2))
+                {
+                    double v1 = c.GetDataSimple(t);
+                    double v2 = d.GetDataSimple(t);
+                    double r = double.NaN;
+
+                    if (v1 == 0d && v2 != 0d)
+                    {
+                        r = 1d / Globals.factorZero;
+                    }
+                    else if (v1 != 0d && v2 == 0d)
+                    {
+                        r = Globals.factorZero;
+                    }
+                    else if (v1 == 0d && v2 == 0d)
+                    {
+                        r = 1d;
+                    }
+                    else
+                    {
+                        r = G.HandleNumericalError(v1 / v2);
+                    }
+                    p.SetData(t, p.GetDataSimple(t.Add(-1)) * r);
+                }
+                double x = p.GetDataSimple(ti);
+                foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+                {
+                    p.SetData(t, p.GetDataSimple(t) / x);  //Indexing
+                }
+            }
+            else
+            {
+                if (Program.options.bugfix_laspchain_fix2)
+                {
+                    //New way, backwards and forwards
+                    //                    
+                    //rp = (p1 q1 + p2 q2)/ (p1.1 q1 + p2.1 q2)             = c/d
+                    //rq = (p1.1 q1 + p2.1 q2)/(p1.1 q1.1 + p2.1 q2.1)      = d/c.1   (may produce something even if current prices are missing. This scenario is probably rare, though)
+                    //rc = rp rq = (p1 q1 + p2 q2)/ (p1.1 q1.1 + p2.1 q2.1) = c/c.1                    
+                    //
+                    //p = p.1 * rp  -->  p.1 = p / rp
+                    //q = q.1 * rq  -->  q.1 = q / rq
+                    //
+                    // ------------------------
+                    p.SetData(ti, 1d);
+                    q.SetData(ti, c.GetDataSimple(ti));
+                    foreach (GekkoTime t in new GekkoTimeIteratorBackwards(ti.Add(-1), t1))
+                    {
+                        //First backwards
+                        double rp, rq; ChainLoopR(out rp, out rq, c.GetDataSimple(t.Add(1)), d.GetDataSimple(t.Add(1)), c.GetDataSimple(t), opt);
+                        p.SetData(t, p.GetDataSimple(t.Add(+1)) / rp);
+                        if (G.IsNumericalError(rp) && !G.IsNumericalError(rq)) q.SetData(t, q.GetDataSimple(t.Add(+1)) / rq); //May sometimes produce something for q
+                        else q.SetData(t, c.GetDataSimple(t) / p.GetDataSimple(t)); //Safest to do like this when possible
+                    }
+                    foreach (GekkoTime t in new GekkoTimeIterator(ti.Add(1), t2))
+                    {
+                        //Then forwards
+                        double rp, rq; ChainLoopR(out rp, out rq, c.GetDataSimple(t), d.GetDataSimple(t), c.GetDataSimple(t.Add(-1)), opt);
+                        p.SetData(t, p.GetDataSimple(t.Add(-1)) * rp);
+                        if (G.IsNumericalError(rp) && !G.IsNumericalError(rq)) q.SetData(t, q.GetDataSimple(t.Add(-1)) * rq); //May sometimes produce something for q
+                        else q.SetData(t, c.GetDataSimple(t) / p.GetDataSimple(t)); //Safest to do like this when possible
+                    }
+                }
+                else
+                {
+                    //Old way
+
+                    GekkoTime tStart_real = GekkoTime.tNull;
+                    //TODO
+                    //TODO
+                    //TODO Integrate the two loops so it is only 1 loop to handle all the logic
+                    //TODO
+                    //TODO
+                    foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+                    {
+                        double v1 = c.GetDataSimple(t);
+                        double v2 = d.GetDataSimple(t);
+                        if (G.IsNumericalError(v1) || G.IsNumericalError(v2))
+                        {
+                            //Do nothing
+                        }
+                        else
+                        {
+                            //if both are non-missing
+                            tStart_real = t;
+                            break;
+                        }
+                    }
+                    if (tStart_real.IsNull()) tStart_real = t1;  //then we just get missing values later on                
+                    p.SetData(tStart_real.Add(-1), 1d);
+                    foreach (GekkoTime t in new GekkoTimeIterator(tStart_real, t2))
+                    {
+                        //Note: ts1 or ts2 not used in period tStart_real.
+                        //But tStart_real+1 contains prices from tStart_real, so implicitly the period is used.
+                        double v1 = c.GetDataSimple(t);
+                        double v2 = d.GetDataSimple(t);
+
+                        double r = double.NaN;
+                        //if (Program.options.bugfix_series_chain && t.EqualsGekkoTime(tStart_real))
+                        //{
+                        //    //The first can be set to this, because even if it has some value, that value is not actually used in the resulting prices/quantities, because the chain-price is normalized anyway.
+                        //    //For v2 == 0d, this fix is a good thing.
+                        //    //What happens for v2 == double.NaN ??
+                        //    r = 1d;
+                        //}
+                        //else
+                        //{
+                        r = G.HandleNumericalError(v1 / v2);
+                        //}
+
+                        if (opt.zeros1)
+                        {
+                            if (v1 == 0d)
+                            {
+                                r = 1d;
+                            }
+                        }
+                        else if (opt.zeros2)
+                        {
+                            if (v1 == 0d && v2 == 0d)
+                            {
+                                r = 1d;
+                            }
+                        }
+                        else if (Globals.handleZero)
+                        {
+                            if (v1 == 0d && v2 != 0d) r = 1 / Globals.factorZero;
+                            else if (v1 != 0d && v2 == 0d) r = Globals.factorZero;
+                        }
+                        p.SetData(t, p.GetDataSimple(t.Add(-1)) * r);  //Could be faster directly on arrays, but never mind
+                    }
+                    double x = p.GetDataSimple(ti);
+                    foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+                    {
+                        p.SetData(t, p.GetDataSimple(t) / x);  //Indexing
+                    }
+                    foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+                    {
+                        q.SetData(t, c.GetDataSimple(t) / p.GetDataSimple(t));
+                    }
+                }
+            }
+        }
+
+        private static void ChainLoopR(out double rp, out double rq, double c, double d, double cLag, LaspeyresOptions opt)
+        {
+            rp = G.HandleNumericalError(c / d);
+            rq = G.HandleNumericalError(d / cLag); //only used if rp is missing value. If not, we later on get q from c and p.
+            if (opt.zeros1)
+            {
+                if (c == 0d)
+                {
+                    rp = 1d; rq = double.NaN; //rq: signals to compute q from costs and price
+                }
+            }
+            else if (opt.zeros2)
+            {
+                if (c == 0d && d == 0d)
+                {
+                    rp = 1d; rq = double.NaN; //rq: signals to compute q from costs and price
+                }
+            }
+            else if (!G.Equal(Program.options.series_laspchain_type, "none"))
+            {
+                //Here, we can have some pre-cooked types
+            }
+            else if (!G.IsNumericalError(Program.options.series_laspchain_zeros_a) || !G.IsNumericalError(Program.options.series_laspchain_zeros_b) || !G.IsNumericalError(Program.options.series_laspchain_zeros_c))
+            {
+                //For second obs and on, r is multiplied on pchain[-1]
+                //                              d
+                //                       ==0          <>0
+                //                  +--------------------------+
+                //      c      ==0  |   zerosa      zerosb     |  For instance: zerosa = 1, zerosb = 0.01, zerosc= 100
+                //             <>0  |   zerosc                 |  corresponding to old kaedepris2()
+                //                  +--------------------------+
+                //
+                if (G.IsNumericalError(c) || G.IsNumericalError(d))
+                {
+                    //Do nothing, this is only about zeroes
+                }
+                else
+                {
+                    if (!G.IsNumericalError(Program.options.series_laspchain_zeros_a) && c == 0d && d == 0d)
+                    {
+                        rp = Program.options.series_laspchain_zeros_a; rq = double.NaN; //rq: signals to compute q from costs and price
+                    }
+                    else if (!G.IsNumericalError(Program.options.series_laspchain_zeros_b) && c == 0d && d != 0d)
+                    {
+                        rp = Program.options.series_laspchain_zeros_b; rq = double.NaN; //rq: signals to compute q from costs and price
+                    }
+                    else if (!G.IsNumericalError(Program.options.series_laspchain_zeros_c) && c != 0d && d == 0d)
+                    {
+                        rp = Program.options.series_laspchain_zeros_c; rq = double.NaN; //rq: signals to compute q from costs and price
+                    }
+                }
+            }
+        }
+
 
         /// <summary>
         /// Parameter i is the period being investigated.
@@ -23405,7 +24668,7 @@ namespace Gekko
                     CheckSomethingToWrite(list2Sorted.Count);
                     string file = G.AddExtension(fileName, "." + "gdx");
                     string pathAndFilename = CreateFullPathAndFileName(file);
-                    Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
+                    string blob = Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
                     if (Program.options.gams_fast)
                     {
                         GamsData.WriteGdx(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list1Sorted); //probably cannot handle list2
@@ -23414,6 +24677,7 @@ namespace Gekko
                     {
                         GamsData.WriteGdxSlow(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list1Sorted); //probably cannot handle list2
                     }
+                    Blob(blob, list1Sorted?.Count ?? 0);
                     return 0;
                 }
                 else if (o.opt_arrow != null)
@@ -23427,7 +24691,7 @@ namespace Gekko
                     CheckSomethingToWrite(list2Sorted.Count);
                     string file = G.AddExtension(fileName, "." + "arrow");
                     string pathAndFilename = CreateFullPathAndFileName(file);
-                    Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
+                    string blob = Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
                     try
                     {
                         Arrow.WriteArrowDatabank(list2Sorted, tStart, tEnd, pathAndFilename);
@@ -23441,6 +24705,7 @@ namespace Gekko
                         }
                         throw;
                     }
+                    Blob(blob, list2Sorted?.Count ?? 0);
                     return 0;
                 }
                 else if (o.opt_parquet != null)
@@ -23454,7 +24719,7 @@ namespace Gekko
                     CheckSomethingToWrite(list2Sorted.Count);
                     string file = G.AddExtension(fileName, "." + "parquet");
                     string pathAndFilename = CreateFullPathAndFileName(file);
-                    Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
+                    string blob = Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
                     try
                     {
                         Arrow.WriteParquetDatabank(list2Sorted, tStart, tEnd, pathAndFilename, Program.databanks.GetFirst().info1, o.opt_bankname);
@@ -23468,6 +24733,7 @@ namespace Gekko
                         }
                         throw;
                     }
+                    Blob(blob, list2Sorted?.Count ?? 0);
                     return 0;
                 }
                 else if (isRecordsFormat)
@@ -23612,7 +24878,7 @@ namespace Gekko
 
             string fullFileName = CreateFullPathAndFileName(o.fileName);
 
-            Globals.dependencyTracking.Add(2, "Write", false, fullFileName);
+            string blob = Globals.dependencyTracking.Add(2, "Write", false, fullFileName);
 
             using (FileStream fs = WaitForFileStream(fullFileName, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter file = G.GekkoStreamWriter(fs))
@@ -23642,7 +24908,8 @@ namespace Gekko
                 }
                 file.Flush();
             }
-            G.Writeln2("R export of " + o.list1.Count() + " matrices, " + fullFileName);
+            Blob(blob, null);
+            G.Writeln2("R export of " + o.list1.Count() + " matrices, " + fullFileName);            
         }
 
         /// <summary>
@@ -23656,12 +24923,11 @@ namespace Gekko
             if (o.fileName == null)
             {
                 new Error("You must state a filename with FILE = ...");
-                //throw new GekkoException();
             }
 
             string fullFileName = CreateFullPathAndFileName(o.fileName);
 
-            Globals.dependencyTracking.Add(2, "Write", false, fullFileName);
+            string blob = Globals.dependencyTracking.Add(2, "Write", false, fullFileName);
 
             using (FileStream fs = WaitForFileStream(fullFileName, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter file = G.GekkoStreamWriter(fs))
@@ -23691,6 +24957,7 @@ namespace Gekko
                 }
                 file.Flush();
             }
+            Blob(blob, null);
             G.Writeln2("Python export of " + o.list1.Count() + " matrices, " + fullFileName);
         }
 
@@ -23858,7 +25125,7 @@ namespace Gekko
 
             string pathAndFileNameResultingFile = pathAndFilename;
 
-            Globals.dependencyTracking.Add(2, "Write", false, pathAndFileNameResultingFile);
+            string blob = Globals.dependencyTracking.Add(2, "Write", false, pathAndFileNameResultingFile);
 
             int count = 0;
 
@@ -23876,7 +25143,7 @@ namespace Gekko
                 //in the very rare case, any files here will be overwritten
             }
 
-            CreateDatabankXmlInfo(p, databank, tempTsdxPath, databankVersion, traceVersion, isCloseCommand);
+            //CreateDatabankXmlInfo(p, databank, tempTsdxPath, databankVersion, traceVersion, isCloseCommand);
 
             //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
 
@@ -23954,6 +25221,30 @@ namespace Gekko
                     tracesToWrite = databank.traces;
                     databank.traces = null;
                 }
+
+                //Data hash
+                string dataHash = null;
+                if (Program.options.databank_file_gbk_datahash)
+                {
+                    //At this point, the databank has been trimmed regarding series internal arrays                    
+                    DateTime t0 = DateTime.Now;
+                    DeepHashHelper helper = new DeepHashHelper();
+                    helper.includeMetadata = Program.options.databank_file_gbk_datahash_meta;
+                    foreach (var kvp in databank.storage.OrderBy(kvp => kvp.Key, StringComparer.OrdinalIgnoreCase)) kvp.Value.DeepHash(kvp.Key, helper);
+                    if (Program.options.databank_file_gbk_datahash_trace)
+                    {
+                        //With this option, we distinguish between a gbk with 0 data-traces and a gbk with > 0 data-traces
+                        //When releasing a databank, traces are sometimes removed. The contents of the data-traces is not hashed.
+                        Hashing.HashEnum1(Hashing.EHashType.SeriesTraces, helper.hash);
+                        int hasTraces = 0; if (tracesToWrite != null && tracesToWrite.Count > 0) hasTraces = 1;
+                        Hashing.HashInteger(hasTraces, helper.hash);
+                    }
+                    helper.hash.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
+                    dataHash = BitConverter.ToString(helper.hash.Hash!).Replace("-", "").ToLower();
+                    G.WritelnGray("Datahash = " + dataHash + ", " + G.Seconds(t0));
+                }
+
+                CreateDatabankXmlInfo(p, databank, tempTsdxPath, databankVersion, traceVersion, isCloseCommand, dataHash);
 
                 List<int> workToDo = new List<int>() { 0, 1 };
                 if (noTrace) workToDo = new List<int>() { 0 };  //do not do traces
@@ -24033,6 +25324,7 @@ namespace Gekko
                 }
             }
 
+            Blob(blob, count);
             return count;
         }
 
@@ -24093,7 +25385,7 @@ namespace Gekko
                 path = Program.options.folder_bank;
             }
             string pathAndFilename = CreateFullPathAndFileNameFromFolder(file, path);
-            Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
+            string blob = Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
 
             string pathAndFileNameResultingFile = pathAndFilename;
 
@@ -24114,6 +25406,7 @@ namespace Gekko
                     }
                 }
             }
+            Blob(blob, count);
             return count;
         }
 
@@ -24133,7 +25426,7 @@ namespace Gekko
                 path = Program.options.folder_bank;
             }
             string pathAndFilename = CreateFullPathAndFileNameFromFolder(file, path);
-            Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
+            string blob = Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
 
             string pathAndFileNameResultingFile = pathAndFilename;
 
@@ -24154,6 +25447,7 @@ namespace Gekko
                     }
                 }
             }
+            Blob(blob, count);
             return count;
         }
 
@@ -24244,7 +25538,7 @@ namespace Gekko
             }
         }
 
-        private static void CreateDatabankXmlInfo(P p, Databank databank, string tempTsdxPath, string databankVersion, string traceVersion, bool isCloseCommand)
+        private static void CreateDatabankXmlInfo(P p, Databank databank, string tempTsdxPath, string databankVersion, string traceVersion, bool isCloseCommand, string dataHash)
         {
 
             // Create the xml document containe
@@ -24263,7 +25557,7 @@ namespace Gekko
                 {                     
                     XmlElement user = doc.CreateElement("User");                    
                     user.InnerText = (Functions.user(null, null, null, new IVariable[] { }) as ScalarString).string2;
-                    root.AppendChild(user);
+                    if (!G.NullOrBlanks(user.InnerText)) root.AppendChild(user);
                 } 
                 catch { }
                 
@@ -24271,7 +25565,7 @@ namespace Gekko
                 {                     
                     XmlElement branch = doc.CreateElement("Branch");
                     branch.InnerText = (Functions.branch(null, null, null, new IVariable[] { }) as ScalarString).string2;
-                    root.AppendChild(branch);
+                    if (!G.NullOrBlanks(branch.InnerText)) root.AppendChild(branch);
                 } 
                 catch { }
                 
@@ -24279,7 +25573,7 @@ namespace Gekko
                 {                    
                     XmlElement commit = doc.CreateElement("Commit");
                     commit.InnerText = (Functions.commit(null, null, null, new IVariable[] { }) as ScalarString).string2;
-                    root.AppendChild(commit);
+                    if (!G.NullOrBlanks(commit.InnerText)) root.AppendChild(commit);
                 } 
                 catch { }
                 
@@ -24287,7 +25581,7 @@ namespace Gekko
                 {                    
                     XmlElement gcm = doc.CreateElement("Gcm");
                     gcm.InnerText = p?.GetExecutingGcmFile(ERunningGcm.ExcludeProcFuncIgnoreExistence); //Like for runfolder() and runfile(), we are interested in the executing .gcm file, so do not return a proc/func. This is done for data-traces, though, so there is a minor inconsistency here, but for traces, you often want to see the exact series statement.
-                    root.AppendChild(gcm);
+                    if (!G.NullOrBlanks(gcm.InnerText)) root.AppendChild(gcm);
                 } 
                 catch { }
             }
@@ -24295,12 +25589,16 @@ namespace Gekko
 
             XmlElement comment = doc.CreateElement("Info1");  //HDG
             comment.InnerText = databank.info1;
-            root.AppendChild(comment);
+            if (!G.NullOrBlanks(comment.InnerText)) root.AppendChild(comment);
 
             XmlElement date = doc.CreateElement("Date");
             string now = GetDateTimePretty(DateTime.Now);
             date.InnerText = now;
-            root.AppendChild(date);
+            if (!G.NullOrBlanks(date.InnerText)) root.AppendChild(date);
+
+            XmlElement dataHash2 = doc.CreateElement("DataHash");
+            dataHash2.InnerText = dataHash;
+            if (!G.NullOrBlanks(dataHash2.InnerText)) root.AppendChild(dataHash2);
 
             if (G.GetModelSourceType() == EModelType.Gekko && !isCloseCommand)
             {
@@ -24322,40 +25620,40 @@ namespace Gekko
 
                     XmlElement modelName = doc.CreateElement("ModelName");
                     modelName.InnerText = Path.GetFileName(Program.model.modelGekko.modelInfo.fileName);
-                    root.AppendChild(modelName);
+                    if (!G.NullOrBlanks(modelName.InnerText)) root.AppendChild(modelName);
 
                     XmlElement modelInfo = doc.CreateElement("ModelInfo");
                     modelInfo.InnerText = Program.model.modelGekko.modelInfo.info;
-                    root.AppendChild(modelInfo);
+                    if (!G.NullOrBlanks(modelInfo.InnerText)) root.AppendChild(modelInfo);
 
                     XmlElement modelDate = doc.CreateElement("ModelDate");
                     modelDate.InnerText = Program.model.modelGekko.modelInfo.date;
-                    root.AppendChild(modelDate);
+                    if (!G.NullOrBlanks(modelDate.InnerText)) root.AppendChild(modelDate);
 
                     XmlElement modelSignature = doc.CreateElement("ModelSignature");
                     modelSignature.InnerText = Program.model.modelGekko.signatureFoundInFileHeader;
-                    root.AppendChild(modelSignature);
+                    if (!G.NullOrBlanks(modelSignature.InnerText)) root.AppendChild(modelSignature);
 
                     XmlElement modelHash = doc.CreateElement("ModelHash");
                     modelHash.InnerText = Program.model.modelGekko.modelHashTrue;
-                    root.AppendChild(modelHash);
+                    if (!G.NullOrBlanks(modelHash.InnerText)) root.AppendChild(modelHash);
 
                     XmlElement modelLastSimPeriod = doc.CreateElement("ModelLastSimPeriod");
                     if (Program.model.modelGekko.lastSimPer1.IsNull() || Program.model.modelGekko.lastSimPer2.IsNull()) modelLastSimPeriod.InnerText = "";
                     else modelLastSimPeriod.InnerText = G.FromDateToString(Program.model.modelGekko.lastSimPer1) + "-" + G.FromDateToString(Program.model.modelGekko.lastSimPer2);
-                    root.AppendChild(modelLastSimPeriod);
+                    if (!G.NullOrBlanks(modelLastSimPeriod.InnerText)) root.AppendChild(modelLastSimPeriod);
 
                     XmlElement modelLastSimStamp = doc.CreateElement("ModelLastSimStamp");
                     modelLastSimStamp.InnerText = Program.model.modelGekko.lastSimStamp;
-                    root.AppendChild(modelLastSimStamp);
+                    if (!G.NullOrBlanks(modelLastSimStamp.InnerText)) root.AppendChild(modelLastSimStamp);
 
                     XmlElement modelLargestLag = doc.CreateElement("ModelLargestLag");
                     modelLargestLag.InnerText = "" + Program.model.modelGekko.largestLag;
-                    root.AppendChild(modelLargestLag);
+                    if (!G.NullOrBlanks(modelLargestLag.InnerText)) root.AppendChild(modelLargestLag);
 
                     XmlElement modelLargestLead = doc.CreateElement("ModelLargestLead");
                     modelLargestLead.InnerText = "" + Program.model.modelGekko.largestLead;
-                    root.AppendChild(modelLargestLead);
+                    if (!G.NullOrBlanks(modelLargestLead.InnerText)) root.AppendChild(modelLargestLead);
                 }
             }
 
@@ -24957,7 +26255,7 @@ namespace Gekko
             }
 
             string pathAndFilename = CreateFullPathAndFileName(filename);
-            Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
+            string blob = Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
 
             int counter = 0;
             if (true)
@@ -25214,7 +26512,7 @@ namespace Gekko
             }
 
             G.Writeln("Wrote " + counter + " variables to " + pathAndFilename);
-
+            Blob(blob, counter);
             return counter;
         }        
 
@@ -25312,7 +26610,7 @@ namespace Gekko
             filename = G.AddExtension(filename, ".dat");
 
             string pathAndFilename = CreateFullPathAndFileName(filename);
-            Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
+            string blob = Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
 
             int counter = 0;
             using (FileStream fs = WaitForFileStream(pathAndFilename, null, GekkoFileReadOrWrite.Write))
@@ -25361,7 +26659,7 @@ namespace Gekko
             }
 
             G.Writeln("Wrote " + list2.Count + " variables to " + pathAndFilename);
-
+            Blob(blob, list2.Count);
             return list2.Count;
         }
 
@@ -25408,7 +26706,7 @@ namespace Gekko
             filename = filename;
             filename = G.AddExtension(filename, ".tsp");
             string pathAndFilename = CreateFullPathAndFileName(filename);
-            Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
+            string blob = Globals.dependencyTracking.Add(2, "Write", false, pathAndFilename);
 
             int counter = 0;
             using (FileStream fs = WaitForFileStream(pathAndFilename, null, GekkoFileReadOrWrite.Write))
@@ -25453,6 +26751,7 @@ namespace Gekko
             }
 
             if (true) G.Writeln("Wrote " + counter + " variables to " + pathAndFilename);
+            Blob(blob, counter);
             return counter;
         }
 
@@ -25581,6 +26880,10 @@ namespace Gekko
                 else
                 {
                     Program.WriteRemovedDatabank(p, removed, noTrace);
+                    if (File.Exists(removed.FileNameWithPath)) //probably always exists...
+                    {
+                        Blob(removed.FileNameWithPath, removed.storage.Count());
+                    }
                 }
             }
         }
@@ -26060,11 +27363,12 @@ namespace Gekko
                     }
                 }
             }
-            int n = 0;
+            //int n = 0;
             if (!skipWrite)
             {
-                Globals.dependencyTracking.Add(2, "Write", false, removed.FileNameWithPath);
-                n = WriteGbk(p, null, removed, tStart, tEnd, removed.FileNameWithPath, false, "" + Globals.extensionDatabank + "", true, true, noTrace);
+                //Globals.dependencyTracking.Add(2, "Write", false, removed.FileNameWithPath);
+                //n = WriteGbk(p, null, removed, tStart, tEnd, removed.FileNameWithPath, false, "" + Globals.extensionDatabank + "", true, true, noTrace);
+                WriteGbk(p, null, removed, tStart, tEnd, removed.FileNameWithPath, false, "" + Globals.extensionDatabank + "", true, true, noTrace);
             }
         }
 
@@ -26761,7 +28065,7 @@ namespace Gekko
                 {
                     try
                     {
-                        DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
+                        //DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
                         Trace2 trace = new Trace2(ETraceType.Normal, ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast(), true);
                         trace.GetContents().text = gekkocode + ";";
                         trace.GetContents().name = ts_lhs.GetNameAndParentDatabank();
@@ -26769,7 +28073,7 @@ namespace Gekko
                         trace.AddRangeFromSeries2(ts_lhs, ts_rhs);
                         //trace can only have null period if lhs has all missing values
                         Gekko.Trace2.PushIntoSeries(ts_lhs, trace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
-                        Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
+                        //Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                     }
                     catch
                     {
@@ -27094,7 +28398,7 @@ namespace Gekko
                 {
                     try
                     {
-                        DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
+                        //DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
                         Trace2 trace = new Trace2(ETraceType.Normal, ts_lhs.GetRealDataPeriodFirst(), ts_lhs.GetRealDataPeriodLast(), true);
                         trace.GetContents().text = gekkocode + ";";
                         trace.GetContents().name = ts_lhs.GetNameAndParentDatabank();
@@ -27102,7 +28406,7 @@ namespace Gekko
                         trace.AddRangeFromSeries2(ts_lhs, ts_rhs);
                         //trace can only have null period if lhs has all missing values
                         Gekko.Trace2.PushIntoSeries(ts_lhs, trace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
-                        Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
+                        //Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                     }
                     catch
                     {
@@ -28413,6 +29717,10 @@ namespace Gekko
                     {
                         d = Print.PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, o.guiGraphIsLogTransform, o.opt_yoy, o.opt_i, EPrtCollapseTypes.None, 1, skipCounter);
                     }
+                    //gnuplot does not like values too small apparently                    
+                    if (d > 0) d = Math.Max(d, 1e-200);
+                    if (d < 0) d = Math.Min(d, -1e-200);
+
                     i++;                    
 
                     //The columns (variables) are counted with j=1 for date column, and variables following for j=2, j=3, ...
@@ -30989,7 +32297,7 @@ namespace Gekko
         /// <returns></returns>
         public static double[,] InvertMatrix(double[,] matrix)
         {
-            return InvertMatrix(matrix, true);
+            bool fail; return InvertMatrix(matrix, true, true, out fail);
         }
 
         /// <summary>
@@ -30998,20 +32306,37 @@ namespace Gekko
         /// <param name="matrix"></param>
         /// <param name="printError"></param>
         /// <returns></returns>
-        public static double[,] InvertMatrix(double[,] matrix, bool printError)
+        public static double[,] InvertMatrix(double[,] matrix, bool printError, bool mayGiveExceptionError, out bool fail)
         {
+            fail = false;
             int success = 0;
             alglib.matinvreport report = new alglib.matinvreport();
             alglib.rmatrixinverse(ref matrix, out success, out report);
             if (success == 3)
             {
-                if (printError) new Error("Inv(): It seems the matrix is singular");
-                else throw new GekkoException();
+                if (mayGiveExceptionError)
+                {
+                    if (printError) new Error("Inv(): It seems the matrix is singular");
+                    else throw new GekkoException();
+                }
+                else
+                {
+                    if (printError) new Writeln("Inv(): It seems the matrix is singular");
+                }
+                fail = true;
             }
             else if (success != 1)
             {
-                if (printError) new Error("Inv(): Could not invert matrix");
-                else throw new GekkoException();
+                if (mayGiveExceptionError)
+                {
+                    if (printError) new Error("Inv(): Could not invert matrix");
+                    else throw new GekkoException();
+                }
+                else
+                {
+                    if (printError) new Writeln("Inv(): Could not invert matrix");
+                }
+                fail = true;
             }
             return matrix;
         }
@@ -32179,7 +33504,7 @@ namespace Gekko
                 }
                 fileNameWithPathOriginal = fileNameWithPath;
 
-                Globals.dependencyTracking.Add(2, "Write", false, fileNameWithPathOriginal);
+                string blob = Globals.dependencyTracking.Add(2, "Write", false, fileNameWithPathOriginal);
 
                 EAppend append = EAppend.No;
                 if (oPrt != null && oPrt.opt_append != null)
@@ -32570,6 +33895,7 @@ namespace Gekko
                                 if (File.Exists(fileNameWithPathOriginal)) WaitForFileDelete(fileNameWithPathOriginal);  //probably not necessary
                                 WaitForFileCopy(fileNameWithPath, fileNameWithPathOriginal);
                                 if (true) G.Writeln2("Wrote dataset with " + dataRows + " rows and " + dataCols + " cols to " + fileNameWithPathOriginal);
+                                Blob(blob, null);
                             }
                             catch (Exception e)
                             {
@@ -32815,7 +34141,7 @@ namespace Gekko
                 }
 
                 fileNameTempLocalFile = fileNameOriginalFile;  //3a is original file, 4 may become a local copy below
-                Globals.dependencyTracking.Add(2, "Write", false, fileNameOriginalFile);
+                string blob = Globals.dependencyTracking.Add(2, "Write", false, fileNameOriginalFile);
 
                 if (copyLocal)
                 {
@@ -33196,6 +34522,7 @@ namespace Gekko
 
                         ExcelCleanup(ref objBook, ref objBooks, ref objSheets, ref objSheet, ref range, ref newSheet, ref range0);
                         if (true) G.Writeln2("Wrote dataset with " + dataRows + " rows and " + dataCols + " cols to " + fileNameOriginalFile);
+                        Blob(blob, null);
                     }
                     return null;
                 }
@@ -35339,6 +36666,7 @@ namespace Gekko
             public string databankVersion = "";
             public string info1 = null;
             public string date;
+            public string dataHash;
             public string user;
             public string branch;
             public string commit;
@@ -35352,6 +36680,9 @@ namespace Gekko
             public string modelLastSimStamp;
             public string modelLargestLag;
             public string modelLargestLead;
+
+            //Used for analyzing traces from both Gekko 2 and 3
+            public TraceFrame traceFrame = null;
 
             public void Print()
             {
@@ -35395,12 +36726,33 @@ namespace Gekko
                     tab.CurRow.Next();
                 }
 
+                string dateAndHash = null;
                 if (!G.NullOrBlanks(this.date))
                 {
-                    tab.CurRow.SetText(1, "Date     : " + this.date);
-                    tab.CurRow.Next();
-                }                
-                
+                    if (!G.NullOrBlanks(this.dataHash))
+                    {
+                        tab.CurRow.SetText(1, "Stamp    : " + this.date + " (data-hash: " + this.dataHash + ")");
+                        tab.CurRow.Next();
+                    }
+                    else
+                    {
+                        tab.CurRow.SetText(1, "Stamp    : " + this.date);
+                        tab.CurRow.Next();
+                    }
+                }
+                else
+                {
+                    if (!G.NullOrBlanks(this.dataHash))
+                    {
+                        tab.CurRow.SetText(1, "Data-hash: " + this.dataHash);
+                        tab.CurRow.Next();
+                    }
+                    else
+                    {
+                        //No printing
+                    }
+                }
+
                 if (open)
                 {
                     tab.CurRow.SetText(1, "Open     : Opened " + fileNameNamePretty + " as '" + this.dbName + "'");
@@ -35440,11 +36792,7 @@ namespace Gekko
                 TraceHelper th = Trace2.CollectAllTraces(this.databank, ETraceHelper.GetAllMetasAndTraces);
                 if (this.nTraces > 0)
                 {
-                    Action<GAO> a = (gao) =>
-                    {
-                        Functions.tracestats2(null, null, null, new ScalarString(this.databank.GetName()));
-                    };
-                    tab.CurRow.SetText(1, "Trace    : " + this.nTraces + " data-traces (" + G.GetLinkAction("more", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")");
+                    tab.CurRow.SetText(1, "Trace    : " + this.nTraces + " data-traces");
                     tab.CurRow.Next();
                 }
 
@@ -37570,6 +38918,82 @@ namespace Gekko
         {
             [ProtoMember(1)]
             public string Value;
+        }
+    }
+
+    [ProtoContract]
+    public class CacheIndexDlink
+    {
+        [ProtoMember(1)]
+        public string version = "1.0";
+        [ProtoMember(2)]
+        public GekkoDictionary<string, CacheIndexDlinkElement> storage = new GekkoDictionary<string, CacheIndexDlinkElement>(StringComparer.OrdinalIgnoreCase);
+    }
+
+    [ProtoContract]
+    public class CacheIndexDlinkElement
+    {
+        [ProtoMember(1)]
+        public readonly string name = null;
+        [ProtoMember(2)]
+        public readonly string hash = null;
+        [ProtoMember(3)]
+        public readonly long? size = null;
+        [ProtoMember(4)]
+        public readonly DateTime? stamp = null;
+
+        public CacheIndexDlinkElement()
+        {
+            //For protobuf
+        }
+
+        public CacheIndexDlinkElement(string name, string hash, long? size, DateTime? stamp)
+        {
+            this.name = name;
+            this.hash = hash;
+            this.size = size;
+            this.stamp = stamp;
+        }
+    }
+
+    public class DlinkFile
+    {
+        public readonly string version = "1.0";
+        public string hash { get; private set; }
+        public long? size { get; private set; }
+        public DateTime? stamp { get; private set; }
+        public long? variables { get; private set; }
+        public string extra { get; private set; }
+
+        public DlinkFile()
+        {
+        }
+
+        public DlinkFile(string hash, long? size, DateTime? stamp, long? nVariables, string extra)
+        {
+            this.hash = hash;
+            this.size = size;
+            this.stamp = stamp;
+            this.variables = nVariables;
+            this.extra = extra;
+        }
+    }
+
+    public class RealFile
+    {
+        public readonly string name = null;
+        public readonly string hash = null;
+        public readonly long? size = null;
+        public readonly DateTime? stamp = null;
+        public readonly bool exists = false;
+
+        public RealFile(string name, string hash, long? size, DateTime? stamp, bool exists)
+        {
+            this.name = name;
+            this.hash = hash;
+            this.size = size;
+            this.stamp = stamp;
+            this.exists = exists;
         }
     }
 }
