@@ -37040,6 +37040,7 @@ exit;
                 //second time, it will be loaded from cache
                 //so the loop tests that the cache works.
                 UData u = null;
+                if (i == 0) Program.Flush();
                 I("RESET; MODE sim;");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\ADAM-kursus\';");  //needs "'" since it contains a "-"
                 I("option solve gauss reorder no;"); //Necessary for historical simulation, maybe also for last test... would be nice to be able to avoid it

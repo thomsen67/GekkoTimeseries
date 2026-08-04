@@ -61,30 +61,7 @@ namespace Gekko.Parser.Frm
             if (isCalledFromModelStatement) PrintInfoFilesCreateVarsEtc(isCalledFromModelStatement);  //so the "endogenous" are endogenous in original model without ENDO/EXO.
 
             if (newM2) Program.model.modelGekko.m2cache.lru.Add(cacheKey, Program.model.modelGekko.m2);
-        }
-
-        //public static void ParserFrmMakeProtobuf()
-        //{
-        //    try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
-        //    {
-        //        DateTime dt1 = DateTime.Now;
-
-        //        PutListsIntoModelListHelper();
-        //        // ----- SERIALIZE
-        //        //string outputPath = Globals.localTempFilesLocation;
-        //        //DeleteFolder(outputPath);
-        //        //Directory.CreateDirectory(outputPath);
-        //        string protobufFileName = Globals.gekkoVersion + "_" + Program.model.modelGekko.modelHashTrue + Globals.cacheExtensionModel;
-        //        string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;                
-        //        Program.ProtobufWrite(Program.model.modelGekko, pathAndFilename);
-        //        //Program.WaitForZipWrite(outputPath, Globals.localTempFilesLocation + "\\" + protobufFileName);
-        //        G.WritelnGray("Created model cache file in " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        //do nothing, not the end of the world if it fails
-        //    }
-        //}
+        }        
 
         private static void EmitCsCodeAndCompileModel(ECompiledModelType modelType, bool isCalledFromModelStatement)
         {
@@ -216,31 +193,27 @@ namespace Gekko.Parser.Frm
                     codeGauss.AppendLine(@"}");  //end of eqs()
                     codeGauss.AppendLine(@"" + "}}");  //namespace and class
 
-                    CompilerParameters compilerParams = new CompilerParameters();
-                    compilerParams.CompilerOptions = Program.GetCompilerOptions();
-                    compilerParams.GenerateInMemory = true;
-                    compilerParams.IncludeDebugInformation = false;
-                    compilerParams.ReferencedAssemblies.Add("system.dll");
-                    ReferencedAssembliesGekko(compilerParams);
-                    compilerParams.GenerateExecutable = false;
-
-                    CompilerResults cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, codeGauss.ToString());
-
-                    if (cr.Errors.HasErrors)
+                    System.Reflection.Assembly assembly = null;
+                    
+                    bool hasErrors;                        
+                    if (Program.options.system_code_compile_ram) assembly = Program.CompileAssembly(codeGauss, out hasErrors);
+                    else assembly = Program.CompileAssemblyOld(codeGauss, out hasErrors);
+                    if (hasErrors)
                     {
                         new Error("Model not compiled due to errors while compiling for Gauss-Seidel algorithm.");
-                    }
+                    }                    
+
                     if (modelType == ECompiledModelType.Gauss)
                     {                        
-                        Program.model.modelGekko.m2.assemblyGauss = cr.CompiledAssembly.GetType("Gekko." + type);
+                        Program.model.modelGekko.m2.assemblyGauss = assembly.GetType("Gekko." + type);
                     }
                     else if (modelType == ECompiledModelType.GaussFailSafe)
                     {
-                        Program.model.modelGekko.m2.assemblyGaussFailSafe = cr.CompiledAssembly.GetType("Gekko." + type);
+                        Program.model.modelGekko.m2.assemblyGaussFailSafe = assembly.GetType("Gekko." + type);
                     }
                     else if (modelType == ECompiledModelType.Res)
                     {
-                        Program.model.modelGekko.m2.assemblyRes = cr.CompiledAssembly.GetType("Gekko." + type);
+                        Program.model.modelGekko.m2.assemblyRes = assembly.GetType("Gekko." + type);
                     }
                     else throw new GekkoException();  //must be one of these
                 }
@@ -327,23 +300,21 @@ namespace Gekko.Parser.Frm
 
                     codeNewton.AppendLine("}");  //class
                     codeNewton.AppendLine("}");  //namespace
-                    //codeNewton.Flush();
-                    //codeNewton.Close();
 
-                    CompilerParameters compilerParams = new CompilerParameters();
-                    compilerParams = new CompilerParameters();
-                    compilerParams.CompilerOptions = Program.GetCompilerOptions();
-                    compilerParams.GenerateInMemory = true;
-                    compilerParams.IncludeDebugInformation = false;
-                    compilerParams.ReferencedAssemblies.Add("system.dll");
-                    //compilerParams.ReferencedAssemblies.Add(Application.ExecutablePath);
-                    ReferencedAssembliesGekko(compilerParams);
-                    compilerParams.GenerateExecutable = false;
-                    string s = codeNewton.ToString();                    
-                    CompilerResults cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, s);
+                    System.Reflection.Assembly assembly = null;
+
+                    bool hasErrors;
+                    if (Program.options.system_code_compile_ram) assembly = Program.CompileAssembly(codeNewton, out hasErrors);
+                    else assembly = Program.CompileAssemblyOld(codeNewton, out hasErrors);
+
+                    if (hasErrors)
+                    {
+                        new Error("Model not compiled due to errors while compiling for Newton algorithm.");
+                    }
+
                     if (modelType == ECompiledModelType.Newton)
                     {
-                        Program.model.modelGekko.m2.assemblyNewton = cr.CompiledAssembly.GetType("Gekko." + type);
+                        Program.model.modelGekko.m2.assemblyNewton = assembly.GetType("Gekko." + type);
                     }
                     else throw new GekkoException();  //must be one of these
                 }
@@ -378,30 +349,24 @@ namespace Gekko.Parser.Frm
                     code.AppendLine("}");  //class
                     code.AppendLine("}");  //namespace
 
-                    CompilerParameters compilerParams = new CompilerParameters();
-                    compilerParams = new CompilerParameters();
-                    compilerParams.CompilerOptions = Program.GetCompilerOptions();
-                    compilerParams.GenerateInMemory = true;
-                    compilerParams.IncludeDebugInformation = false;
-                    compilerParams.ReferencedAssemblies.Add("system.dll");
-                    //compilerParams.ReferencedAssemblies.Add(Application.ExecutablePath);
-                    ReferencedAssembliesGekko(compilerParams);
-                    compilerParams.GenerateExecutable = false;
+                    System.Reflection.Assembly assembly = null;
 
-                    CompilerResults cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, code.ToString());
+                    bool hasErrors;
+                    if (Program.options.system_code_compile_ram) assembly = Program.CompileAssembly(code, out hasErrors);
+                    else assembly = Program.CompileAssemblyOld(code, out hasErrors);
 
-                    if (cr.Errors.HasErrors)
+                    if (hasErrors)
                     {
-                        throw new GekkoException();
+                        new Error("Model not compiled due to errors while compiling for reverted equations.");
                     }
 
                     if (!failSafe)
                     {
-                        Program.model.modelGekko.assemblyReverted = cr.CompiledAssembly.GetType("Gekko.Reverted");
+                        Program.model.modelGekko.assemblyReverted = assembly.GetType("Gekko.Reverted");
                     }
                     else
                     {
-                        Program.model.modelGekko.assemblyRevertedFailSafe = cr.CompiledAssembly.GetType("Gekko.RevertedFailSafe");
+                        Program.model.modelGekko.assemblyRevertedFailSafe = assembly.GetType("Gekko.RevertedFailSafe");
                     }
                 }
             }
@@ -432,29 +397,24 @@ namespace Gekko.Parser.Frm
                     code.AppendLine("}");  //class
                     code.AppendLine("}");  //namespace
 
-                    CompilerParameters compilerParams = new CompilerParameters();
-                    compilerParams = new CompilerParameters();
-                    compilerParams.CompilerOptions = Program.GetCompilerOptions();
-                    compilerParams.GenerateInMemory = true;
-                    compilerParams.IncludeDebugInformation = false;
-                    compilerParams.ReferencedAssemblies.Add("system.dll");
-                    ReferencedAssembliesGekko(compilerParams);
-                    compilerParams.GenerateExecutable = false;
+                    System.Reflection.Assembly assembly = null;
 
-                    CompilerResults cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, code.ToString());
+                    bool hasErrors;
+                    if (Program.options.system_code_compile_ram) assembly = Program.CompileAssembly(code, out hasErrors);
+                    else assembly = Program.CompileAssemblyOld(code, out hasErrors);
 
-                    if (cr.Errors.HasErrors)
+                    if (hasErrors)
                     {
-                        throw new GekkoException();
+                        new Error("Model not compiled due to errors while compiling prologue/epilogue.");
                     }
 
                     if (failSafeString == "")
                     {
-                        Program.model.modelGekko.m2.assemblyPrologueEpilogue = cr.CompiledAssembly.GetType("Gekko.PrologueEpilogue");
+                        Program.model.modelGekko.m2.assemblyPrologueEpilogue = assembly.GetType("Gekko.PrologueEpilogue");
                     }
                     else
                     {
-                        Program.model.modelGekko.m2.assemblyPrologueEpilogueFailSafe = cr.CompiledAssembly.GetType("Gekko.PrologueEpilogueFailSafe");
+                        Program.model.modelGekko.m2.assemblyPrologueEpilogueFailSafe = assembly.GetType("Gekko.PrologueEpilogueFailSafe");
                     }
                 }
             }
@@ -484,29 +444,24 @@ namespace Gekko.Parser.Frm
                     code.AppendLine("}");  //class
                     code.AppendLine("}");  //namespace
 
-                    CompilerParameters compilerParams = new CompilerParameters();
-                    compilerParams = new CompilerParameters();
-                    compilerParams.CompilerOptions = Program.GetCompilerOptions();
-                    compilerParams.GenerateInMemory = true;
-                    compilerParams.IncludeDebugInformation = false;
-                    compilerParams.ReferencedAssemblies.Add("system.dll");
-                    ReferencedAssembliesGekko(compilerParams);
-                    compilerParams.GenerateExecutable = false;
+                    System.Reflection.Assembly assembly = null;
 
-                    CompilerResults cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, code.ToString());
+                    bool hasErrors;
+                    if (Program.options.system_code_compile_ram) assembly = Program.CompileAssembly(code, out hasErrors);
+                    else assembly = Program.CompileAssemblyOld(code, out hasErrors);
 
-                    if (cr.Errors.HasErrors)
+                    if (hasErrors)
                     {
-                        throw new GekkoException();
+                        new Error("Model not compiled due to errors while compiling for 'after' equations.");
                     }
 
                     if (failSafeString == "")
                     {
-                        Program.model.modelGekko.assemblyAfter = cr.CompiledAssembly.GetType("Gekko.After");
+                        Program.model.modelGekko.assemblyAfter = assembly.GetType("Gekko.After");
                     }
                     else
                     {
-                        Program.model.modelGekko.assemblyAfterFailSafe = cr.CompiledAssembly.GetType("Gekko.AfterFailSafe");
+                        Program.model.modelGekko.assemblyAfterFailSafe = assembly.GetType("Gekko.AfterFailSafe");
                     }
                 }
             }  //finished After
@@ -522,7 +477,7 @@ namespace Gekko.Parser.Frm
                     G.Writeln("Compiling lasted " + duration);
                 }
             }
-        }
+        }        
 
         private static List<int> GetLeftsideBNumbers()
         {
@@ -867,24 +822,7 @@ namespace Gekko.Parser.Frm
                 //if (isCalledFromModelStatement) G.Writeln("Details regarding model: see " + Path.GetFileName(zipFileNameInput));
 
             }
-        }
-
-        public static void ReferencedAssembliesGekko(CompilerParameters compilerParams)
-        {
-            if (G.IsUnitTestingOrNotShowingGUI())
-            {
-                //if running test cases, use this absolute path                
-                //compilerParams.ReferencedAssemblies.Add(Globals.ttPath2 + @"\GekkoCS\Gekko\bin\Debug\gekko.exe");
-                // --
-                //This should work too, and be more robust:
-                compilerParams.ReferencedAssemblies.Add(G.GekkoExePath());
-            }
-            else
-            {
-                //Should this not be: compilerParams.ReferencedAssemblies.Add(G.GekkoExePath()); ???
-                compilerParams.ReferencedAssemblies.Add(Application.ExecutablePath);
-            }
-        }
+        }        
 
         public static void ParserFrmHandleVarlist(ModelCommentsHelper modelCommentsHelper, Model model, P p)
         {

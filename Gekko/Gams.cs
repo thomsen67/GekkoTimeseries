@@ -129,24 +129,18 @@ namespace Gekko
                     code.AppendLine("}");  //end class
                     code.AppendLine("}");  //end namespace
 
-                    CompilerParameters compilerParams = new CompilerParameters();
-                    compilerParams = new CompilerParameters();
-                    compilerParams.CompilerOptions = Program.GetCompilerOptions();
-                    compilerParams.GenerateInMemory = true;
-                    compilerParams.IncludeDebugInformation = false;
-                    compilerParams.ReferencedAssemblies.Add("system.dll");
-                    Parser.Frm.ParserFrmCompileAST.ReferencedAssembliesGekko(compilerParams);
-                    compilerParams.GenerateExecutable = false;
-                    string s2 = code.ToString();
-                    CompilerResults cr = null;                    
-                    cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, s2);
-                    if (cr.Errors.HasErrors)
+                    bool hasErrors2;
+                    Assembly assembly = null;
+                    if (Program.options.system_code_compile_ram) assembly = Program.CompileAssembly(code, out hasErrors2);
+                    else assembly = Program.CompileAssemblyOld(code, out hasErrors2);
+                    
+                    if (hasErrors2)
                     {
+                        //Do nothing
                         hasErrors = true;
                     }
                     else
-                    {
-                        Assembly assembly = cr.CompiledAssembly;
+                    {                        
                         DateTime dt2 = DateTime.Now;
                         Object[] o = new Object[1] { functions };
                         assembly.GetType("Gekko.Equations").InvokeMember("Residuals", BindingFlags.InvokeMethod, null, null, o);  //the method                                                                                                                                                  
