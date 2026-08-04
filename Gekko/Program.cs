@@ -13882,79 +13882,20 @@ namespace Gekko
 
         public static System.Reflection.Assembly CompileAssembly(StringBuilder code, out bool hasErrors)
         {
-            hasErrors = false;
-            //System.Reflection.Assembly assembly = null;
-            //hasErrors = false;
-            //CompilerParameters compilerParams = new CompilerParameters();
-            //compilerParams.CompilerOptions = Program.GetCompilerOptions();
-            //compilerParams.GenerateInMemory = true;
-            //compilerParams.IncludeDebugInformation = false;
-            //compilerParams.ReferencedAssemblies.Add("system.dll");
-            //ReferencedAssembliesGekko(compilerParams);
-            //compilerParams.GenerateExecutable = false;
-            //CompilerResults cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, code.ToString());
-            //if (cr.Errors.HasErrors)
-            //{
-            //    hasErrors = true;
-            //}
-            //else
-            //{
-            //    assembly = cr.CompiledAssembly;
-            //}
-            //return assembly;                        
-
-            // 1. Parse C# source string into Roslyn Syntax Tree
+            hasErrors = false;            
+            //Parse C# source string into Roslyn Syntax Tree
             string s = code.ToString();
             SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(code.ToString());
-
-            // 2. Resolve referenced assemblies for Roslyn
+            //Resolve referenced assemblies for Roslyn
             List<MetadataReference> references = new List<MetadataReference>
             {
-                MetadataReference.CreateFromFile(typeof(object).Assembly.Location), // mscorlib
-                MetadataReference.CreateFromFile(typeof(Uri).Assembly.Location), // System.dll
-                //MetadataReference.CreateFromFile(typeof(Form).Assembly.Location), // System.Windows.Forms.dll
-                //MetadataReference.CreateFromFile(typeof(Point).Assembly.Location), // System.Drawing.dll
-                //MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location) // System.Core.dll
+                MetadataReference.CreateFromFile(typeof(object).Assembly.Location), // mscorlib --> must be here for Roslyn
+                MetadataReference.CreateFromFile(typeof(Uri).Assembly.Location), // System.dll            
             };
 
-            if (G.IsUnitTestingOrNotShowingGUI())
-            {
-                references.Add(MetadataReference.CreateFromFile(G.GekkoExePath()));
-            }
-            else
-            {
-                references.Add(MetadataReference.CreateFromFile(Application.ExecutablePath));
-            }
-
-            //if (Globals.batchType == EBatchType.Gekcel)
-            //{
-            //    references.Add(MetadataReference.CreateFromFile(Path.Combine(Globals.excelDnaPath, "ANTLR.dll")));
-            //    references.Add(MetadataReference.CreateFromFile(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", "").Replace("/", "\\")));
-            //}
-            //else if (Globals.batchType == EBatchType.Hide)
-            //{
-            //    string path = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            //    references.Add(MetadataReference.CreateFromFile(Path.Combine(path, "ANTLR.dll")));
-            //    references.Add(MetadataReference.CreateFromFile(Path.Combine(path, "gekko.exe")));
-            //}
-            //else if (Globals.batchType == EBatchType.PyGekko)
-            //{
-            //    string exeFolder = G.GekkoExeFolder();
-            //    references.Add(MetadataReference.CreateFromFile(Path.Combine(exeFolder, "ANTLR.dll")));
-            //    references.Add(MetadataReference.CreateFromFile(Path.Combine(exeFolder, "gekko.exe")));
-            //}
-            //else if (G.IsUnitTestingOrNotShowingGUI())
-            //{
-            //    string exeFolder = G.GekkoExeFolder();
-            //    references.Add(MetadataReference.CreateFromFile(Path.Combine(exeFolder, "ANTLR.dll")));
-            //    references.Add(MetadataReference.CreateFromFile(Path.Combine(exeFolder, "gekko.exe")));
-            //}
-            //else
-            //{
-            //    references.Add(MetadataReference.CreateFromFile(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "ANTLR.dll")));
-            //    references.Add(MetadataReference.CreateFromFile(Application.ExecutablePath));
-            //}            
-
+            if (G.IsUnitTestingOrNotShowingGUI()) references.Add(MetadataReference.CreateFromFile(G.GekkoExePath()));
+            else references.Add(MetadataReference.CreateFromFile(Application.ExecutablePath));            
+            
             CSharpCompilationOptions compilationOptions = new CSharpCompilationOptions(
                 OutputKind.DynamicallyLinkedLibrary,
                 optimizationLevel: OptimizationLevel.Release,
@@ -13968,20 +13909,19 @@ namespace Gekko
                 options: compilationOptions
             );            
 
-            // Emit assembly bytecode directly to an in-memory stream --> 0 disk usage
+            //Emit assembly bytecode directly to an in-memory stream --> 0 disk usage
             using (MemoryStream ms = new MemoryStream())
             {
                 EmitResult result = compilation.Emit(ms);
-                // Load compiled bytes directly into runtime memory
                 ms.Seek(0, SeekOrigin.Begin);
                 byte[] assemblyBytes = ms.ToArray();
                 return Assembly.Load(assemblyBytes);
             }
         }
 
-        public static System.Reflection.Assembly CompileAssemblyOld(StringBuilder code, out bool hasErrors)
+        public static Assembly CompileAssemblyOld(StringBuilder code, out bool hasErrors)
         {
-            System.Reflection.Assembly assembly = null;
+            Assembly assembly = null;
             hasErrors = false;
             CompilerParameters compilerParams = new CompilerParameters();
             compilerParams.CompilerOptions = Program.GetCompilerOptions();
