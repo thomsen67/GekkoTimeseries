@@ -59,7 +59,11 @@ namespace Gekko.Parser.Gek
                 assemblyName: "DynamicHelloMsgBox",
                 syntaxTrees: new[] { syntaxTree },
                 references: references,
-                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                options: new CSharpCompilationOptions(
+                    OutputKind.DynamicallyLinkedLibrary,
+                    optimizationLevel: OptimizationLevel.Release, 
+                    platform: Platform.X64
+                )
             );
 
             // 5. Emit the compiled assembly bytecode directly to a MemoryStream
@@ -154,77 +158,6 @@ namespace Gekko.Parser.Gek
             }
 
             return;
-        }
-
-        /// <summary>
-        /// Run the compiled C# code from .gcm statements.
-        /// </summary>
-        /// <param name="ch"></param>
-        /// <param name="p"></param>
-        public static void CompileAndRunASTOld(ConvertHelper ch, P p)
-        {
-
-            Assembly a = null;
-            CompilerResults compilerResults = CompileASTOld(ch.code, p, a);
-            if (compilerResults.Errors.HasErrors) return;
-
-            // Load the generated assembly into the ApplicationDomain    
-            Object[] args = new Object[1];
-            args[0] = p;
-
-            try
-            {
-                if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Running dll start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
-                p.Deeper();
-                DateTime t0 = DateTime.Now;
-                //---------------------------------------------------------------------------
-                // Actually running the .gcm file (translated into .cs) is done below
-                //---------------------------------------------------------------------------
-                //This only takes time to JIT the first time it is invoked
-                //But cmd files are typically only run 1 time and not called
-                //again and again (like model SIM for instance). So the JIT overhead
-                //is always there. But just to say that if the below line was multiplied,
-                //only the first instance would takte time to JIT.
-                //Seems NGEN can avoid the JIT if the image is cached, but is it really worth it?
-                //The issue is worst for large cmd files full of simple lines like UPD or
-                //GENR, and no loops etc. But then why not use a databank and a model for that
-                //kind of stuff? For more normal kinds of programs, especially when we go the
-                //AREMOS way with loops etc., the parsing/compiling/JITting would probably be
-                //less visible. We would have smaller programs with more looping.
-                //On a .cmd file with 1000 GENRs, the JITting is unreasonably slow (50 sec.). 
-                //Probably the following takes place. Without splitting of the code, there is a
-                //large method called. This starts to execute, and C# sees that it is 'big' and
-                //hence should rather be optimized. So while executing it, C# starts to JIT it
-                //aggressively which does not make sense since it is only run once. JIT'ing an
-                //UPD statement takes a lot longer than just running it more slowly ('interpreted').
-                //The solution is code splitting, forcing C# NOT to try to optimize.                
-                //Splitting it into 
-                //for instance 200 methods each with 5 GENRs speeds the JIT up to about 4 sec.
-                //So splitting large cmd files seems to help a lot.
-
-                //code = code;  //just so it is easy to see here                                                
-                if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("RUN START");
-
-                Assembly assembly = compilerResults.CompiledAssembly;
-
-                Type tpe = assembly.GetType("Gekko.TranslatedCode");  //the class                       
-                tpe.InvokeMember("CodeLines", BindingFlags.InvokeMethod, null, null, args);  //the method                     
-
-                if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("RUN END");
-            }
-            catch (Exception e)
-            {
-                //This Exception typically has a GekkoException inside
-                HandleCommandRunErrors(p, e);
-                throw;  //changed from return til throw here. This provides a 'more' link with C# line, also if the error occurs in a gcm file. The question is: does this break something??
-                //return;
-            }
-            finally
-            {
-                p.RemoveLast();
-            }
-
-            return;
         }        
 
         private static Assembly CompileAST(string code, P p, Assembly addedAssembly)
@@ -240,9 +173,7 @@ namespace Gekko.Parser.Gek
             List<MetadataReference> references = new List<MetadataReference>
             {
                 MetadataReference.CreateFromFile(typeof(object).Assembly.Location), // mscorlib
-                //MetadataReference.CreateFromFile(Assembly.Load("System").Location),
                 MetadataReference.CreateFromFile(typeof(Uri).Assembly.Location), // System.dll
-                //MetadataReference.CreateFromFile(typeof(Component).Assembly.Location), // System.dll
                 MetadataReference.CreateFromFile(typeof(Form).Assembly.Location), // System.Windows.Forms.dll
                 MetadataReference.CreateFromFile(typeof(Point).Assembly.Location), // System.Drawing.dll
                 MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location) // System.Core.dll
@@ -252,42 +183,40 @@ namespace Gekko.Parser.Gek
             {
                 references.Add(MetadataReference.CreateFromFile(addedAssembly.Location));
             }
-
-            // Map original reference logic
+            
             if (Globals.batchType == EBatchType.Gekcel)
             {
-                references.Add(MetadataReference.CreateFromFile(Path.Combine(Globals.excelDnaPath, "ANTLR.dll")));
-                string executingAssemblyPath = Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", "").Replace("/", "\\");
-                references.Add(MetadataReference.CreateFromFile(executingAssemblyPath));
+                references.Add(MetadataReference.CreateFromFile(Path.Combine(Globals.excelDnaPath, "ANTLR.dll")));                
+                references.Add(MetadataReference.CreateFromFile(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", "").Replace("/", "\\")));
             }
             else if (Globals.batchType == EBatchType.Hide)
             {
-                string xx = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-                references.Add(MetadataReference.CreateFromFile(Path.Combine(xx, "ANTLR.dll")));
-                references.Add(MetadataReference.CreateFromFile(Path.Combine(xx, "gekko.exe")));
+                string path = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+                references.Add(MetadataReference.CreateFromFile(Path.Combine(path, "ANTLR.dll")));
+                references.Add(MetadataReference.CreateFromFile(Path.Combine(path, "gekko.exe")));
             }
             else if (Globals.batchType == EBatchType.PyGekko)
             {
-                string xx = G.GekkoExeFolder();
-                references.Add(MetadataReference.CreateFromFile(Path.Combine(xx, "ANTLR.dll")));
-                references.Add(MetadataReference.CreateFromFile(Path.Combine(xx, "gekko.exe")));
+                string exeFolder = G.GekkoExeFolder();
+                references.Add(MetadataReference.CreateFromFile(Path.Combine(exeFolder, "ANTLR.dll")));
+                references.Add(MetadataReference.CreateFromFile(Path.Combine(exeFolder, "gekko.exe")));
             }
             else if (G.IsUnitTestingOrNotShowingGUI())
             {
-                string s = G.GekkoExeFolder();
-                references.Add(MetadataReference.CreateFromFile(Path.Combine(s, "ANTLR.dll")));
-                references.Add(MetadataReference.CreateFromFile(Path.Combine(s, "gekko.exe")));
+                string exeFolder = G.GekkoExeFolder();
+                references.Add(MetadataReference.CreateFromFile(Path.Combine(exeFolder, "ANTLR.dll")));
+                references.Add(MetadataReference.CreateFromFile(Path.Combine(exeFolder, "gekko.exe")));
             }
             else
             {
                 references.Add(MetadataReference.CreateFromFile(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "ANTLR.dll")));
                 references.Add(MetadataReference.CreateFromFile(Application.ExecutablePath));
             }
-
-            // 3. Configure Roslyn Compilation Options
+                        
             CSharpCompilationOptions compilationOptions = new CSharpCompilationOptions(
                 OutputKind.DynamicallyLinkedLibrary,
-                optimizationLevel: OptimizationLevel.Release
+                optimizationLevel: OptimizationLevel.Release,                
+                platform: Platform.X64
             );
 
             CSharpCompilation compilation = CSharpCompilation.Create(
@@ -300,20 +229,15 @@ namespace Gekko.Parser.Gek
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Compile start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("COMPILE START");
 
-            // 4. Emit assembly bytecode directly to an in-memory stream (0 disk usage)
-            using (MemoryStream peStream = new MemoryStream())
+            // 4. Emit assembly bytecode directly to an in-memory stream --> 0 disk usage
+            using (MemoryStream ms = new MemoryStream())
             {
-                EmitResult result = compilation.Emit(peStream);
-
+                EmitResult result = compilation.Emit(ms);
                 if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("COMPILE END");
                 if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Compile end: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
-
                 if (!result.Success)
                 {
-                    List<Diagnostic> errors = result.Diagnostics
-                        .Where(d => d.Severity == DiagnosticSeverity.Error)
-                        .ToList();
-
+                    List<Diagnostic> errors = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToList();
                     try
                     {
                         if (errors.Count > 0)
@@ -386,146 +310,12 @@ namespace Gekko.Parser.Gek
                 }
 
                 // Load compiled bytes directly into runtime memory
-                peStream.Seek(0, SeekOrigin.Begin);
-                byte[] assemblyBytes = peStream.ToArray();
+                ms.Seek(0, SeekOrigin.Begin);
+                byte[] assemblyBytes = ms.ToArray();
                 return Assembly.Load(assemblyBytes);
             }
         }
-
-        private static CompilerResults CompileASTOld(string code, P p, Assembly addedAssembly)
-        {
-            CompilerResults cr;
-            if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("RunCmd start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
-
-            CompilerParameters compilerParams = new CompilerParameters();
-            compilerParams.CompilerOptions = Program.GetCompilerOptions();  //has no effect it seems
-            compilerParams.GenerateInMemory = false;  //It seems it can be set to true. In that case a file is made for a split second, and erased afterward. No persistence of the file. Generating 100% only in memory seems to demand Roslyn compiler.
-            compilerParams.IncludeDebugInformation = false; //Changed, maybe change back
-            compilerParams.ReferencedAssemblies.Add("system.dll");
-            compilerParams.ReferencedAssemblies.Add("system.windows.forms.dll");
-            compilerParams.ReferencedAssemblies.Add("system.drawing.dll");
-            compilerParams.ReferencedAssemblies.Add("system.core.dll");
-            if (addedAssembly != null) compilerParams.ReferencedAssemblies.Add(addedAssembly.Location);
-
-            if (Globals.batchType == EBatchType.Gekcel)
-            {
-                compilerParams.ReferencedAssemblies.Add(Path.Combine(Globals.excelDnaPath, "ANTLR.dll"));
-                compilerParams.ReferencedAssemblies.Add(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", "").Replace("/", "\\"));
-            }
-            else if (Globals.batchType == EBatchType.Hide)
-            {
-                string xx = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-                compilerParams.ReferencedAssemblies.Add(Path.Combine(xx, "ANTLR.dll"));
-                compilerParams.ReferencedAssemblies.Add(Path.Combine(xx, "gekko.exe"));
-            }
-            else if (Globals.batchType == EBatchType.PyGekko)
-            {
-                string xx = G.GekkoExeFolder();
-                compilerParams.ReferencedAssemblies.Add(Path.Combine(xx, "ANTLR.dll"));
-                compilerParams.ReferencedAssemblies.Add(Path.Combine(xx, "gekko.exe"));
-            }
-            else if (G.IsUnitTestingOrNotShowingGUI())
-            {
-                //if running test cases, use this absolute path, this will never be run by users. Hmm, sure?
-                //compilerParams.ReferencedAssemblies.Add(Globals.ttPath2 + "\\" + Globals.ttPath3 + @"\Gekko\bin\Debug\ANTLR.dll");
-                //compilerParams.ReferencedAssemblies.Add(Globals.ttPath2 + "\\" + Globals.ttPath3 + @"\Gekko\bin\Debug\gekko.exe");
-                // ---
-                //This seems more robust, and should work when unit testing too
-                string s = G.GekkoExeFolder();
-                compilerParams.ReferencedAssemblies.Add(s + @"\ANTLR.dll");
-                compilerParams.ReferencedAssemblies.Add(s + @"\gekko.exe");
-            }
-            else
-            {
-                compilerParams.ReferencedAssemblies.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "ANTLR.dll"));
-                compilerParams.ReferencedAssemblies.Add(Application.ExecutablePath);
-            }
-
-            compilerParams.GenerateExecutable = false;
-
-            //code = ch.code + " ";
-            Globals.lastDynamicCsCode = code;  //would be nicer to have this in the P object.        
-
-            CodeDomProvider provider = CodeDomProvider.CreateProvider("CSharp");
-            if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Compile start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
-            if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("COMPILE START");
-
-            cr = provider.CompileAssemblyFromSource(compilerParams, code);
-
-            if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("COMPILE END");
-            if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Compile end: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
-
-            if (cr.Errors.HasErrors)
-            {
-                try
-                {
-                    if (cr.Errors.Count > 0)
-                    {
-                        List<int> gekkoLines = new List<int>();
-                        List<string> codeLines = Stringlist.ExtractLinesFromText(code);
-                        foreach (CompilerError error in cr.Errors)
-                        {
-                            int errorLineNumber0Based = error.Line - 1;
-                            int lastGekkoLineMentioned = -12345;
-                            for (int i = 0; i < codeLines.Count; i++)
-                            {
-                                string line = codeLines[i].Trim();
-                                int i2 = line.IndexOf("p.SetStack(");
-                                if (i2 >= 0)
-                                {
-                                    int i3 = line.IndexOf("¤", i2 + 1);
-                                    if (i3 > 0)
-                                    {
-                                        int end = -12345;
-                                        for (int i4 = i3 + 1; i4 < line.Length; i4++)
-                                        {
-                                            if (!G.IsInteger(line.Substring(i4, 1)))
-                                            {
-                                                end = i4 - 1;
-                                                break;
-                                            }
-                                        }
-                                        if (end != -12345)
-                                        {
-                                            string sInt = G.Substring(line, i3 + 1, end);
-                                            int gekkoLine = G.IntParse(sInt);
-                                            if (gekkoLine != -12345)
-                                            {
-                                                lastGekkoLineMentioned = gekkoLine;
-                                            }
-                                        }
-                                    }
-                                }
-                                if (i == errorLineNumber0Based)
-                                {
-                                    if (lastGekkoLineMentioned != -12345) gekkoLines.Add(lastGekkoLineMentioned);
-                                }
-                            }
-                        }
-                        if (gekkoLines.Count > 0)
-                        {
-                            if (gekkoLines.Count == 1)
-                            {
-                                G.Writeln();
-                                G.Writeln("Internal syntax error triggered by line " + gekkoLines[0], Color.DarkOrange);
-                            }
-                            else
-                            {
-                                G.Writeln();
-                                G.Writeln("Internal syntax error triggered by lines " + string.Join(", ", gekkoLines), Color.DarkOrange);
-                            }
-                        }
-                    }
-                }
-                catch
-                {
-                    //Do not choke on this
-                }
-                HandleCommandCompileErrorsOld(p, cr);
-            }
-            return cr;
-        }        
-
+        
         /// <summary>
         /// Run errors, that is, not lexer/parser/syntax errors, or compile errors. These are "real" error messages,
         /// typically from an Error(...) with implied GekkoException.
@@ -779,6 +569,217 @@ namespace Gekko.Parser.Gek
 
                 throw new GekkoException();
             }
+        }
+
+        // ==================================================================================================================
+        // ==================================================================================================================
+        // ============================================= OLD STUFF ==========================================================
+        // ==================================================================================================================
+        // ==================================================================================================================
+
+        /// <summary>
+        /// Run the compiled C# code from .gcm statements.
+        /// </summary>
+        /// <param name="ch"></param>
+        /// <param name="p"></param>
+        public static void CompileAndRunASTOld(ConvertHelper ch, P p)
+        {
+
+            Assembly a = null;
+            CompilerResults compilerResults = CompileASTOld(ch.code, p, a);
+            if (compilerResults.Errors.HasErrors) return;
+
+            // Load the generated assembly into the ApplicationDomain    
+            Object[] args = new Object[1];
+            args[0] = p;
+
+            try
+            {
+                if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Running dll start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
+                p.Deeper();
+                DateTime t0 = DateTime.Now;
+                //---------------------------------------------------------------------------
+                // Actually running the .gcm file (translated into .cs) is done below
+                //---------------------------------------------------------------------------
+                //This only takes time to JIT the first time it is invoked
+                //But cmd files are typically only run 1 time and not called
+                //again and again (like model SIM for instance). So the JIT overhead
+                //is always there. But just to say that if the below line was multiplied,
+                //only the first instance would takte time to JIT.
+                //Seems NGEN can avoid the JIT if the image is cached, but is it really worth it?
+                //The issue is worst for large cmd files full of simple lines like UPD or
+                //GENR, and no loops etc. But then why not use a databank and a model for that
+                //kind of stuff? For more normal kinds of programs, especially when we go the
+                //AREMOS way with loops etc., the parsing/compiling/JITting would probably be
+                //less visible. We would have smaller programs with more looping.
+                //On a .cmd file with 1000 GENRs, the JITting is unreasonably slow (50 sec.). 
+                //Probably the following takes place. Without splitting of the code, there is a
+                //large method called. This starts to execute, and C# sees that it is 'big' and
+                //hence should rather be optimized. So while executing it, C# starts to JIT it
+                //aggressively which does not make sense since it is only run once. JIT'ing an
+                //UPD statement takes a lot longer than just running it more slowly ('interpreted').
+                //The solution is code splitting, forcing C# NOT to try to optimize.                
+                //Splitting it into 
+                //for instance 200 methods each with 5 GENRs speeds the JIT up to about 4 sec.
+                //So splitting large cmd files seems to help a lot.
+
+                //code = code;  //just so it is easy to see here                                                
+                if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("RUN START");
+
+                Assembly assembly = compilerResults.CompiledAssembly;
+
+                Type tpe = assembly.GetType("Gekko.TranslatedCode");  //the class                       
+                tpe.InvokeMember("CodeLines", BindingFlags.InvokeMethod, null, null, args);  //the method                     
+
+                if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("RUN END");
+            }
+            catch (Exception e)
+            {
+                //This Exception typically has a GekkoException inside
+                HandleCommandRunErrors(p, e);
+                throw;  //changed from return til throw here. This provides a 'more' link with C# line, also if the error occurs in a gcm file. The question is: does this break something??
+                //return;
+            }
+            finally
+            {
+                p.RemoveLast();
+            }
+
+            return;
+        }
+
+        private static CompilerResults CompileASTOld(string code, P p, Assembly addedAssembly)
+        {
+            CompilerResults cr;
+            if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("RunCmd start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
+
+            CompilerParameters compilerParams = new CompilerParameters();
+            compilerParams.CompilerOptions = Program.GetCompilerOptions();  //has no effect it seems
+            compilerParams.GenerateInMemory = false;  //It seems it can be set to true. In that case a file is made for a split second, and erased afterward. No persistence of the file. Generating 100% only in memory seems to demand Roslyn compiler.
+            compilerParams.IncludeDebugInformation = false; //Changed, maybe change back
+            compilerParams.ReferencedAssemblies.Add("system.dll");
+            compilerParams.ReferencedAssemblies.Add("system.windows.forms.dll");
+            compilerParams.ReferencedAssemblies.Add("system.drawing.dll");
+            compilerParams.ReferencedAssemblies.Add("system.core.dll");
+            if (addedAssembly != null) compilerParams.ReferencedAssemblies.Add(addedAssembly.Location);
+
+            if (Globals.batchType == EBatchType.Gekcel)
+            {
+                compilerParams.ReferencedAssemblies.Add(Path.Combine(Globals.excelDnaPath, "ANTLR.dll"));
+                compilerParams.ReferencedAssemblies.Add(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", "").Replace("/", "\\"));
+            }
+            else if (Globals.batchType == EBatchType.Hide)
+            {
+                string xx = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+                compilerParams.ReferencedAssemblies.Add(Path.Combine(xx, "ANTLR.dll"));
+                compilerParams.ReferencedAssemblies.Add(Path.Combine(xx, "gekko.exe"));
+            }
+            else if (Globals.batchType == EBatchType.PyGekko)
+            {
+                string xx = G.GekkoExeFolder();
+                compilerParams.ReferencedAssemblies.Add(Path.Combine(xx, "ANTLR.dll"));
+                compilerParams.ReferencedAssemblies.Add(Path.Combine(xx, "gekko.exe"));
+            }
+            else if (G.IsUnitTestingOrNotShowingGUI())
+            {
+                //if running test cases, use this absolute path, this will never be run by users. Hmm, sure?
+                //compilerParams.ReferencedAssemblies.Add(Globals.ttPath2 + "\\" + Globals.ttPath3 + @"\Gekko\bin\Debug\ANTLR.dll");
+                //compilerParams.ReferencedAssemblies.Add(Globals.ttPath2 + "\\" + Globals.ttPath3 + @"\Gekko\bin\Debug\gekko.exe");
+                // ---
+                //This seems more robust, and should work when unit testing too
+                string s = G.GekkoExeFolder();
+                compilerParams.ReferencedAssemblies.Add(s + @"\ANTLR.dll");
+                compilerParams.ReferencedAssemblies.Add(s + @"\gekko.exe");
+            }
+            else
+            {
+                compilerParams.ReferencedAssemblies.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "ANTLR.dll"));
+                compilerParams.ReferencedAssemblies.Add(Application.ExecutablePath);
+            }
+
+            compilerParams.GenerateExecutable = false;
+
+            //code = ch.code + " ";
+            Globals.lastDynamicCsCode = code;  //would be nicer to have this in the P object.        
+
+            CodeDomProvider provider = CodeDomProvider.CreateProvider("CSharp");
+            if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Compile start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
+            if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("COMPILE START");
+
+            cr = provider.CompileAssemblyFromSource(compilerParams, code);
+
+            if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("COMPILE END");
+            if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Compile end: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
+
+            if (cr.Errors.HasErrors)
+            {
+                try
+                {
+                    if (cr.Errors.Count > 0)
+                    {
+                        List<int> gekkoLines = new List<int>();
+                        List<string> codeLines = Stringlist.ExtractLinesFromText(code);
+                        foreach (CompilerError error in cr.Errors)
+                        {
+                            int errorLineNumber0Based = error.Line - 1;
+                            int lastGekkoLineMentioned = -12345;
+                            for (int i = 0; i < codeLines.Count; i++)
+                            {
+                                string line = codeLines[i].Trim();
+                                int i2 = line.IndexOf("p.SetStack(");
+                                if (i2 >= 0)
+                                {
+                                    int i3 = line.IndexOf("¤", i2 + 1);
+                                    if (i3 > 0)
+                                    {
+                                        int end = -12345;
+                                        for (int i4 = i3 + 1; i4 < line.Length; i4++)
+                                        {
+                                            if (!G.IsInteger(line.Substring(i4, 1)))
+                                            {
+                                                end = i4 - 1;
+                                                break;
+                                            }
+                                        }
+                                        if (end != -12345)
+                                        {
+                                            string sInt = G.Substring(line, i3 + 1, end);
+                                            int gekkoLine = G.IntParse(sInt);
+                                            if (gekkoLine != -12345)
+                                            {
+                                                lastGekkoLineMentioned = gekkoLine;
+                                            }
+                                        }
+                                    }
+                                }
+                                if (i == errorLineNumber0Based)
+                                {
+                                    if (lastGekkoLineMentioned != -12345) gekkoLines.Add(lastGekkoLineMentioned);
+                                }
+                            }
+                        }
+                        if (gekkoLines.Count > 0)
+                        {
+                            if (gekkoLines.Count == 1)
+                            {
+                                G.Writeln();
+                                G.Writeln("Internal syntax error triggered by line " + gekkoLines[0], Color.DarkOrange);
+                            }
+                            else
+                            {
+                                G.Writeln();
+                                G.Writeln("Internal syntax error triggered by lines " + string.Join(", ", gekkoLines), Color.DarkOrange);
+                            }
+                        }
+                    }
+                }
+                catch
+                {
+                    //Do not choke on this
+                }
+                HandleCommandCompileErrorsOld(p, cr);
+            }
+            return cr;
         }
 
 

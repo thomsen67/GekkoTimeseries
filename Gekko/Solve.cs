@@ -230,7 +230,6 @@ namespace Gekko
         }
 
 
-
         public static void SimulateSimulPrologue(Type assembly)
         {
             if (Program.options.solve_newton_robust)

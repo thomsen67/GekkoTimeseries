@@ -158,28 +158,11 @@ namespace Gekko.Parser.Frm
                         }
                         else
                         {
-
-                            //This is old code: it is checked that the
-                            //ArrayList al = new ArrayList();
-                            //al.AddRange(Program.model.modelGekko.m2.simulRecursive);
-                            //al.AddRange(Program.model.modelGekko.m2.simulFeedback);
-                            //SortedList<int, EquationHelper> sorted = new SortedList<int, EquationHelper>();
-                            //foreach (int eq in al)
-                            //{
-                            //    EquationHelper eh = Program.model.modelGekko.equations[eq];
-                            //    sorted.Add(eh.equationNumber, eh);
-                            //}
-                            //for (int i = 0; i < sorted.Count; i++)
-                            //{
-                            //    eqs.Add(sorted.Values[i]);
-                            //}
-
                             List<int> allSimul = GetLeftsideBNumbers();
                             foreach (int i in allSimul)
                             {
                                 eqs.Add(Program.model.modelGekko.equations[i]);
                             }
-
                         }
 
                         foreach (int endoNumber in Program.model.modelGekko.m2.epilogue)
@@ -187,8 +170,7 @@ namespace Gekko.Parser.Frm
                             EquationHelper eh = Program.model.modelGekko.equations[endoNumber];
                             epilogue.Add(eh);
                         }
-
-                        //G.Writeln(Program.model.modelGekko.equations.Count + " == " + (prologue.Count + eqs.Count + epilogue.Count));
+                        
                         if (Program.model.modelGekko.equations.Count - (prologue.Count + eqs.Count + epilogue.Count) != 0) throw new GekkoException();
                     }
 
@@ -249,9 +231,7 @@ namespace Gekko.Parser.Frm
                         new Error("Model not compiled due to errors while compiling for Gauss-Seidel algorithm.");
                     }
                     if (modelType == ECompiledModelType.Gauss)
-                    {
-                        //Assembly temp = Assembly.LoadFile(@"c:\Users\Thomas\AppData\Local\Temp\gauss.dll");
-                        //Program.model.modelGekko.m2.assemblyGauss = temp.GetType("Gekko." + type);
+                    {                        
                         Program.model.modelGekko.m2.assemblyGauss = cr.CompiledAssembly.GetType("Gekko." + type);
                     }
                     else if (modelType == ECompiledModelType.GaussFailSafe)
@@ -321,7 +301,6 @@ namespace Gekko.Parser.Frm
                     }
                     codeNewton.AppendLine("}");
 
-
                     codeNewton.AppendLine("public static void simulFeedbackSingle(double[] b, double[] r, int n, double[] scale)");
                     codeNewton.AppendLine("{");
                     codeNewton.AppendLine("switch(n)");
@@ -360,8 +339,7 @@ namespace Gekko.Parser.Frm
                     //compilerParams.ReferencedAssemblies.Add(Application.ExecutablePath);
                     ReferencedAssembliesGekko(compilerParams);
                     compilerParams.GenerateExecutable = false;
-                    string s = codeNewton.ToString();
-                    //CompilerResults cr = Program.model.modelGekko.iCodeCompiler.CompileAssemblyFromFile(compilerParams, Globals.localTempFilesLocation + "\\" + type + ".cs");
+                    string s = codeNewton.ToString();                    
                     CompilerResults cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, s);
                     if (modelType == ECompiledModelType.Newton)
                     {
@@ -460,7 +438,6 @@ namespace Gekko.Parser.Frm
                     compilerParams.GenerateInMemory = true;
                     compilerParams.IncludeDebugInformation = false;
                     compilerParams.ReferencedAssemblies.Add("system.dll");
-                    //compilerParams.ReferencedAssemblies.Add(Application.ExecutablePath);
                     ReferencedAssembliesGekko(compilerParams);
                     compilerParams.GenerateExecutable = false;
 
@@ -513,7 +490,6 @@ namespace Gekko.Parser.Frm
                     compilerParams.GenerateInMemory = true;
                     compilerParams.IncludeDebugInformation = false;
                     compilerParams.ReferencedAssemblies.Add("system.dll");
-                    //compilerParams.ReferencedAssemblies.Add(Application.ExecutablePath);
                     ReferencedAssembliesGekko(compilerParams);
                     compilerParams.GenerateExecutable = false;
 

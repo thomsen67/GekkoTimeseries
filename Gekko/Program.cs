@@ -13878,26 +13878,6 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Internal helper method for SIM testing.
-        /// </summary>
-        /// <param name="list"></param>
-        /// <param name="start"></param>
-        /// <param name="end"></param>
-        /// <returns></returns>
-        public static List<string> TestSim(List<string> list, int start, int end)
-        {
-            List<string> res = new List<string>();
-            CompilerResults cr;
-            CreateTestSimDll(out cr, list, start, end);
-            Object[] args2 = new Object[1];
-            args2[0] = res;
-            cr.CompiledAssembly.GetType("Gekko.TranslatedCode").InvokeMember("TestSim", BindingFlags.InvokeMethod, null, null, args2);
-            return res;
-        }                
-
-        
-
-        /// <summary>
         /// Helper for the PREDICT statement, compiling some dynamic C# code.
         /// </summary>
         /// <param name="code"></param>
@@ -13935,109 +13915,7 @@ namespace Gekko
 
             Object[] args = new Object[0];
             cr.CompiledAssembly.GetType("Gekko.TranslatedCode").InvokeMember("PredictActions", BindingFlags.InvokeMethod, null, null, args);
-        }
-
-        /// <summary>
-        /// Helper for internal test of SIM statement.
-        /// </summary>
-        /// <param name="cr"></param>
-        /// <param name="list"></param>
-        /// <param name="start"></param>
-        /// <param name="end"></param>
-        private static void CreateTestSimDll(out CompilerResults cr, List<string> list, int start, int end)
-        {
-            //This is a method only used for debugging purposes
-            StringBuilder s2 = new StringBuilder();
-            s2.AppendLine("using System;");
-            s2.AppendLine("using System.Collections.Generic;");
-            s2.AppendLine("using System.Text;");
-            s2.AppendLine("namespace Gekko");
-            s2.AppendLine("{");
-            s2.AppendLine("    public class TranslatedCode");
-            s2.AppendLine("    {");
-            s2.AppendLine("public static void TestSim(List<string>res)");
-            s2.AppendLine("{");
-            s2.AppendLine("GekkoTime tStart, tEnd; tStart = Globals.globalPeriodStart; tEnd = Globals.globalPeriodEnd;");
-            s2.AppendLine("foreach (GekkoTime t in new GekkoTimeIterator( tStart, tEnd)) {");
-            s2.AppendLine("double hs;");
-            s2.AppendLine("double vs;");
-            s2.AppendLine("double difMax = 0d;");
-            s2.AppendLine("double pchMax = 0d;");
-            s2.AppendLine("double dif;");
-            s2.AppendLine("double pch;");
-            s2.AppendLine("string difMaxName = ``;");
-            s2.AppendLine("string pchMaxName = ``;");
-            s2.AppendLine("double difMaxVs = 0d;");
-            s2.AppendLine("double pchMaxVs = 0d;");
-            s2.AppendLine("double difMaxHs = 0d;");
-            s2.AppendLine("double pchMaxHs = 0d;");
-            s2.AppendLine("Databank databank = Program.databanks.GetDatabank(`Work`);");
-
-            int count = -1;
-
-            foreach (string s in list)
-            {
-                count++;
-                if (count < start) continue;
-                if (count > end) break;
-                int eqNumber = (int)Program.model.modelGekko.fromVariableToEquationNumber[new DNameSimplest(s + Globals.lagIndicator + "0")];
-                EquationHelper eh = Program.model.modelGekko.equations[eqNumber];
-                string code = eh.csCodeRhsLongVersion;
-                s2.Append("hs = ");
-                s2.AppendLine(code + ";");
-                s2.AppendLine("vs = databank.GetVariable(`" + s + "`).GetDataNonLight(t);");
-                s2.AppendLine("dif = Math.Abs(hs - vs);");
-                s2.AppendLine("pch = Math.Abs((hs / vs - 1) * 100);");
-                s2.AppendLine("if (dif > difMax) {difMaxVs=vs; difMaxHs=hs; difMax = dif; difMaxName = `" + s + "`; }");
-                s2.AppendLine("if (pch > pchMax) {pchMaxVs=vs; pchMaxHs=hs; pchMax = pch; pchMaxName = `" + s + "`; }");
-                //s2.AppendLine("G.Writeln(`XXXXXX: ` + t.ToString() + `: ` + dif + ` ` + pch);");
-                s2.AppendLine();
-            }
-            s2.AppendLine("G.Writeln(`Abs: ` + t.ToString() + `: ` + difMaxName + ` = ` + difMax);");
-
-            s2.AppendLine("res.Add(`abs¤` + t.ToString() + `¤` + difMaxName + `¤` + difMax + `¤` + difMaxVs + `¤` + difMaxHs);");
-
-            s2.AppendLine("G.Writeln(`Rel: ` + t.ToString() + `: ` + pchMaxName + ` = ` + pchMax);");
-
-            s2.AppendLine("res.Add(`rel¤` + t.ToString() + `¤` + pchMaxName + `¤` + pchMax + `¤` + pchMaxVs + `¤` + pchMaxHs);");
-
-            s2.AppendLine("}");  //end time loop
-            s2.AppendLine("}");  //method DecompEquation()
-            s2.AppendLine("}");  //class TranslatedCode
-            s2.AppendLine("}");  //namespace Gekko
-            s2.Replace("`", Globals.QT);
-            CompilerParameters compilerParams = new CompilerParameters();
-            compilerParams = new CompilerParameters();
-            compilerParams.CompilerOptions = Program.GetCompilerOptions();
-            compilerParams.GenerateInMemory = false;
-            compilerParams.IncludeDebugInformation = false;
-            compilerParams.ReferencedAssemblies.Add("system.dll");
-            compilerParams.ReferencedAssemblies.Add(Application.ExecutablePath);
-            compilerParams.GenerateExecutable = false;
-            cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, s2.ToString());
-            if (cr.Errors.HasErrors)
-            {
-                throw new GekkoException();
-            }
-        }
-
-        /// <summary>
-        /// Helper for "old" DECOMP statement. Will be obsolete.
-        /// </summary>
-        /// <param name="cr"></param>
-        /// <param name="t"></param>
-        /// <param name="db"></param>
-        /// <returns></returns>
-        private static double RunDecompEquation(CompilerResults cr, GekkoTime t, Databank db)
-        {
-            Object[] args2 = new Object[3];
-            args2[0] = new double[1];
-            args2[1] = t;
-            args2[2] = db;
-            cr.CompiledAssembly.GetType("Gekko.TranslatedCode").InvokeMember("DecompEquation", BindingFlags.InvokeMethod, null, null, args2);
-            double val0 = ((double[])(args2[0]))[0];
-            return val0;
-        }
+        }        
 
         /// <summary>
         /// For Gekko model files (.frm), takes care of normal equations (FRML), variable list, and runbefore$ or runafter$ code.
