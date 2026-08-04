@@ -703,6 +703,7 @@ namespace Gekko
         }        
 
         //Removes last index
+        //HMMMM WHAT IF TIME IS LAST???
         public DName RemoveLastIndex()
         {
             if (!this.HasIndex()) return this;

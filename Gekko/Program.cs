@@ -2976,9 +2976,12 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer)
             {
-                Program.ProgramFolderRunning();
-                Program.ProgramFolderGit();
-                Program.ProgramFolderRunningRelative();
+                if (false)
+                {
+                    Program.ProgramFolderRunning();
+                    Program.ProgramFolderGit();
+                    Program.ProgramFolderRunningRelative();
+                }
 
                 // -----------------------------------------------------------
                 // Kør tell't1', tell't2', tell't3'.
