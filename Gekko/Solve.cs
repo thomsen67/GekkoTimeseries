@@ -2526,25 +2526,10 @@ namespace Gekko
             //reverted equations (J-factors and so on)
 
             if (Globals.fastGauss)
-            {
-                if (false && modelType == ECompiledModelType.GaussFailSafe)
-                {
-                    //This is switched off. Often it is ok that epilogue variables produce missing values.
-                    //The model can be deemed converged quite ok, and still have som epilogue variables
-                    //with division 0 etc. The difference is that if a prologue or simultaneous variable
-                    //produces a missing, and the simulations are continued, the result is that ALL
-                    //simultanous variables end up with missing values.
-                    //TODO: Maybe the failsafe option should just count how many missings are produced
-                    //      and report it.
-                    //simulateResults[1] = 0;
-                    //Program.model.modelGekko.m2.assemblyCommonFailSafe.InvokeMember("epilogue", BindingFlags.InvokeMethod, null, null, args);
-                }
-                else
-                {
+            {                   
                     //if failsafe is on, this is run without failsafe -- and may produce some missing values!
                     Program.model.modelGekko.simulateResults[1] = 0;
                     Program.model.modelGekko.m2.assemblyPrologueEpilogue.InvokeMember("epilogue", BindingFlags.InvokeMethod, null, null, args);
-                }
                 if (Program.model.modelGekko.simulateResults[1] == 12345)
                 {
                     Program.model.modelGekko.simulateResults[0] = iterCounter;

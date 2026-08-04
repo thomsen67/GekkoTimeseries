@@ -5962,7 +5962,8 @@ namespace Gekko
                     ph.fileName = gfc.fileNameWithPath + "*" + gfc.line;  //the "*" is illegal as filename character. The line is used as offset. If this snippet fails in its own line 4, this may mean line 13 in the original file.
                     Parser.ConvertHelper ch = Gekko.Parser.Gek.ParserGekCreateAST.ParseAndCallWalkAndEmit(ph, p);
                     ch.commandsText = commandLinesFlat;
-                    Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);
+                    if (Program.options.system_code_compile_ram) Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);
+                    else Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunASTOld(ch, p);
                 }
                 f.hasBeenCompiled = true;
             }

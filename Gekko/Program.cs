@@ -2981,7 +2981,7 @@ namespace Gekko
                     Program.ProgramFolderRunning();
                     Program.ProgramFolderGit();
                     Program.ProgramFolderRunningRelative();
-                }
+                }                
 
                 // -----------------------------------------------------------
                 // Kør tell't1', tell't2', tell't3'.
@@ -3516,6 +3516,12 @@ namespace Gekko
                     return;
                 }
             }
+
+            if (G.Equal(text, "roslyn"))
+            {                
+                Gekko.Parser.Gek.ParserGekCompileAndRunAST.Roslyn();                
+            }
+
             if (nocr) G.Write(text);
             else G.Writeln(text);
         }
@@ -11016,7 +11022,8 @@ namespace Gekko
                         if (commandLinesFlat.ToLower().StartsWith("run ") && Regex.Matches(commandLinesFlat, ";").Count == 1)
                         {
                             //else we cannot even do a RUN xx.gcm, because the file does not get called.
-                            Gekko.Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);
+                            if (Program.options.system_code_compile_ram) Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);
+                            else Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunASTOld(ch, p);
                         }
                         else
                         {
@@ -11025,7 +11032,8 @@ namespace Gekko
                     }
                     else
                     {
-                        Gekko.Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);
+                        if (Program.options.system_code_compile_ram) Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);
+                        else Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunASTOld(ch, p);
                     }
                 }
                 catch (Exception e)
