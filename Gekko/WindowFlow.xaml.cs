@@ -108,49 +108,34 @@ namespace Gekko
                 DName varName = this.decompFind.decompOptions2.guiFlowName;
                 int depth = 0;
 
-                if (false)
+                DNameTime eqName = null;
+
+                //TODO: If decomp is called with a certain equation, and the user then clicks [Flow].
+                //The following was made between 31/1 2026 and 22/7 2026, with the old string name representation (no DName).
+                //#flowgraphproblem
+                if (this.decompFind.decompOptions2.guiIsFlowUseEquationName)
                 {
-                    //TODO: If decomp is called with a certain equation, and the user then clicks [Flow].
-                    //The following was made between 31/1 2026 and 22/7 2026, with the old string name representation (no DName).
-                    //#flowgraphproblem
-                    
-                    //string eqName = null;
-                    //if (this.decompFind.decompOptions2.guiIsFlowUseEquationName)
-                    //{
-                    //    try
-                    //    {
-                    //        eqName = G.Chop_DimensionRemoveLast_FASTER(this.decompFind.decompOptions2.new_from[0]);
-                    //    }
-                    //    catch { }
-                    //}
-
-                    //if (eqName == null)
-                    //{
-                    //    try
-                    //    {
-                    //        List<EqInfoSimple> temp = GamsModel.GetSortedEquations(varName, GekkoTime.tNull, Program.model, false, false, false);
-                    //        if (temp.Count > 0) //if .Count == 0, the window will be empty but not crash...
-                    //        {
-                    //            eqName = G.Chop_DimensionRemoveLast_FASTER(temp[0].eqName);
-                    //        }
-                    //    }
-                    //    catch { }
-                    //}
-
-                    //if (!G.NullOrBlanks(eqName))
-                    //{
-                    //    WalkNodes(depth, graph, varName, eqName, walkInfo); //if problems, the window will be empty but not crash...
-                    //}
+                    try
+                    {
+                        //eqName = G.Chop_DimensionRemoveLast_FASTER(this.decompFind.decompOptions2.new_from[0]);
+                        eqName = this.decompFind.decompOptions2.new_from[0].RemoveTime().AddTime(new GekkoTime(EFreq.Lag, 0));
+                    }
+                    catch { }
                 }
 
-                List<EqInfoSimple> temp = GamsModel.GetSortedEquations(varName, GekkoTime.tNull, Program.model, false, false, false);
-                //
-                //
-                // TODO: Lag: What if it is a leaded equ input. Bad lag hack, #osaf89dsafa
-                //
-                //
-                DNameTime eqName = temp[0].eqName.RemoveTime().AddTime(new GekkoTime(EFreq.Lag, 0));
+                if (eqName == null)
+                {
+                    List<EqInfoSimple> temp = GamsModel.GetSortedEquations(varName, GekkoTime.tNull, Program.model, false, false, false);
+                    //
+                    //
+                    // TODO: Lag: What if it is a leaded equ input. Bad lag hack, #osaf89dsafa
+                    //
+                    //
+                    eqName = temp[0].eqName.RemoveTime().AddTime(new GekkoTime(EFreq.Lag, 0));
+                }
+
                 WalkNodes(depth, graph, varName, eqName, walkInfo);
+
                 if (walkInfo.lagsOrLeadsWereEncountered) this.decompFind.decompOptions2.guiFlowLagsOrLeadsWereEncountered = true;
                 if (this.decompFind.decompOptions2.guiFlowRotate) graph.Attr.LayerDirection = LayerDirection.RL;
                 else graph.Attr.LayerDirection = LayerDirection.TB;

@@ -2756,15 +2756,18 @@ namespace Gekko
                     //if (Globals.python) System.Threading.Thread.Sleep(int.MaxValue);  //HACK
                 }
 
-                //Also see #9237532567
-                //This stuff makes sure we wait for the window to open, before we move on with the code.
-                for (int i = 0; i < 6000; i++)  //up to 60 s, then we move on anyway
+                if (!decompFind.decompOptions2.guiIsFlowStatement) //For flow statement, the decomp window does not show at all
                 {
-                    System.Threading.Thread.Sleep(10);  //0.01s
-                                                        //not sure why decompFind.decompOptions2 can become == null in the other thread...?
-                    if ((decompFind.decompOptions2 != null && decompFind.decompOptions2.numberOfRecalcs > 0) || decompFind.hasException)
+                    //Also see #9237532567
+                    //This stuff makes sure we wait for the window to open, before we move on with the code.
+                    for (int i = 0; i < 6000; i++)  //up to 60 s, then we move on anyway
                     {
-                        break;
+                        System.Threading.Thread.Sleep(10);  //0.01s
+                                                            //not sure why decompFind.decompOptions2 can become == null in the other thread...?
+                        if ((decompFind.decompOptions2 != null && decompFind.decompOptions2.numberOfRecalcs > 0) || decompFind.hasException)
+                        {
+                            break;
+                        }
                     }
                 }
 
