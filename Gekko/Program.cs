@@ -21685,24 +21685,21 @@ namespace Gekko
                 }
             }
 
+            List<Series> l = new List<Series>();
+            List<Series> r = new List<Series>(); //ref
+            List<string> n = new List<string>();
             foreach (KeyValuePair<string, IVariable> kvp in work.storage)
             //all variables in work databank
-            //foreach (string ss in work.storage.Keys)
             {
                 if (kvp.Value.Type() != EVariableType.Series) continue;
                 string ss = kvp.Key;
                 if (G.GetFreqFromName(ss) != Program.options.freq) continue;  //we filter out other freqs
                 string s = G.Chop_RemoveFreq(ss);
-
                 if (hasFilter)
                 {
                     if (!filter.ContainsKey(s)) continue;  //ignore this
                 }
                 Series ts = kvp.Value as Series;
-                //Series ts = work.GetVariable(s);  //can this not be moved before loop??  //#getvar
-
-                List<Series> l = new List<Series>();
-                List<string> n = new List<string>();
 
                 if (ts.type == ESeriesType.ArraySuper)
                 {
@@ -21718,32 +21715,46 @@ namespace Gekko
                     l.Add(ts);
                     n.Add(s);
                 }
+            }
 
-                for (int i = 0; i < l.Count; i++)
+            if (G.Equal(o.opt_ref, "yes"))
+            {
+                for (int i = 0; i < n.Count; i++)
                 {
+                    //Note: freq not added to first arg. since FINDMISSINGDATA only deals with current freq anyway
+                    Series ts_ref = O.GetIVariableFromString("ref:" + n[i], O.ECreatePossibilities.NoneReturnNullAlways) as Series;
+                    r.Add(ts_ref);
+                }
+            }
 
-                    foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
+            for (int i = 0; i < l.Count; i++)
+            {
+                foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
+                {
+                    double value = l[i].GetDataSimple(t);
+                    if (G.IsNumericalError(value))
                     {
-                        double value = l[i].GetDataSimple(t);
-                        if (G.IsNumericalError(value))
+                        if (G.Equal(o.opt_ref, "yes"))
+                        {                            
+                            if (r[i] == null) continue; //x[%t] being missing is not worse than @x not existing                            
+                            if (G.IsNumericalError(r[i].GetDataSimple(t))) continue; //x[%t] being missing is not worse than @x[%t] being missing
+                        }
+                        if (replace)
                         {
-                            if (replace)
-                            {
-                                l[i].SetData(t, o.opt_replace);
-                            }
-                            else
-                            {
-                                missing_.Add(n[i]);  //always put it in this list
-                                if (exod.ContainsKey(n[i])) missing_exod.Add(s);
-                                if (exoj.ContainsKey(n[i])) missing_exoj.Add(s);
-                                if (exoz.ContainsKey(n[i])) missing_exoz.Add(s);
-                                if (exodjz.ContainsKey(n[i])) missing_exodjz.Add(s);
-                                if (exo.ContainsKey(n[i])) missing_exo.Add(s);
-                                if (exotrue.ContainsKey(n[i])) missing_exotrue.Add(s);
-                                if (endo.ContainsKey(n[i])) missing_endo.Add(s);
-                                if (all.ContainsKey(n[i])) missing_all.Add(s);
-                                break;  //one is enough
-                            }
+                            l[i].SetData(t, o.opt_replace);
+                        }
+                        else
+                        {
+                            missing_.Add(n[i]);  //always put it in this list
+                            if (exod.ContainsKey(n[i])) missing_exod.Add(n[i]);
+                            if (exoj.ContainsKey(n[i])) missing_exoj.Add(n[i]);
+                            if (exoz.ContainsKey(n[i])) missing_exoz.Add(n[i]);
+                            if (exodjz.ContainsKey(n[i])) missing_exodjz.Add(n[i]);
+                            if (exo.ContainsKey(n[i])) missing_exo.Add(n[i]);
+                            if (exotrue.ContainsKey(n[i])) missing_exotrue.Add(n[i]);
+                            if (endo.ContainsKey(n[i])) missing_endo.Add(n[i]);
+                            if (all.ContainsKey(n[i])) missing_all.Add(n[i]);
+                            break;  //one is enough
                         }
                     }
                 }

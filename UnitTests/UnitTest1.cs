@@ -24871,6 +24871,24 @@ print(df2)
         {
             Databank w = First();
 
+            //Check if x[%t] is missing, here we replace with 0.
+            //BUT: with <ref> such a replacement is ignored if (a) @x exists and (b) @x[%t] is also missing.
+            //NOTE: This will not show a Work-variable that does not exist but exists in Ref. But that will be caught with COMPARE.            
+            I("reset;");            
+            I("time 2000 2003;");
+            I("@a = 1, m(), 2, 100;");
+            I("a = 1, m(), 2, m();");
+            I("b = m(), 1, m(), 2;");
+            I("findmissingdata <ref replace = 0> a, b;");
+            _AssertSeries(w, "a", 2000, 1, sharedDelta);
+            _AssertSeries(w, "a", 2001, double.NaN, sharedDelta); //Because it is also missing in @a, and therefore M is "not worse"
+            _AssertSeries(w, "a", 2002, 2, sharedDelta);
+            _AssertSeries(w, "a", 2003, 0, sharedDelta);
+            _AssertSeries(w, "b", 2000, double.NaN, sharedDelta); //Because the whole @b does not exist, and therefore M is "not worse"
+            _AssertSeries(w, "b", 2001, 1, sharedDelta);
+            _AssertSeries(w, "b", 2002, double.NaN, sharedDelta); //Because the whole @b does not exist, and therefore M is "not worse"
+            _AssertSeries(w, "b", 2003, 2, sharedDelta);
+
             //Does not test the result, only the command
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");  //needs "'" since it contains a "-"
@@ -24881,7 +24899,6 @@ print(df2)
 
             //Tests replacement of M with a value (here 0)
             I("RESET;");
-
             I("CREATE a, b;");
             I("TIME 2000 2003;");
             I("SERIES a = (1, m(), 2, m());");
@@ -24895,6 +24912,7 @@ print(df2)
             _AssertSeries(w, "b", 2001, 1, sharedDelta);
             _AssertSeries(w, "b", 2002, 0, sharedDelta);
             _AssertSeries(w, "b", 2003, 2, sharedDelta);
+            
             I("RESET;");
             I("CREATE a, b;");
             I("TIME 2000 2003;");
