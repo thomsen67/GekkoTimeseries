@@ -1194,7 +1194,7 @@ namespace Gekko
                 Button infl = new Button
                 {
                     Content = "Infl.",
-                    Margin = new Thickness(0, -3, 0, 0),
+                    Margin = new Thickness(0, -3, 0, 2),
                     Width = 30,
                     Height = 15,  //18 elsewhere                 
                     Padding = new Thickness(0, -2, 0, 0),
