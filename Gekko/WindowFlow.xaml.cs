@@ -66,7 +66,8 @@ namespace Gekko
             this.isInitializing = false;
             this.decompFind = decompFind;
             this.Closing += Window_Closing;
-            SetupToolbar();
+            SetupToolbar();            
+
             graphViewerPanel.ClipToBounds = true;
             graphViewer.ObjectUnderMouseCursorChanged += graphViewer_ObjectUnderMouseCursorChanged;            
             graphViewer.BindToPanel(graphViewerPanel);            
@@ -140,6 +141,7 @@ namespace Gekko
                 if (this.decompFind.decompOptions2.guiFlowRotate) graph.Attr.LayerDirection = LayerDirection.RL;
                 else graph.Attr.LayerDirection = LayerDirection.TB;
                 graphViewer.Graph = graph;
+                Zoom(1d / 1.1d); //Otherwise the graph becomes a little bit too large, touching the WPF window
                 SetStatusBar();
             }
             catch (Exception ex)
