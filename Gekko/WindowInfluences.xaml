@@ -41,31 +41,32 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock>
-                            <Hyperlink Click="Hyperlink_Click" ToolTip="{Binding ToolTip}" Foreground="#FF0645AD">
-                                <Hyperlink.Style>
-            <Style TargetType="Hyperlink">
-                <Setter Property="Foreground" Value="#FF0645AD" />
-                <Setter Property="TextDecorations" Value="None" />
-                <Setter Property="Cursor" Value="Arrow" />
-                
-                <Style.Triggers>
-                    <Trigger Property="IsMouseOver" Value="True">
-                        <Setter Property="Foreground" Value="#FF0645AD" /> 
-                        <Setter Property="TextDecorations" Value="Underline" />
-                    </Trigger>
-                </Style.Triggers>
-            </Style>
-        </Hyperlink.Style>
-                                <Run Text="{Binding Name}" />
-                            </Hyperlink>
-                            </TextBlock>
-
+                            <!-- Comma placed BEFORE the item -->
                             <TextBlock Text=", " x:Name="CommaText" />
+
+                            <TextBlock>
+            <Hyperlink Click="Hyperlink_Click" ToolTip="{Binding ToolTip}">
+                <Hyperlink.Style>
+                    <Style TargetType="Hyperlink">
+                        <Setter Property="Foreground" Value="#FF0645AD" />
+                        <Setter Property="TextDecorations" Value="None" />
+                        <Setter Property="Cursor" Value="Hand" />
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="TextDecorations" Value="Underline" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Hyperlink.Style>
+                <Run Text="{Binding Name}" />
+            </Hyperlink>
+                            </TextBlock>
                         </StackPanel>
 
                         <DataTemplate.Triggers>
+                            <!-- If there is no previous item (this is the 1st item), hide the comma -->
                             <DataTrigger Binding="{Binding RelativeSource={RelativeSource PreviousData}}" Value="{x:Null}">
+                                <Setter TargetName="CommaText" Property="Visibility" Value="Collapsed" />
                             </DataTrigger>
                         </DataTemplate.Triggers>
                     </DataTemplate>
@@ -74,3 +75,4 @@
         </ScrollViewer>
     </Grid>
 </Window>
+    

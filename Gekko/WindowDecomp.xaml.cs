@@ -1183,26 +1183,33 @@ namespace Gekko
             }
 
             border.Child = textBlock;
-            if (true && type == GekkoTableTypes.UpperLeft)
+            if (type == GekkoTableTypes.UpperLeft)
             {
-                TextBlock infl = new TextBlock();
-                infl.HorizontalAlignment = HorizontalAlignment.Left;
-                infl.VerticalAlignment = VerticalAlignment.Center;
-                infl.FontFamily = Globals.decompFontFamily;
-                infl.FontSize = Globals.decompFontSize - 0;
-                int padding = 0;
-                double opa = 0.4;
-                infl.Padding = new Thickness(padding, 2, 4, 3);
-                infl.MouseDown += Mouse_Down;
+                double opa = 0.60;
                 Brush originalColor = Brushes.Black;
-                infl.Foreground = originalColor;
-                infl.MouseEnter += (s, e) => { infl.Foreground = Brushes.Blue; infl.Opacity = 1.0; };
-                infl.MouseLeave += (s, e) => { infl.Foreground = originalColor; infl.Opacity = opa; };
-                infl.ToolTip = "Click to see which variables are influenced by the dependent variable";
-                infl.Text = "[Infl.]";
-                infl.Opacity = opa;
+
+                Style borderStyle = new Style(typeof(Border));
+                borderStyle.Setters.Add(new Setter(Border.CornerRadiusProperty, new CornerRadius(5)));
+
+                Button infl = new Button
+                {
+                    Content = "Infl.",
+                    Margin = new Thickness(0, -3, 0, 0),
+                    Width = 30,
+                    Height = 15,  //18 elsewhere                 
+                    Padding = new Thickness(0, -2, 0, 0),
+                    Opacity = opa,
+                    ToolTip = "Click to see which variables are influenced by the dependent variable",
+                };
+
+                infl.Resources.Add(typeof(Border), borderStyle);
+                infl.Click += Button_Down;
+                // Hover effects
+                infl.MouseEnter += (s, e) => { infl.Opacity = 1.0; };
+                infl.MouseLeave += (s, e) => { infl.Opacity = opa; };
                 dockPanel.Children.Add(infl);
             }
+
             dockPanel.Children.Add(border);
             dockPanel.SetValue(Grid.ColumnProperty, j);
             dockPanel.SetValue(Grid.RowProperty, i);
@@ -1752,18 +1759,30 @@ namespace Gekko
         {
             //#98732498724
             //Click in FIND: #8fdskfesdfw
-
-            //bool isCtrl = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
-
             TextBlock tb = (TextBlock)sender;
             DockPanel dp = G.FindParent<DockPanel>(tb);
-
             int col = (int)dp.GetValue(Grid.ColumnProperty);
             int row = (int)dp.GetValue(Grid.RowProperty);
-
             bool isInfluences = false;
             if (row == 0 && col == 0) isInfluences = true;
+            LinkHelper(col, row, isInfluences);
+        }
 
+        private void Button_Down(object sender, RoutedEventArgs e) // MouseEventArgs e)
+        {
+            //#98732498724
+            //Click in FIND: #8fdskfesdfw
+            Button tb = (Button)sender;
+            DockPanel dp = G.FindParent<DockPanel>(tb);
+            int col = (int)dp.GetValue(Grid.ColumnProperty);
+            int row = (int)dp.GetValue(Grid.RowProperty);
+            bool isInfluences = false;
+            if (row == 0 && col == 0) isInfluences = true;
+            LinkHelper(col, row, isInfluences);
+        }
+
+        private void LinkHelper(int col, int row, bool isInfluences)
+        {
             Cell c, c2;
             GetTwoCells(row, col, out c, out c2);
 
@@ -1776,7 +1795,7 @@ namespace Gekko
                 DName var = Decomp.HiddenVariableHelper(c2, false);
 
                 if (isInfluences)
-                {                    
+                {
                     try
                     {
                         if (var == null) return;
@@ -1799,14 +1818,14 @@ namespace Gekko
                         {
                             List<string> myNames2 = new List<string>();
                             List<EqInfoSimple> eqsContainingVariable = GamsModel.GetSortedEquations(var, Program.model.modelGamsScalar.GetDecompT(), Program.model, false, false, false);
-                            myNames2 = Program.FindDependentVars(var.ToString(), Program.model, Program.model.modelGams, Program.model.modelGamsScalar, eqsContainingVariable);                            
+                            myNames2 = Program.FindDependentVars(var.ToString(), Program.model, Program.model.modelGams, Program.model.modelGamsScalar, eqsContainingVariable);
                             foreach (string s in myNames2)
                             {
                                 myTooltips.Add(s + G.NL + Program.GetVariableExplanation1Line(Program.DName_HACK1(s), false));
                             }
                             myNames3 = myNames2;
                         }
-                        
+
                         WindowInfluences popup = new WindowInfluences(myNames3, myTooltips, this.decompFind);
                         popup.Owner = this;
                         popup.Title = "Influences (" + var + ")";
@@ -1817,12 +1836,12 @@ namespace Gekko
                 }
 
                 if (var == null)
-                {                    
+                {
                     new Error(Decomp.Text1(1));
                 }
 
                 _activeVariable = var.ToString();
-                DecompLinkClicked(_activeVariable, this.decompFind);                
+                DecompLinkClicked(_activeVariable, this.decompFind);
             }
             else
             {
