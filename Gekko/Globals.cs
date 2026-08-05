@@ -167,6 +167,8 @@ namespace Gekko
         public static GekkoDictionary<string, GekkoDictionary<string, bool>> traceChunks = null;
         public static GekkoDictionary<string, bool> traceChunksRelevant = null;
 
+        public const string evalName1 = "VAR_EVALFUNCTION"; //CAREFUL: If this name is changed, it must be changed in Cmd3.g too (and perhaps other places)
+        public const string evalName2 = "deleteme_evalfunction";
 
         public static bool gbkExtraMetadata = true;
 

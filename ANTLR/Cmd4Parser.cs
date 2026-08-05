@@ -1,4 +1,4 @@
-// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g 2026-06-29 18:18:21
+// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g 2026-08-05 20:42:54
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 168, 219
@@ -1419,7 +1419,7 @@ public partial class Cmd4Parser : Parser
 		"V", 
 		"VAL", 
 		"VAR", 
-		"VAR_KDUSJFLQO2", 
+		"VAR_EVALFUNCTION", 
 		"VALUE", 
 		"VERS", 
 		"VERSION", 
@@ -1805,6 +1805,7 @@ public partial class Cmd4Parser : Parser
     public const int ASTOPT_STRING_POINTTYPE = 543;
     public const int SETVALUES = 1310;
     public const int EXIT = 1046;
+    public const int VAR_EVALFUNCTION = 1396;
     public const int ASTPRTELEMENTY2 = 681;
     public const int ASTOPT_VAL_DEC = 644;
     public const int PERIOD = 1241;
@@ -2178,7 +2179,6 @@ public partial class Cmd4Parser : Parser
     public const int TSD = 1373;
     public const int ASTMODELFILE = 456;
     public const int XLINE = 879;
-    public const int VAR_KDUSJFLQO2 = 1396;
     public const int ASTNAMEWITHDOT = 470;
     public const int ASTSERIESQUESTION = 710;
     public const int ASTTUPLEFUNCTIONSIMPLE = 772;
@@ -3305,7 +3305,7 @@ public partial class Cmd4Parser : Parser
 
 
             			    		// AST REWRITE
-            			    		// elements:          additiveExpression, lbla
+            			    		// elements:          lbla, additiveExpression
             			    		// token labels:      
             			    		// rule labels:       retval, lbla
             			    		// token list labels: 
@@ -3355,7 +3355,7 @@ public partial class Cmd4Parser : Parser
 
 
             			    		// AST REWRITE
-            			    		// elements:          additiveExpression, lblb
+            			    		// elements:          lblb, additiveExpression
             			    		// token labels:      
             			    		// rule labels:       retval, lblb
             			    		// token list labels: 
@@ -3407,7 +3407,7 @@ public partial class Cmd4Parser : Parser
 
 
             			    		// AST REWRITE
-            			    		// elements:          lblb, additiveExpression
+            			    		// elements:          additiveExpression, lblb
             			    		// token labels:      
             			    		// rule labels:       retval, lblb
             			    		// token list labels: 
@@ -3457,7 +3457,7 @@ public partial class Cmd4Parser : Parser
 
 
             			    		// AST REWRITE
-            			    		// elements:          additiveExpression, lblb
+            			    		// elements:          lblb, additiveExpression
             			    		// token labels:      
             			    		// rule labels:       retval, lblb
             			    		// token list labels: 
@@ -3676,7 +3676,7 @@ public partial class Cmd4Parser : Parser
 
 
             			    		// AST REWRITE
-            			    		// elements:          lblb, multiplicativeExpression
+            			    		// elements:          multiplicativeExpression, lblb
             			    		// token labels:      
             			    		// rule labels:       retval, lblb
             			    		// token list labels: 
@@ -3837,7 +3837,7 @@ public partial class Cmd4Parser : Parser
 
 
             			    	// AST REWRITE
-            			    	// elements:          powerExpression, lbla
+            			    	// elements:          lbla, powerExpression
             			    	// token labels:      
             			    	// rule labels:       retval, lbla
             			    	// token list labels: 
@@ -4333,7 +4333,7 @@ public partial class Cmd4Parser : Parser
 
 
             			    	// AST REWRITE
-            			    	// elements:          indexerExpression, lbla
+            			    	// elements:          lbla, indexerExpression
             			    	// token labels:      
             			    	// rule labels:       retval, lbla
             			    	// token list labels: 
@@ -5056,7 +5056,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          stringInQuotesWithCurliesA, stringInQuotesWithCurliesB, stringInQuotesWithCurliesC
+            	// elements:          stringInQuotesWithCurliesB, stringInQuotesWithCurliesC, stringInQuotesWithCurliesA
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -6914,7 +6914,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          repExpression, listHelper
+                    	// elements:          listHelper, repExpression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -7813,7 +7813,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          mapHelper, mapItem
+                    	// elements:          mapItem, mapHelper
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -8708,7 +8708,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          ident, fargs, libraryWithColon
+                    	// elements:          fargs, ident, libraryWithColon
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -8818,7 +8818,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          ident, fargs, libraryWithColon
+                    	// elements:          libraryWithColon, ident, fargs
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -9077,7 +9077,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fargs, ident, libraryWithColon
+                    	// elements:          ident, libraryWithColon, fargs
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -9187,7 +9187,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          libraryWithColon, ident, fargs
+                    	// elements:          ident, libraryWithColon, fargs
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -10348,7 +10348,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          dates, expression
+                    	// elements:          expression, dates
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -11363,7 +11363,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          repN, seqItem7Naked
+                    	// elements:          seqItem7Naked, repN
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -11517,7 +11517,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          repN, seqNumber
+                    	// elements:          seqNumber, repN
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -11833,7 +11833,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          name7, indexer7Naked1, freq7Naked, bank7Naked, indexer7Naked
+            	// elements:          freq7Naked, indexer7Naked, indexer7Naked1, bank7Naked, name7
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -12670,7 +12670,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          minus, double2
+                    	// elements:          double2, minus
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -12738,7 +12738,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          Integer, minus
+                    	// elements:          minus, Integer
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -13155,7 +13155,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          indexer7, wildcard7, indexer71, bank7
+                    	// elements:          indexer71, bank7, indexer7, wildcard7
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -13708,7 +13708,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          indexerHelper7, plus7
+            	// elements:          plus7, indexerHelper7
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -18787,7 +18787,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          name, cnameHelper
+            	// elements:          cnameHelper, name
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -18945,7 +18945,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          sigil, name
+                    	// elements:          name, sigil
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -19387,7 +19387,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          nameOrCname, freq
+                    	// elements:          freq, nameOrCname
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -19461,7 +19461,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          sigil, name
+                    	// elements:          name, sigil
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -20007,7 +20007,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          sigil, ident
+            	// elements:          ident, sigil
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -21383,7 +21383,7 @@ public partial class Cmd4Parser : Parser
 
 
             			    	// AST REWRITE
-            			    	// elements:          lbla, logicalOr
+            			    	// elements:          logicalOr, lbla
             			    	// token labels:      
             			    	// rule labels:       retval, lbla
             			    	// token list labels: 
@@ -21546,7 +21546,7 @@ public partial class Cmd4Parser : Parser
 
 
             			    	// AST REWRITE
-            			    	// elements:          lbla, logicalAnd
+            			    	// elements:          logicalAnd, lbla
             			    	// token labels:      
             			    	// rule labels:       retval, lbla
             			    	// token list labels: 
@@ -21802,7 +21802,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          ifOperator, expression, expression
+                    	// elements:          expression, ifOperator, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -25428,7 +25428,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, assignmentType, seriesOpt1, nakedList
+                    	// elements:          seriesOpt1, nakedList, leftSide, assignmentType
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -25552,7 +25552,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          assignmentType, seriesOpt1, expression, leftSide
+                    	// elements:          assignmentType, leftSide, seriesOpt1, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -25652,7 +25652,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, assignmentType, leftSide, seriesOpt1, nakedList
+                    	// elements:          leftSide, seriesOpt1, nakedList, leftSide, assignmentType
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -25785,7 +25785,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, seriesOpt1, leftSide, expression, assignmentType
+                    	// elements:          expression, seriesOpt1, leftSide, assignmentType, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -25894,7 +25894,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, nakedList, assignmentType, leftSide, seriesOpt1
+                    	// elements:          seriesOpt1, leftSide, nakedList, assignmentType, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -26027,7 +26027,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, seriesOpt1, leftSide, assignmentType, leftSide
+                    	// elements:          expression, assignmentType, seriesOpt1, leftSide, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -26158,7 +26158,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, leftSide, assignmentType, seriesOpt1, nakedList
+                    	// elements:          seriesOpt1, assignmentType, leftSide, leftSide, nakedList
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -26313,7 +26313,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, leftSide, assignmentType, seriesOpt1, leftSide
+                    	// elements:          assignmentType, seriesOpt1, leftSide, leftSide, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -26422,7 +26422,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          assignmentType, nakedList, leftSide, seriesOpt1, leftSide
+                    	// elements:          assignmentType, leftSide, nakedList, leftSide, seriesOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -26555,7 +26555,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seriesOpt1, expression, assignmentType, leftSide, leftSide
+                    	// elements:          leftSide, assignmentType, leftSide, expression, seriesOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -26666,7 +26666,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          nakedList, assignmentType, leftSide, seriesOpt1
+                    	// elements:          nakedList, assignmentType, seriesOpt1, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -26792,7 +26792,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, assignmentType, expression, seriesOpt1
+                    	// elements:          seriesOpt1, expression, leftSide, assignmentType
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -26892,7 +26892,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          assignmentType, seriesOpt1, leftSide, nakedList
+                    	// elements:          leftSide, assignmentType, nakedList, seriesOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -27016,7 +27016,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, seriesOpt1, assignmentType, expression
+                    	// elements:          assignmentType, seriesOpt1, expression, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -27244,7 +27244,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, assignmentType, expression, seriesOpt1
+                    	// elements:          seriesOpt1, expression, leftSide, assignmentType
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -27325,7 +27325,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, assignmentType, nakedList, seriesOpt1
+                    	// elements:          assignmentType, leftSide, seriesOpt1, nakedList
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -27424,7 +27424,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seriesOpt1, expression, assignmentType, leftSide
+                    	// elements:          assignmentType, seriesOpt1, expression, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -27499,7 +27499,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          assignmentType, seriesOpt1, leftSide, leftSide, nakedList
+                    	// elements:          assignmentType, leftSide, leftSide, nakedList, seriesOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -27607,7 +27607,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, leftSide, leftSide, seriesOpt1, assignmentType
+                    	// elements:          seriesOpt1, assignmentType, leftSide, leftSide, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -27691,7 +27691,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          assignmentType, seriesOpt1, leftSide, nakedList, leftSide
+                    	// elements:          seriesOpt1, leftSide, leftSide, nakedList, assignmentType
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -27799,7 +27799,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, seriesOpt1, assignmentType, leftSide, expression
+                    	// elements:          expression, leftSide, leftSide, assignmentType, seriesOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -27883,7 +27883,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seriesOpt1, leftSide, nakedList, assignmentType, leftSide
+                    	// elements:          seriesOpt1, leftSide, assignmentType, leftSide, nakedList
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -27991,7 +27991,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, leftSide, seriesOpt1, leftSide, assignmentType
+                    	// elements:          leftSide, assignmentType, seriesOpt1, leftSide, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -28075,7 +28075,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seriesOpt1, nakedList, assignmentType, leftSide, leftSide
+                    	// elements:          seriesOpt1, leftSide, nakedList, leftSide, assignmentType
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -28183,7 +28183,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, leftSide, expression, seriesOpt1, assignmentType
+                    	// elements:          assignmentType, seriesOpt1, leftSide, expression, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -28269,7 +28269,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, seriesOpt1, assignmentType, nakedList
+                    	// elements:          seriesOpt1, assignmentType, nakedList, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -28370,7 +28370,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          assignmentType, seriesOpt1, expression, leftSide
+                    	// elements:          leftSide, seriesOpt1, expression, assignmentType
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -28445,7 +28445,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          nakedList, assignmentType, leftSide, seriesOpt1
+                    	// elements:          assignmentType, nakedList, seriesOpt1, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -28544,7 +28544,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, leftSide, seriesOpt1, assignmentType
+                    	// elements:          assignmentType, seriesOpt1, leftSide, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -28621,7 +28621,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          assignmentType, seriesOpt1, nakedList, leftSide
+                    	// elements:          leftSide, assignmentType, nakedList, seriesOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -28722,7 +28722,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seriesOpt1, assignmentType, leftSide, expression
+                    	// elements:          expression, leftSide, seriesOpt1, assignmentType
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -28797,7 +28797,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          nakedList, seriesOpt1a, leftSide, assignmentType
+                    	// elements:          nakedList, seriesOpt1a, assignmentType, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -28896,7 +28896,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          assignmentType, seriesOpt1a, expression, leftSide
+                    	// elements:          leftSide, assignmentType, expression, seriesOpt1a
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -29008,7 +29008,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, assignmentType, seriesOpt1a, expression, ident
+                    	// elements:          assignmentType, expression, ident, leftSide, seriesOpt1a
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -29140,7 +29140,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, seriesOpt1, ident, leftSide, assignmentType
+                    	// elements:          leftSide, assignmentType, expression, seriesOpt1, ident
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -29259,7 +29259,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          ident, seriesOpt1, expression, leftSide, assignmentType
+                    	// elements:          expression, leftSide, seriesOpt1, assignmentType, ident
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -29449,7 +29449,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          assignmentType, expression, leftSide, seriesOpt1
+            	// elements:          seriesOpt1, leftSide, assignmentType, expression
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -29716,7 +29716,7 @@ public partial class Cmd4Parser : Parser
     };
 
     // $ANTLR start "assignmentTypeNotEmpty"
-    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:2850:1: assignmentTypeNotEmpty : ( SER | SERIES | STRING2 | VAL | DATE | LIST | MAP | MATRIX | VAR | VAR_KDUSJFLQO2 | -> ASTPLACEHOLDER );
+    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:2850:1: assignmentTypeNotEmpty : ( SER | SERIES | STRING2 | VAL | DATE | LIST | MAP | MATRIX | VAR | VAR_EVALFUNCTION | -> ASTPLACEHOLDER );
     public Cmd4Parser.assignmentTypeNotEmpty_return assignmentTypeNotEmpty() // throws RecognitionException [1]
     {   
         Cmd4Parser.assignmentTypeNotEmpty_return retval = new Cmd4Parser.assignmentTypeNotEmpty_return();
@@ -29733,7 +29733,7 @@ public partial class Cmd4Parser : Parser
         IToken MAP858 = null;
         IToken MATRIX859 = null;
         IToken VAR860 = null;
-        IToken VAR_KDUSJFLQO2861 = null;
+        IToken VAR_EVALFUNCTION861 = null;
 
         object SER852_tree=null;
         object SERIES853_tree=null;
@@ -29744,7 +29744,7 @@ public partial class Cmd4Parser : Parser
         object MAP858_tree=null;
         object MATRIX859_tree=null;
         object VAR860_tree=null;
-        object VAR_KDUSJFLQO2861_tree=null;
+        object VAR_EVALFUNCTION861_tree=null;
 
         try 
     	{
@@ -29752,7 +29752,7 @@ public partial class Cmd4Parser : Parser
     	    {
     	    	return retval; 
     	    }
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:2850:23: ( SER | SERIES | STRING2 | VAL | DATE | LIST | MAP | MATRIX | VAR | VAR_KDUSJFLQO2 | -> ASTPLACEHOLDER )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:2850:23: ( SER | SERIES | STRING2 | VAL | DATE | LIST | MAP | MATRIX | VAR | VAR_EVALFUNCTION | -> ASTPLACEHOLDER )
             int alt186 = 11;
             alt186 = dfa186.Predict(input);
             switch (alt186) 
@@ -29875,14 +29875,14 @@ public partial class Cmd4Parser : Parser
                     }
                     break;
                 case 10 :
-                    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:2859:29: VAR_KDUSJFLQO2
+                    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:2859:29: VAR_EVALFUNCTION
                     {
                     	root_0 = (object)adaptor.GetNilNode();
 
-                    	VAR_KDUSJFLQO2861=(IToken)Match(input,VAR_KDUSJFLQO2,FOLLOW_VAR_KDUSJFLQO2_in_assignmentTypeNotEmpty30796); if (state.failed) return retval;
+                    	VAR_EVALFUNCTION861=(IToken)Match(input,VAR_EVALFUNCTION,FOLLOW_VAR_EVALFUNCTION_in_assignmentTypeNotEmpty30796); if (state.failed) return retval;
                     	if ( state.backtracking == 0 )
-                    	{VAR_KDUSJFLQO2861_tree = (object)adaptor.Create(VAR_KDUSJFLQO2861);
-                    		adaptor.AddChild(root_0, VAR_KDUSJFLQO2861_tree);
+                    	{VAR_EVALFUNCTION861_tree = (object)adaptor.Create(VAR_EVALFUNCTION861);
+                    		adaptor.AddChild(root_0, VAR_EVALFUNCTION861_tree);
                     	}
 
                     }
@@ -30393,7 +30393,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          dates, localOptions, seriesOpt1h
+                    	// elements:          dates, seriesOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -30855,7 +30855,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, seriesOpt1h, dates
+                    	// elements:          dates, seriesOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -32413,7 +32413,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          expression, acceptType, varname
+            	// elements:          varname, expression, acceptType
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -32659,7 +32659,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          analyzeExpression, analyzeOpt1
+            	// elements:          analyzeOpt1, analyzeExpression
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -33726,7 +33726,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          clearOpt1, seqOfBankvarnames
+            	// elements:          seqOfBankvarnames, clearOpt1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -34998,7 +34998,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          closeOpt1h, localOptions
+                    	// elements:          localOptions, closeOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -35594,7 +35594,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          seqOfBankvarnames2, seqOfBankvarnames, collapseOpt1, collapseMethod
+            	// elements:          collapseOpt1, collapseMethod, seqOfBankvarnames2, seqOfBankvarnames
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -36281,7 +36281,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          fileName, compareOpt1, seqOfBankvarnames
+            	// elements:          compareOpt1, seqOfBankvarnames, fileName
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -36622,7 +36622,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, compareOpt1h
+                    	// elements:          compareOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -36757,7 +36757,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, compareOpt1h, dates
+                    	// elements:          dates, localOptions, compareOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -37632,7 +37632,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          seqOfBankvarnames, copyOpt1, seqOfBankvarnames2, assignmentType
+            	// elements:          assignmentType, seqOfBankvarnames, seqOfBankvarnames2, copyOpt1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -38095,7 +38095,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          copyOpt1h, dates, localOptions
+                    	// elements:          localOptions, copyOpt1h, dates
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -38749,7 +38749,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          countOpt1, assignmentType, seqOfBankvarnames
+            	// elements:          assignmentType, seqOfBankvarnames, countOpt1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -39665,7 +39665,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          decompHelper, decompGroup, decompWhere, decompVar1Simple, decompEndo, decompFrom, decompCols, decompRows, decompOpt1
+            	// elements:          decompRows, decompEndo, decompCols, decompFrom, decompVar1Simple, decompOpt1, decompHelper, decompGroup, decompWhere
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -40145,7 +40145,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          decompOpt2, seqOfBankvarnamesOnly1, seqOfBankvarnamesAlias
+            	// elements:          seqOfBankvarnamesOnly1, seqOfBankvarnamesAlias, decompOpt2
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -40331,7 +40331,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          decompExpression2, decompOpt2, seqOfBankvarnamesOnly1Alias
+            	// elements:          decompOpt2, decompExpression2, seqOfBankvarnamesOnly1Alias
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -41468,7 +41468,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          decompWhere1, seqOfBankvarnamesOnly1
+            	// elements:          seqOfBankvarnamesOnly1, decompWhere1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -41730,7 +41730,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          seqOfBankvarnamesOnly1, expression2, seqOfBankvarnamesOnly1, expression
+            	// elements:          seqOfBankvarnamesOnly1, seqOfBankvarnamesOnly1, expression2, expression
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -42200,7 +42200,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, decompOpt1h
+                    	// elements:          decompOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -42335,7 +42335,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          dates, decompOpt1h, localOptions
+                    	// elements:          localOptions, decompOpt1h, dates
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -43602,7 +43602,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          findOpt1, seqOfBankvarnamesOnly1
+            	// elements:          seqOfBankvarnamesOnly1, findOpt1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -44057,7 +44057,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          findOpt1h, localOptions, dates
+                    	// elements:          findOpt1h, dates, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -44999,7 +44999,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          dispOpt1, seqOfBankvarnames, assignmentType
+                    	// elements:          assignmentType, seqOfBankvarnames, dispOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -45322,7 +45322,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          dispOpt1h, localOptions
+                    	// elements:          localOptions, dispOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -45480,7 +45480,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          dates, dispOpt1h, localOptions
+                    	// elements:          localOptions, dispOpt1h, dates
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -45868,7 +45868,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          seqOfBankvarnames, docOpt1, fileName, docOpt2
+            	// elements:          fileName, docOpt2, seqOfBankvarnames, docOpt1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -47201,7 +47201,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          fileName, downloadOpt1, fileName2, url
+            	// elements:          fileName, url, downloadOpt1, fileName2
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -47514,7 +47514,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          downloadOpt1h, localOptions
+                    	// elements:          localOptions, downloadOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -48036,7 +48036,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          eeHelper, eeOpt1
+            	// elements:          eeOpt1, eeHelper
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -48177,7 +48177,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          eeHelper, eeOpt1
+            	// elements:          eeOpt1, eeHelper
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -48618,7 +48618,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          indexerExpression, eeOpt1
+            	// elements:          eeOpt1, indexerExpression
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -48860,7 +48860,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          findmissingdataOpt1, seqOfBankvarnames
+            	// elements:          seqOfBankvarnames, findmissingdataOpt1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -49362,7 +49362,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          dates, localOptions, findmissingdataOpt1h
+                    	// elements:          localOptions, dates, findmissingdataOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -49804,7 +49804,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          forHelper7b, functionStatements
+                    	// elements:          functionStatements, forHelper7b
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -50379,7 +50379,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression2, expression3, expression, forLhs
+                    	// elements:          expression, forLhs, expression3, expression2
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -50456,7 +50456,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          forLhs, nakedList
+                    	// elements:          nakedList, forLhs
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -50523,7 +50523,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, forLhs
+                    	// elements:          forLhs, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -50813,7 +50813,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          ident, typeRv, functionArg, functionStatements
+            	// elements:          ident, functionStatements, functionArg, typeRv
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -51059,7 +51059,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          functionArgElement, functionArgElement1, tripleDot
+            	// elements:          tripleDot, functionArgElement, functionArgElement1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -51467,7 +51467,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          expression1, expression2, typeArg, svarname
+            	// elements:          expression1, svarname, typeArg, expression2
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -52365,7 +52365,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fargs, ident, libraryWithColon, bankvarname
+                    	// elements:          bankvarname, ident, fargs, libraryWithColon
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -52567,7 +52567,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          ifOperator, andOr, versionAndDate, versionAndDate, ifOperator
+            	// elements:          andOr, ifOperator, versionAndDate, ifOperator, versionAndDate
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -53402,7 +53402,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          logical, functionStatements2, functionStatements
+                    	// elements:          functionStatements2, logical, functionStatements
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -53574,7 +53574,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          logical, functionStatements, functionStatements, functionStatements2, logical
+                    	// elements:          functionStatements, functionStatements2, logical, functionStatements, logical
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -53707,7 +53707,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          functionStatements, functionStatements2, logical
+                    	// elements:          functionStatements2, logical, functionStatements
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -53857,7 +53857,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          blockOpt1, functionStatements
+            	// elements:          functionStatements, blockOpt1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -54432,7 +54432,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          seqOfBankvarnames2, indexOpt1, assignmentType, seqOfBankvarnames
+            	// elements:          seqOfBankvarnames2, indexOpt1, seqOfBankvarnames, assignmentType
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -55527,7 +55527,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          interpolateMethod, interpolateOpt1, interpolateMethod2, seqOfBankvarnames3, seqOfBankvarnames, seqOfBankvarnames2
+            	// elements:          seqOfBankvarnames, interpolateMethod2, interpolateOpt1, seqOfBankvarnames3, seqOfBankvarnames2, interpolateMethod
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -55864,7 +55864,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, interpolateOpt1h
+                    	// elements:          interpolateOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -56302,7 +56302,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          seqOfBankvarnames, dates
+            	// elements:          dates, seqOfBankvarnames
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -57065,7 +57065,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          seqOfBankvarnames, globalOpt1
+            	// elements:          globalOpt1, seqOfBankvarnames
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -57378,7 +57378,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          globalOpt1h, localOptions
+                    	// elements:          localOptions, globalOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -57840,7 +57840,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          libraryHelper, libraryOpt1
+                    	// elements:          libraryOpt1, libraryHelper
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -58185,7 +58185,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          fileNameStar, name
+            	// elements:          name, fileNameStar
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -59267,7 +59267,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          modelOpt1, fileNameStar
+            	// elements:          fileNameStar, modelOpt1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -59597,7 +59597,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          modelOpt1h, localOptions
+                    	// elements:          localOptions, modelOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -59724,7 +59724,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          modelOpt1h, localOptions, dates
+                    	// elements:          localOptions, modelOpt1h, dates
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -60409,7 +60409,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          olsOpt1, olsImpose, olsExpression
+                    	// elements:          olsOpt1, olsExpression, olsImpose
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -60634,7 +60634,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          name, olsOpt1, olsExpression, olsImpose
+                    	// elements:          olsImpose, olsExpression, olsOpt1, name
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -61175,7 +61175,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          olsOpt1h, localOptions
+                    	// elements:          localOptions, olsOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -64889,7 +64889,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          fileName, pipeOpt1
+            	// elements:          pipeOpt1, fileName
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -66445,7 +66445,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          libraryWithColon, fargs_proc, identWithoutCommand
+                    	// elements:          identWithoutCommand, libraryWithColon, fargs_proc
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -66551,7 +66551,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          identWithoutCommand, libraryWithColon, fargs_proc
+                    	// elements:          fargs_proc, libraryWithColon, identWithoutCommand
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -66810,7 +66810,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          ident, libraryWithColon, fargs
+                    	// elements:          libraryWithColon, ident, fargs
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -67073,7 +67073,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          procedureArg, identWithoutCommand, procedureStatements
+            	// elements:          procedureArg, procedureStatements, identWithoutCommand
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -67727,7 +67727,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          expression1, svarname, expression2, typeArg
+            	// elements:          expression2, typeArg, expression1, svarname
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -68041,7 +68041,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          prtOpt2, prtHelper, prtOpt1, prtElements
+            	// elements:          prtOpt1, prtElements, prtHelper, prtOpt2
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -68464,7 +68464,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          gekkoLabel, prtElementOptionField, expression
+            	// elements:          expression, gekkoLabel, prtElementOptionField
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -69060,7 +69060,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, prtOpt1Helper, dates
+                    	// elements:          dates, localOptions, prtOpt1Helper
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -82864,7 +82864,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seqOfBankvarnames, r_runOpt1, fileName
+                    	// elements:          fileName, r_runOpt1, seqOfBankvarnames
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -82987,7 +82987,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fileName, r_runOpt1
+                    	// elements:          r_runOpt1, fileName
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -83723,7 +83723,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seqOfBankvarnames, python_runOpt1, fileName
+                    	// elements:          python_runOpt1, fileName, seqOfBankvarnames
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -84162,7 +84162,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          python_runOpt1h, localOptions
+                    	// elements:          localOptions, python_runOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -84644,7 +84644,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          rebaseOpt1, seqOfBankvarnames, rebaseDate2, rebaseDate1
+            	// elements:          rebaseDate2, rebaseDate1, seqOfBankvarnames, rebaseOpt1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -85083,7 +85083,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, rebaseOpt1h
+                    	// elements:          rebaseOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -85696,7 +85696,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          seqOfBankvarnames2, seqOfBankvarnames, assignmentType, renameOpt1
+            	// elements:          renameOpt1, seqOfBankvarnames, seqOfBankvarnames2, assignmentType
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -85989,7 +85989,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, renameOpt1h
+                    	// elements:          renameOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -86728,7 +86728,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          readOpt1, readHelper, nameOrStar, fileNameStar
+            	// elements:          readOpt1, fileNameStar, readHelper, nameOrStar
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -87124,7 +87124,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, readOpt1h
+                    	// elements:          readOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -87251,7 +87251,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          dates, readOpt1h, localOptions
+                    	// elements:          dates, localOptions, readOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -90262,7 +90262,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          fileNameStar, runOpt1
+            	// elements:          runOpt1, fileNameStar
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -90553,7 +90553,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          runOpt1h, localOptions
+                    	// elements:          localOptions, runOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -90792,7 +90792,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          sheetImportOpt1, seqOfBankvarnames, fileName
+            	// elements:          seqOfBankvarnames, sheetImportOpt1, fileName
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -92833,7 +92833,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          simOpt1h, dates, localOptions
+                    	// elements:          simOpt1h, localOptions, dates
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -93626,7 +93626,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          seqOfBankvarnames, seqOfBankvarnames2, seqOfBankvarnames3, smoothOpt2
+            	// elements:          smoothOpt2, seqOfBankvarnames2, seqOfBankvarnames, seqOfBankvarnames3
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -94455,7 +94455,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          spliceOpt1, expression, seqOfBankvarnames
+            	// elements:          seqOfBankvarnames, spliceOpt1, expression
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -95420,7 +95420,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          sysOpt1, expression, fileName
+                    	// elements:          expression, sysOpt1, fileName
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -96365,7 +96365,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, name
+                    	// elements:          name, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -96435,7 +96435,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, tableCurrow, expression
+                    	// elements:          tableCurrow, expression, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -96501,7 +96501,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, tableCurrow, expression
+                    	// elements:          expression, expression, tableCurrow
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -96559,7 +96559,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, tableCurrow
+                    	// elements:          tableCurrow, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -96624,7 +96624,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, expression, tableCurrow
+                    	// elements:          expression, tableCurrow, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -96747,7 +96747,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          tableCurrow, expression, expression
+                    	// elements:          expression, expression, tableCurrow
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -96805,7 +96805,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          tableCurrow, expression
+                    	// elements:          expression, tableCurrow
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -97028,7 +97028,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          tableCurrow, expression, expression
+                    	// elements:          expression, expression, tableCurrow
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -97086,7 +97086,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, tableCurrow
+                    	// elements:          tableCurrow, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -97339,7 +97339,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          tableCurrow, expression, expression, expression
+                    	// elements:          expression, tableCurrow, expression, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -97529,7 +97529,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fileName, tableOpt1
+                    	// elements:          tableOpt1, fileName
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -97610,7 +97610,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          tableOpt1, fileName
+                    	// elements:          fileName, tableOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -97924,7 +97924,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, tableOpt1h
+                    	// elements:          tableOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -98059,7 +98059,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          dates, localOptions, tableOpt1h
+                    	// elements:          tableOpt1h, dates, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -98704,7 +98704,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          expression, tellOpt1
+            	// elements:          tellOpt1, expression
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -99017,7 +99017,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          tellOpt1h, localOptions
+                    	// elements:          localOptions, tellOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -100646,7 +100646,7 @@ public partial class Cmd4Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          translateOpt1, fileName
+            	// elements:          fileName, translateOpt1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -101743,7 +101743,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seqOfBankvarnames, fileName, writeOpt1, seqOfBankvarnames2, writeHelper
+                    	// elements:          writeHelper, seqOfBankvarnames2, seqOfBankvarnames, fileName, writeOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -101859,7 +101859,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          writeOpt1, writeHelper, fileName
+                    	// elements:          writeOpt1, fileName, writeHelper
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -102399,7 +102399,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          writeOpt1h, localOptions, dates
+                    	// elements:          dates, localOptions, writeOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -105279,7 +105279,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, truncateOpt1h
+                    	// elements:          truncateOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -106082,7 +106082,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          x12aOpt1h, dates, localOptions
+                    	// elements:          x12aOpt1h, localOptions, dates
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -106625,7 +106625,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fileName, GBK, FILE, DATABANK, INTERNAL
+                    	// elements:          FILE, DATABANK, INTERNAL, GBK, fileName
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -106797,7 +106797,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          FOLDER, fileName, BANK1
+                    	// elements:          FOLDER, BANK1, fileName
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -106874,7 +106874,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fileName, BANK2, FOLDER
+                    	// elements:          FOLDER, BANK2, fileName
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -106951,7 +106951,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          FOLDER, COMMAND, fileName
+                    	// elements:          COMMAND, FOLDER, fileName
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -107028,7 +107028,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          COMMAND1, fileName, FOLDER
+                    	// elements:          FOLDER, fileName, COMMAND1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -107105,7 +107105,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fileName, COMMAND2, FOLDER
+                    	// elements:          COMMAND2, fileName, FOLDER
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -107182,7 +107182,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          HELP, FOLDER, fileName
+                    	// elements:          FOLDER, fileName, HELP
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -107259,7 +107259,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          FOLDER, MENU, fileName
+                    	// elements:          fileName, FOLDER, MENU
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -107336,7 +107336,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fileName, FOLDER, MODEL
+                    	// elements:          MODEL, fileName, FOLDER
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -107413,7 +107413,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          PIPE, fileName, FOLDER
+                    	// elements:          fileName, FOLDER, PIPE
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -107490,7 +107490,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          TABLE, FOLDER, fileName
+                    	// elements:          TABLE, fileName, FOLDER
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -107567,7 +107567,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          FOLDER, fileName, TABLE1
+                    	// elements:          fileName, TABLE1, FOLDER
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -107644,7 +107644,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          FOLDER, fileName, TABLE2
+                    	// elements:          fileName, TABLE2, FOLDER
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -107721,7 +107721,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fileName, FOLDER, WORKING
+                    	// elements:          WORKING, fileName, FOLDER
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -107801,7 +107801,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fileName, FOLDER, EXE, GAMS
+                    	// elements:          fileName, GAMS, FOLDER, EXE
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -107890,7 +107890,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          REMOTE, INTERFACE, FILE, fileName
+                    	// elements:          REMOTE, FILE, fileName, INTERFACE
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -107976,7 +107976,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fileName, STARTFILE, MENU
+                    	// elements:          MENU, STARTFILE, fileName
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -108053,7 +108053,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fileName, PLOT, USING
+                    	// elements:          USING, fileName, PLOT
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -108133,7 +108133,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          EXE, fileName, FOLDER, PYTHON
+                    	// elements:          fileName, EXE, PYTHON, FOLDER
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -108222,7 +108222,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fileName, EXE, R, FOLDER
+                    	// elements:          fileName, R, EXE, FOLDER
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -108433,7 +108433,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          question, ident
+                    	// elements:          ident, question
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -108542,7 +108542,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          name, ident
+                    	// elements:          ident, name
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -110372,7 +110372,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          name, fileNamePart
+                    	// elements:          fileNamePart, name
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -110451,7 +110451,7 @@ public partial class Cmd4Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fileNamePart, fileNameFirstPart
+                    	// elements:          fileNameFirstPart, fileNamePart
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -115813,7 +115813,7 @@ public partial class Cmd4Parser : Parser
     };
 
     // $ANTLR start "ident2"
-    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:4408:1: ident2 : ( Ident | ACCEPT | ANALYZE | CHECKOFF | CLEAR | CLIP | CLONE | CLOSE | CLS | COLLAPSE | COMPARE | COPY | COUNT | CREATE | CUT | DATE | DECOMP | DECOMP2 | DECOMP3 | EVAL | DELETE | DISP | GEKKO | DOC | DOWNLOAD | EDIT | ENDO | END | EXIT | EXO | EXPORT | FINDMISSINGDATA | BANKNAME | FLOW | META | ECHO | OBS | A3DP | A3 | ADP | AL | ADL | A3P | AD | AP | A3D | A3L | A3DL | YOY | CLOSEALL | VIEW | LIBRARY | KEEPTYPES | PREDICT | FIND | PYTHON | BROWSER | FOR | FUNCTION | GOTO | GLOBAL | HDG | HELP | IF | IF_OLD | IMPORT | INDEX | INI | INTERPOLATE | ITERSHOW | LIST | LOCK_ | LOCAL | MATRIX | MEM | MENU | MODEL | MODE | MULPRT | NAME | OLS | OPEN | OPTION | PAUSE | PIPE | PLOT | PRINT | PRI | PROCEDURE | PRT | P | R_EXPORT | R_FILE | R_RUN | PYTHON_EXPORT | PYTHON_FILE | PYTHON_RUN | READ | REBASE | RENAME | RESET | BLOCK | RESTART | RETURN2 | RUN | SERIES | SER | SHEET | SHOW | SIGN | SIM | SMOOTH | SPLICE | STOP | STRING2 | SYS | TABLE | TARGET | TELL | TIMEFILTER | TIME | TRACE | TRACE2 | TRANSLATE | TRUNCATE | UNFIX | SPEEDUP | UNLOCK_ | UNSWAP | VAL | WRITE | X12A | XEDIT | ABS | GEOMETRIC | OVERLAY | ADDBANK | SHOWBANK | SHOWFREQ | ADD | AFTER2 | AFTER | ALIGNCENTER | ALIGNLEFT | ALIGNRIGHT | ALL | AND | ANNUAL | APPEND | AREMOS | OP | ARRAY | ARROW | PARQUET | ASERIES | ASER | AS | AT2 | AUTO | AVG | A | BACKTRACK | INDICATOR | BANK1 | BANK2 | BANK | BETWEEN | BOLD | BOWL | BOXES | BOXGAP | BOXWIDTH | BUGFIX | GCM | BY | CACHE | CALC | CAPS | CELL | CHANGE | CLEAR2 | CLIPBOARD | CLOSEBANKS | CODE | MOVE | REMOVE | COLNAMES | COLORS | COLS | DELIMITER | DATEFORMAT | DATETYPE | COMMAND1 | COMMAND2 | COMMAND | COMMA | COMPRESS | CONSTANT | CONST | CONTINUE | CONV1 | CONV2 | CONV | COPYLOCAL | CPLOT | CREATEVARS | CSV | SDF | CURROW | DAMP | DANISH | DASHTYPE | DATABANK | DATAWIDTH | DATA | DATES | DEBUG | DECIMALSEPARATOR | DEC | DEFAULT | DETAILS | DETECT | DIALOG | DIFF | DIFPRT | DIF | DIGITS | DING | DYN | DIRECT | DISPLAY | DOTS | DP | DUMOFF | DUMOF | DUMON | DUMP | DUMPOPTIONS | D | EFTER | ELEMENTS | ELSE | ELSEIF | ENGLISH | ERROR | EXCEL | EXE | EXP | EXPAND | EXTERNAL | FAILSAFE | FAIR | FAST | FEEDBACK | FEED | FIELDS | FILEWIDTH | VARIABLECODE | FILE | FILLEDCURVES | FILLSTYLE | FILTER | FIRSTCOLWIDTH | FIRST | FIX | FLAT | NAMECELL | DATECELL | DEP | FOLDER | FONTSIZE | FONT | FORMAT | FORWARD | FREQ | FRML | FROM | GAMS | GAUSS | GBK | GDIFF | GDIF | GDXOPT | GDX | GEKKO18 | GEKKO20 | GENR | GMS | GMULPRT | GNUPLOT | GOAL | GRAPH | GRIDSTYLE | GRID | GROWTH | HEADING | HIDELEFTBORDER | HIDERIGHTBORDER | HIDE | HORIZON | HPFILTER | HTML | ASBANK | TOBANK | VARLIST | FROMBANK | IGNOREMISSINGVARS | IGNOREMISSING | IGNOREVARS | IMPOSE | IMPULSES | IN | INFOFILE | INFO | INIT | INTERFACE | INTERNAL | INVERT | ROBUST | ITALIC | ITERMAX | ITERMIN | ITER | KEEP | MAP | KEY | LABELS | LABEL | LAGFIX | LAG | LANGUAGE | LAST | LEV | LINEAR | LINECOLOR | LINESPOINTS | LINES | LINEWIDTH | LISTFILE | LOGIC | LOG | LU | MACRO2 | MAIN | MAXLINES | MAX | MDATEFORMAT | MENUTABLE | MERGECOLS | MERGE | MESSAGE | METHOD | MIN | MISSING | MIXED | MODERNLOOK | MP | DL | L | RDL | RL | MULBK | MULPCT | MUTE | M | NAMES | NDEC | NDIFPRT | NEWTON | NEW | NEXT | NFAIR | NOABS | NOCR | NODIFF | NODIF | NOFILTER | NOGDIFF | NOGDIF | NOLEV | NOMAX | MAXLAG | DFMIN | LEAD | REKUR | MAXLEAD | FIT | NONANNUAL | CURRENT | NONE | NONMODEL | NOPCH | NOTIFY | NOT | NOV | NO | NWIDTH | NYTVINDU | N | OFFSET | OR | PALETTE | PARAM | PATCH | PATH | PCH | PCIMSTYLE | STYLE | PCIM | PCTPRT | PDEC | PERIOD | PLOTCODE | POINTSIZE | POINTS | POINTTYPE | POS | PREFIX | PRETTY | PRIM | OPERATORS | PRN | PRORATE | PROT | PRTX | PUDVALG | PWIDTH | PX | Q | RDP | RD | REF | REL | REMOTE | ALIAS | REORDER | REPLACE | REPEAT | REP | RESPECT | RES | RING | RN | ROWNAMES | ROWS | GROUP | LEVEL | LINK | WHERE | RP | R | SAVE | SEARCH | SECONDCOLWIDTH | SEC | SEPARATE | SER2 | SER3 | SERIES2 | SERIES3 | SETBORDER | SETBOTTOMBORDER | SETDATES | SETLEFTBORDER | SETRIGHTBORDER | SETTEXT | SETTOPBORDER | SETVALUES | SET | SHOWBORDERS | SHOWPCH | SIMPLE | SIZE | SKIP | NAN | ENGINE | NORMAL | SOLVE | SOME | SORT | SOUND | SOURCE | SPECIALMINUS | SPLINE | SPLIT | STACKED | STACK | STAMP | STARTFILE | STATIC | CHECK | STEPS | STEP | STRIP | SUBTITLE | SUFFIX | SUGGESTIONS | SWAP | SYSTEM | TABLE1 | TABLE2 | TABLEOLD | TABS | TEMP | TERMINAL | TESTRANDOMMODELCHECK | TESTRANDOMMODEL | TESTSIM | TEST | THOUSANDSSEPARATOR | TICS | TIMESPAN | TITLE | TOTAL | TO | TRANSPOSE | TREL | TRIM | TSDX | TSD | TSP | TXT | TYPE | UABS | UDIFF | UDIF | UDVALG | UGDIFF | UGDIF | ULEV | UNDO | UPCH | UPDATEFREQ | UPDX | USING | U | VALUE | VAR | VAR_KDUSJFLQO2 | VERSION | VERS | VOID | VPRT | V | WAIT | WIDTH | WINDOW | WORKING | WPLOT | WUDVALG | X2ZEROAXIS | XLABELS | XLINEAFTER | XLINEBEFORE | XLINE | XLSX | XLS | XZEROAXIS | X | XTREND | XFLAT | Y2LINE | Y2MAXHARD | Y2MAXSOFT | Y2MAX | Y2MINHARD | Y2MINSOFT | Y2MIN | Y2TITLE | Y2 | YES | YLABELS | YLINE | SHARES | ERRORS | IGNORE | YMAXHARD | YMAXSOFT | YMAX | LINE | YMINHARD | YMINSOFT | YMIN | I | YMIRROR | YTITLE | Y | ZERO | ZOOM | ZVAR );
+    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:4408:1: ident2 : ( Ident | ACCEPT | ANALYZE | CHECKOFF | CLEAR | CLIP | CLONE | CLOSE | CLS | COLLAPSE | COMPARE | COPY | COUNT | CREATE | CUT | DATE | DECOMP | DECOMP2 | DECOMP3 | EVAL | DELETE | DISP | GEKKO | DOC | DOWNLOAD | EDIT | ENDO | END | EXIT | EXO | EXPORT | FINDMISSINGDATA | BANKNAME | FLOW | META | ECHO | OBS | A3DP | A3 | ADP | AL | ADL | A3P | AD | AP | A3D | A3L | A3DL | YOY | CLOSEALL | VIEW | LIBRARY | KEEPTYPES | PREDICT | FIND | PYTHON | BROWSER | FOR | FUNCTION | GOTO | GLOBAL | HDG | HELP | IF | IF_OLD | IMPORT | INDEX | INI | INTERPOLATE | ITERSHOW | LIST | LOCK_ | LOCAL | MATRIX | MEM | MENU | MODEL | MODE | MULPRT | NAME | OLS | OPEN | OPTION | PAUSE | PIPE | PLOT | PRINT | PRI | PROCEDURE | PRT | P | R_EXPORT | R_FILE | R_RUN | PYTHON_EXPORT | PYTHON_FILE | PYTHON_RUN | READ | REBASE | RENAME | RESET | BLOCK | RESTART | RETURN2 | RUN | SERIES | SER | SHEET | SHOW | SIGN | SIM | SMOOTH | SPLICE | STOP | STRING2 | SYS | TABLE | TARGET | TELL | TIMEFILTER | TIME | TRACE | TRACE2 | TRANSLATE | TRUNCATE | UNFIX | SPEEDUP | UNLOCK_ | UNSWAP | VAL | WRITE | X12A | XEDIT | ABS | GEOMETRIC | OVERLAY | ADDBANK | SHOWBANK | SHOWFREQ | ADD | AFTER2 | AFTER | ALIGNCENTER | ALIGNLEFT | ALIGNRIGHT | ALL | AND | ANNUAL | APPEND | AREMOS | OP | ARRAY | ARROW | PARQUET | ASERIES | ASER | AS | AT2 | AUTO | AVG | A | BACKTRACK | INDICATOR | BANK1 | BANK2 | BANK | BETWEEN | BOLD | BOWL | BOXES | BOXGAP | BOXWIDTH | BUGFIX | GCM | BY | CACHE | CALC | CAPS | CELL | CHANGE | CLEAR2 | CLIPBOARD | CLOSEBANKS | CODE | MOVE | REMOVE | COLNAMES | COLORS | COLS | DELIMITER | DATEFORMAT | DATETYPE | COMMAND1 | COMMAND2 | COMMAND | COMMA | COMPRESS | CONSTANT | CONST | CONTINUE | CONV1 | CONV2 | CONV | COPYLOCAL | CPLOT | CREATEVARS | CSV | SDF | CURROW | DAMP | DANISH | DASHTYPE | DATABANK | DATAWIDTH | DATA | DATES | DEBUG | DECIMALSEPARATOR | DEC | DEFAULT | DETAILS | DETECT | DIALOG | DIFF | DIFPRT | DIF | DIGITS | DING | DYN | DIRECT | DISPLAY | DOTS | DP | DUMOFF | DUMOF | DUMON | DUMP | DUMPOPTIONS | D | EFTER | ELEMENTS | ELSE | ELSEIF | ENGLISH | ERROR | EXCEL | EXE | EXP | EXPAND | EXTERNAL | FAILSAFE | FAIR | FAST | FEEDBACK | FEED | FIELDS | FILEWIDTH | VARIABLECODE | FILE | FILLEDCURVES | FILLSTYLE | FILTER | FIRSTCOLWIDTH | FIRST | FIX | FLAT | NAMECELL | DATECELL | DEP | FOLDER | FONTSIZE | FONT | FORMAT | FORWARD | FREQ | FRML | FROM | GAMS | GAUSS | GBK | GDIFF | GDIF | GDXOPT | GDX | GEKKO18 | GEKKO20 | GENR | GMS | GMULPRT | GNUPLOT | GOAL | GRAPH | GRIDSTYLE | GRID | GROWTH | HEADING | HIDELEFTBORDER | HIDERIGHTBORDER | HIDE | HORIZON | HPFILTER | HTML | ASBANK | TOBANK | VARLIST | FROMBANK | IGNOREMISSINGVARS | IGNOREMISSING | IGNOREVARS | IMPOSE | IMPULSES | IN | INFOFILE | INFO | INIT | INTERFACE | INTERNAL | INVERT | ROBUST | ITALIC | ITERMAX | ITERMIN | ITER | KEEP | MAP | KEY | LABELS | LABEL | LAGFIX | LAG | LANGUAGE | LAST | LEV | LINEAR | LINECOLOR | LINESPOINTS | LINES | LINEWIDTH | LISTFILE | LOGIC | LOG | LU | MACRO2 | MAIN | MAXLINES | MAX | MDATEFORMAT | MENUTABLE | MERGECOLS | MERGE | MESSAGE | METHOD | MIN | MISSING | MIXED | MODERNLOOK | MP | DL | L | RDL | RL | MULBK | MULPCT | MUTE | M | NAMES | NDEC | NDIFPRT | NEWTON | NEW | NEXT | NFAIR | NOABS | NOCR | NODIFF | NODIF | NOFILTER | NOGDIFF | NOGDIF | NOLEV | NOMAX | MAXLAG | DFMIN | LEAD | REKUR | MAXLEAD | FIT | NONANNUAL | CURRENT | NONE | NONMODEL | NOPCH | NOTIFY | NOT | NOV | NO | NWIDTH | NYTVINDU | N | OFFSET | OR | PALETTE | PARAM | PATCH | PATH | PCH | PCIMSTYLE | STYLE | PCIM | PCTPRT | PDEC | PERIOD | PLOTCODE | POINTSIZE | POINTS | POINTTYPE | POS | PREFIX | PRETTY | PRIM | OPERATORS | PRN | PRORATE | PROT | PRTX | PUDVALG | PWIDTH | PX | Q | RDP | RD | REF | REL | REMOTE | ALIAS | REORDER | REPLACE | REPEAT | REP | RESPECT | RES | RING | RN | ROWNAMES | ROWS | GROUP | LEVEL | LINK | WHERE | RP | R | SAVE | SEARCH | SECONDCOLWIDTH | SEC | SEPARATE | SER2 | SER3 | SERIES2 | SERIES3 | SETBORDER | SETBOTTOMBORDER | SETDATES | SETLEFTBORDER | SETRIGHTBORDER | SETTEXT | SETTOPBORDER | SETVALUES | SET | SHOWBORDERS | SHOWPCH | SIMPLE | SIZE | SKIP | NAN | ENGINE | NORMAL | SOLVE | SOME | SORT | SOUND | SOURCE | SPECIALMINUS | SPLINE | SPLIT | STACKED | STACK | STAMP | STARTFILE | STATIC | CHECK | STEPS | STEP | STRIP | SUBTITLE | SUFFIX | SUGGESTIONS | SWAP | SYSTEM | TABLE1 | TABLE2 | TABLEOLD | TABS | TEMP | TERMINAL | TESTRANDOMMODELCHECK | TESTRANDOMMODEL | TESTSIM | TEST | THOUSANDSSEPARATOR | TICS | TIMESPAN | TITLE | TOTAL | TO | TRANSPOSE | TREL | TRIM | TSDX | TSD | TSP | TXT | TYPE | UABS | UDIFF | UDIF | UDVALG | UGDIFF | UGDIF | ULEV | UNDO | UPCH | UPDATEFREQ | UPDX | USING | U | VALUE | VAR | VAR_EVALFUNCTION | VERSION | VERS | VOID | VPRT | V | WAIT | WIDTH | WINDOW | WORKING | WPLOT | WUDVALG | X2ZEROAXIS | XLABELS | XLINEAFTER | XLINEBEFORE | XLINE | XLSX | XLS | XZEROAXIS | X | XTREND | XFLAT | Y2LINE | Y2MAXHARD | Y2MAXSOFT | Y2MAX | Y2MINHARD | Y2MINSOFT | Y2MIN | Y2TITLE | Y2 | YES | YLABELS | YLINE | SHARES | ERRORS | IGNORE | YMAXHARD | YMAXSOFT | YMAX | LINE | YMINHARD | YMINSOFT | YMIN | I | YMIRROR | YTITLE | Y | ZERO | ZOOM | ZVAR );
     public Cmd4Parser.ident2_return ident2() // throws RecognitionException [1]
     {   
         Cmd4Parser.ident2_return retval = new Cmd4Parser.ident2_return();
@@ -115831,7 +115831,7 @@ public partial class Cmd4Parser : Parser
     	    {
     	    	return retval; 
     	    }
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:4408:7: ( Ident | ACCEPT | ANALYZE | CHECKOFF | CLEAR | CLIP | CLONE | CLOSE | CLS | COLLAPSE | COMPARE | COPY | COUNT | CREATE | CUT | DATE | DECOMP | DECOMP2 | DECOMP3 | EVAL | DELETE | DISP | GEKKO | DOC | DOWNLOAD | EDIT | ENDO | END | EXIT | EXO | EXPORT | FINDMISSINGDATA | BANKNAME | FLOW | META | ECHO | OBS | A3DP | A3 | ADP | AL | ADL | A3P | AD | AP | A3D | A3L | A3DL | YOY | CLOSEALL | VIEW | LIBRARY | KEEPTYPES | PREDICT | FIND | PYTHON | BROWSER | FOR | FUNCTION | GOTO | GLOBAL | HDG | HELP | IF | IF_OLD | IMPORT | INDEX | INI | INTERPOLATE | ITERSHOW | LIST | LOCK_ | LOCAL | MATRIX | MEM | MENU | MODEL | MODE | MULPRT | NAME | OLS | OPEN | OPTION | PAUSE | PIPE | PLOT | PRINT | PRI | PROCEDURE | PRT | P | R_EXPORT | R_FILE | R_RUN | PYTHON_EXPORT | PYTHON_FILE | PYTHON_RUN | READ | REBASE | RENAME | RESET | BLOCK | RESTART | RETURN2 | RUN | SERIES | SER | SHEET | SHOW | SIGN | SIM | SMOOTH | SPLICE | STOP | STRING2 | SYS | TABLE | TARGET | TELL | TIMEFILTER | TIME | TRACE | TRACE2 | TRANSLATE | TRUNCATE | UNFIX | SPEEDUP | UNLOCK_ | UNSWAP | VAL | WRITE | X12A | XEDIT | ABS | GEOMETRIC | OVERLAY | ADDBANK | SHOWBANK | SHOWFREQ | ADD | AFTER2 | AFTER | ALIGNCENTER | ALIGNLEFT | ALIGNRIGHT | ALL | AND | ANNUAL | APPEND | AREMOS | OP | ARRAY | ARROW | PARQUET | ASERIES | ASER | AS | AT2 | AUTO | AVG | A | BACKTRACK | INDICATOR | BANK1 | BANK2 | BANK | BETWEEN | BOLD | BOWL | BOXES | BOXGAP | BOXWIDTH | BUGFIX | GCM | BY | CACHE | CALC | CAPS | CELL | CHANGE | CLEAR2 | CLIPBOARD | CLOSEBANKS | CODE | MOVE | REMOVE | COLNAMES | COLORS | COLS | DELIMITER | DATEFORMAT | DATETYPE | COMMAND1 | COMMAND2 | COMMAND | COMMA | COMPRESS | CONSTANT | CONST | CONTINUE | CONV1 | CONV2 | CONV | COPYLOCAL | CPLOT | CREATEVARS | CSV | SDF | CURROW | DAMP | DANISH | DASHTYPE | DATABANK | DATAWIDTH | DATA | DATES | DEBUG | DECIMALSEPARATOR | DEC | DEFAULT | DETAILS | DETECT | DIALOG | DIFF | DIFPRT | DIF | DIGITS | DING | DYN | DIRECT | DISPLAY | DOTS | DP | DUMOFF | DUMOF | DUMON | DUMP | DUMPOPTIONS | D | EFTER | ELEMENTS | ELSE | ELSEIF | ENGLISH | ERROR | EXCEL | EXE | EXP | EXPAND | EXTERNAL | FAILSAFE | FAIR | FAST | FEEDBACK | FEED | FIELDS | FILEWIDTH | VARIABLECODE | FILE | FILLEDCURVES | FILLSTYLE | FILTER | FIRSTCOLWIDTH | FIRST | FIX | FLAT | NAMECELL | DATECELL | DEP | FOLDER | FONTSIZE | FONT | FORMAT | FORWARD | FREQ | FRML | FROM | GAMS | GAUSS | GBK | GDIFF | GDIF | GDXOPT | GDX | GEKKO18 | GEKKO20 | GENR | GMS | GMULPRT | GNUPLOT | GOAL | GRAPH | GRIDSTYLE | GRID | GROWTH | HEADING | HIDELEFTBORDER | HIDERIGHTBORDER | HIDE | HORIZON | HPFILTER | HTML | ASBANK | TOBANK | VARLIST | FROMBANK | IGNOREMISSINGVARS | IGNOREMISSING | IGNOREVARS | IMPOSE | IMPULSES | IN | INFOFILE | INFO | INIT | INTERFACE | INTERNAL | INVERT | ROBUST | ITALIC | ITERMAX | ITERMIN | ITER | KEEP | MAP | KEY | LABELS | LABEL | LAGFIX | LAG | LANGUAGE | LAST | LEV | LINEAR | LINECOLOR | LINESPOINTS | LINES | LINEWIDTH | LISTFILE | LOGIC | LOG | LU | MACRO2 | MAIN | MAXLINES | MAX | MDATEFORMAT | MENUTABLE | MERGECOLS | MERGE | MESSAGE | METHOD | MIN | MISSING | MIXED | MODERNLOOK | MP | DL | L | RDL | RL | MULBK | MULPCT | MUTE | M | NAMES | NDEC | NDIFPRT | NEWTON | NEW | NEXT | NFAIR | NOABS | NOCR | NODIFF | NODIF | NOFILTER | NOGDIFF | NOGDIF | NOLEV | NOMAX | MAXLAG | DFMIN | LEAD | REKUR | MAXLEAD | FIT | NONANNUAL | CURRENT | NONE | NONMODEL | NOPCH | NOTIFY | NOT | NOV | NO | NWIDTH | NYTVINDU | N | OFFSET | OR | PALETTE | PARAM | PATCH | PATH | PCH | PCIMSTYLE | STYLE | PCIM | PCTPRT | PDEC | PERIOD | PLOTCODE | POINTSIZE | POINTS | POINTTYPE | POS | PREFIX | PRETTY | PRIM | OPERATORS | PRN | PRORATE | PROT | PRTX | PUDVALG | PWIDTH | PX | Q | RDP | RD | REF | REL | REMOTE | ALIAS | REORDER | REPLACE | REPEAT | REP | RESPECT | RES | RING | RN | ROWNAMES | ROWS | GROUP | LEVEL | LINK | WHERE | RP | R | SAVE | SEARCH | SECONDCOLWIDTH | SEC | SEPARATE | SER2 | SER3 | SERIES2 | SERIES3 | SETBORDER | SETBOTTOMBORDER | SETDATES | SETLEFTBORDER | SETRIGHTBORDER | SETTEXT | SETTOPBORDER | SETVALUES | SET | SHOWBORDERS | SHOWPCH | SIMPLE | SIZE | SKIP | NAN | ENGINE | NORMAL | SOLVE | SOME | SORT | SOUND | SOURCE | SPECIALMINUS | SPLINE | SPLIT | STACKED | STACK | STAMP | STARTFILE | STATIC | CHECK | STEPS | STEP | STRIP | SUBTITLE | SUFFIX | SUGGESTIONS | SWAP | SYSTEM | TABLE1 | TABLE2 | TABLEOLD | TABS | TEMP | TERMINAL | TESTRANDOMMODELCHECK | TESTRANDOMMODEL | TESTSIM | TEST | THOUSANDSSEPARATOR | TICS | TIMESPAN | TITLE | TOTAL | TO | TRANSPOSE | TREL | TRIM | TSDX | TSD | TSP | TXT | TYPE | UABS | UDIFF | UDIF | UDVALG | UGDIFF | UGDIF | ULEV | UNDO | UPCH | UPDATEFREQ | UPDX | USING | U | VALUE | VAR | VAR_KDUSJFLQO2 | VERSION | VERS | VOID | VPRT | V | WAIT | WIDTH | WINDOW | WORKING | WPLOT | WUDVALG | X2ZEROAXIS | XLABELS | XLINEAFTER | XLINEBEFORE | XLINE | XLSX | XLS | XZEROAXIS | X | XTREND | XFLAT | Y2LINE | Y2MAXHARD | Y2MAXSOFT | Y2MAX | Y2MINHARD | Y2MINSOFT | Y2MIN | Y2TITLE | Y2 | YES | YLABELS | YLINE | SHARES | ERRORS | IGNORE | YMAXHARD | YMAXSOFT | YMAX | LINE | YMINHARD | YMINSOFT | YMIN | I | YMIRROR | YTITLE | Y | ZERO | ZOOM | ZVAR )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:4408:7: ( Ident | ACCEPT | ANALYZE | CHECKOFF | CLEAR | CLIP | CLONE | CLOSE | CLS | COLLAPSE | COMPARE | COPY | COUNT | CREATE | CUT | DATE | DECOMP | DECOMP2 | DECOMP3 | EVAL | DELETE | DISP | GEKKO | DOC | DOWNLOAD | EDIT | ENDO | END | EXIT | EXO | EXPORT | FINDMISSINGDATA | BANKNAME | FLOW | META | ECHO | OBS | A3DP | A3 | ADP | AL | ADL | A3P | AD | AP | A3D | A3L | A3DL | YOY | CLOSEALL | VIEW | LIBRARY | KEEPTYPES | PREDICT | FIND | PYTHON | BROWSER | FOR | FUNCTION | GOTO | GLOBAL | HDG | HELP | IF | IF_OLD | IMPORT | INDEX | INI | INTERPOLATE | ITERSHOW | LIST | LOCK_ | LOCAL | MATRIX | MEM | MENU | MODEL | MODE | MULPRT | NAME | OLS | OPEN | OPTION | PAUSE | PIPE | PLOT | PRINT | PRI | PROCEDURE | PRT | P | R_EXPORT | R_FILE | R_RUN | PYTHON_EXPORT | PYTHON_FILE | PYTHON_RUN | READ | REBASE | RENAME | RESET | BLOCK | RESTART | RETURN2 | RUN | SERIES | SER | SHEET | SHOW | SIGN | SIM | SMOOTH | SPLICE | STOP | STRING2 | SYS | TABLE | TARGET | TELL | TIMEFILTER | TIME | TRACE | TRACE2 | TRANSLATE | TRUNCATE | UNFIX | SPEEDUP | UNLOCK_ | UNSWAP | VAL | WRITE | X12A | XEDIT | ABS | GEOMETRIC | OVERLAY | ADDBANK | SHOWBANK | SHOWFREQ | ADD | AFTER2 | AFTER | ALIGNCENTER | ALIGNLEFT | ALIGNRIGHT | ALL | AND | ANNUAL | APPEND | AREMOS | OP | ARRAY | ARROW | PARQUET | ASERIES | ASER | AS | AT2 | AUTO | AVG | A | BACKTRACK | INDICATOR | BANK1 | BANK2 | BANK | BETWEEN | BOLD | BOWL | BOXES | BOXGAP | BOXWIDTH | BUGFIX | GCM | BY | CACHE | CALC | CAPS | CELL | CHANGE | CLEAR2 | CLIPBOARD | CLOSEBANKS | CODE | MOVE | REMOVE | COLNAMES | COLORS | COLS | DELIMITER | DATEFORMAT | DATETYPE | COMMAND1 | COMMAND2 | COMMAND | COMMA | COMPRESS | CONSTANT | CONST | CONTINUE | CONV1 | CONV2 | CONV | COPYLOCAL | CPLOT | CREATEVARS | CSV | SDF | CURROW | DAMP | DANISH | DASHTYPE | DATABANK | DATAWIDTH | DATA | DATES | DEBUG | DECIMALSEPARATOR | DEC | DEFAULT | DETAILS | DETECT | DIALOG | DIFF | DIFPRT | DIF | DIGITS | DING | DYN | DIRECT | DISPLAY | DOTS | DP | DUMOFF | DUMOF | DUMON | DUMP | DUMPOPTIONS | D | EFTER | ELEMENTS | ELSE | ELSEIF | ENGLISH | ERROR | EXCEL | EXE | EXP | EXPAND | EXTERNAL | FAILSAFE | FAIR | FAST | FEEDBACK | FEED | FIELDS | FILEWIDTH | VARIABLECODE | FILE | FILLEDCURVES | FILLSTYLE | FILTER | FIRSTCOLWIDTH | FIRST | FIX | FLAT | NAMECELL | DATECELL | DEP | FOLDER | FONTSIZE | FONT | FORMAT | FORWARD | FREQ | FRML | FROM | GAMS | GAUSS | GBK | GDIFF | GDIF | GDXOPT | GDX | GEKKO18 | GEKKO20 | GENR | GMS | GMULPRT | GNUPLOT | GOAL | GRAPH | GRIDSTYLE | GRID | GROWTH | HEADING | HIDELEFTBORDER | HIDERIGHTBORDER | HIDE | HORIZON | HPFILTER | HTML | ASBANK | TOBANK | VARLIST | FROMBANK | IGNOREMISSINGVARS | IGNOREMISSING | IGNOREVARS | IMPOSE | IMPULSES | IN | INFOFILE | INFO | INIT | INTERFACE | INTERNAL | INVERT | ROBUST | ITALIC | ITERMAX | ITERMIN | ITER | KEEP | MAP | KEY | LABELS | LABEL | LAGFIX | LAG | LANGUAGE | LAST | LEV | LINEAR | LINECOLOR | LINESPOINTS | LINES | LINEWIDTH | LISTFILE | LOGIC | LOG | LU | MACRO2 | MAIN | MAXLINES | MAX | MDATEFORMAT | MENUTABLE | MERGECOLS | MERGE | MESSAGE | METHOD | MIN | MISSING | MIXED | MODERNLOOK | MP | DL | L | RDL | RL | MULBK | MULPCT | MUTE | M | NAMES | NDEC | NDIFPRT | NEWTON | NEW | NEXT | NFAIR | NOABS | NOCR | NODIFF | NODIF | NOFILTER | NOGDIFF | NOGDIF | NOLEV | NOMAX | MAXLAG | DFMIN | LEAD | REKUR | MAXLEAD | FIT | NONANNUAL | CURRENT | NONE | NONMODEL | NOPCH | NOTIFY | NOT | NOV | NO | NWIDTH | NYTVINDU | N | OFFSET | OR | PALETTE | PARAM | PATCH | PATH | PCH | PCIMSTYLE | STYLE | PCIM | PCTPRT | PDEC | PERIOD | PLOTCODE | POINTSIZE | POINTS | POINTTYPE | POS | PREFIX | PRETTY | PRIM | OPERATORS | PRN | PRORATE | PROT | PRTX | PUDVALG | PWIDTH | PX | Q | RDP | RD | REF | REL | REMOTE | ALIAS | REORDER | REPLACE | REPEAT | REP | RESPECT | RES | RING | RN | ROWNAMES | ROWS | GROUP | LEVEL | LINK | WHERE | RP | R | SAVE | SEARCH | SECONDCOLWIDTH | SEC | SEPARATE | SER2 | SER3 | SERIES2 | SERIES3 | SETBORDER | SETBOTTOMBORDER | SETDATES | SETLEFTBORDER | SETRIGHTBORDER | SETTEXT | SETTOPBORDER | SETVALUES | SET | SHOWBORDERS | SHOWPCH | SIMPLE | SIZE | SKIP | NAN | ENGINE | NORMAL | SOLVE | SOME | SORT | SOUND | SOURCE | SPECIALMINUS | SPLINE | SPLIT | STACKED | STACK | STAMP | STARTFILE | STATIC | CHECK | STEPS | STEP | STRIP | SUBTITLE | SUFFIX | SUGGESTIONS | SWAP | SYSTEM | TABLE1 | TABLE2 | TABLEOLD | TABS | TEMP | TERMINAL | TESTRANDOMMODELCHECK | TESTRANDOMMODEL | TESTSIM | TEST | THOUSANDSSEPARATOR | TICS | TIMESPAN | TITLE | TOTAL | TO | TRANSPOSE | TREL | TRIM | TSDX | TSD | TSP | TXT | TYPE | UABS | UDIFF | UDIF | UDVALG | UGDIFF | UGDIF | ULEV | UNDO | UPCH | UPDATEFREQ | UPDX | USING | U | VALUE | VAR | VAR_EVALFUNCTION | VERSION | VERS | VOID | VPRT | V | WAIT | WIDTH | WINDOW | WORKING | WPLOT | WUDVALG | X2ZEROAXIS | XLABELS | XLINEAFTER | XLINEBEFORE | XLINE | XLSX | XLS | XZEROAXIS | X | XTREND | XFLAT | Y2LINE | Y2MAXHARD | Y2MAXSOFT | Y2MAX | Y2MINHARD | Y2MINSOFT | Y2MIN | Y2TITLE | Y2 | YES | YLABELS | YLINE | SHARES | ERRORS | IGNORE | YMAXHARD | YMAXSOFT | YMAX | LINE | YMINHARD | YMINSOFT | YMIN | I | YMIRROR | YTITLE | Y | ZERO | ZOOM | ZVAR )
             // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:
             {
             	root_0 = (object)adaptor.GetNilNode();
@@ -115889,7 +115889,7 @@ public partial class Cmd4Parser : Parser
     };
 
     // $ANTLR start "ident3"
-    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5012:1: ident3 : ( Ident | META | ASBANK | TOBANK | VARLIST | FROMBANK | ABS | GEOMETRIC | OVERLAY | ADDBANK | SHOWBANK | SHOWFREQ | ADD | AFTER2 | AFTER | ALIGNCENTER | ALIGNLEFT | ALIGNRIGHT | ALL | AND | ANNUAL | APPEND | AREMOS | OP | ARRAY | ARROW | PARQUET | ASERIES | ASER | AS | AT2 | AUTO | AVG | A | BACKTRACK | INDICATOR | BANK1 | BANK2 | BANK | BETWEEN | BOLD | BOWL | BOXES | BOXGAP | BOXWIDTH | BUGFIX | GCM | BY | CACHE | CALC | CAPS | CELL | CHANGE | CLIPBOARD | CLOSEBANKS | CODE | MOVE | REMOVE | COLNAMES | COLORS | COLS | DELIMITER | DATEFORMAT | DATETYPE | COMMAND1 | COMMAND2 | COMMAND | COMMA | COMPRESS | CONSTANT | CONST | CONTINUE | CONV1 | CONV2 | CONV | COPYLOCAL | CPLOT | CREATEVARS | CSV | SDF | CURROW | DAMP | DANISH | DASHTYPE | DATABANK | DATAWIDTH | DATA | DATES | DEBUG | DECIMALSEPARATOR | DEC | DEFAULT | DETAILS | DETECT | DIALOG | DIFF | DIFPRT | DIF | DIGITS | DING | DYN | DIRECT | DISPLAY | DOTS | DP | D | EFTER | ELEMENTS | ENGLISH | ERROR | EXCEL | EXE | EXP | EXPAND | EXTERNAL | FAILSAFE | FAIR | FAST | FEEDBACK | FEED | FIELDS | FILEWIDTH | VARIABLECODE | FILE | FILLEDCURVES | FILLSTYLE | FILTER | FIRSTCOLWIDTH | FIRST | FIX | FLAT | DATECELL | DEP | NAMECELL | FOLDER | FONTSIZE | FONT | FORMAT | FORWARD | FREQ | FRML | FROM | GAMS | GAUSS | GBK | GDIFF | GDIF | GDXOPT | GDX | GEKKO18 | GEKKO20 | GENR | GMS | GNUPLOT | GOAL | GRAPH | GRIDSTYLE | GRID | GROWTH | HEADING | HIDELEFTBORDER | HIDERIGHTBORDER | HIDE | HORIZON | HPFILTER | HTML | IGNOREMISSINGVARS | IGNOREMISSING | IGNOREVARS | IMPOSE | IMPULSES | I | IN | INFOFILE | INFO | INIT | INTERFACE | INTERNAL | INVERT | ROBUST | ITALIC | ITERMAX | ITERMIN | ITER | KEEP | KEY | LABELS | LABEL | LAGFIX | LAG | LANGUAGE | LAST | LEV | LINECOLOR | LINESPOINTS | LINES | LINEWIDTH | LISTFILE | LOGIC | LOG | LU | MACRO2 | MAIN | MAXLINES | MAX | MDATEFORMAT | MENUTABLE | MERGECOLS | MERGE | MESSAGE | METHOD | MIN | MISSING | MIXED | MODERNLOOK | MP | DL | L | RDL | RL | MULBK | MULPCT | MUTE | M | NAMES | NDEC | NDIFPRT | NEWTON | NEW | NEXT | NFAIR | NOABS | NOCR | NODIFF | NODIF | NOFILTER | NOGDIFF | NOGDIF | NOLEV | NOMAX | MAXLAG | DFMIN | LEAD | REKUR | MAXLEAD | FIT | PYTHON | NONANNUAL | CURRENT | NONE | NONMODEL | NOPCH | NOTIFY | NOT | NOV | NO | NWIDTH | NYTVINDU | N | OFFSET | OR | PALETTE | PARAM | PATCH | PATH | PCH | PCIMSTYLE | STYLE | PCIM | PCTPRT | PDEC | PERIOD | PLOTCODE | POINTSIZE | POINTS | POINTTYPE | POS | PREFIX | PRETTY | PRIM | OPERATORS | PRN | PRORATE | PROT | PRTX | PUDVALG | PWIDTH | PX | Q | RDP | RD | REF | REL | REMOTE | ALIAS | REORDER | REPLACE | REPEAT | REP | RESPECT | RES | RING | RN | ROWNAMES | ROWS | GROUP | LEVEL | LINK | WHERE | RP | R | SAVE | SEARCH | SECONDCOLWIDTH | SEC | SEPARATE | SETBORDER | SETBOTTOMBORDER | SETDATES | SETLEFTBORDER | SETRIGHTBORDER | SETTEXT | SETTOPBORDER | SETVALUES | SET | SHOWBORDERS | SHOWPCH | SIMPLE | SIZE | SKIP | NAN | ENGINE | NORMAL | SOLVE | SOME | SORT | SOUND | SOURCE | SPECIALMINUS | SPLIT | STACKED | STACK | STAMP | STARTFILE | STATIC | CHECK | STEPS | STEP | STRIP | SUBTITLE | SUFFIX | SUGGESTIONS | SWAP | SYSTEM | TABLE1 | TABLE2 | TABLEOLD | TABS | TEMP | TERMINAL | TESTRANDOMMODELCHECK | TESTRANDOMMODEL | TESTSIM | TEST | THOUSANDSSEPARATOR | TICS | TIMESPAN | TITLE | TOTAL | TO | TRANSPOSE | TREL | TRIM | TSDX | TSD | TSP | TXT | TYPE | UABS | UDIFF | UDIF | UDVALG | UGDIFF | UGDIF | ULEV | UNDO | UPCH | UPDATEFREQ | UPDX | USING | U | VALUE | VAR | VAR_KDUSJFLQO2 | VERSION | VERS | VOID | VPRT | V | WAIT | WIDTH | WINDOW | WORKING | WPLOT | WUDVALG | X2ZEROAXIS | XLABELS | XLINEAFTER | XLINEBEFORE | XLINE | XLSX | XLS | XZEROAXIS | X | XTREND | XFLAT | Y2LINE | Y2MAXHARD | Y2MAXSOFT | Y2MAX | Y2MINHARD | Y2MINSOFT | Y2MIN | Y2TITLE | Y2 | YES | YLABELS | YLINE | SHARES | ERRORS | IGNORE | YMAXHARD | YMAXSOFT | YMAX | LINE | YMINHARD | YMINSOFT | YMIN | YMIRROR | YTITLE | Y | ZERO | ZOOM | ZVAR );
+    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5012:1: ident3 : ( Ident | META | ASBANK | TOBANK | VARLIST | FROMBANK | ABS | GEOMETRIC | OVERLAY | ADDBANK | SHOWBANK | SHOWFREQ | ADD | AFTER2 | AFTER | ALIGNCENTER | ALIGNLEFT | ALIGNRIGHT | ALL | AND | ANNUAL | APPEND | AREMOS | OP | ARRAY | ARROW | PARQUET | ASERIES | ASER | AS | AT2 | AUTO | AVG | A | BACKTRACK | INDICATOR | BANK1 | BANK2 | BANK | BETWEEN | BOLD | BOWL | BOXES | BOXGAP | BOXWIDTH | BUGFIX | GCM | BY | CACHE | CALC | CAPS | CELL | CHANGE | CLIPBOARD | CLOSEBANKS | CODE | MOVE | REMOVE | COLNAMES | COLORS | COLS | DELIMITER | DATEFORMAT | DATETYPE | COMMAND1 | COMMAND2 | COMMAND | COMMA | COMPRESS | CONSTANT | CONST | CONTINUE | CONV1 | CONV2 | CONV | COPYLOCAL | CPLOT | CREATEVARS | CSV | SDF | CURROW | DAMP | DANISH | DASHTYPE | DATABANK | DATAWIDTH | DATA | DATES | DEBUG | DECIMALSEPARATOR | DEC | DEFAULT | DETAILS | DETECT | DIALOG | DIFF | DIFPRT | DIF | DIGITS | DING | DYN | DIRECT | DISPLAY | DOTS | DP | D | EFTER | ELEMENTS | ENGLISH | ERROR | EXCEL | EXE | EXP | EXPAND | EXTERNAL | FAILSAFE | FAIR | FAST | FEEDBACK | FEED | FIELDS | FILEWIDTH | VARIABLECODE | FILE | FILLEDCURVES | FILLSTYLE | FILTER | FIRSTCOLWIDTH | FIRST | FIX | FLAT | DATECELL | DEP | NAMECELL | FOLDER | FONTSIZE | FONT | FORMAT | FORWARD | FREQ | FRML | FROM | GAMS | GAUSS | GBK | GDIFF | GDIF | GDXOPT | GDX | GEKKO18 | GEKKO20 | GENR | GMS | GNUPLOT | GOAL | GRAPH | GRIDSTYLE | GRID | GROWTH | HEADING | HIDELEFTBORDER | HIDERIGHTBORDER | HIDE | HORIZON | HPFILTER | HTML | IGNOREMISSINGVARS | IGNOREMISSING | IGNOREVARS | IMPOSE | IMPULSES | I | IN | INFOFILE | INFO | INIT | INTERFACE | INTERNAL | INVERT | ROBUST | ITALIC | ITERMAX | ITERMIN | ITER | KEEP | KEY | LABELS | LABEL | LAGFIX | LAG | LANGUAGE | LAST | LEV | LINECOLOR | LINESPOINTS | LINES | LINEWIDTH | LISTFILE | LOGIC | LOG | LU | MACRO2 | MAIN | MAXLINES | MAX | MDATEFORMAT | MENUTABLE | MERGECOLS | MERGE | MESSAGE | METHOD | MIN | MISSING | MIXED | MODERNLOOK | MP | DL | L | RDL | RL | MULBK | MULPCT | MUTE | M | NAMES | NDEC | NDIFPRT | NEWTON | NEW | NEXT | NFAIR | NOABS | NOCR | NODIFF | NODIF | NOFILTER | NOGDIFF | NOGDIF | NOLEV | NOMAX | MAXLAG | DFMIN | LEAD | REKUR | MAXLEAD | FIT | PYTHON | NONANNUAL | CURRENT | NONE | NONMODEL | NOPCH | NOTIFY | NOT | NOV | NO | NWIDTH | NYTVINDU | N | OFFSET | OR | PALETTE | PARAM | PATCH | PATH | PCH | PCIMSTYLE | STYLE | PCIM | PCTPRT | PDEC | PERIOD | PLOTCODE | POINTSIZE | POINTS | POINTTYPE | POS | PREFIX | PRETTY | PRIM | OPERATORS | PRN | PRORATE | PROT | PRTX | PUDVALG | PWIDTH | PX | Q | RDP | RD | REF | REL | REMOTE | ALIAS | REORDER | REPLACE | REPEAT | REP | RESPECT | RES | RING | RN | ROWNAMES | ROWS | GROUP | LEVEL | LINK | WHERE | RP | R | SAVE | SEARCH | SECONDCOLWIDTH | SEC | SEPARATE | SETBORDER | SETBOTTOMBORDER | SETDATES | SETLEFTBORDER | SETRIGHTBORDER | SETTEXT | SETTOPBORDER | SETVALUES | SET | SHOWBORDERS | SHOWPCH | SIMPLE | SIZE | SKIP | NAN | ENGINE | NORMAL | SOLVE | SOME | SORT | SOUND | SOURCE | SPECIALMINUS | SPLIT | STACKED | STACK | STAMP | STARTFILE | STATIC | CHECK | STEPS | STEP | STRIP | SUBTITLE | SUFFIX | SUGGESTIONS | SWAP | SYSTEM | TABLE1 | TABLE2 | TABLEOLD | TABS | TEMP | TERMINAL | TESTRANDOMMODELCHECK | TESTRANDOMMODEL | TESTSIM | TEST | THOUSANDSSEPARATOR | TICS | TIMESPAN | TITLE | TOTAL | TO | TRANSPOSE | TREL | TRIM | TSDX | TSD | TSP | TXT | TYPE | UABS | UDIFF | UDIF | UDVALG | UGDIFF | UGDIF | ULEV | UNDO | UPCH | UPDATEFREQ | UPDX | USING | U | VALUE | VAR | VAR_EVALFUNCTION | VERSION | VERS | VOID | VPRT | V | WAIT | WIDTH | WINDOW | WORKING | WPLOT | WUDVALG | X2ZEROAXIS | XLABELS | XLINEAFTER | XLINEBEFORE | XLINE | XLSX | XLS | XZEROAXIS | X | XTREND | XFLAT | Y2LINE | Y2MAXHARD | Y2MAXSOFT | Y2MAX | Y2MINHARD | Y2MINSOFT | Y2MIN | Y2TITLE | Y2 | YES | YLABELS | YLINE | SHARES | ERRORS | IGNORE | YMAXHARD | YMAXSOFT | YMAX | LINE | YMINHARD | YMINSOFT | YMIN | YMIRROR | YTITLE | Y | ZERO | ZOOM | ZVAR );
     public Cmd4Parser.ident3_return ident3() // throws RecognitionException [1]
     {   
         Cmd4Parser.ident3_return retval = new Cmd4Parser.ident3_return();
@@ -115907,7 +115907,7 @@ public partial class Cmd4Parser : Parser
     	    {
     	    	return retval; 
     	    }
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5012:7: ( Ident | META | ASBANK | TOBANK | VARLIST | FROMBANK | ABS | GEOMETRIC | OVERLAY | ADDBANK | SHOWBANK | SHOWFREQ | ADD | AFTER2 | AFTER | ALIGNCENTER | ALIGNLEFT | ALIGNRIGHT | ALL | AND | ANNUAL | APPEND | AREMOS | OP | ARRAY | ARROW | PARQUET | ASERIES | ASER | AS | AT2 | AUTO | AVG | A | BACKTRACK | INDICATOR | BANK1 | BANK2 | BANK | BETWEEN | BOLD | BOWL | BOXES | BOXGAP | BOXWIDTH | BUGFIX | GCM | BY | CACHE | CALC | CAPS | CELL | CHANGE | CLIPBOARD | CLOSEBANKS | CODE | MOVE | REMOVE | COLNAMES | COLORS | COLS | DELIMITER | DATEFORMAT | DATETYPE | COMMAND1 | COMMAND2 | COMMAND | COMMA | COMPRESS | CONSTANT | CONST | CONTINUE | CONV1 | CONV2 | CONV | COPYLOCAL | CPLOT | CREATEVARS | CSV | SDF | CURROW | DAMP | DANISH | DASHTYPE | DATABANK | DATAWIDTH | DATA | DATES | DEBUG | DECIMALSEPARATOR | DEC | DEFAULT | DETAILS | DETECT | DIALOG | DIFF | DIFPRT | DIF | DIGITS | DING | DYN | DIRECT | DISPLAY | DOTS | DP | D | EFTER | ELEMENTS | ENGLISH | ERROR | EXCEL | EXE | EXP | EXPAND | EXTERNAL | FAILSAFE | FAIR | FAST | FEEDBACK | FEED | FIELDS | FILEWIDTH | VARIABLECODE | FILE | FILLEDCURVES | FILLSTYLE | FILTER | FIRSTCOLWIDTH | FIRST | FIX | FLAT | DATECELL | DEP | NAMECELL | FOLDER | FONTSIZE | FONT | FORMAT | FORWARD | FREQ | FRML | FROM | GAMS | GAUSS | GBK | GDIFF | GDIF | GDXOPT | GDX | GEKKO18 | GEKKO20 | GENR | GMS | GNUPLOT | GOAL | GRAPH | GRIDSTYLE | GRID | GROWTH | HEADING | HIDELEFTBORDER | HIDERIGHTBORDER | HIDE | HORIZON | HPFILTER | HTML | IGNOREMISSINGVARS | IGNOREMISSING | IGNOREVARS | IMPOSE | IMPULSES | I | IN | INFOFILE | INFO | INIT | INTERFACE | INTERNAL | INVERT | ROBUST | ITALIC | ITERMAX | ITERMIN | ITER | KEEP | KEY | LABELS | LABEL | LAGFIX | LAG | LANGUAGE | LAST | LEV | LINECOLOR | LINESPOINTS | LINES | LINEWIDTH | LISTFILE | LOGIC | LOG | LU | MACRO2 | MAIN | MAXLINES | MAX | MDATEFORMAT | MENUTABLE | MERGECOLS | MERGE | MESSAGE | METHOD | MIN | MISSING | MIXED | MODERNLOOK | MP | DL | L | RDL | RL | MULBK | MULPCT | MUTE | M | NAMES | NDEC | NDIFPRT | NEWTON | NEW | NEXT | NFAIR | NOABS | NOCR | NODIFF | NODIF | NOFILTER | NOGDIFF | NOGDIF | NOLEV | NOMAX | MAXLAG | DFMIN | LEAD | REKUR | MAXLEAD | FIT | PYTHON | NONANNUAL | CURRENT | NONE | NONMODEL | NOPCH | NOTIFY | NOT | NOV | NO | NWIDTH | NYTVINDU | N | OFFSET | OR | PALETTE | PARAM | PATCH | PATH | PCH | PCIMSTYLE | STYLE | PCIM | PCTPRT | PDEC | PERIOD | PLOTCODE | POINTSIZE | POINTS | POINTTYPE | POS | PREFIX | PRETTY | PRIM | OPERATORS | PRN | PRORATE | PROT | PRTX | PUDVALG | PWIDTH | PX | Q | RDP | RD | REF | REL | REMOTE | ALIAS | REORDER | REPLACE | REPEAT | REP | RESPECT | RES | RING | RN | ROWNAMES | ROWS | GROUP | LEVEL | LINK | WHERE | RP | R | SAVE | SEARCH | SECONDCOLWIDTH | SEC | SEPARATE | SETBORDER | SETBOTTOMBORDER | SETDATES | SETLEFTBORDER | SETRIGHTBORDER | SETTEXT | SETTOPBORDER | SETVALUES | SET | SHOWBORDERS | SHOWPCH | SIMPLE | SIZE | SKIP | NAN | ENGINE | NORMAL | SOLVE | SOME | SORT | SOUND | SOURCE | SPECIALMINUS | SPLIT | STACKED | STACK | STAMP | STARTFILE | STATIC | CHECK | STEPS | STEP | STRIP | SUBTITLE | SUFFIX | SUGGESTIONS | SWAP | SYSTEM | TABLE1 | TABLE2 | TABLEOLD | TABS | TEMP | TERMINAL | TESTRANDOMMODELCHECK | TESTRANDOMMODEL | TESTSIM | TEST | THOUSANDSSEPARATOR | TICS | TIMESPAN | TITLE | TOTAL | TO | TRANSPOSE | TREL | TRIM | TSDX | TSD | TSP | TXT | TYPE | UABS | UDIFF | UDIF | UDVALG | UGDIFF | UGDIF | ULEV | UNDO | UPCH | UPDATEFREQ | UPDX | USING | U | VALUE | VAR | VAR_KDUSJFLQO2 | VERSION | VERS | VOID | VPRT | V | WAIT | WIDTH | WINDOW | WORKING | WPLOT | WUDVALG | X2ZEROAXIS | XLABELS | XLINEAFTER | XLINEBEFORE | XLINE | XLSX | XLS | XZEROAXIS | X | XTREND | XFLAT | Y2LINE | Y2MAXHARD | Y2MAXSOFT | Y2MAX | Y2MINHARD | Y2MINSOFT | Y2MIN | Y2TITLE | Y2 | YES | YLABELS | YLINE | SHARES | ERRORS | IGNORE | YMAXHARD | YMAXSOFT | YMAX | LINE | YMINHARD | YMINSOFT | YMIN | YMIRROR | YTITLE | Y | ZERO | ZOOM | ZVAR )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:5012:7: ( Ident | META | ASBANK | TOBANK | VARLIST | FROMBANK | ABS | GEOMETRIC | OVERLAY | ADDBANK | SHOWBANK | SHOWFREQ | ADD | AFTER2 | AFTER | ALIGNCENTER | ALIGNLEFT | ALIGNRIGHT | ALL | AND | ANNUAL | APPEND | AREMOS | OP | ARRAY | ARROW | PARQUET | ASERIES | ASER | AS | AT2 | AUTO | AVG | A | BACKTRACK | INDICATOR | BANK1 | BANK2 | BANK | BETWEEN | BOLD | BOWL | BOXES | BOXGAP | BOXWIDTH | BUGFIX | GCM | BY | CACHE | CALC | CAPS | CELL | CHANGE | CLIPBOARD | CLOSEBANKS | CODE | MOVE | REMOVE | COLNAMES | COLORS | COLS | DELIMITER | DATEFORMAT | DATETYPE | COMMAND1 | COMMAND2 | COMMAND | COMMA | COMPRESS | CONSTANT | CONST | CONTINUE | CONV1 | CONV2 | CONV | COPYLOCAL | CPLOT | CREATEVARS | CSV | SDF | CURROW | DAMP | DANISH | DASHTYPE | DATABANK | DATAWIDTH | DATA | DATES | DEBUG | DECIMALSEPARATOR | DEC | DEFAULT | DETAILS | DETECT | DIALOG | DIFF | DIFPRT | DIF | DIGITS | DING | DYN | DIRECT | DISPLAY | DOTS | DP | D | EFTER | ELEMENTS | ENGLISH | ERROR | EXCEL | EXE | EXP | EXPAND | EXTERNAL | FAILSAFE | FAIR | FAST | FEEDBACK | FEED | FIELDS | FILEWIDTH | VARIABLECODE | FILE | FILLEDCURVES | FILLSTYLE | FILTER | FIRSTCOLWIDTH | FIRST | FIX | FLAT | DATECELL | DEP | NAMECELL | FOLDER | FONTSIZE | FONT | FORMAT | FORWARD | FREQ | FRML | FROM | GAMS | GAUSS | GBK | GDIFF | GDIF | GDXOPT | GDX | GEKKO18 | GEKKO20 | GENR | GMS | GNUPLOT | GOAL | GRAPH | GRIDSTYLE | GRID | GROWTH | HEADING | HIDELEFTBORDER | HIDERIGHTBORDER | HIDE | HORIZON | HPFILTER | HTML | IGNOREMISSINGVARS | IGNOREMISSING | IGNOREVARS | IMPOSE | IMPULSES | I | IN | INFOFILE | INFO | INIT | INTERFACE | INTERNAL | INVERT | ROBUST | ITALIC | ITERMAX | ITERMIN | ITER | KEEP | KEY | LABELS | LABEL | LAGFIX | LAG | LANGUAGE | LAST | LEV | LINECOLOR | LINESPOINTS | LINES | LINEWIDTH | LISTFILE | LOGIC | LOG | LU | MACRO2 | MAIN | MAXLINES | MAX | MDATEFORMAT | MENUTABLE | MERGECOLS | MERGE | MESSAGE | METHOD | MIN | MISSING | MIXED | MODERNLOOK | MP | DL | L | RDL | RL | MULBK | MULPCT | MUTE | M | NAMES | NDEC | NDIFPRT | NEWTON | NEW | NEXT | NFAIR | NOABS | NOCR | NODIFF | NODIF | NOFILTER | NOGDIFF | NOGDIF | NOLEV | NOMAX | MAXLAG | DFMIN | LEAD | REKUR | MAXLEAD | FIT | PYTHON | NONANNUAL | CURRENT | NONE | NONMODEL | NOPCH | NOTIFY | NOT | NOV | NO | NWIDTH | NYTVINDU | N | OFFSET | OR | PALETTE | PARAM | PATCH | PATH | PCH | PCIMSTYLE | STYLE | PCIM | PCTPRT | PDEC | PERIOD | PLOTCODE | POINTSIZE | POINTS | POINTTYPE | POS | PREFIX | PRETTY | PRIM | OPERATORS | PRN | PRORATE | PROT | PRTX | PUDVALG | PWIDTH | PX | Q | RDP | RD | REF | REL | REMOTE | ALIAS | REORDER | REPLACE | REPEAT | REP | RESPECT | RES | RING | RN | ROWNAMES | ROWS | GROUP | LEVEL | LINK | WHERE | RP | R | SAVE | SEARCH | SECONDCOLWIDTH | SEC | SEPARATE | SETBORDER | SETBOTTOMBORDER | SETDATES | SETLEFTBORDER | SETRIGHTBORDER | SETTEXT | SETTOPBORDER | SETVALUES | SET | SHOWBORDERS | SHOWPCH | SIMPLE | SIZE | SKIP | NAN | ENGINE | NORMAL | SOLVE | SOME | SORT | SOUND | SOURCE | SPECIALMINUS | SPLIT | STACKED | STACK | STAMP | STARTFILE | STATIC | CHECK | STEPS | STEP | STRIP | SUBTITLE | SUFFIX | SUGGESTIONS | SWAP | SYSTEM | TABLE1 | TABLE2 | TABLEOLD | TABS | TEMP | TERMINAL | TESTRANDOMMODELCHECK | TESTRANDOMMODEL | TESTSIM | TEST | THOUSANDSSEPARATOR | TICS | TIMESPAN | TITLE | TOTAL | TO | TRANSPOSE | TREL | TRIM | TSDX | TSD | TSP | TXT | TYPE | UABS | UDIFF | UDIF | UDVALG | UGDIFF | UGDIF | ULEV | UNDO | UPCH | UPDATEFREQ | UPDX | USING | U | VALUE | VAR | VAR_EVALFUNCTION | VERSION | VERS | VOID | VPRT | V | WAIT | WIDTH | WINDOW | WORKING | WPLOT | WUDVALG | X2ZEROAXIS | XLABELS | XLINEAFTER | XLINEBEFORE | XLINE | XLSX | XLS | XZEROAXIS | X | XTREND | XFLAT | Y2LINE | Y2MAXHARD | Y2MAXSOFT | Y2MAX | Y2MINHARD | Y2MINSOFT | Y2MIN | Y2TITLE | Y2 | YES | YLABELS | YLINE | SHARES | ERRORS | IGNORE | YMAXHARD | YMAXSOFT | YMAX | LINE | YMINHARD | YMINSOFT | YMIN | YMIRROR | YTITLE | Y | ZERO | ZOOM | ZVAR )
             // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:
             {
             	root_0 = (object)adaptor.GetNilNode();
@@ -120222,10 +120222,10 @@ public partial class Cmd4Parser : Parser
 
     // $ANTLR start "synpred365_Cmd4"
     public void synpred365_Cmd4_fragment() {
-        // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:2859:29: ( VAR_KDUSJFLQO2 )
-        // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:2859:29: VAR_KDUSJFLQO2
+        // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:2859:29: ( VAR_EVALFUNCTION )
+        // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd4.g:2859:29: VAR_EVALFUNCTION
         {
-        	Match(input,VAR_KDUSJFLQO2,FOLLOW_VAR_KDUSJFLQO2_in_synpred365_Cmd430796); if (state.failed) return ;
+        	Match(input,VAR_EVALFUNCTION,FOLLOW_VAR_EVALFUNCTION_in_synpred365_Cmd430796); if (state.failed) return ;
 
         }
     }
@@ -136168,7 +136168,7 @@ public partial class Cmd4Parser : Parser
 
         override public string Description
         {
-            get { return "2850:1: assignmentTypeNotEmpty : ( SER | SERIES | STRING2 | VAL | DATE | LIST | MAP | MATRIX | VAR | VAR_KDUSJFLQO2 | -> ASTPLACEHOLDER );"; }
+            get { return "2850:1: assignmentTypeNotEmpty : ( SER | SERIES | STRING2 | VAL | DATE | LIST | MAP | MATRIX | VAR | VAR_EVALFUNCTION | -> ASTPLACEHOLDER );"; }
         }
 
     }
@@ -151463,7 +151463,7 @@ public partial class Cmd4Parser : Parser
     public static readonly BitSet FOLLOW_MAP_in_assignmentTypeNotEmpty30739 = new BitSet(new ulong[]{0x0000000000000002UL});
     public static readonly BitSet FOLLOW_MATRIX_in_assignmentTypeNotEmpty30752 = new BitSet(new ulong[]{0x0000000000000002UL});
     public static readonly BitSet FOLLOW_VAR_in_assignmentTypeNotEmpty30765 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_VAR_KDUSJFLQO2_in_assignmentTypeNotEmpty30796 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_VAR_EVALFUNCTION_in_assignmentTypeNotEmpty30796 = new BitSet(new ulong[]{0x0000000000000002UL});
     public static readonly BitSet FOLLOW_assignmentTypeNotEmpty_in_assignmentType30842 = new BitSet(new ulong[]{0x0000000000000002UL});
     public static readonly BitSet FOLLOW_leftAngle2_in_seriesOpt1a30927 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000001000UL});
     public static readonly BitSet FOLLOW_localOptions_in_seriesOpt1a30929 = new BitSet(new ulong[]{0x0000000000000002UL});
@@ -154461,7 +154461,7 @@ public partial class Cmd4Parser : Parser
     public static readonly BitSet FOLLOW_MAP_in_synpred362_Cmd430739 = new BitSet(new ulong[]{0x0000000000000002UL});
     public static readonly BitSet FOLLOW_MATRIX_in_synpred363_Cmd430752 = new BitSet(new ulong[]{0x0000000000000002UL});
     public static readonly BitSet FOLLOW_VAR_in_synpred364_Cmd430765 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_VAR_KDUSJFLQO2_in_synpred365_Cmd430796 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_VAR_EVALFUNCTION_in_synpred365_Cmd430796 = new BitSet(new ulong[]{0x0000000000000002UL});
     public static readonly BitSet FOLLOW_assignmentTypeNotEmpty_in_synpred366_Cmd430842 = new BitSet(new ulong[]{0x0000000000000002UL});
     public static readonly BitSet FOLLOW_dates_in_synpred372_Cmd431003 = new BitSet(new ulong[]{0x0000000000000002UL});
     public static readonly BitSet FOLLOW_dates_in_synpred380_Cmd431223 = new BitSet(new ulong[]{0x0000000000000002UL});

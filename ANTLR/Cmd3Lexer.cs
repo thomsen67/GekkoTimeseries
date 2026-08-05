@@ -1,4 +1,4 @@
-// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g 2026-06-29 18:16:42
+// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g 2026-08-05 20:39:53
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 168, 219
@@ -281,6 +281,7 @@ public partial class Cmd3Lexer : Lexer {
     public const int EXIT = 1046;
     public const int SETVALUES = 1310;
     public const int ASTPRTELEMENTY2 = 681;
+    public const int VAR_EVALFUNCTION = 1396;
     public const int ASTOPT_VAL_DEC = 644;
     public const int ASTOPT_STRING_NAMECELL = 116;
     public const int PERIOD = 1241;
@@ -653,7 +654,6 @@ public partial class Cmd3Lexer : Lexer {
     public const int TSD = 1373;
     public const int ASTMODELFILE = 456;
     public const int XLINE = 879;
-    public const int VAR_KDUSJFLQO2 = 1396;
     public const int ASTNAMEWITHDOT = 470;
     public const int ASTSERIESQUESTION = 710;
     public const int ASTTUPLEFUNCTIONSIMPLE = 772;
@@ -2132,7 +2132,7 @@ public partial class Cmd3Lexer : Lexer {
                                             d.Add("v"    , V    );
                                             d.Add("val"     , VAL    );
     										d.Add("var"     , VAR    );
-                                            d.Add("VAR_KDUSJFLQO2"     , VAR_KDUSJFLQO2    );
+                                            d.Add("VAR_EVALFUNCTION"     , VAR_EVALFUNCTION    );
                                             d.Add("value"   , VALUE    );
                                             d.Add("vers"    , VERS    );
                                             d.Add("version"    , VERSION    );
@@ -15941,17 +15941,17 @@ public partial class Cmd3Lexer : Lexer {
     }
     // $ANTLR end "VAR"
 
-    // $ANTLR start "VAR_KDUSJFLQO2"
-    public void mVAR_KDUSJFLQO2() // throws RecognitionException [2]
+    // $ANTLR start "VAR_EVALFUNCTION"
+    public void mVAR_EVALFUNCTION() // throws RecognitionException [2]
     {
     		try
     		{
-            int _type = VAR_KDUSJFLQO2;
+            int _type = VAR_EVALFUNCTION;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1232:16: ( 'VAR_KDUSJFLQO2' )
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1232:18: 'VAR_KDUSJFLQO2'
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1232:18: ( 'VAR_EVALFUNCTION' )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1232:20: 'VAR_EVALFUNCTION'
             {
-            	Match("VAR_KDUSJFLQO2"); 
+            	Match("VAR_EVALFUNCTION"); 
 
 
             }
@@ -15963,7 +15963,7 @@ public partial class Cmd3Lexer : Lexer {
     	{
         }
     }
-    // $ANTLR end "VAR_KDUSJFLQO2"
+    // $ANTLR end "VAR_EVALFUNCTION"
 
     // $ANTLR start "VALUE"
     public void mVALUE() // throws RecognitionException [2]
@@ -20084,7 +20084,7 @@ public partial class Cmd3Lexer : Lexer {
 
     override public void mTokens() // throws RecognitionException 
     {
-        // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:8: ( MAXLAG | DFMIN | LEAD | REKUR | MAXLEAD | FIT | GMS | ELEMENTS | NOMAX | RETURN2 | IN | MAP | STRING2 | REMOTE | ALIAS | OFFSET | DETECT | GRIDSTYLE | BOLD | ITALIC | ASER | ASERIES | XLABELS | YLABELS | ANNUAL | AT2 | BETWEEN | NONANNUAL | CURRENT | DIGITS | GAMS | GDX | GDXOPT | LAGFIX | ADDBANK | SHOWBANK | SHOWFREQ | REBASE | LINESPOINTS | BOXES | FILLEDCURVES | STEPS | DOTS | IMPULSES | CONTINUE | VOID | PROCEDURE | SIZE | SUBTITLE | TICS | GRID | KEY | PALETTE | STACK | BOXWIDTH | BOXGAP | SEPARATE | XLINE | XLINEBEFORE | XLINEAFTER | YMIRROR | YTITLE | YLINE | SHARES | ERRORS | LINE | IGNORE | YMAXHARD | YMAXSOFT | YMINHARD | YMINSOFT | XZEROAXIS | Y2TITLE | Y2LINE | Y2MAXHARD | Y2MAXSOFT | Y2MINHARD | Y2MINSOFT | X2ZEROAXIS | ARROW | PARQUET | DASHTYPE | LINEWIDTH | LINECOLOR | POINTTYPE | POINTSIZE | FILLSTYLE | LABEL | Y2 | X | Y | MDATEFORMAT | THOUSANDSSEPARATOR | XEDIT | IMPOSE | CONSTANT | INTERPOLATE | PRORATE | TRIM | USING | A | DEFAULT | LOGIC | ABS | ABSOLUTE | ACCEPT | ADD | AFTER | AFTER2 | ALIGNCENTER | ALIGNLEFT | ALIGNRIGHT | ALL | ANALYZE | AND | APPEND | AREMOS | OP | AS | AUTO | AVG | INDICATOR | BACKTRACK | BANK | BANK1 | BANK2 | BOWL | BY | CACHE | CALC | CAPS | CELL | CHANGE | CHECKOFF | CLEAR | CLEAR2 | CLIP | CLIPBOARD | CLONE | MOVE | REMOVE | CLOSE | CLOSEALL | CLOSEBANKS | CLS | CODE | COLLAPSE | XTREND | XFLAT | PX | ARRAY | BUGFIX | GCM | COLORS | COLS | DELIMITER | DATEFORMAT | DATETYPE | COMMA | COMMAND | COMMAND1 | COMMAND2 | COMPARE | COMPRESS | CONST | CONV | CONV1 | CONV2 | COPY | COPYLOCAL | LOCAL | GLOBAL | COUNT | CPLOT | CREATE | CREATEVARS | CSV | SDF | CURROW | D | DAMP | DANISH | DATA | DATABANK | DATAWIDTH | DATE | DATES | DEBUG | DEC | DECIMALSEPARATOR | DECOMP | DECOMP2 | DECOMP3 | EVAL | DELETE | DETAILS | DIALOG | DIF | DIFF | DIFPRT | DING | DYN | DIRECT | DISP | GEKKO | DISPLAY | DOC | DOWNLOAD | DP | DUMOF | DUMOFF | DUMON | DUMP | DUMPOPTIONS | EDIT | EFTER | ELSE | ELSEIF | END | ENDO | ENGLISH | ERROR | EXCEL | EXE | EXIT | EXO | EXP | EXPORT | EXTERNAL | FAILSAFE | FAIR | FALSE | FAST | FEED | FEEDBACK | FIELDS | FILE | FILEWIDTH | FILTER | FINDMISSINGDATA | BANKNAME | FLOW | META | ECHO | OBS | A3DP | A3 | A3N | ADP | AL | ADL | A3P | AN | AD | AP | A3D | A3L | A3DL | YOY | EXPAND | VARIABLECODE | VIEW | KEEPTYPES | PREDICT | FIND | PYTHON | DEP | BROWSER | FIRST | FIRSTCOLWIDTH | FIX | FLAT | DATECELL | NAMECELL | FOLDER | FONT | FONTSIZE | FOR | FORMAT | FORWARD | FREQ | FRML | FROM | FUNCTION | GAUSS | GBK | GDIF | GDIFF | GEKKO18 | GEKKO20 | GENR | GEOMETRIC | OVERLAY | GMULPRT | GNUPLOT | GOAL | GOTO | GRAPH | GROWTH | HDG | HEADING | HELP | HIDE | HIDELEFTBORDER | HIDERIGHTBORDER | HORIZON | HPFILTER | HTML | IF | IF_OLD | ASBANK | TOBANK | VARLIST | FROMBANK | IGNOREMISSING | IGNOREMISSINGVARS | IGNOREVARS | IMPORT | INDEX | INFO | INFOFILE | INI | INIT | INTERFACE | INTERNAL | INVERT | ROBUST | ITER | ITERMAX | ITERMIN | ITERSHOW | KEEP | LABELS | LAG | LANGUAGE | LAST | LEV | LINEAR | LINES | LIST | LISTFILE | LOG | LOCK_ | UNLOCK_ | LU | M | MACRO2 | MAIN | MAT | MATRIX | ROWNAMES | COLNAMES | MAX | MAXLINES | MEM | MENU | MENUTABLE | MERGE | MERGECOLS | MESSAGE | METHOD | MIN | MIXED | MISSING | MODE | MODEL | MODERNLOOK | MP | DL | L | RDL | RL | MULBK | MULPCT | MULPRT | MUTE | N | NAME | NAMES | NDEC | NDIFPRT | NEW | NEWTON | NEXT | NFAIR | NO | NOABS | NOCR | NODIF | NODIFF | NOFILTER | NOGDIF | NOGDIFF | NOLEV | NONE | NONMODEL | NOPCH | SAVE | NOT | NOTIFY | NOV | NWIDTH | NYTVINDU | OLS | OPEN | OPTION | OR | P | PARAM | PATCH | PATH | PAUSE | PCH | PCIM | PCIMSTYLE | STYLE | PCTPRT | PDEC | PERIOD | PIPE | PLOT | PLOTCODE | CUT | POINTS | POS | PREFIX | PRETTY | PRI | PRIM | PRINT | OPERATORS | PRN | PROT | PRT | PRTX | PUDVALG | PWIDTH | Q | R | R_EXPORT | R_FILE | R_RUN | PYTHON_EXPORT | PYTHON_FILE | PYTHON_RUN | RD | RDP | READ | REF | REL | RENAME | REORDER | REP | REPEAT | REPLACE | RES | RESET | BLOCK | RESPECT | RESTART | RING | RN | ROWS | GROUP | LEVEL | LINK | WHERE | RP | RUN | LIBRARY | SEARCH | SEC | SECONDCOLWIDTH | SER2 | SER3 | SER | SERIES2 | SERIES3 | SERIES | SET | SETBORDER | SETBOTTOMBORDER | SETDATES | SETLEFTBORDER | SETRIGHTBORDER | SETTEXT | SETTOPBORDER | SETVALUES | SHEET | SHOW | SHOWBORDERS | SHOWPCH | SIGN | SIM | SIMPLE | SKIP | NAN | ENGINE | NORMAL | SMOOTH | SOLVE | SOME | SORT | SOUND | SOURCE | SPECIALMINUS | SPLICE | SPLINE | SPLIT | STACKED | STAMP | STARTFILE | STATIC | CHECK | STEP | STOP | STRIP | SUFFIX | SUGGESTIONS | SWAP | SYS | SYSTEM | TABLE | TABLE1 | TABLE2 | TABLEOLD | TABS | TARGET | TELL | TEMP | TERMINAL | TEST | TESTRANDOMMODEL | TESTRANDOMMODELCHECK | TESTSIM | TIME | TIMEFILTER | UNIT | UNITS | TIMESPAN | TITLE | TO | TOTAL | TRACE | TRACE2 | TRANSLATE | TRANSPOSE | TREL | TRUE | TRUNCATE | TSD | TSDX | TSP | TXT | TYPE | U | UABS | UDIF | UDIFF | UDVALG | UGDIF | UGDIFF | ULEV | UNDO | UNFIX | SPEEDUP | UNSWAP | UPCH | UPDATEFREQ | UPDX | V | VAL | VAR | VAR_KDUSJFLQO2 | VALUE | VERS | VERSION | VPRT | WAIT | WIDTH | WINDOW | WORKING | WPLOT | WRITE | WUDVALG | X12A | XLS | XLSX | YES | YMAX | YMIN | I | Y2MAX | Y2MIN | ZERO | ZOOM | ZVAR | HTTP | HTTPS | WHITESPACE | COMMENT | COMMENT_MULTILINE | Ident | Integer | DigitsEDigits | DateDef | IdentStartingWithInt | Double | StringInQuotes | StringInQuotes1 | StringInQuotes2 | StringInQuotes3 | PLUSEQUAL | STAREQUAL | PERCENTEQUAL | HASHEQUAL | HATEQUAL | GLUE | GLUEDOT | GLUEDOTNUMBER | GLUESTAR | LEFTANGLESPECIAL | GLUEBACKSLASH | ISEQUAL | ISNOTQUAL | ISLARGEROREQUAL | ISSMALLEROREQUAL | EXCLAMATION | TILDE | AT | HAT | SEMICOLON | COLONGLUE | COLON | COMMA2 | DOT | HASH | PERCENT | DOLLAR | LEFTCURLY | RIGHTCURLY | LEFTPAREN | RIGHTPAREN | LEFTBRACKETGLUE | LEFTBRACKET | RIGHTBRACKET | LEFTANGLESIMPLE | RIGHTANGLE | STAR | DOUBLEVERTICALBAR1 | DOUBLEAND | DOUBLEVERTICALBAR2 | VERTICALBAR | PLUS | MINUS | DIV | TRIPLESTARS | STARS | EQUAL | MINUSEQUAL | DIVEQUAL | BACKSLASH | QUESTION )
+        // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:8: ( MAXLAG | DFMIN | LEAD | REKUR | MAXLEAD | FIT | GMS | ELEMENTS | NOMAX | RETURN2 | IN | MAP | STRING2 | REMOTE | ALIAS | OFFSET | DETECT | GRIDSTYLE | BOLD | ITALIC | ASER | ASERIES | XLABELS | YLABELS | ANNUAL | AT2 | BETWEEN | NONANNUAL | CURRENT | DIGITS | GAMS | GDX | GDXOPT | LAGFIX | ADDBANK | SHOWBANK | SHOWFREQ | REBASE | LINESPOINTS | BOXES | FILLEDCURVES | STEPS | DOTS | IMPULSES | CONTINUE | VOID | PROCEDURE | SIZE | SUBTITLE | TICS | GRID | KEY | PALETTE | STACK | BOXWIDTH | BOXGAP | SEPARATE | XLINE | XLINEBEFORE | XLINEAFTER | YMIRROR | YTITLE | YLINE | SHARES | ERRORS | LINE | IGNORE | YMAXHARD | YMAXSOFT | YMINHARD | YMINSOFT | XZEROAXIS | Y2TITLE | Y2LINE | Y2MAXHARD | Y2MAXSOFT | Y2MINHARD | Y2MINSOFT | X2ZEROAXIS | ARROW | PARQUET | DASHTYPE | LINEWIDTH | LINECOLOR | POINTTYPE | POINTSIZE | FILLSTYLE | LABEL | Y2 | X | Y | MDATEFORMAT | THOUSANDSSEPARATOR | XEDIT | IMPOSE | CONSTANT | INTERPOLATE | PRORATE | TRIM | USING | A | DEFAULT | LOGIC | ABS | ABSOLUTE | ACCEPT | ADD | AFTER | AFTER2 | ALIGNCENTER | ALIGNLEFT | ALIGNRIGHT | ALL | ANALYZE | AND | APPEND | AREMOS | OP | AS | AUTO | AVG | INDICATOR | BACKTRACK | BANK | BANK1 | BANK2 | BOWL | BY | CACHE | CALC | CAPS | CELL | CHANGE | CHECKOFF | CLEAR | CLEAR2 | CLIP | CLIPBOARD | CLONE | MOVE | REMOVE | CLOSE | CLOSEALL | CLOSEBANKS | CLS | CODE | COLLAPSE | XTREND | XFLAT | PX | ARRAY | BUGFIX | GCM | COLORS | COLS | DELIMITER | DATEFORMAT | DATETYPE | COMMA | COMMAND | COMMAND1 | COMMAND2 | COMPARE | COMPRESS | CONST | CONV | CONV1 | CONV2 | COPY | COPYLOCAL | LOCAL | GLOBAL | COUNT | CPLOT | CREATE | CREATEVARS | CSV | SDF | CURROW | D | DAMP | DANISH | DATA | DATABANK | DATAWIDTH | DATE | DATES | DEBUG | DEC | DECIMALSEPARATOR | DECOMP | DECOMP2 | DECOMP3 | EVAL | DELETE | DETAILS | DIALOG | DIF | DIFF | DIFPRT | DING | DYN | DIRECT | DISP | GEKKO | DISPLAY | DOC | DOWNLOAD | DP | DUMOF | DUMOFF | DUMON | DUMP | DUMPOPTIONS | EDIT | EFTER | ELSE | ELSEIF | END | ENDO | ENGLISH | ERROR | EXCEL | EXE | EXIT | EXO | EXP | EXPORT | EXTERNAL | FAILSAFE | FAIR | FALSE | FAST | FEED | FEEDBACK | FIELDS | FILE | FILEWIDTH | FILTER | FINDMISSINGDATA | BANKNAME | FLOW | META | ECHO | OBS | A3DP | A3 | A3N | ADP | AL | ADL | A3P | AN | AD | AP | A3D | A3L | A3DL | YOY | EXPAND | VARIABLECODE | VIEW | KEEPTYPES | PREDICT | FIND | PYTHON | DEP | BROWSER | FIRST | FIRSTCOLWIDTH | FIX | FLAT | DATECELL | NAMECELL | FOLDER | FONT | FONTSIZE | FOR | FORMAT | FORWARD | FREQ | FRML | FROM | FUNCTION | GAUSS | GBK | GDIF | GDIFF | GEKKO18 | GEKKO20 | GENR | GEOMETRIC | OVERLAY | GMULPRT | GNUPLOT | GOAL | GOTO | GRAPH | GROWTH | HDG | HEADING | HELP | HIDE | HIDELEFTBORDER | HIDERIGHTBORDER | HORIZON | HPFILTER | HTML | IF | IF_OLD | ASBANK | TOBANK | VARLIST | FROMBANK | IGNOREMISSING | IGNOREMISSINGVARS | IGNOREVARS | IMPORT | INDEX | INFO | INFOFILE | INI | INIT | INTERFACE | INTERNAL | INVERT | ROBUST | ITER | ITERMAX | ITERMIN | ITERSHOW | KEEP | LABELS | LAG | LANGUAGE | LAST | LEV | LINEAR | LINES | LIST | LISTFILE | LOG | LOCK_ | UNLOCK_ | LU | M | MACRO2 | MAIN | MAT | MATRIX | ROWNAMES | COLNAMES | MAX | MAXLINES | MEM | MENU | MENUTABLE | MERGE | MERGECOLS | MESSAGE | METHOD | MIN | MIXED | MISSING | MODE | MODEL | MODERNLOOK | MP | DL | L | RDL | RL | MULBK | MULPCT | MULPRT | MUTE | N | NAME | NAMES | NDEC | NDIFPRT | NEW | NEWTON | NEXT | NFAIR | NO | NOABS | NOCR | NODIF | NODIFF | NOFILTER | NOGDIF | NOGDIFF | NOLEV | NONE | NONMODEL | NOPCH | SAVE | NOT | NOTIFY | NOV | NWIDTH | NYTVINDU | OLS | OPEN | OPTION | OR | P | PARAM | PATCH | PATH | PAUSE | PCH | PCIM | PCIMSTYLE | STYLE | PCTPRT | PDEC | PERIOD | PIPE | PLOT | PLOTCODE | CUT | POINTS | POS | PREFIX | PRETTY | PRI | PRIM | PRINT | OPERATORS | PRN | PROT | PRT | PRTX | PUDVALG | PWIDTH | Q | R | R_EXPORT | R_FILE | R_RUN | PYTHON_EXPORT | PYTHON_FILE | PYTHON_RUN | RD | RDP | READ | REF | REL | RENAME | REORDER | REP | REPEAT | REPLACE | RES | RESET | BLOCK | RESPECT | RESTART | RING | RN | ROWS | GROUP | LEVEL | LINK | WHERE | RP | RUN | LIBRARY | SEARCH | SEC | SECONDCOLWIDTH | SER2 | SER3 | SER | SERIES2 | SERIES3 | SERIES | SET | SETBORDER | SETBOTTOMBORDER | SETDATES | SETLEFTBORDER | SETRIGHTBORDER | SETTEXT | SETTOPBORDER | SETVALUES | SHEET | SHOW | SHOWBORDERS | SHOWPCH | SIGN | SIM | SIMPLE | SKIP | NAN | ENGINE | NORMAL | SMOOTH | SOLVE | SOME | SORT | SOUND | SOURCE | SPECIALMINUS | SPLICE | SPLINE | SPLIT | STACKED | STAMP | STARTFILE | STATIC | CHECK | STEP | STOP | STRIP | SUFFIX | SUGGESTIONS | SWAP | SYS | SYSTEM | TABLE | TABLE1 | TABLE2 | TABLEOLD | TABS | TARGET | TELL | TEMP | TERMINAL | TEST | TESTRANDOMMODEL | TESTRANDOMMODELCHECK | TESTSIM | TIME | TIMEFILTER | UNIT | UNITS | TIMESPAN | TITLE | TO | TOTAL | TRACE | TRACE2 | TRANSLATE | TRANSPOSE | TREL | TRUE | TRUNCATE | TSD | TSDX | TSP | TXT | TYPE | U | UABS | UDIF | UDIFF | UDVALG | UGDIF | UGDIFF | ULEV | UNDO | UNFIX | SPEEDUP | UNSWAP | UPCH | UPDATEFREQ | UPDX | V | VAL | VAR | VAR_EVALFUNCTION | VALUE | VERS | VERSION | VPRT | WAIT | WIDTH | WINDOW | WORKING | WPLOT | WRITE | WUDVALG | X12A | XLS | XLSX | YES | YMAX | YMIN | I | Y2MAX | Y2MIN | ZERO | ZOOM | ZVAR | HTTP | HTTPS | WHITESPACE | COMMENT | COMMENT_MULTILINE | Ident | Integer | DigitsEDigits | DateDef | IdentStartingWithInt | Double | StringInQuotes | StringInQuotes1 | StringInQuotes2 | StringInQuotes3 | PLUSEQUAL | STAREQUAL | PERCENTEQUAL | HASHEQUAL | HATEQUAL | GLUE | GLUEDOT | GLUEDOTNUMBER | GLUESTAR | LEFTANGLESPECIAL | GLUEBACKSLASH | ISEQUAL | ISNOTQUAL | ISLARGEROREQUAL | ISSMALLEROREQUAL | EXCLAMATION | TILDE | AT | HAT | SEMICOLON | COLONGLUE | COLON | COMMA2 | DOT | HASH | PERCENT | DOLLAR | LEFTCURLY | RIGHTCURLY | LEFTPAREN | RIGHTPAREN | LEFTBRACKETGLUE | LEFTBRACKET | RIGHTBRACKET | LEFTANGLESIMPLE | RIGHTANGLE | STAR | DOUBLEVERTICALBAR1 | DOUBLEAND | DOUBLEVERTICALBAR2 | VERTICALBAR | PLUS | MINUS | DIV | TRIPLESTARS | STARS | EQUAL | MINUSEQUAL | DIVEQUAL | BACKSLASH | QUESTION )
         int alt29 = 663;
         alt29 = dfa29.Predict(input);
         switch (alt29) 
@@ -24101,630 +24101,630 @@ public partial class Cmd3Lexer : Lexer {
                 }
                 break;
             case 574 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3850: VAR_KDUSJFLQO2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3850: VAR_EVALFUNCTION
                 {
-                	mVAR_KDUSJFLQO2(); 
+                	mVAR_EVALFUNCTION(); 
 
                 }
                 break;
             case 575 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3865: VALUE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3867: VALUE
                 {
                 	mVALUE(); 
 
                 }
                 break;
             case 576 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3871: VERS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3873: VERS
                 {
                 	mVERS(); 
 
                 }
                 break;
             case 577 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3876: VERSION
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3878: VERSION
                 {
                 	mVERSION(); 
 
                 }
                 break;
             case 578 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3884: VPRT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3886: VPRT
                 {
                 	mVPRT(); 
 
                 }
                 break;
             case 579 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3889: WAIT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3891: WAIT
                 {
                 	mWAIT(); 
 
                 }
                 break;
             case 580 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3894: WIDTH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3896: WIDTH
                 {
                 	mWIDTH(); 
 
                 }
                 break;
             case 581 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3900: WINDOW
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3902: WINDOW
                 {
                 	mWINDOW(); 
 
                 }
                 break;
             case 582 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3907: WORKING
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3909: WORKING
                 {
                 	mWORKING(); 
 
                 }
                 break;
             case 583 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3915: WPLOT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3917: WPLOT
                 {
                 	mWPLOT(); 
 
                 }
                 break;
             case 584 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3921: WRITE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3923: WRITE
                 {
                 	mWRITE(); 
 
                 }
                 break;
             case 585 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3927: WUDVALG
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3929: WUDVALG
                 {
                 	mWUDVALG(); 
 
                 }
                 break;
             case 586 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3935: X12A
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3937: X12A
                 {
                 	mX12A(); 
 
                 }
                 break;
             case 587 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3940: XLS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3942: XLS
                 {
                 	mXLS(); 
 
                 }
                 break;
             case 588 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3944: XLSX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3946: XLSX
                 {
                 	mXLSX(); 
 
                 }
                 break;
             case 589 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3949: YES
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3951: YES
                 {
                 	mYES(); 
 
                 }
                 break;
             case 590 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3953: YMAX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3955: YMAX
                 {
                 	mYMAX(); 
 
                 }
                 break;
             case 591 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3958: YMIN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3960: YMIN
                 {
                 	mYMIN(); 
 
                 }
                 break;
             case 592 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3963: I
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3965: I
                 {
                 	mI(); 
 
                 }
                 break;
             case 593 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3965: Y2MAX
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3967: Y2MAX
                 {
                 	mY2MAX(); 
 
                 }
                 break;
             case 594 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3971: Y2MIN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3973: Y2MIN
                 {
                 	mY2MIN(); 
 
                 }
                 break;
             case 595 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3977: ZERO
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3979: ZERO
                 {
                 	mZERO(); 
 
                 }
                 break;
             case 596 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3982: ZOOM
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3984: ZOOM
                 {
                 	mZOOM(); 
 
                 }
                 break;
             case 597 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3987: ZVAR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3989: ZVAR
                 {
                 	mZVAR(); 
 
                 }
                 break;
             case 598 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3992: HTTP
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3994: HTTP
                 {
                 	mHTTP(); 
 
                 }
                 break;
             case 599 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3997: HTTPS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:3999: HTTPS
                 {
                 	mHTTPS(); 
 
                 }
                 break;
             case 600 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4003: WHITESPACE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4005: WHITESPACE
                 {
                 	mWHITESPACE(); 
 
                 }
                 break;
             case 601 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4014: COMMENT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4016: COMMENT
                 {
                 	mCOMMENT(); 
 
                 }
                 break;
             case 602 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4022: COMMENT_MULTILINE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4024: COMMENT_MULTILINE
                 {
                 	mCOMMENT_MULTILINE(); 
 
                 }
                 break;
             case 603 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4040: Ident
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4042: Ident
                 {
                 	mIdent(); 
 
                 }
                 break;
             case 604 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4046: Integer
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4048: Integer
                 {
                 	mInteger(); 
 
                 }
                 break;
             case 605 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4054: DigitsEDigits
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4056: DigitsEDigits
                 {
                 	mDigitsEDigits(); 
 
                 }
                 break;
             case 606 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4068: DateDef
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4070: DateDef
                 {
                 	mDateDef(); 
 
                 }
                 break;
             case 607 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4076: IdentStartingWithInt
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4078: IdentStartingWithInt
                 {
                 	mIdentStartingWithInt(); 
 
                 }
                 break;
             case 608 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4097: Double
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4099: Double
                 {
                 	mDouble(); 
 
                 }
                 break;
             case 609 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4104: StringInQuotes
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4106: StringInQuotes
                 {
                 	mStringInQuotes(); 
 
                 }
                 break;
             case 610 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4119: StringInQuotes1
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4121: StringInQuotes1
                 {
                 	mStringInQuotes1(); 
 
                 }
                 break;
             case 611 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4135: StringInQuotes2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4137: StringInQuotes2
                 {
                 	mStringInQuotes2(); 
 
                 }
                 break;
             case 612 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4151: StringInQuotes3
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4153: StringInQuotes3
                 {
                 	mStringInQuotes3(); 
 
                 }
                 break;
             case 613 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4167: PLUSEQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4169: PLUSEQUAL
                 {
                 	mPLUSEQUAL(); 
 
                 }
                 break;
             case 614 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4177: STAREQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4179: STAREQUAL
                 {
                 	mSTAREQUAL(); 
 
                 }
                 break;
             case 615 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4187: PERCENTEQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4189: PERCENTEQUAL
                 {
                 	mPERCENTEQUAL(); 
 
                 }
                 break;
             case 616 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4200: HASHEQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4202: HASHEQUAL
                 {
                 	mHASHEQUAL(); 
 
                 }
                 break;
             case 617 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4210: HATEQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4212: HATEQUAL
                 {
                 	mHATEQUAL(); 
 
                 }
                 break;
             case 618 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4219: GLUE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4221: GLUE
                 {
                 	mGLUE(); 
 
                 }
                 break;
             case 619 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4224: GLUEDOT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4226: GLUEDOT
                 {
                 	mGLUEDOT(); 
 
                 }
                 break;
             case 620 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4232: GLUEDOTNUMBER
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4234: GLUEDOTNUMBER
                 {
                 	mGLUEDOTNUMBER(); 
 
                 }
                 break;
             case 621 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4246: GLUESTAR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4248: GLUESTAR
                 {
                 	mGLUESTAR(); 
 
                 }
                 break;
             case 622 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4255: LEFTANGLESPECIAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4257: LEFTANGLESPECIAL
                 {
                 	mLEFTANGLESPECIAL(); 
 
                 }
                 break;
             case 623 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4272: GLUEBACKSLASH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4274: GLUEBACKSLASH
                 {
                 	mGLUEBACKSLASH(); 
 
                 }
                 break;
             case 624 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4286: ISEQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4288: ISEQUAL
                 {
                 	mISEQUAL(); 
 
                 }
                 break;
             case 625 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4294: ISNOTQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4296: ISNOTQUAL
                 {
                 	mISNOTQUAL(); 
 
                 }
                 break;
             case 626 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4304: ISLARGEROREQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4306: ISLARGEROREQUAL
                 {
                 	mISLARGEROREQUAL(); 
 
                 }
                 break;
             case 627 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4320: ISSMALLEROREQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4322: ISSMALLEROREQUAL
                 {
                 	mISSMALLEROREQUAL(); 
 
                 }
                 break;
             case 628 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4337: EXCLAMATION
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4339: EXCLAMATION
                 {
                 	mEXCLAMATION(); 
 
                 }
                 break;
             case 629 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4349: TILDE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4351: TILDE
                 {
                 	mTILDE(); 
 
                 }
                 break;
             case 630 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4355: AT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4357: AT
                 {
                 	mAT(); 
 
                 }
                 break;
             case 631 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4358: HAT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4360: HAT
                 {
                 	mHAT(); 
 
                 }
                 break;
             case 632 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4362: SEMICOLON
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4364: SEMICOLON
                 {
                 	mSEMICOLON(); 
 
                 }
                 break;
             case 633 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4372: COLONGLUE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4374: COLONGLUE
                 {
                 	mCOLONGLUE(); 
 
                 }
                 break;
             case 634 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4382: COLON
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4384: COLON
                 {
                 	mCOLON(); 
 
                 }
                 break;
             case 635 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4388: COMMA2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4390: COMMA2
                 {
                 	mCOMMA2(); 
 
                 }
                 break;
             case 636 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4395: DOT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4397: DOT
                 {
                 	mDOT(); 
 
                 }
                 break;
             case 637 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4399: HASH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4401: HASH
                 {
                 	mHASH(); 
 
                 }
                 break;
             case 638 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4404: PERCENT
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4406: PERCENT
                 {
                 	mPERCENT(); 
 
                 }
                 break;
             case 639 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4412: DOLLAR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4414: DOLLAR
                 {
                 	mDOLLAR(); 
 
                 }
                 break;
             case 640 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4419: LEFTCURLY
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4421: LEFTCURLY
                 {
                 	mLEFTCURLY(); 
 
                 }
                 break;
             case 641 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4429: RIGHTCURLY
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4431: RIGHTCURLY
                 {
                 	mRIGHTCURLY(); 
 
                 }
                 break;
             case 642 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4440: LEFTPAREN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4442: LEFTPAREN
                 {
                 	mLEFTPAREN(); 
 
                 }
                 break;
             case 643 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4450: RIGHTPAREN
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4452: RIGHTPAREN
                 {
                 	mRIGHTPAREN(); 
 
                 }
                 break;
             case 644 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4461: LEFTBRACKETGLUE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4463: LEFTBRACKETGLUE
                 {
                 	mLEFTBRACKETGLUE(); 
 
                 }
                 break;
             case 645 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4477: LEFTBRACKET
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4479: LEFTBRACKET
                 {
                 	mLEFTBRACKET(); 
 
                 }
                 break;
             case 646 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4489: RIGHTBRACKET
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4491: RIGHTBRACKET
                 {
                 	mRIGHTBRACKET(); 
 
                 }
                 break;
             case 647 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4502: LEFTANGLESIMPLE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4504: LEFTANGLESIMPLE
                 {
                 	mLEFTANGLESIMPLE(); 
 
                 }
                 break;
             case 648 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4518: RIGHTANGLE
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4520: RIGHTANGLE
                 {
                 	mRIGHTANGLE(); 
 
                 }
                 break;
             case 649 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4529: STAR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4531: STAR
                 {
                 	mSTAR(); 
 
                 }
                 break;
             case 650 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4534: DOUBLEVERTICALBAR1
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4536: DOUBLEVERTICALBAR1
                 {
                 	mDOUBLEVERTICALBAR1(); 
 
                 }
                 break;
             case 651 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4553: DOUBLEAND
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4555: DOUBLEAND
                 {
                 	mDOUBLEAND(); 
 
                 }
                 break;
             case 652 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4563: DOUBLEVERTICALBAR2
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4565: DOUBLEVERTICALBAR2
                 {
                 	mDOUBLEVERTICALBAR2(); 
 
                 }
                 break;
             case 653 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4582: VERTICALBAR
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4584: VERTICALBAR
                 {
                 	mVERTICALBAR(); 
 
                 }
                 break;
             case 654 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4594: PLUS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4596: PLUS
                 {
                 	mPLUS(); 
 
                 }
                 break;
             case 655 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4599: MINUS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4601: MINUS
                 {
                 	mMINUS(); 
 
                 }
                 break;
             case 656 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4605: DIV
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4607: DIV
                 {
                 	mDIV(); 
 
                 }
                 break;
             case 657 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4609: TRIPLESTARS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4611: TRIPLESTARS
                 {
                 	mTRIPLESTARS(); 
 
                 }
                 break;
             case 658 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4621: STARS
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4623: STARS
                 {
                 	mSTARS(); 
 
                 }
                 break;
             case 659 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4627: EQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4629: EQUAL
                 {
                 	mEQUAL(); 
 
                 }
                 break;
             case 660 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4633: MINUSEQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4635: MINUSEQUAL
                 {
                 	mMINUSEQUAL(); 
 
                 }
                 break;
             case 661 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4644: DIVEQUAL
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4646: DIVEQUAL
                 {
                 	mDIVEQUAL(); 
 
                 }
                 break;
             case 662 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4653: BACKSLASH
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4655: BACKSLASH
                 {
                 	mBACKSLASH(); 
 
                 }
                 break;
             case 663 :
-                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4663: QUESTION
+                // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:1:4665: QUESTION
                 {
                 	mQUESTION(); 
 
@@ -24750,28 +24750,28 @@ public partial class Cmd3Lexer : Lexer {
 	}
 
     const string DFA14_eotS =
-        "\x02\uffff\x01\x05\x03\uffff\x01\x04\x01\uffff";
+        "\x03\uffff\x01\x06\x01\uffff\x01\x04\x02\uffff";
     const string DFA14_eofS =
         "\x08\uffff";
     const string DFA14_minS =
-        "\x04\x30\x02\uffff\x01\x30\x01\uffff";
+        "\x04\x30\x01\uffff\x01\x30\x02\uffff";
     const string DFA14_maxS =
-        "\x01\x39\x01\x77\x02\x39\x02\uffff\x01\x64\x01\uffff";
+        "\x01\x39\x01\x77\x02\x39\x01\uffff\x01\x64\x02\uffff";
     const string DFA14_acceptS =
-        "\x04\uffff\x01\x02\x01\x03\x01\uffff\x01\x01";
+        "\x04\uffff\x01\x02\x01\uffff\x01\x03\x01\x01";
     const string DFA14_specialS =
         "\x08\uffff}>";
     static readonly string[] DFA14_transitionS = {
             "\x0a\x01",
-            "\x0a\x01\x07\uffff\x01\x02\x0b\uffff\x01\x03\x03\uffff\x01"+
-            "\x04\x03\uffff\x01\x02\x01\uffff\x01\x04\x09\uffff\x01\x02\x0b"+
-            "\uffff\x01\x03\x03\uffff\x01\x04\x03\uffff\x01\x02\x01\uffff"+
+            "\x0a\x01\x07\uffff\x01\x03\x0b\uffff\x01\x02\x03\uffff\x01"+
+            "\x04\x03\uffff\x01\x03\x01\uffff\x01\x04\x09\uffff\x01\x03\x0b"+
+            "\uffff\x01\x02\x03\uffff\x01\x04\x03\uffff\x01\x03\x01\uffff"+
             "\x01\x04",
+            "\x0a\x05",
             "\x0a\x04",
-            "\x0a\x06",
             "",
+            "\x0a\x05\x0a\uffff\x01\x07\x1f\uffff\x01\x07",
             "",
-            "\x0a\x06\x0a\uffff\x01\x07\x1f\uffff\x01\x07",
             ""
     };
 
@@ -24815,13 +24815,13 @@ public partial class Cmd3Lexer : Lexer {
     const string DFA22_maxS =
         "\x02\u00a7\x03\uffff";
     const string DFA22_acceptS =
-        "\x02\uffff\x01\x03\x01\x02\x01\x01";
+        "\x02\uffff\x01\x03\x01\x01\x01\x02";
     const string DFA22_specialS =
         "\x05\uffff}>";
     static readonly string[] DFA22_transitionS = {
             "\x0a\x01\x6d\uffff\x01\x02",
-            "\x0a\x01\x0b\uffff\x01\x03\x1f\uffff\x01\x03\x41\uffff\x01"+
-            "\x04",
+            "\x0a\x01\x0b\uffff\x01\x04\x1f\uffff\x01\x04\x41\uffff\x01"+
+            "\x03",
             "",
             "",
             ""
@@ -24875,76 +24875,75 @@ public partial class Cmd3Lexer : Lexer {
         "\x03\x6f\x01\u022d\x0a\x6f\x01\uffff\x03\x6f\x01\u0242\x01\x6f\x01"+
         "\uffff\x0e\x6f\x01\uffff\x03\x6f\x01\u026a\x08\x6f\x01\uffff\x03"+
         "\x6f\x01\u027f\x0a\x6f\x01\uffff\x09\x6f\x01\u029e\x01\uffff\x11"+
-        "\x6f\x05\uffff\x01\u0117\x01\uffff\x01\u02b3\x01\u0117\x01\uffff"+
-        "\x01\u0117\x0c\uffff\x01\u02b7\x09\uffff\x01\u02b9\x0f\uffff\x01"+
-        "\u02bb\x01\u02bc\x02\x6f\x01\u02c0\x04\x6f\x01\u02c6\x03\x6f\x01"+
-        "\u02ca\x02\x6f\x01\uffff\x07\x6f\x01\u02d9\x01\u02da\x02\x6f\x01"+
-        "\u02df\x04\x6f\x01\u02e4\x05\x6f\x01\u02eb\x01\uffff\x01\x6f\x01"+
-        "\uffff\x01\x6f\x01\u02f0\x01\u02f2\x06\x6f\x01\u02fb\x01\x6f\x01"+
-        "\uffff\x05\x6f\x01\u0303\x01\u0304\x02\x6f\x01\u0309\x01\u030d\x02"+
-        "\x6f\x01\u0311\x01\u0312\x02\uffff\x04\x6f\x02\uffff\x01\u0317\x01"+
-        "\u0318\x04\x6f\x01\u031f\x07\x6f\x01\u032a\x04\x6f\x01\u032f\x06"+
-        "\x6f\x01\u0338\x01\x6f\x01\u033a\x04\x6f\x01\u033f\x09\x6f\x01\u034a"+
-        "\x02\x6f\x01\u034e\x01\x6f\x01\u0350\x01\u0353\x0b\x6f\x01\u0362"+
-        "\x01\u0363\x02\x6f\x01\u0366\x02\x6f\x01\u036a\x07\x6f\x01\u0374"+
-        "\x01\x6f\x01\uffff\x05\x6f\x01\uffff\x0a\x6f\x01\u038a\x05\x6f\x01"+
-        "\u0391\x01\u0393\x01\u039a\x01\u039b\x0b\x6f\x01\u03aa\x01\x6f\x01"+
-        "\u03ad\x01\uffff\x02\x6f\x01\uffff\x02\x6f\x01\u03b2\x02\uffff\x01"+
-        "\u03b4\x01\u03b5\x01\u03b6\x01\uffff\x02\x6f\x01\u03ba\x03\x6f\x01"+
-        "\uffff\x01\x6f\x01\u03bf\x01\u03c2\x01\u03c3\x01\u03c4\x01\u03c5"+
-        "\x01\uffff\x03\x6f\x01\uffff\x01\u03ca\x01\x6f\x01\u03cc\x01\uffff"+
-        "\x06\x6f\x01\uffff\x05\x6f\x01\u03db\x0e\x6f\x01\uffff\x01\u03ec"+
-        "\x01\x6f\x01\u03ee\x0f\x6f\x01\u0405\x02\x6f\x01\u0408\x01\x6f\x01"+
-        "\u040d\x01\u040f\x05\x6f\x01\u041b\x01\u041c\x01\u041e\x05\x6f\x01"+
-        "\u0426\x01\uffff\x01\x6f\x01\u0428\x12\x6f\x01\uffff\x06\x6f\x01"+
-        "\u0444\x01\u0445\x01\u0446\x01\x6f\x01\u0448\x0b\x6f\x01\u0455\x07"+
-        "\x6f\x01\uffff\x0e\x6f\x01\u046b\x03\x6f\x02\u02b3\x01\uffff\x01"+
-        "\u0470\x01\u011b\x04\uffff\x01\x6f\x02\uffff\x01\x6f\x01\u0475\x01"+
-        "\x6f\x01\uffff\x01\x6f\x01\u0478\x01\u047b\x01\u047c\x01\x6f\x01"+
-        "\uffff\x01\u047f\x02\x6f\x01\uffff\x04\x6f\x01\u0487\x09\x6f\x02"+
-        "\uffff\x02\x6f\x01\u0493\x01\x6f\x01\uffff\x01\u0495\x01\x6f\x01"+
-        "\u0498\x01\u0499\x01\uffff\x02\x6f\x01\u04a0\x01\u04a3\x01\u04a4"+
-        "\x01\x6f\x01\uffff\x01\x6f\x01\u04a9\x01\u04aa\x01\x6f\x01\uffff"+
-        "\x01\x6f\x01\uffff\x02\x6f\x01\u04af\x01\u04b4\x01\u04b5\x01\u04b7"+
-        "\x02\x6f\x01\uffff\x01\x6f\x01\u04bb\x04\x6f\x01\u04c1\x02\uffff"+
-        "\x04\x6f\x01\uffff\x03\x6f\x01\uffff\x02\x6f\x01\u04cb\x02\uffff"+
-        "\x03\x6f\x01\u04cf\x02\uffff\x01\x6f\x01\u04d3\x02\x6f\x01\u04d7"+
-        "\x01\x6f\x01\uffff\x01\x6f\x01\u04da\x01\u04db\x01\u04dd\x01\u04de"+
-        "\x01\u04df\x01\x6f\x01\u04e2\x02\x6f\x01\uffff\x01\u04e5\x01\u04e6"+
-        "\x01\u04e8\x01\x6f\x01\uffff\x01\x6f\x01\u04ec\x03\x6f\x01\u04f0"+
-        "\x02\x6f\x01\uffff\x01\u04f4\x01\uffff\x02\x6f\x01\u04f7\x01\x6f"+
-        "\x01\uffff\x01\x6f\x01\u04fa\x01\u04fb\x01\x6f\x01\u04fe\x01\x6f"+
-        "\x01\u0500\x01\u0501\x01\x6f\x01\u0503\x01\uffff\x03\x6f\x01\uffff"+
-        "\x01\u0507\x01\uffff\x02\x6f\x01\uffff\x01\x6f\x01\u050b\x02\x6f"+
-        "\x01\u050e\x02\x6f\x01\u0511\x06\x6f\x02\uffff\x01\x6f\x01\u051b"+
-        "\x01\uffff\x01\u051c\x02\x6f\x01\uffff\x01\u051f\x06\x6f\x01\u0527"+
-        "\x01\u0528\x01\uffff\x02\x6f\x01\u052d\x05\x6f\x01\u0536\x05\x6f"+
-        "\x01\u053c\x01\u0540\x02\x6f\x01\u0543\x01\u0544\x01\x6f\x01\uffff"+
-        "\x06\x6f\x01\uffff\x01\x6f\x01\uffff\x06\x6f\x02\uffff\x01\u0554"+
-        "\x01\x6f\x01\u0557\x02\x6f\x01\u055a\x01\u055b\x05\x6f\x01\u0563"+
-        "\x01\x6f\x01\uffff\x02\x6f\x01\uffff\x01\u0568\x03\x6f\x01\uffff"+
-        "\x01\x6f\x03\uffff\x03\x6f\x01\uffff\x03\x6f\x01\u0573\x01\uffff"+
-        "\x01\u0574\x01\u0575\x04\uffff\x01\x6f\x01\u0577\x02\x6f\x01\uffff"+
-        "\x01\x6f\x01\uffff\x01\u057b\x03\x6f\x01\u057f\x02\x6f\x01\u0585"+
-        "\x05\x6f\x01\u058b\x01\uffff\x05\x6f\x01\u0591\x03\x6f\x01\u0597"+
-        "\x01\u059a\x05\x6f\x01\uffff\x01\x6f\x01\uffff\x02\x6f\x01\u05a6"+
-        "\x01\u05a7\x02\x6f\x01\u05aa\x03\x6f\x01\u05b0\x02\x6f\x01\u05b3"+
-        "\x01\u05b4\x01\u05b5\x03\x6f\x01\u05ba\x02\x6f\x01\uffff\x02\x6f"+
-        "\x01\uffff\x01\u05bf\x03\x6f\x01\uffff\x01\x6f\x01\uffff\x01\u05c4"+
-        "\x01\u05c6\x01\u05c7\x02\x6f\x01\u05ca\x03\x6f\x01\u05ce\x01\x6f"+
-        "\x02\uffff\x01\u05d0\x01\uffff\x04\x6f\x01\u05d5\x02\x6f\x01\uffff"+
-        "\x01\x6f\x01\uffff\x01\u05da\x01\x6f\x01\u05dc\x01\x6f\x01\u05de"+
-        "\x01\u05e0\x02\x6f\x01\u05e3\x01\u05e6\x02\x6f\x01\u05e9\x02\x6f"+
-        "\x01\u05ec\x04\x6f\x01\u05f1\x01\x6f\x01\u05f3\x01\u05f4\x01\x6f"+
-        "\x01\u05f8\x01\u05f9\x03\uffff\x01\u05fa\x01\uffff\x01\u05fc\x02"+
-        "\x6f\x01\u0600\x01\u0601\x04\x6f\x01\u0606\x02\x6f\x01\uffff\x01"+
-        "\x6f\x01\u060a\x01\u060d\x02\x6f\x01\u0610\x02\x6f\x01\u0614\x06"+
-        "\x6f\x01\u061b\x01\u061c\x01\u061e\x01\x6f\x01\u0620\x01\u0621\x01"+
-        "\uffff\x01\u0622\x01\u0623\x01\u0624\x01\u0117\x01\uffff\x04\x6f"+
-        "\x01\uffff\x02\x6f\x01\uffff\x01\u062c\x01\x6f\x02\uffff\x02\x6f"+
-        "\x01\uffff\x01\u0631\x01\x6f\x01\u0633\x01\x6f\x01\u0635\x02\x6f"+
-        "\x01\uffff\x01\u0638\x05\x6f\x01\u063e\x04\x6f\x01\uffff\x01\x6f"+
-        "\x01\uffff\x02\x6f\x02\uffff\x04\x6f\x01\u064a\x01\x6f\x01\uffff"+
+        "\x6f\x05\uffff\x02\u0118\x01\u02b4\x01\u0118\x0e\uffff\x01\u02b7"+
+        "\x09\uffff\x01\u02b9\x0f\uffff\x01\u02bb\x01\u02bc\x02\x6f\x01\u02c0"+
+        "\x04\x6f\x01\u02c6\x03\x6f\x01\u02ca\x02\x6f\x01\uffff\x07\x6f\x01"+
+        "\u02d9\x01\u02da\x02\x6f\x01\u02df\x04\x6f\x01\u02e4\x05\x6f\x01"+
+        "\u02eb\x01\uffff\x01\x6f\x01\uffff\x01\x6f\x01\u02f0\x01\u02f2\x06"+
+        "\x6f\x01\u02fb\x01\x6f\x01\uffff\x05\x6f\x01\u0303\x01\u0304\x02"+
+        "\x6f\x01\u0309\x01\u030d\x02\x6f\x01\u0311\x01\u0312\x02\uffff\x04"+
+        "\x6f\x02\uffff\x01\u0317\x01\u0318\x04\x6f\x01\u031f\x07\x6f\x01"+
+        "\u032a\x04\x6f\x01\u032f\x06\x6f\x01\u0338\x01\x6f\x01\u033a\x04"+
+        "\x6f\x01\u033f\x09\x6f\x01\u034a\x02\x6f\x01\u034e\x01\x6f\x01\u0350"+
+        "\x01\u0353\x0b\x6f\x01\u0362\x01\u0363\x02\x6f\x01\u0366\x02\x6f"+
+        "\x01\u036a\x07\x6f\x01\u0374\x01\x6f\x01\uffff\x05\x6f\x01\uffff"+
+        "\x0a\x6f\x01\u038a\x05\x6f\x01\u0391\x01\u0393\x01\u039a\x01\u039b"+
+        "\x0b\x6f\x01\u03aa\x01\x6f\x01\u03ad\x01\uffff\x02\x6f\x01\uffff"+
+        "\x02\x6f\x01\u03b2\x02\uffff\x01\u03b4\x01\u03b5\x01\u03b6\x01\uffff"+
+        "\x02\x6f\x01\u03ba\x03\x6f\x01\uffff\x01\x6f\x01\u03bf\x01\u03c2"+
+        "\x01\u03c3\x01\u03c4\x01\u03c5\x01\uffff\x03\x6f\x01\uffff\x01\u03ca"+
+        "\x01\x6f\x01\u03cc\x01\uffff\x06\x6f\x01\uffff\x05\x6f\x01\u03db"+
+        "\x0e\x6f\x01\uffff\x01\u03ec\x01\x6f\x01\u03ee\x0f\x6f\x01\u0405"+
+        "\x02\x6f\x01\u0408\x01\x6f\x01\u040d\x01\u040f\x05\x6f\x01\u041b"+
+        "\x01\u041c\x01\u041e\x05\x6f\x01\u0426\x01\uffff\x01\x6f\x01\u0428"+
+        "\x12\x6f\x01\uffff\x06\x6f\x01\u0444\x01\u0445\x01\u0446\x01\x6f"+
+        "\x01\u0448\x0b\x6f\x01\u0455\x07\x6f\x01\uffff\x0e\x6f\x01\u046b"+
+        "\x03\x6f\x01\u046f\x02\u02b4\x01\uffff\x01\u011b\x04\uffff\x01\x6f"+
+        "\x02\uffff\x01\x6f\x01\u0475\x01\x6f\x01\uffff\x01\x6f\x01\u0478"+
+        "\x01\u047b\x01\u047c\x01\x6f\x01\uffff\x01\u047f\x02\x6f\x01\uffff"+
+        "\x04\x6f\x01\u0487\x09\x6f\x02\uffff\x02\x6f\x01\u0493\x01\x6f\x01"+
+        "\uffff\x01\u0495\x01\x6f\x01\u0498\x01\u0499\x01\uffff\x02\x6f\x01"+
+        "\u04a0\x01\u04a3\x01\u04a4\x01\x6f\x01\uffff\x01\x6f\x01\u04a9\x01"+
+        "\u04aa\x01\x6f\x01\uffff\x01\x6f\x01\uffff\x02\x6f\x01\u04af\x01"+
+        "\u04b4\x01\u04b5\x01\u04b7\x02\x6f\x01\uffff\x01\x6f\x01\u04bb\x04"+
+        "\x6f\x01\u04c1\x02\uffff\x04\x6f\x01\uffff\x03\x6f\x01\uffff\x02"+
+        "\x6f\x01\u04cb\x02\uffff\x03\x6f\x01\u04cf\x02\uffff\x01\x6f\x01"+
+        "\u04d3\x02\x6f\x01\u04d7\x01\x6f\x01\uffff\x01\x6f\x01\u04da\x01"+
+        "\u04db\x01\u04dd\x01\u04de\x01\u04df\x01\x6f\x01\u04e2\x02\x6f\x01"+
+        "\uffff\x01\u04e5\x01\u04e6\x01\u04e8\x01\x6f\x01\uffff\x01\x6f\x01"+
+        "\u04ec\x03\x6f\x01\u04f0\x02\x6f\x01\uffff\x01\u04f4\x01\uffff\x02"+
+        "\x6f\x01\u04f7\x01\x6f\x01\uffff\x01\x6f\x01\u04fa\x01\u04fb\x01"+
+        "\x6f\x01\u04fe\x01\x6f\x01\u0500\x01\u0501\x01\x6f\x01\u0503\x01"+
+        "\uffff\x03\x6f\x01\uffff\x01\u0507\x01\uffff\x02\x6f\x01\uffff\x01"+
+        "\x6f\x01\u050b\x02\x6f\x01\u050e\x02\x6f\x01\u0511\x06\x6f\x02\uffff"+
+        "\x01\x6f\x01\u051b\x01\uffff\x01\u051c\x02\x6f\x01\uffff\x01\u051f"+
+        "\x06\x6f\x01\u0527\x01\u0528\x01\uffff\x02\x6f\x01\u052d\x05\x6f"+
+        "\x01\u0536\x05\x6f\x01\u053c\x01\u0540\x02\x6f\x01\u0543\x01\u0544"+
+        "\x01\x6f\x01\uffff\x06\x6f\x01\uffff\x01\x6f\x01\uffff\x06\x6f\x02"+
+        "\uffff\x01\u0554\x01\x6f\x01\u0557\x02\x6f\x01\u055a\x01\u055b\x05"+
+        "\x6f\x01\u0563\x01\x6f\x01\uffff\x02\x6f\x01\uffff\x01\u0568\x03"+
+        "\x6f\x01\uffff\x01\x6f\x03\uffff\x03\x6f\x01\uffff\x03\x6f\x01\u0573"+
+        "\x01\uffff\x01\u0574\x01\u0575\x04\uffff\x01\x6f\x01\u0577\x02\x6f"+
+        "\x01\uffff\x01\x6f\x01\uffff\x01\u057b\x03\x6f\x01\u057f\x02\x6f"+
+        "\x01\u0585\x05\x6f\x01\u058b\x01\uffff\x05\x6f\x01\u0591\x03\x6f"+
+        "\x01\u0597\x01\u059a\x05\x6f\x01\uffff\x01\x6f\x01\uffff\x02\x6f"+
+        "\x01\u05a6\x01\u05a7\x02\x6f\x01\u05aa\x03\x6f\x01\u05b0\x02\x6f"+
+        "\x01\u05b3\x01\u05b4\x01\u05b5\x03\x6f\x01\u05ba\x02\x6f\x01\uffff"+
+        "\x02\x6f\x01\uffff\x01\u05bf\x03\x6f\x01\uffff\x01\x6f\x01\uffff"+
+        "\x01\u05c4\x01\u05c6\x01\u05c7\x02\x6f\x01\u05ca\x03\x6f\x01\u05ce"+
+        "\x01\x6f\x02\uffff\x01\u05d0\x01\uffff\x04\x6f\x01\u05d5\x02\x6f"+
+        "\x01\uffff\x01\x6f\x01\uffff\x01\u05da\x01\x6f\x01\u05dc\x01\x6f"+
+        "\x01\u05de\x01\u05e0\x02\x6f\x01\u05e3\x01\u05e6\x02\x6f\x01\u05e9"+
+        "\x02\x6f\x01\u05ec\x04\x6f\x01\u05f1\x01\x6f\x01\u05f3\x01\u05f4"+
+        "\x01\x6f\x01\u05f8\x01\u05f9\x03\uffff\x01\u05fa\x01\uffff\x01\u05fc"+
+        "\x02\x6f\x01\u0600\x01\u0601\x04\x6f\x01\u0606\x02\x6f\x01\uffff"+
+        "\x01\x6f\x01\u060a\x01\u060d\x02\x6f\x01\u0610\x02\x6f\x01\u0614"+
+        "\x06\x6f\x01\u061b\x01\u061c\x01\u061e\x01\x6f\x01\u0620\x01\u0621"+
+        "\x01\uffff\x01\u0622\x01\u0623\x01\u0624\x01\uffff\x01\u0118\x04"+
+        "\x6f\x01\uffff\x02\x6f\x01\uffff\x01\u062c\x01\x6f\x02\uffff\x02"+
+        "\x6f\x01\uffff\x01\u0631\x01\x6f\x01\u0633\x01\x6f\x01\u0635\x02"+
+        "\x6f\x01\uffff\x01\u0638\x05\x6f\x01\u063e\x04\x6f\x01\uffff\x01"+
+        "\x6f\x01\uffff\x02\x6f\x02\uffff\x04\x6f\x01\u064a\x01\x6f\x01\uffff"+
         "\x02\x6f\x02\uffff\x01\x6f\x01\u0650\x01\u0651\x01\x6f\x02\uffff"+
         "\x01\u0653\x01\x6f\x01\u0656\x01\x6f\x01\uffff\x01\u0659\x03\x6f"+
         "\x02\uffff\x01\x6f\x01\uffff\x01\x6f\x01\u065f\x01\u0660\x01\uffff"+
@@ -24979,49 +24978,49 @@ public partial class Cmd3Lexer : Lexer {
         "\x01\uffff\x02\x6f\x01\u0761\x01\u0765\x01\uffff\x01\x6f\x02\uffff"+
         "\x03\x6f\x03\uffff\x01\x6f\x01\uffff\x01\u076b\x01\x6f\x01\u076d"+
         "\x02\uffff\x01\u076e\x03\x6f\x01\uffff\x01\x6f\x01\u0773\x01\x6f"+
-        "\x01\uffff\x02\x6f\x01\uffff\x02\x6f\x02\uffff\x01\x6f\x01\u077a"+
-        "\x01\uffff\x01\u077b\x02\x6f\x01\u077e\x01\u077f\x01\x6f\x02\uffff"+
-        "\x01\u0781\x01\uffff\x01\u0783\x05\uffff\x01\u02b3\x01\u0784\x02"+
-        "\x6f\x01\u0787\x01\u0788\x01\x6f\x01\uffff\x01\x6f\x01\u078b\x02"+
-        "\x6f\x01\uffff\x01\x6f\x01\uffff\x01\x6f\x01\uffff\x01\u0790\x01"+
-        "\u0791\x01\uffff\x01\u0792\x03\x6f\x01\u0796\x01\uffff\x01\x6f\x01"+
-        "\u079a\x01\u079b\x01\u079c\x01\u079d\x01\u079e\x05\x6f\x01\uffff"+
-        "\x03\x6f\x01\u07a7\x01\u07a8\x02\uffff\x01\x6f\x01\uffff\x01\u07aa"+
-        "\x01\u07ab\x01\uffff\x02\x6f\x01\uffff\x02\x6f\x01\u07b0\x02\x6f"+
-        "\x03\uffff\x01\u07b3\x01\u07b4\x01\u07b5\x01\u07b6\x01\u07b7\x01"+
-        "\x6f\x01\u07b9\x01\x6f\x01\uffff\x02\x6f\x01\u07bd\x02\x6f\x01\u07c0"+
-        "\x01\uffff\x03\x6f\x01\u07c4\x01\u07c5\x02\x6f\x01\uffff\x02\x6f"+
-        "\x01\u07ca\x01\x6f\x01\u07cc\x05\x6f\x01\uffff\x01\u07d2\x02\uffff"+
-        "\x01\u07d3\x01\uffff\x01\u07d4\x02\x6f\x01\uffff\x03\x6f\x01\u07da"+
-        "\x01\u07db\x02\uffff\x01\x6f\x01\u07dd\x01\uffff\x01\u07de\x01\u07df"+
-        "\x01\x6f\x01\uffff\x02\x6f\x01\uffff\x01\u07e3\x01\uffff\x01\x6f"+
-        "\x01\u07e6\x02\uffff\x01\u07e7\x01\u07e8\x01\x6f\x01\uffff\x01\x6f"+
-        "\x01\u07eb\x01\uffff\x01\u07ec\x05\x6f\x01\uffff\x01\x6f\x01\u07f3"+
-        "\x01\u07f4\x04\x6f\x01\u07f9\x01\u07fa\x01\u07fd\x01\u07fe\x01\u07ff"+
-        "\x02\uffff\x01\x6f\x02\uffff\x01\x6f\x01\u0802\x01\uffff\x04\x6f"+
-        "\x01\u0807\x01\uffff\x01\u0808\x01\x6f\x01\u080a\x02\x6f\x01\u080d"+
-        "\x01\x6f\x01\u080f\x08\x6f\x01\u0819\x01\x6f\x01\u081b\x02\uffff"+
-        "\x01\u081c\x02\x6f\x01\u081f\x01\u0820\x01\uffff\x01\u0821\x01\uffff"+
-        "\x04\x6f\x01\u0826\x01\u0827\x02\x6f\x02\uffff\x01\u082a\x01\u082b"+
-        "\x01\u082c\x01\uffff\x01\u082d\x01\u082e\x01\x6f\x01\u0830\x01\x6f"+
-        "\x01\uffff\x01\x6f\x01\u0833\x02\x6f\x02\uffff\x01\x6f\x01\u0837"+
-        "\x01\x6f\x01\uffff\x03\x6f\x01\uffff\x02\x6f\x01\uffff\x01\u083e"+
-        "\x01\uffff\x01\x6f\x01\uffff\x05\x6f\x01\u0845\x01\x6f\x01\u0847"+
-        "\x02\x6f\x01\uffff\x02\x6f\x01\uffff\x01\x6f\x01\u084d\x02\x6f\x03"+
-        "\uffff\x01\x6f\x01\u0851\x02\x6f\x01\uffff\x03\x6f\x02\uffff\x01"+
-        "\u0857\x01\x6f\x01\uffff\x01\u0859\x01\uffff\x01\x6f\x01\uffff\x02"+
-        "\x6f\x02\uffff\x01\u085e\x03\x6f\x01\uffff\x04\x6f\x01\u0866\x01"+
-        "\u0867\x01\uffff\x02\x6f\x03\uffff\x01\x6f\x01\u086c\x01\u086e\x01"+
-        "\x6f\x01\u0870\x01\u0871\x02\x6f\x01\u0874\x02\x6f\x01\uffff\x01"+
-        "\x6f\x01\u0878\x01\uffff\x03\x6f\x01\u087c\x01\uffff\x01\u087d\x01"+
-        "\u087e\x01\x6f\x01\uffff\x01\u0880\x04\x6f\x01\uffff\x01\u0885\x02"+
-        "\uffff\x01\u0886\x01\u0887\x02\x6f\x01\uffff\x05\x6f\x03\uffff\x01"+
-        "\u088f\x01\x6f\x02\uffff\x01\x6f\x01\uffff\x01\u0892\x02\uffff\x01"+
-        "\u0893\x01\x6f\x02\uffff\x02\x6f\x01\uffff\x02\x6f\x01\u0899\x01"+
-        "\u089a\x03\uffff\x01\u089b\x01\u089c\x01\x6f\x01\uffff\x01\x6f\x01"+
-        "\u089f\x01\u08a0\x05\uffff\x01\u08a1\x07\x6f\x02\uffff\x01\x6f\x02"+
-        "\uffff\x04\x6f\x01\uffff\x01\x6f\x01\u08af\x05\uffff\x01\u08b0\x01"+
-        "\uffff\x01\u08b1\x01\u08b2\x01\u08b3\x01\uffff\x02\x6f\x01\uffff"+
+        "\x01\uffff\x02\x6f\x01\uffff\x02\x6f\x01\uffff\x01\x6f\x01\uffff"+
+        "\x01\u077a\x01\uffff\x01\u077b\x02\x6f\x01\u077e\x01\u077f\x01\x6f"+
+        "\x02\uffff\x01\u0781\x01\uffff\x01\u0783\x05\uffff\x01\u02b4\x01"+
+        "\u0784\x02\x6f\x01\u0787\x01\u0788\x01\x6f\x01\uffff\x01\x6f\x01"+
+        "\u078b\x02\x6f\x01\uffff\x01\x6f\x01\uffff\x01\x6f\x01\uffff\x01"+
+        "\u0790\x01\u0791\x01\uffff\x01\u0792\x03\x6f\x01\u0796\x01\uffff"+
+        "\x01\x6f\x01\u079a\x01\u079b\x01\u079c\x01\u079d\x01\u079e\x05\x6f"+
+        "\x01\uffff\x03\x6f\x01\u07a7\x01\u07a8\x02\uffff\x01\x6f\x01\uffff"+
+        "\x01\u07aa\x01\u07ab\x01\uffff\x02\x6f\x01\uffff\x02\x6f\x01\u07b0"+
+        "\x02\x6f\x03\uffff\x01\u07b3\x01\u07b4\x01\u07b5\x01\u07b6\x01\u07b7"+
+        "\x01\x6f\x01\u07b9\x01\x6f\x01\uffff\x02\x6f\x01\u07bd\x02\x6f\x01"+
+        "\u07c0\x01\uffff\x03\x6f\x01\u07c4\x01\u07c5\x02\x6f\x01\uffff\x02"+
+        "\x6f\x01\u07ca\x01\x6f\x01\u07cc\x05\x6f\x01\uffff\x01\u07d2\x02"+
+        "\uffff\x01\u07d3\x01\uffff\x01\u07d4\x02\x6f\x01\uffff\x03\x6f\x01"+
+        "\u07da\x01\u07db\x02\uffff\x01\x6f\x01\u07dd\x01\uffff\x01\u07de"+
+        "\x01\u07df\x01\x6f\x01\uffff\x02\x6f\x01\uffff\x01\u07e3\x01\uffff"+
+        "\x01\x6f\x01\u07e6\x02\uffff\x01\u07e7\x01\u07e8\x01\x6f\x01\uffff"+
+        "\x01\x6f\x01\u07eb\x01\uffff\x01\u07ec\x05\x6f\x01\uffff\x01\x6f"+
+        "\x01\u07f3\x01\u07f4\x04\x6f\x01\u07f9\x01\u07fa\x01\u07fd\x01\u07fe"+
+        "\x01\u07ff\x02\uffff\x01\x6f\x02\uffff\x01\x6f\x01\u0802\x01\uffff"+
+        "\x04\x6f\x01\u0807\x01\uffff\x01\u0808\x01\x6f\x01\u080a\x02\x6f"+
+        "\x01\u080d\x01\x6f\x01\u080f\x08\x6f\x01\u0819\x01\x6f\x01\u081b"+
+        "\x02\uffff\x01\u081c\x02\x6f\x01\u081f\x01\u0820\x01\uffff\x01\u0821"+
+        "\x01\uffff\x04\x6f\x01\u0826\x01\u0827\x02\x6f\x02\uffff\x01\u082a"+
+        "\x01\u082b\x01\u082c\x01\uffff\x01\u082d\x01\u082e\x01\x6f\x01\u0830"+
+        "\x01\x6f\x01\uffff\x01\x6f\x01\u0833\x02\x6f\x02\uffff\x01\x6f\x01"+
+        "\u0837\x01\x6f\x01\uffff\x03\x6f\x01\uffff\x02\x6f\x01\uffff\x01"+
+        "\u083e\x01\uffff\x01\x6f\x01\uffff\x05\x6f\x01\u0845\x01\x6f\x01"+
+        "\u0847\x02\x6f\x01\uffff\x02\x6f\x01\uffff\x01\x6f\x01\u084d\x02"+
+        "\x6f\x03\uffff\x01\x6f\x01\u0851\x02\x6f\x01\uffff\x03\x6f\x02\uffff"+
+        "\x01\u0857\x01\x6f\x01\uffff\x01\u0859\x01\uffff\x01\x6f\x01\uffff"+
+        "\x02\x6f\x02\uffff\x01\u085e\x03\x6f\x01\uffff\x04\x6f\x01\u0866"+
+        "\x01\u0867\x01\uffff\x02\x6f\x03\uffff\x01\x6f\x01\u086c\x01\u086e"+
+        "\x01\x6f\x01\u0870\x01\u0871\x02\x6f\x01\u0874\x02\x6f\x01\uffff"+
+        "\x01\x6f\x01\u0878\x01\uffff\x03\x6f\x01\u087c\x01\uffff\x01\u087d"+
+        "\x01\u087e\x01\x6f\x01\uffff\x01\u0880\x04\x6f\x01\uffff\x01\u0885"+
+        "\x02\uffff\x01\u0886\x01\u0887\x02\x6f\x01\uffff\x05\x6f\x03\uffff"+
+        "\x01\u088f\x01\x6f\x02\uffff\x01\x6f\x01\uffff\x01\u0892\x02\uffff"+
+        "\x01\u0893\x01\x6f\x02\uffff\x02\x6f\x01\uffff\x02\x6f\x01\u0899"+
+        "\x01\u089a\x03\uffff\x01\u089b\x01\u089c\x01\x6f\x01\uffff\x01\x6f"+
+        "\x01\u089f\x01\u08a0\x05\uffff\x01\u08a1\x07\x6f\x02\uffff\x01\x6f"+
+        "\x02\uffff\x04\x6f\x01\uffff\x01\x6f\x01\u08af\x05\uffff\x01\u08b0"+
+        "\x01\uffff\x01\u08b1\x01\u08b2\x01\u08b3\x01\uffff\x02\x6f\x01\uffff"+
         "\x03\x6f\x02\uffff\x04\x6f\x01\uffff\x01\x6f\x01\uffff\x01\u08be"+
         "\x02\x6f\x01\u08c1\x01\x6f\x03\uffff\x01\u08c3\x01\u08c4\x01\x6f"+
         "\x01\u08c6\x01\x6f\x02\uffff\x01\u08c8\x03\uffff\x03\x6f\x01\uffff"+
@@ -25084,13 +25083,13 @@ public partial class Cmd3Lexer : Lexer {
         "\x01\u0a56\x01\u0a57\x02\uffff\x01\u0a58\x02\x6f\x01\uffff\x05\x6f"+
         "\x01\uffff\x01\x6f\x01\u0a61\x01\u0a63\x02\x6f\x01\u0a66\x01\x6f"+
         "\x03\uffff\x01\x6f\x01\u0a69\x06\x6f\x01\uffff\x01\x6f\x01\uffff"+
-        "\x01\u0a71\x01\x6f\x01\uffff\x01\u0a73\x01\u0a74\x01\uffff\x02\x6f"+
-        "\x01\u0a77\x02\x6f\x01\u0a7a\x01\x6f\x01\uffff\x01\u0a7c\x02\uffff"+
-        "\x01\x6f\x01\u0a7f\x01\uffff\x01\u0a80\x01\u0a81\x01\uffff\x01\x6f"+
-        "\x01\uffff\x02\x6f\x03\uffff\x01\u0a85\x02\x6f\x01\uffff\x01\u0a88"+
-        "\x01\x6f\x01\uffff\x01\x6f\x01\u0a8b\x01\uffff";
+        "\x01\u0a71\x01\x6f\x01\uffff\x01\u0a73\x01\x6f\x01\uffff\x02\x6f"+
+        "\x01\u0a77\x02\x6f\x01\u0a7a\x01\x6f\x01\uffff\x01\u0a7c\x01\uffff"+
+        "\x02\x6f\x01\u0a80\x01\uffff\x01\u0a81\x01\u0a82\x01\uffff\x01\x6f"+
+        "\x01\uffff\x01\u0a84\x02\x6f\x03\uffff\x01\u0a87\x01\uffff\x02\x6f"+
+        "\x01\uffff\x01\u0a8a\x01\x6f\x01\uffff\x01\x6f\x01\u0a8d\x01\uffff";
     const string DFA29_eofS =
-        "\u0a8c\uffff";
+        "\u0a8e\uffff";
     const string DFA29_minS =
         "\x01\x09\x20\x30\x01\uffff\x01\x2a\x02\x30\x01\x2e\x02\x00\x01"+
         "\x3d\x01\x2a\x03\x3d\x01\x5c\x02\uffff\x03\x3d\x04\uffff\x01\x7c"+
@@ -25099,118 +25098,118 @@ public partial class Cmd3Lexer : Lexer {
         "\uffff\x07\x30\x01\uffff\x19\x30\x01\uffff\x05\x30\x01\uffff\x1b"+
         "\x30\x01\uffff\x14\x30\x01\uffff\x05\x30\x01\uffff\x0e\x30\x01\uffff"+
         "\x0c\x30\x01\uffff\x0e\x30\x01\uffff\x0a\x30\x01\uffff\x11\x30\x05"+
-        "\uffff\x01\x30\x01\uffff\x01\x30\x01\x2b\x01\uffff\x01\x30\x01\uffff"+
-        "\x01\x00\x01\uffff\x01\x00\x02\uffff\x01\x00\x05\uffff\x01\x2a\x09"+
-        "\uffff\x01\x3c\x0f\uffff\x10\x30\x01\uffff\x17\x30\x01\uffff\x01"+
-        "\x30\x01\uffff\x0b\x30\x01\uffff\x0f\x30\x02\uffff\x04\x30\x02\uffff"+
-        "\x4e\x30\x01\uffff\x05\x30\x01\uffff\x22\x30\x01\uffff\x02\x30\x01"+
-        "\uffff\x03\x30\x02\uffff\x03\x30\x01\uffff\x06\x30\x01\uffff\x06"+
-        "\x30\x01\uffff\x03\x30\x01\uffff\x03\x30\x01\uffff\x06\x30\x01\uffff"+
-        "\x14\x30\x01\uffff\x27\x30\x01\uffff\x14\x30\x01\uffff\x1e\x30\x01"+
-        "\uffff\x14\x30\x01\uffff\x01\x30\x01\x00\x04\uffff\x01\x30\x02\uffff"+
-        "\x03\x30\x01\uffff\x05\x30\x01\uffff\x03\x30\x01\uffff\x0e\x30\x02"+
-        "\uffff\x04\x30\x01\uffff\x04\x30\x01\uffff\x06\x30\x01\uffff\x04"+
-        "\x30\x01\uffff\x01\x30\x01\uffff\x08\x30\x01\uffff\x07\x30\x02\uffff"+
-        "\x04\x30\x01\uffff\x03\x30\x01\uffff\x03\x30\x02\uffff\x04\x30\x02"+
-        "\uffff\x06\x30\x01\uffff\x0a\x30\x01\uffff\x04\x30\x01\uffff\x08"+
-        "\x30\x01\uffff\x01\x30\x01\uffff\x04\x30\x01\uffff\x0a\x30\x01\uffff"+
-        "\x03\x30\x01\uffff\x01\x30\x01\uffff\x02\x30\x01\uffff\x0e\x30\x02"+
-        "\uffff\x02\x30\x01\uffff\x03\x30\x01\uffff\x09\x30\x01\uffff\x15"+
-        "\x30\x01\uffff\x06\x30\x01\uffff\x01\x30\x01\uffff\x06\x30\x02\uffff"+
-        "\x0e\x30\x01\uffff\x02\x30\x01\uffff\x04\x30\x01\uffff\x01\x30\x03"+
-        "\uffff\x03\x30\x01\uffff\x04\x30\x01\uffff\x02\x30\x04\uffff\x04"+
-        "\x30\x01\uffff\x01\x30\x01\uffff\x0e\x30\x01\uffff\x10\x30\x01\uffff"+
-        "\x01\x30\x01\uffff\x16\x30\x01\uffff\x02\x30\x01\uffff\x04\x30\x01"+
-        "\uffff\x01\x30\x01\uffff\x0b\x30\x02\uffff\x01\x30\x01\uffff\x07"+
-        "\x30\x01\uffff\x01\x30\x01\uffff\x1b\x30\x03\uffff\x01\x30\x01\uffff"+
-        "\x0c\x30\x01\uffff\x15\x30\x01\uffff\x04\x30\x01\uffff\x04\x30\x01"+
-        "\uffff\x02\x30\x01\uffff\x02\x30\x02\uffff\x02\x30\x01\uffff\x07"+
-        "\x30\x01\uffff\x0b\x30\x01\uffff\x01\x30\x01\uffff\x02\x30\x02\uffff"+
-        "\x06\x30\x01\uffff\x02\x30\x02\uffff\x04\x30\x02\uffff\x04\x30\x01"+
-        "\uffff\x04\x30\x02\uffff\x01\x30\x01\uffff\x03\x30\x01\uffff\x05"+
-        "\x30\x01\uffff\x09\x30\x01\uffff\x03\x30\x01\uffff\x03\x30\x01\uffff"+
-        "\x03\x30\x01\uffff\x02\x30\x02\uffff\x01\x30\x03\uffff\x02\x30\x01"+
-        "\uffff\x02\x30\x02\uffff\x01\x30\x01\uffff\x03\x30\x01\uffff\x03"+
-        "\x30\x01\uffff\x03\x30\x01\uffff\x02\x30\x01\uffff\x02\x30\x02\uffff"+
-        "\x02\x30\x01\uffff\x01\x30\x02\uffff\x01\x30\x01\uffff\x03\x30\x01"+
-        "\uffff\x03\x30\x01\uffff\x02\x30\x01\uffff\x02\x30\x01\uffff\x09"+
-        "\x30\x02\uffff\x02\x30\x01\uffff\x07\x30\x02\uffff\x04\x30\x01\uffff"+
-        "\x08\x30\x01\uffff\x05\x30\x01\uffff\x03\x30\x01\uffff\x02\x30\x02"+
-        "\uffff\x0f\x30\x01\uffff\x02\x30\x01\uffff\x02\x30\x02\uffff\x07"+
-        "\x30\x01\uffff\x04\x30\x01\uffff\x0a\x30\x03\uffff\x01\x30\x01\uffff"+
-        "\x03\x30\x01\uffff\x03\x30\x01\uffff\x05\x30\x01\uffff\x05\x30\x01"+
-        "\uffff\x05\x30\x01\uffff\x05\x30\x01\uffff\x02\x30\x01\uffff\x0b"+
-        "\x30\x02\uffff\x02\x30\x01\uffff\x05\x30\x01\uffff\x02\x30\x03\uffff"+
-        "\x04\x30\x01\uffff\x04\x30\x01\uffff\x04\x30\x01\uffff\x01\x30\x02"+
-        "\uffff\x02\x30\x01\uffff\x03\x30\x01\uffff\x01\x30\x01\uffff\x04"+
-        "\x30\x01\uffff\x04\x30\x01\uffff\x01\x30\x01\uffff\x01\x30\x01\uffff"+
-        "\x01\x30\x01\uffff\x02\x30\x01\uffff\x02\x30\x01\uffff\x02\x30\x01"+
-        "\uffff\x02\x30\x01\uffff\x04\x30\x01\uffff\x01\x30\x02\uffff\x03"+
-        "\x30\x03\uffff\x01\x30\x01\uffff\x03\x30\x02\uffff\x04\x30\x01\uffff"+
-        "\x03\x30\x01\uffff\x02\x30\x01\uffff\x02\x30\x02\uffff\x02\x30\x01"+
-        "\uffff\x06\x30\x02\uffff\x01\x30\x01\uffff\x01\x30\x05\uffff\x07"+
-        "\x30\x01\uffff\x04\x30\x01\uffff\x01\x30\x01\uffff\x01\x30\x01\uffff"+
-        "\x02\x30\x01\uffff\x05\x30\x01\uffff\x0b\x30\x01\uffff\x05\x30\x02"+
-        "\uffff\x01\x30\x01\uffff\x02\x30\x01\uffff\x02\x30\x01\uffff\x05"+
-        "\x30\x03\uffff\x08\x30\x01\uffff\x06\x30\x01\uffff\x07\x30\x01\uffff"+
-        "\x0a\x30\x01\uffff\x01\x30\x02\uffff\x01\x30\x01\uffff\x03\x30\x01"+
-        "\uffff\x05\x30\x02\uffff\x02\x30\x01\uffff\x03\x30\x01\uffff\x02"+
-        "\x30\x01\uffff\x01\x30\x01\uffff\x02\x30\x02\uffff\x03\x30\x01\uffff"+
-        "\x02\x30\x01\uffff\x06\x30\x01\uffff\x0c\x30\x02\uffff\x01\x30\x02"+
-        "\uffff\x02\x30\x01\uffff\x05\x30\x01\uffff\x13\x30\x02\uffff\x05"+
-        "\x30\x01\uffff\x01\x30\x01\uffff\x08\x30\x02\uffff\x03\x30\x01\uffff"+
-        "\x05\x30\x01\uffff\x04\x30\x02\uffff\x03\x30\x01\uffff\x03\x30\x01"+
-        "\uffff\x02\x30\x01\uffff\x01\x30\x01\uffff\x01\x30\x01\uffff\x0a"+
-        "\x30\x01\uffff\x02\x30\x01\uffff\x04\x30\x03\uffff\x04\x30\x01\uffff"+
-        "\x03\x30\x02\uffff\x02\x30\x01\uffff\x01\x30\x01\uffff\x01\x30\x01"+
-        "\uffff\x02\x30\x02\uffff\x04\x30\x01\uffff\x06\x30\x01\uffff\x02"+
-        "\x30\x03\uffff\x0b\x30\x01\uffff\x02\x30\x01\uffff\x04\x30\x01\uffff"+
-        "\x03\x30\x01\uffff\x05\x30\x01\uffff\x01\x30\x02\uffff\x04\x30\x01"+
-        "\uffff\x05\x30\x03\uffff\x02\x30\x02\uffff\x01\x30\x01\uffff\x01"+
-        "\x30\x02\uffff\x02\x30\x02\uffff\x02\x30\x01\uffff\x04\x30\x03\uffff"+
-        "\x03\x30\x01\uffff\x03\x30\x05\uffff\x08\x30\x02\uffff\x01\x30\x02"+
-        "\uffff\x04\x30\x01\uffff\x02\x30\x05\uffff\x01\x30\x01\uffff\x03"+
-        "\x30\x01\uffff\x02\x30\x01\uffff\x03\x30\x02\uffff\x04\x30\x01\uffff"+
-        "\x01\x30\x01\uffff\x05\x30\x03\uffff\x05\x30\x02\uffff\x01\x30\x03"+
-        "\uffff\x03\x30\x01\uffff\x02\x30\x03\uffff\x02\x30\x02\uffff\x06"+
-        "\x30\x02\uffff\x04\x30\x02\uffff\x02\x30\x03\uffff\x02\x30\x01\uffff"+
-        "\x04\x30\x02\uffff\x01\x30\x01\uffff\x02\x30\x01\uffff\x01\x30\x01"+
-        "\uffff\x09\x30\x01\uffff\x01\x30\x02\uffff\x02\x30\x03\uffff\x04"+
-        "\x30\x02\uffff\x02\x30\x05\uffff\x01\x30\x01\uffff\x02\x30\x01\uffff"+
-        "\x03\x30\x01\uffff\x06\x30\x01\uffff\x06\x30\x01\uffff\x01\x30\x01"+
-        "\uffff\x05\x30\x01\uffff\x03\x30\x01\uffff\x05\x30\x01\uffff\x01"+
-        "\x30\x01\uffff\x04\x30\x01\uffff\x07\x30\x02\uffff\x04\x30\x01\uffff"+
-        "\x01\x30\x01\uffff\x01\x30\x02\uffff\x02\x30\x01\uffff\x03\x30\x01"+
-        "\uffff\x03\x30\x03\uffff\x01\x30\x01\uffff\x04\x30\x03\uffff\x07"+
-        "\x30\x01\uffff\x02\x30\x02\uffff\x05\x30\x04\uffff\x02\x30\x03\uffff"+
-        "\x0d\x30\x05\uffff\x0a\x30\x01\uffff\x02\x30\x01\uffff\x01\x30\x02"+
-        "\uffff\x01\x30\x01\uffff\x01\x30\x01\uffff\x04\x30\x01\uffff\x01"+
-        "\x30\x01\uffff\x06\x30\x02\uffff\x04\x30\x01\uffff\x04\x30\x01\uffff"+
-        "\x09\x30\x01\uffff\x04\x30\x01\uffff\x01\x30\x01\uffff\x03\x30\x03"+
-        "\uffff\x01\x30\x01\uffff\x01\x30\x01\uffff\x02\x30\x02\uffff\x04"+
-        "\x30\x02\uffff\x04\x30\x01\uffff\x04\x30\x01\uffff\x06\x30\x02\uffff"+
-        "\x08\x30\x01\uffff\x01\x30\x01\uffff\x01\x30\x04\uffff\x07\x30\x01"+
-        "\uffff\x09\x30\x01\uffff\x03\x30\x01\uffff\x02\x30\x01\uffff\x01"+
-        "\x30\x03\uffff\x06\x30\x02\uffff\x01\x30\x03\uffff\x02\x30\x01\uffff"+
-        "\x03\x30\x03\uffff\x05\x30\x05\uffff\x02\x30\x02\uffff\x01\x30\x04"+
-        "\uffff\x02\x30\x01\uffff\x01\x30\x03\uffff\x03\x30\x01\uffff\x01"+
-        "\x30\x02\uffff\x01\x30\x01\uffff\x03\x30\x01\uffff\x0b\x30\x01\uffff"+
-        "\x01\x30\x01\uffff\x04\x30\x04\uffff\x04\x30\x07\uffff\x01\x30\x01"+
-        "\uffff\x01\x30\x01\uffff\x0b\x30\x01\uffff\x01\x30\x01\uffff\x03"+
-        "\x30\x03\uffff\x03\x30\x01\uffff\x02\x30\x01\uffff\x02\x30\x03\uffff"+
-        "\x02\x30\x01\uffff\x02\x30\x02\uffff\x01\x30\x02\uffff\x02\x30\x03"+
-        "\uffff\x01\x30\x02\uffff\x02\x30\x01\uffff\x03\x30\x01\uffff\x04"+
-        "\x30\x02\uffff\x03\x30\x01\uffff\x01\x30\x02\uffff\x02\x30\x01\uffff"+
-        "\x01\x30\x06\uffff\x04\x30\x03\uffff\x03\x30\x01\uffff\x02\x30\x02"+
-        "\uffff\x01\x30\x01\uffff\x04\x30\x01\uffff\x01\x30\x01\uffff\x07"+
-        "\x30\x01\uffff\x07\x30\x01\uffff\x02\x30\x01\uffff\x01\x30\x04\uffff"+
-        "\x04\x30\x02\uffff\x02\x30\x01\uffff\x02\x30\x01\uffff\x01\x30\x02"+
-        "\uffff\x03\x30\x01\uffff\x01\x30\x02\uffff\x06\x30\x02\uffff\x03"+
-        "\x30\x01\uffff\x05\x30\x01\uffff\x07\x30\x03\uffff\x08\x30\x01\uffff"+
-        "\x01\x30\x01\uffff\x02\x30\x01\uffff\x02\x30\x01\uffff\x07\x30\x01"+
-        "\uffff\x01\x30\x02\uffff\x02\x30\x01\uffff\x02\x30\x01\uffff\x01"+
-        "\x30\x01\uffff\x02\x30\x03\uffff\x03\x30\x01\uffff\x02\x30\x01\uffff"+
-        "\x02\x30\x01\uffff";
+        "\uffff\x01\x2b\x03\x30\x03\uffff\x01\x00\x01\uffff\x01\x00\x02\uffff"+
+        "\x01\x00\x05\uffff\x01\x2a\x09\uffff\x01\x3c\x0f\uffff\x10\x30\x01"+
+        "\uffff\x17\x30\x01\uffff\x01\x30\x01\uffff\x0b\x30\x01\uffff\x0f"+
+        "\x30\x02\uffff\x04\x30\x02\uffff\x4e\x30\x01\uffff\x05\x30\x01\uffff"+
+        "\x22\x30\x01\uffff\x02\x30\x01\uffff\x03\x30\x02\uffff\x03\x30\x01"+
+        "\uffff\x06\x30\x01\uffff\x06\x30\x01\uffff\x03\x30\x01\uffff\x03"+
+        "\x30\x01\uffff\x06\x30\x01\uffff\x14\x30\x01\uffff\x27\x30\x01\uffff"+
+        "\x14\x30\x01\uffff\x1e\x30\x01\uffff\x15\x30\x01\uffff\x01\x00\x04"+
+        "\uffff\x01\x30\x02\uffff\x03\x30\x01\uffff\x05\x30\x01\uffff\x03"+
+        "\x30\x01\uffff\x0e\x30\x02\uffff\x04\x30\x01\uffff\x04\x30\x01\uffff"+
+        "\x06\x30\x01\uffff\x04\x30\x01\uffff\x01\x30\x01\uffff\x08\x30\x01"+
+        "\uffff\x07\x30\x02\uffff\x04\x30\x01\uffff\x03\x30\x01\uffff\x03"+
+        "\x30\x02\uffff\x04\x30\x02\uffff\x06\x30\x01\uffff\x0a\x30\x01\uffff"+
+        "\x04\x30\x01\uffff\x08\x30\x01\uffff\x01\x30\x01\uffff\x04\x30\x01"+
+        "\uffff\x0a\x30\x01\uffff\x03\x30\x01\uffff\x01\x30\x01\uffff\x02"+
+        "\x30\x01\uffff\x0e\x30\x02\uffff\x02\x30\x01\uffff\x03\x30\x01\uffff"+
+        "\x09\x30\x01\uffff\x15\x30\x01\uffff\x06\x30\x01\uffff\x01\x30\x01"+
+        "\uffff\x06\x30\x02\uffff\x0e\x30\x01\uffff\x02\x30\x01\uffff\x04"+
+        "\x30\x01\uffff\x01\x30\x03\uffff\x03\x30\x01\uffff\x04\x30\x01\uffff"+
+        "\x02\x30\x04\uffff\x04\x30\x01\uffff\x01\x30\x01\uffff\x0e\x30\x01"+
+        "\uffff\x10\x30\x01\uffff\x01\x30\x01\uffff\x16\x30\x01\uffff\x02"+
+        "\x30\x01\uffff\x04\x30\x01\uffff\x01\x30\x01\uffff\x0b\x30\x02\uffff"+
+        "\x01\x30\x01\uffff\x07\x30\x01\uffff\x01\x30\x01\uffff\x1b\x30\x03"+
+        "\uffff\x01\x30\x01\uffff\x0c\x30\x01\uffff\x15\x30\x01\uffff\x03"+
+        "\x30\x01\uffff\x05\x30\x01\uffff\x02\x30\x01\uffff\x02\x30\x02\uffff"+
+        "\x02\x30\x01\uffff\x07\x30\x01\uffff\x0b\x30\x01\uffff\x01\x30\x01"+
+        "\uffff\x02\x30\x02\uffff\x06\x30\x01\uffff\x02\x30\x02\uffff\x04"+
+        "\x30\x02\uffff\x04\x30\x01\uffff\x04\x30\x02\uffff\x01\x30\x01\uffff"+
+        "\x03\x30\x01\uffff\x05\x30\x01\uffff\x09\x30\x01\uffff\x03\x30\x01"+
+        "\uffff\x03\x30\x01\uffff\x03\x30\x01\uffff\x02\x30\x02\uffff\x01"+
+        "\x30\x03\uffff\x02\x30\x01\uffff\x02\x30\x02\uffff\x01\x30\x01\uffff"+
+        "\x03\x30\x01\uffff\x03\x30\x01\uffff\x03\x30\x01\uffff\x02\x30\x01"+
+        "\uffff\x02\x30\x02\uffff\x02\x30\x01\uffff\x01\x30\x02\uffff\x01"+
+        "\x30\x01\uffff\x03\x30\x01\uffff\x03\x30\x01\uffff\x02\x30\x01\uffff"+
+        "\x02\x30\x01\uffff\x09\x30\x02\uffff\x02\x30\x01\uffff\x07\x30\x02"+
+        "\uffff\x04\x30\x01\uffff\x08\x30\x01\uffff\x05\x30\x01\uffff\x03"+
+        "\x30\x01\uffff\x02\x30\x02\uffff\x0f\x30\x01\uffff\x02\x30\x01\uffff"+
+        "\x02\x30\x02\uffff\x07\x30\x01\uffff\x04\x30\x01\uffff\x0a\x30\x03"+
+        "\uffff\x01\x30\x01\uffff\x03\x30\x01\uffff\x03\x30\x01\uffff\x05"+
+        "\x30\x01\uffff\x05\x30\x01\uffff\x05\x30\x01\uffff\x05\x30\x01\uffff"+
+        "\x02\x30\x01\uffff\x0b\x30\x02\uffff\x02\x30\x01\uffff\x05\x30\x01"+
+        "\uffff\x02\x30\x03\uffff\x04\x30\x01\uffff\x04\x30\x01\uffff\x04"+
+        "\x30\x01\uffff\x01\x30\x02\uffff\x02\x30\x01\uffff\x03\x30\x01\uffff"+
+        "\x01\x30\x01\uffff\x04\x30\x01\uffff\x04\x30\x01\uffff\x01\x30\x01"+
+        "\uffff\x01\x30\x01\uffff\x01\x30\x01\uffff\x02\x30\x01\uffff\x02"+
+        "\x30\x01\uffff\x02\x30\x01\uffff\x02\x30\x01\uffff\x04\x30\x01\uffff"+
+        "\x01\x30\x02\uffff\x03\x30\x03\uffff\x01\x30\x01\uffff\x03\x30\x02"+
+        "\uffff\x04\x30\x01\uffff\x03\x30\x01\uffff\x02\x30\x01\uffff\x02"+
+        "\x30\x01\uffff\x01\x30\x01\uffff\x01\x30\x01\uffff\x06\x30\x02\uffff"+
+        "\x01\x30\x01\uffff\x01\x30\x05\uffff\x07\x30\x01\uffff\x04\x30\x01"+
+        "\uffff\x01\x30\x01\uffff\x01\x30\x01\uffff\x02\x30\x01\uffff\x05"+
+        "\x30\x01\uffff\x0b\x30\x01\uffff\x05\x30\x02\uffff\x01\x30\x01\uffff"+
+        "\x02\x30\x01\uffff\x02\x30\x01\uffff\x05\x30\x03\uffff\x08\x30\x01"+
+        "\uffff\x06\x30\x01\uffff\x07\x30\x01\uffff\x0a\x30\x01\uffff\x01"+
+        "\x30\x02\uffff\x01\x30\x01\uffff\x03\x30\x01\uffff\x05\x30\x02\uffff"+
+        "\x02\x30\x01\uffff\x03\x30\x01\uffff\x02\x30\x01\uffff\x01\x30\x01"+
+        "\uffff\x02\x30\x02\uffff\x03\x30\x01\uffff\x02\x30\x01\uffff\x06"+
+        "\x30\x01\uffff\x0c\x30\x02\uffff\x01\x30\x02\uffff\x02\x30\x01\uffff"+
+        "\x05\x30\x01\uffff\x13\x30\x02\uffff\x05\x30\x01\uffff\x01\x30\x01"+
+        "\uffff\x08\x30\x02\uffff\x03\x30\x01\uffff\x05\x30\x01\uffff\x04"+
+        "\x30\x02\uffff\x03\x30\x01\uffff\x03\x30\x01\uffff\x02\x30\x01\uffff"+
+        "\x01\x30\x01\uffff\x01\x30\x01\uffff\x0a\x30\x01\uffff\x02\x30\x01"+
+        "\uffff\x04\x30\x03\uffff\x04\x30\x01\uffff\x03\x30\x02\uffff\x02"+
+        "\x30\x01\uffff\x01\x30\x01\uffff\x01\x30\x01\uffff\x02\x30\x02\uffff"+
+        "\x04\x30\x01\uffff\x06\x30\x01\uffff\x02\x30\x03\uffff\x0b\x30\x01"+
+        "\uffff\x02\x30\x01\uffff\x04\x30\x01\uffff\x03\x30\x01\uffff\x05"+
+        "\x30\x01\uffff\x01\x30\x02\uffff\x04\x30\x01\uffff\x05\x30\x03\uffff"+
+        "\x02\x30\x02\uffff\x01\x30\x01\uffff\x01\x30\x02\uffff\x02\x30\x02"+
+        "\uffff\x02\x30\x01\uffff\x04\x30\x03\uffff\x03\x30\x01\uffff\x03"+
+        "\x30\x05\uffff\x08\x30\x02\uffff\x01\x30\x02\uffff\x04\x30\x01\uffff"+
+        "\x02\x30\x05\uffff\x01\x30\x01\uffff\x03\x30\x01\uffff\x02\x30\x01"+
+        "\uffff\x03\x30\x02\uffff\x04\x30\x01\uffff\x01\x30\x01\uffff\x05"+
+        "\x30\x03\uffff\x05\x30\x02\uffff\x01\x30\x03\uffff\x03\x30\x01\uffff"+
+        "\x02\x30\x03\uffff\x02\x30\x02\uffff\x06\x30\x02\uffff\x04\x30\x02"+
+        "\uffff\x02\x30\x03\uffff\x02\x30\x01\uffff\x04\x30\x02\uffff\x01"+
+        "\x30\x01\uffff\x02\x30\x01\uffff\x01\x30\x01\uffff\x09\x30\x01\uffff"+
+        "\x01\x30\x02\uffff\x02\x30\x03\uffff\x04\x30\x02\uffff\x02\x30\x05"+
+        "\uffff\x01\x30\x01\uffff\x02\x30\x01\uffff\x03\x30\x01\uffff\x06"+
+        "\x30\x01\uffff\x06\x30\x01\uffff\x01\x30\x01\uffff\x05\x30\x01\uffff"+
+        "\x03\x30\x01\uffff\x05\x30\x01\uffff\x01\x30\x01\uffff\x04\x30\x01"+
+        "\uffff\x07\x30\x02\uffff\x04\x30\x01\uffff\x01\x30\x01\uffff\x01"+
+        "\x30\x02\uffff\x02\x30\x01\uffff\x03\x30\x01\uffff\x03\x30\x03\uffff"+
+        "\x01\x30\x01\uffff\x04\x30\x03\uffff\x07\x30\x01\uffff\x02\x30\x02"+
+        "\uffff\x05\x30\x04\uffff\x02\x30\x03\uffff\x0d\x30\x05\uffff\x0a"+
+        "\x30\x01\uffff\x02\x30\x01\uffff\x01\x30\x02\uffff\x01\x30\x01\uffff"+
+        "\x01\x30\x01\uffff\x04\x30\x01\uffff\x01\x30\x01\uffff\x06\x30\x02"+
+        "\uffff\x04\x30\x01\uffff\x04\x30\x01\uffff\x09\x30\x01\uffff\x04"+
+        "\x30\x01\uffff\x01\x30\x01\uffff\x03\x30\x03\uffff\x01\x30\x01\uffff"+
+        "\x01\x30\x01\uffff\x02\x30\x02\uffff\x04\x30\x02\uffff\x04\x30\x01"+
+        "\uffff\x04\x30\x01\uffff\x06\x30\x02\uffff\x08\x30\x01\uffff\x01"+
+        "\x30\x01\uffff\x01\x30\x04\uffff\x07\x30\x01\uffff\x09\x30\x01\uffff"+
+        "\x03\x30\x01\uffff\x02\x30\x01\uffff\x01\x30\x03\uffff\x06\x30\x02"+
+        "\uffff\x01\x30\x03\uffff\x02\x30\x01\uffff\x03\x30\x03\uffff\x05"+
+        "\x30\x05\uffff\x02\x30\x02\uffff\x01\x30\x04\uffff\x02\x30\x01\uffff"+
+        "\x01\x30\x03\uffff\x03\x30\x01\uffff\x01\x30\x02\uffff\x01\x30\x01"+
+        "\uffff\x03\x30\x01\uffff\x0b\x30\x01\uffff\x01\x30\x01\uffff\x04"+
+        "\x30\x04\uffff\x04\x30\x07\uffff\x01\x30\x01\uffff\x01\x30\x01\uffff"+
+        "\x0b\x30\x01\uffff\x01\x30\x01\uffff\x03\x30\x03\uffff\x03\x30\x01"+
+        "\uffff\x02\x30\x01\uffff\x02\x30\x03\uffff\x02\x30\x01\uffff\x02"+
+        "\x30\x02\uffff\x01\x30\x02\uffff\x02\x30\x03\uffff\x01\x30\x02\uffff"+
+        "\x02\x30\x01\uffff\x03\x30\x01\uffff\x04\x30\x02\uffff\x03\x30\x01"+
+        "\uffff\x01\x30\x02\uffff\x02\x30\x01\uffff\x01\x30\x06\uffff\x04"+
+        "\x30\x03\uffff\x03\x30\x01\uffff\x02\x30\x02\uffff\x01\x30\x01\uffff"+
+        "\x04\x30\x01\uffff\x01\x30\x01\uffff\x07\x30\x01\uffff\x07\x30\x01"+
+        "\uffff\x02\x30\x01\uffff\x01\x30\x04\uffff\x04\x30\x02\uffff\x02"+
+        "\x30\x01\uffff\x02\x30\x01\uffff\x01\x30\x02\uffff\x03\x30\x01\uffff"+
+        "\x01\x30\x02\uffff\x06\x30\x02\uffff\x03\x30\x01\uffff\x05\x30\x01"+
+        "\uffff\x07\x30\x03\uffff\x08\x30\x01\uffff\x01\x30\x01\uffff\x02"+
+        "\x30\x01\uffff\x02\x30\x01\uffff\x07\x30\x01\uffff\x01\x30\x01\uffff"+
+        "\x03\x30\x01\uffff\x02\x30\x01\uffff\x01\x30\x01\uffff\x03\x30\x03"+
+        "\uffff\x01\x30\x01\uffff\x02\x30\x01\uffff\x02\x30\x01\uffff\x02"+
+        "\x30\x01\uffff";
     const string DFA29_maxS =
         "\x01\u00bd\x20\x7a\x01\uffff\x01\x3d\x01\x7a\x01\u00a7\x01\x2e"+
         "\x02\uffff\x05\x3d\x01\x5c\x02\uffff\x01\x3e\x02\x3d\x04\uffff\x01"+
@@ -25219,118 +25218,118 @@ public partial class Cmd3Lexer : Lexer {
         "\x7a\x01\uffff\x07\x7a\x01\uffff\x19\x7a\x01\uffff\x05\x7a\x01\uffff"+
         "\x1b\x7a\x01\uffff\x14\x7a\x01\uffff\x05\x7a\x01\uffff\x0e\x7a\x01"+
         "\uffff\x0c\x7a\x01\uffff\x0e\x7a\x01\uffff\x0a\x7a\x01\uffff\x11"+
-        "\x7a\x05\uffff\x01\x39\x01\uffff\x01\x7a\x01\x39\x01\uffff\x01\x39"+
-        "\x01\uffff\x01\uffff\x01\uffff\x01\uffff\x02\uffff\x01\uffff\x05"+
-        "\uffff\x01\x2a\x09\uffff\x01\x3c\x0f\uffff\x10\x7a\x01\uffff\x17"+
-        "\x7a\x01\uffff\x01\x7a\x01\uffff\x0b\x7a\x01\uffff\x0f\x7a\x02\uffff"+
-        "\x04\x7a\x02\uffff\x4e\x7a\x01\uffff\x05\x7a\x01\uffff\x22\x7a\x01"+
-        "\uffff\x02\x7a\x01\uffff\x03\x7a\x02\uffff\x03\x7a\x01\uffff\x06"+
-        "\x7a\x01\uffff\x06\x7a\x01\uffff\x03\x7a\x01\uffff\x03\x7a\x01\uffff"+
-        "\x06\x7a\x01\uffff\x14\x7a\x01\uffff\x27\x7a\x01\uffff\x14\x7a\x01"+
-        "\uffff\x1e\x7a\x01\uffff\x14\x7a\x01\uffff\x01\x7a\x01\uffff\x04"+
-        "\uffff\x01\x7a\x02\uffff\x03\x7a\x01\uffff\x05\x7a\x01\uffff\x03"+
-        "\x7a\x01\uffff\x0e\x7a\x02\uffff\x04\x7a\x01\uffff\x04\x7a\x01\uffff"+
-        "\x06\x7a\x01\uffff\x04\x7a\x01\uffff\x01\x7a\x01\uffff\x08\x7a\x01"+
-        "\uffff\x07\x7a\x02\uffff\x04\x7a\x01\uffff\x03\x7a\x01\uffff\x03"+
-        "\x7a\x02\uffff\x04\x7a\x02\uffff\x06\x7a\x01\uffff\x0a\x7a\x01\uffff"+
-        "\x04\x7a\x01\uffff\x08\x7a\x01\uffff\x01\x7a\x01\uffff\x04\x7a\x01"+
-        "\uffff\x0a\x7a\x01\uffff\x03\x7a\x01\uffff\x01\x7a\x01\uffff\x02"+
-        "\x7a\x01\uffff\x0e\x7a\x02\uffff\x02\x7a\x01\uffff\x03\x7a\x01\uffff"+
-        "\x09\x7a\x01\uffff\x15\x7a\x01\uffff\x06\x7a\x01\uffff\x01\x7a\x01"+
-        "\uffff\x06\x7a\x02\uffff\x0e\x7a\x01\uffff\x02\x7a\x01\uffff\x04"+
-        "\x7a\x01\uffff\x01\x7a\x03\uffff\x03\x7a\x01\uffff\x04\x7a\x01\uffff"+
-        "\x02\x7a\x04\uffff\x04\x7a\x01\uffff\x01\x7a\x01\uffff\x0e\x7a\x01"+
-        "\uffff\x10\x7a\x01\uffff\x01\x7a\x01\uffff\x16\x7a\x01\uffff\x02"+
-        "\x7a\x01\uffff\x04\x7a\x01\uffff\x01\x7a\x01\uffff\x0b\x7a\x02\uffff"+
-        "\x01\x7a\x01\uffff\x07\x7a\x01\uffff\x01\x7a\x01\uffff\x1b\x7a\x03"+
-        "\uffff\x01\x7a\x01\uffff\x0c\x7a\x01\uffff\x15\x7a\x01\uffff\x03"+
-        "\x7a\x01\x39\x01\uffff\x04\x7a\x01\uffff\x02\x7a\x01\uffff\x02\x7a"+
-        "\x02\uffff\x02\x7a\x01\uffff\x07\x7a\x01\uffff\x0b\x7a\x01\uffff"+
-        "\x01\x7a\x01\uffff\x02\x7a\x02\uffff\x06\x7a\x01\uffff\x02\x7a\x02"+
-        "\uffff\x04\x7a\x02\uffff\x04\x7a\x01\uffff\x04\x7a\x02\uffff\x01"+
-        "\x7a\x01\uffff\x03\x7a\x01\uffff\x05\x7a\x01\uffff\x09\x7a\x01\uffff"+
-        "\x03\x7a\x01\uffff\x03\x7a\x01\uffff\x03\x7a\x01\uffff\x02\x7a\x02"+
-        "\uffff\x01\x7a\x03\uffff\x02\x7a\x01\uffff\x02\x7a\x02\uffff\x01"+
-        "\x7a\x01\uffff\x03\x7a\x01\uffff\x03\x7a\x01\uffff\x03\x7a\x01\uffff"+
-        "\x02\x7a\x01\uffff\x02\x7a\x02\uffff\x02\x7a\x01\uffff\x01\x7a\x02"+
-        "\uffff\x01\x7a\x01\uffff\x03\x7a\x01\uffff\x03\x7a\x01\uffff\x02"+
-        "\x7a\x01\uffff\x02\x7a\x01\uffff\x09\x7a\x02\uffff\x02\x7a\x01\uffff"+
-        "\x07\x7a\x02\uffff\x04\x7a\x01\uffff\x08\x7a\x01\uffff\x05\x7a\x01"+
-        "\uffff\x03\x7a\x01\uffff\x02\x7a\x02\uffff\x0f\x7a\x01\uffff\x02"+
-        "\x7a\x01\uffff\x02\x7a\x02\uffff\x07\x7a\x01\uffff\x04\x7a\x01\uffff"+
-        "\x0a\x7a\x03\uffff\x01\x7a\x01\uffff\x03\x7a\x01\uffff\x03\x7a\x01"+
-        "\uffff\x05\x7a\x01\uffff\x05\x7a\x01\uffff\x05\x7a\x01\uffff\x05"+
-        "\x7a\x01\uffff\x02\x7a\x01\uffff\x0b\x7a\x02\uffff\x02\x7a\x01\uffff"+
-        "\x05\x7a\x01\uffff\x02\x7a\x03\uffff\x04\x7a\x01\uffff\x04\x7a\x01"+
-        "\uffff\x04\x7a\x01\uffff\x01\x7a\x02\uffff\x02\x7a\x01\uffff\x03"+
-        "\x7a\x01\uffff\x01\x7a\x01\uffff\x04\x7a\x01\uffff\x04\x7a\x01\uffff"+
-        "\x01\x7a\x01\uffff\x01\x7a\x01\uffff\x01\x7a\x01\uffff\x02\x7a\x01"+
-        "\uffff\x02\x7a\x01\uffff\x02\x7a\x01\uffff\x02\x7a\x01\uffff\x04"+
-        "\x7a\x01\uffff\x01\x7a\x02\uffff\x03\x7a\x03\uffff\x01\x7a\x01\uffff"+
-        "\x03\x7a\x02\uffff\x04\x7a\x01\uffff\x03\x7a\x01\uffff\x02\x7a\x01"+
-        "\uffff\x02\x7a\x02\uffff\x02\x7a\x01\uffff\x06\x7a\x02\uffff\x01"+
-        "\x7a\x01\uffff\x01\x7a\x05\uffff\x07\x7a\x01\uffff\x04\x7a\x01\uffff"+
-        "\x01\x7a\x01\uffff\x01\x7a\x01\uffff\x02\x7a\x01\uffff\x05\x7a\x01"+
-        "\uffff\x0b\x7a\x01\uffff\x05\x7a\x02\uffff\x01\x7a\x01\uffff\x02"+
-        "\x7a\x01\uffff\x02\x7a\x01\uffff\x05\x7a\x03\uffff\x08\x7a\x01\uffff"+
-        "\x06\x7a\x01\uffff\x07\x7a\x01\uffff\x0a\x7a\x01\uffff\x01\x7a\x02"+
-        "\uffff\x01\x7a\x01\uffff\x03\x7a\x01\uffff\x05\x7a\x02\uffff\x02"+
-        "\x7a\x01\uffff\x03\x7a\x01\uffff\x02\x7a\x01\uffff\x01\x7a\x01\uffff"+
-        "\x02\x7a\x02\uffff\x03\x7a\x01\uffff\x02\x7a\x01\uffff\x06\x7a\x01"+
-        "\uffff\x0c\x7a\x02\uffff\x01\x7a\x02\uffff\x02\x7a\x01\uffff\x05"+
-        "\x7a\x01\uffff\x13\x7a\x02\uffff\x05\x7a\x01\uffff\x01\x7a\x01\uffff"+
-        "\x08\x7a\x02\uffff\x03\x7a\x01\uffff\x05\x7a\x01\uffff\x04\x7a\x02"+
-        "\uffff\x03\x7a\x01\uffff\x03\x7a\x01\uffff\x02\x7a\x01\uffff\x01"+
-        "\x7a\x01\uffff\x01\x7a\x01\uffff\x0a\x7a\x01\uffff\x02\x7a\x01\uffff"+
-        "\x04\x7a\x03\uffff\x04\x7a\x01\uffff\x03\x7a\x02\uffff\x02\x7a\x01"+
-        "\uffff\x01\x7a\x01\uffff\x01\x7a\x01\uffff\x02\x7a\x02\uffff\x04"+
-        "\x7a\x01\uffff\x06\x7a\x01\uffff\x02\x7a\x03\uffff\x0b\x7a\x01\uffff"+
-        "\x02\x7a\x01\uffff\x04\x7a\x01\uffff\x03\x7a\x01\uffff\x05\x7a\x01"+
-        "\uffff\x01\x7a\x02\uffff\x04\x7a\x01\uffff\x05\x7a\x03\uffff\x02"+
-        "\x7a\x02\uffff\x01\x7a\x01\uffff\x01\x7a\x02\uffff\x02\x7a\x02\uffff"+
-        "\x02\x7a\x01\uffff\x04\x7a\x03\uffff\x03\x7a\x01\uffff\x03\x7a\x05"+
-        "\uffff\x08\x7a\x02\uffff\x01\x7a\x02\uffff\x04\x7a\x01\uffff\x02"+
-        "\x7a\x05\uffff\x01\x7a\x01\uffff\x03\x7a\x01\uffff\x02\x7a\x01\uffff"+
-        "\x03\x7a\x02\uffff\x04\x7a\x01\uffff\x01\x7a\x01\uffff\x05\x7a\x03"+
-        "\uffff\x05\x7a\x02\uffff\x01\x7a\x03\uffff\x03\x7a\x01\uffff\x02"+
-        "\x7a\x03\uffff\x02\x7a\x02\uffff\x06\x7a\x02\uffff\x04\x7a\x02\uffff"+
-        "\x02\x7a\x03\uffff\x02\x7a\x01\uffff\x04\x7a\x02\uffff\x01\x7a\x01"+
-        "\uffff\x02\x7a\x01\uffff\x01\x7a\x01\uffff\x09\x7a\x01\uffff\x01"+
-        "\x7a\x02\uffff\x02\x7a\x03\uffff\x04\x7a\x02\uffff\x02\x7a\x05\uffff"+
-        "\x01\x7a\x01\uffff\x02\x7a\x01\uffff\x03\x7a\x01\uffff\x06\x7a\x01"+
-        "\uffff\x06\x7a\x01\uffff\x01\x7a\x01\uffff\x05\x7a\x01\uffff\x03"+
-        "\x7a\x01\uffff\x05\x7a\x01\uffff\x01\x7a\x01\uffff\x04\x7a\x01\uffff"+
-        "\x07\x7a\x02\uffff\x04\x7a\x01\uffff\x01\x7a\x01\uffff\x01\x7a\x02"+
-        "\uffff\x02\x7a\x01\uffff\x03\x7a\x01\uffff\x03\x7a\x03\uffff\x01"+
-        "\x7a\x01\uffff\x04\x7a\x03\uffff\x07\x7a\x01\uffff\x02\x7a\x02\uffff"+
-        "\x05\x7a\x04\uffff\x02\x7a\x03\uffff\x0d\x7a\x05\uffff\x0a\x7a\x01"+
-        "\uffff\x02\x7a\x01\uffff\x01\x7a\x02\uffff\x01\x7a\x01\uffff\x01"+
-        "\x7a\x01\uffff\x04\x7a\x01\uffff\x01\x7a\x01\uffff\x06\x7a\x02\uffff"+
-        "\x04\x7a\x01\uffff\x04\x7a\x01\uffff\x09\x7a\x01\uffff\x04\x7a\x01"+
-        "\uffff\x01\x7a\x01\uffff\x03\x7a\x03\uffff\x01\x7a\x01\uffff\x01"+
+        "\x7a\x05\uffff\x02\x39\x01\x7a\x01\x39\x03\uffff\x01\uffff\x01\uffff"+
+        "\x01\uffff\x02\uffff\x01\uffff\x05\uffff\x01\x2a\x09\uffff\x01\x3c"+
+        "\x0f\uffff\x10\x7a\x01\uffff\x17\x7a\x01\uffff\x01\x7a\x01\uffff"+
+        "\x0b\x7a\x01\uffff\x0f\x7a\x02\uffff\x04\x7a\x02\uffff\x4e\x7a\x01"+
+        "\uffff\x05\x7a\x01\uffff\x22\x7a\x01\uffff\x02\x7a\x01\uffff\x03"+
+        "\x7a\x02\uffff\x03\x7a\x01\uffff\x06\x7a\x01\uffff\x06\x7a\x01\uffff"+
+        "\x03\x7a\x01\uffff\x03\x7a\x01\uffff\x06\x7a\x01\uffff\x14\x7a\x01"+
+        "\uffff\x27\x7a\x01\uffff\x14\x7a\x01\uffff\x1e\x7a\x01\uffff\x15"+
+        "\x7a\x01\uffff\x01\uffff\x04\uffff\x01\x7a\x02\uffff\x03\x7a\x01"+
+        "\uffff\x05\x7a\x01\uffff\x03\x7a\x01\uffff\x0e\x7a\x02\uffff\x04"+
+        "\x7a\x01\uffff\x04\x7a\x01\uffff\x06\x7a\x01\uffff\x04\x7a\x01\uffff"+
+        "\x01\x7a\x01\uffff\x08\x7a\x01\uffff\x07\x7a\x02\uffff\x04\x7a\x01"+
+        "\uffff\x03\x7a\x01\uffff\x03\x7a\x02\uffff\x04\x7a\x02\uffff\x06"+
+        "\x7a\x01\uffff\x0a\x7a\x01\uffff\x04\x7a\x01\uffff\x08\x7a\x01\uffff"+
+        "\x01\x7a\x01\uffff\x04\x7a\x01\uffff\x0a\x7a\x01\uffff\x03\x7a\x01"+
+        "\uffff\x01\x7a\x01\uffff\x02\x7a\x01\uffff\x0e\x7a\x02\uffff\x02"+
+        "\x7a\x01\uffff\x03\x7a\x01\uffff\x09\x7a\x01\uffff\x15\x7a\x01\uffff"+
+        "\x06\x7a\x01\uffff\x01\x7a\x01\uffff\x06\x7a\x02\uffff\x0e\x7a\x01"+
+        "\uffff\x02\x7a\x01\uffff\x04\x7a\x01\uffff\x01\x7a\x03\uffff\x03"+
+        "\x7a\x01\uffff\x04\x7a\x01\uffff\x02\x7a\x04\uffff\x04\x7a\x01\uffff"+
+        "\x01\x7a\x01\uffff\x0e\x7a\x01\uffff\x10\x7a\x01\uffff\x01\x7a\x01"+
+        "\uffff\x16\x7a\x01\uffff\x02\x7a\x01\uffff\x04\x7a\x01\uffff\x01"+
+        "\x7a\x01\uffff\x0b\x7a\x02\uffff\x01\x7a\x01\uffff\x07\x7a\x01\uffff"+
+        "\x01\x7a\x01\uffff\x1b\x7a\x03\uffff\x01\x7a\x01\uffff\x0c\x7a\x01"+
+        "\uffff\x15\x7a\x01\uffff\x03\x7a\x01\uffff\x01\x39\x04\x7a\x01\uffff"+
+        "\x02\x7a\x01\uffff\x02\x7a\x02\uffff\x02\x7a\x01\uffff\x07\x7a\x01"+
+        "\uffff\x0b\x7a\x01\uffff\x01\x7a\x01\uffff\x02\x7a\x02\uffff\x06"+
         "\x7a\x01\uffff\x02\x7a\x02\uffff\x04\x7a\x02\uffff\x04\x7a\x01\uffff"+
-        "\x04\x7a\x01\uffff\x06\x7a\x02\uffff\x08\x7a\x01\uffff\x01\x7a\x01"+
-        "\uffff\x01\x7a\x04\uffff\x07\x7a\x01\uffff\x09\x7a\x01\uffff\x03"+
-        "\x7a\x01\uffff\x02\x7a\x01\uffff\x01\x7a\x03\uffff\x06\x7a\x02\uffff"+
-        "\x01\x7a\x03\uffff\x02\x7a\x01\uffff\x03\x7a\x03\uffff\x05\x7a\x05"+
-        "\uffff\x02\x7a\x02\uffff\x01\x7a\x04\uffff\x02\x7a\x01\uffff\x01"+
-        "\x7a\x03\uffff\x03\x7a\x01\uffff\x01\x7a\x02\uffff\x01\x7a\x01\uffff"+
-        "\x03\x7a\x01\uffff\x0b\x7a\x01\uffff\x01\x7a\x01\uffff\x04\x7a\x04"+
-        "\uffff\x04\x7a\x07\uffff\x01\x7a\x01\uffff\x01\x7a\x01\uffff\x0b"+
-        "\x7a\x01\uffff\x01\x7a\x01\uffff\x03\x7a\x03\uffff\x03\x7a\x01\uffff"+
-        "\x02\x7a\x01\uffff\x02\x7a\x03\uffff\x02\x7a\x01\uffff\x02\x7a\x02"+
-        "\uffff\x01\x7a\x02\uffff\x02\x7a\x03\uffff\x01\x7a\x02\uffff\x02"+
-        "\x7a\x01\uffff\x03\x7a\x01\uffff\x04\x7a\x02\uffff\x03\x7a\x01\uffff"+
-        "\x01\x7a\x02\uffff\x02\x7a\x01\uffff\x01\x7a\x06\uffff\x04\x7a\x03"+
-        "\uffff\x03\x7a\x01\uffff\x02\x7a\x02\uffff\x01\x7a\x01\uffff\x04"+
-        "\x7a\x01\uffff\x01\x7a\x01\uffff\x07\x7a\x01\uffff\x07\x7a\x01\uffff"+
-        "\x02\x7a\x01\uffff\x01\x7a\x04\uffff\x04\x7a\x02\uffff\x02\x7a\x01"+
-        "\uffff\x02\x7a\x01\uffff\x01\x7a\x02\uffff\x03\x7a\x01\uffff\x01"+
-        "\x7a\x02\uffff\x06\x7a\x02\uffff\x03\x7a\x01\uffff\x05\x7a\x01\uffff"+
-        "\x07\x7a\x03\uffff\x08\x7a\x01\uffff\x01\x7a\x01\uffff\x02\x7a\x01"+
-        "\uffff\x02\x7a\x01\uffff\x07\x7a\x01\uffff\x01\x7a\x02\uffff\x02"+
-        "\x7a\x01\uffff\x02\x7a\x01\uffff\x01\x7a\x01\uffff\x02\x7a\x03\uffff"+
-        "\x03\x7a\x01\uffff\x02\x7a\x01\uffff\x02\x7a\x01\uffff";
+        "\x04\x7a\x02\uffff\x01\x7a\x01\uffff\x03\x7a\x01\uffff\x05\x7a\x01"+
+        "\uffff\x09\x7a\x01\uffff\x03\x7a\x01\uffff\x03\x7a\x01\uffff\x03"+
+        "\x7a\x01\uffff\x02\x7a\x02\uffff\x01\x7a\x03\uffff\x02\x7a\x01\uffff"+
+        "\x02\x7a\x02\uffff\x01\x7a\x01\uffff\x03\x7a\x01\uffff\x03\x7a\x01"+
+        "\uffff\x03\x7a\x01\uffff\x02\x7a\x01\uffff\x02\x7a\x02\uffff\x02"+
+        "\x7a\x01\uffff\x01\x7a\x02\uffff\x01\x7a\x01\uffff\x03\x7a\x01\uffff"+
+        "\x03\x7a\x01\uffff\x02\x7a\x01\uffff\x02\x7a\x01\uffff\x09\x7a\x02"+
+        "\uffff\x02\x7a\x01\uffff\x07\x7a\x02\uffff\x04\x7a\x01\uffff\x08"+
+        "\x7a\x01\uffff\x05\x7a\x01\uffff\x03\x7a\x01\uffff\x02\x7a\x02\uffff"+
+        "\x0f\x7a\x01\uffff\x02\x7a\x01\uffff\x02\x7a\x02\uffff\x07\x7a\x01"+
+        "\uffff\x04\x7a\x01\uffff\x0a\x7a\x03\uffff\x01\x7a\x01\uffff\x03"+
+        "\x7a\x01\uffff\x03\x7a\x01\uffff\x05\x7a\x01\uffff\x05\x7a\x01\uffff"+
+        "\x05\x7a\x01\uffff\x05\x7a\x01\uffff\x02\x7a\x01\uffff\x0b\x7a\x02"+
+        "\uffff\x02\x7a\x01\uffff\x05\x7a\x01\uffff\x02\x7a\x03\uffff\x04"+
+        "\x7a\x01\uffff\x04\x7a\x01\uffff\x04\x7a\x01\uffff\x01\x7a\x02\uffff"+
+        "\x02\x7a\x01\uffff\x03\x7a\x01\uffff\x01\x7a\x01\uffff\x04\x7a\x01"+
+        "\uffff\x04\x7a\x01\uffff\x01\x7a\x01\uffff\x01\x7a\x01\uffff\x01"+
+        "\x7a\x01\uffff\x02\x7a\x01\uffff\x02\x7a\x01\uffff\x02\x7a\x01\uffff"+
+        "\x02\x7a\x01\uffff\x04\x7a\x01\uffff\x01\x7a\x02\uffff\x03\x7a\x03"+
+        "\uffff\x01\x7a\x01\uffff\x03\x7a\x02\uffff\x04\x7a\x01\uffff\x03"+
+        "\x7a\x01\uffff\x02\x7a\x01\uffff\x02\x7a\x01\uffff\x01\x7a\x01\uffff"+
+        "\x01\x7a\x01\uffff\x06\x7a\x02\uffff\x01\x7a\x01\uffff\x01\x7a\x05"+
+        "\uffff\x07\x7a\x01\uffff\x04\x7a\x01\uffff\x01\x7a\x01\uffff\x01"+
+        "\x7a\x01\uffff\x02\x7a\x01\uffff\x05\x7a\x01\uffff\x0b\x7a\x01\uffff"+
+        "\x05\x7a\x02\uffff\x01\x7a\x01\uffff\x02\x7a\x01\uffff\x02\x7a\x01"+
+        "\uffff\x05\x7a\x03\uffff\x08\x7a\x01\uffff\x06\x7a\x01\uffff\x07"+
+        "\x7a\x01\uffff\x0a\x7a\x01\uffff\x01\x7a\x02\uffff\x01\x7a\x01\uffff"+
+        "\x03\x7a\x01\uffff\x05\x7a\x02\uffff\x02\x7a\x01\uffff\x03\x7a\x01"+
+        "\uffff\x02\x7a\x01\uffff\x01\x7a\x01\uffff\x02\x7a\x02\uffff\x03"+
+        "\x7a\x01\uffff\x02\x7a\x01\uffff\x06\x7a\x01\uffff\x0c\x7a\x02\uffff"+
+        "\x01\x7a\x02\uffff\x02\x7a\x01\uffff\x05\x7a\x01\uffff\x13\x7a\x02"+
+        "\uffff\x05\x7a\x01\uffff\x01\x7a\x01\uffff\x08\x7a\x02\uffff\x03"+
+        "\x7a\x01\uffff\x05\x7a\x01\uffff\x04\x7a\x02\uffff\x03\x7a\x01\uffff"+
+        "\x03\x7a\x01\uffff\x02\x7a\x01\uffff\x01\x7a\x01\uffff\x01\x7a\x01"+
+        "\uffff\x0a\x7a\x01\uffff\x02\x7a\x01\uffff\x04\x7a\x03\uffff\x04"+
+        "\x7a\x01\uffff\x03\x7a\x02\uffff\x02\x7a\x01\uffff\x01\x7a\x01\uffff"+
+        "\x01\x7a\x01\uffff\x02\x7a\x02\uffff\x04\x7a\x01\uffff\x06\x7a\x01"+
+        "\uffff\x02\x7a\x03\uffff\x0b\x7a\x01\uffff\x02\x7a\x01\uffff\x04"+
+        "\x7a\x01\uffff\x03\x7a\x01\uffff\x05\x7a\x01\uffff\x01\x7a\x02\uffff"+
+        "\x04\x7a\x01\uffff\x05\x7a\x03\uffff\x02\x7a\x02\uffff\x01\x7a\x01"+
+        "\uffff\x01\x7a\x02\uffff\x02\x7a\x02\uffff\x02\x7a\x01\uffff\x04"+
+        "\x7a\x03\uffff\x03\x7a\x01\uffff\x03\x7a\x05\uffff\x08\x7a\x02\uffff"+
+        "\x01\x7a\x02\uffff\x04\x7a\x01\uffff\x02\x7a\x05\uffff\x01\x7a\x01"+
+        "\uffff\x03\x7a\x01\uffff\x02\x7a\x01\uffff\x03\x7a\x02\uffff\x04"+
+        "\x7a\x01\uffff\x01\x7a\x01\uffff\x05\x7a\x03\uffff\x05\x7a\x02\uffff"+
+        "\x01\x7a\x03\uffff\x03\x7a\x01\uffff\x02\x7a\x03\uffff\x02\x7a\x02"+
+        "\uffff\x06\x7a\x02\uffff\x04\x7a\x02\uffff\x02\x7a\x03\uffff\x02"+
+        "\x7a\x01\uffff\x04\x7a\x02\uffff\x01\x7a\x01\uffff\x02\x7a\x01\uffff"+
+        "\x01\x7a\x01\uffff\x09\x7a\x01\uffff\x01\x7a\x02\uffff\x02\x7a\x03"+
+        "\uffff\x04\x7a\x02\uffff\x02\x7a\x05\uffff\x01\x7a\x01\uffff\x02"+
+        "\x7a\x01\uffff\x03\x7a\x01\uffff\x06\x7a\x01\uffff\x06\x7a\x01\uffff"+
+        "\x01\x7a\x01\uffff\x05\x7a\x01\uffff\x03\x7a\x01\uffff\x05\x7a\x01"+
+        "\uffff\x01\x7a\x01\uffff\x04\x7a\x01\uffff\x07\x7a\x02\uffff\x04"+
+        "\x7a\x01\uffff\x01\x7a\x01\uffff\x01\x7a\x02\uffff\x02\x7a\x01\uffff"+
+        "\x03\x7a\x01\uffff\x03\x7a\x03\uffff\x01\x7a\x01\uffff\x04\x7a\x03"+
+        "\uffff\x07\x7a\x01\uffff\x02\x7a\x02\uffff\x05\x7a\x04\uffff\x02"+
+        "\x7a\x03\uffff\x0d\x7a\x05\uffff\x0a\x7a\x01\uffff\x02\x7a\x01\uffff"+
+        "\x01\x7a\x02\uffff\x01\x7a\x01\uffff\x01\x7a\x01\uffff\x04\x7a\x01"+
+        "\uffff\x01\x7a\x01\uffff\x06\x7a\x02\uffff\x04\x7a\x01\uffff\x04"+
+        "\x7a\x01\uffff\x09\x7a\x01\uffff\x04\x7a\x01\uffff\x01\x7a\x01\uffff"+
+        "\x03\x7a\x03\uffff\x01\x7a\x01\uffff\x01\x7a\x01\uffff\x02\x7a\x02"+
+        "\uffff\x04\x7a\x02\uffff\x04\x7a\x01\uffff\x04\x7a\x01\uffff\x06"+
+        "\x7a\x02\uffff\x08\x7a\x01\uffff\x01\x7a\x01\uffff\x01\x7a\x04\uffff"+
+        "\x07\x7a\x01\uffff\x09\x7a\x01\uffff\x03\x7a\x01\uffff\x02\x7a\x01"+
+        "\uffff\x01\x7a\x03\uffff\x06\x7a\x02\uffff\x01\x7a\x03\uffff\x02"+
+        "\x7a\x01\uffff\x03\x7a\x03\uffff\x05\x7a\x05\uffff\x02\x7a\x02\uffff"+
+        "\x01\x7a\x04\uffff\x02\x7a\x01\uffff\x01\x7a\x03\uffff\x03\x7a\x01"+
+        "\uffff\x01\x7a\x02\uffff\x01\x7a\x01\uffff\x03\x7a\x01\uffff\x0b"+
+        "\x7a\x01\uffff\x01\x7a\x01\uffff\x04\x7a\x04\uffff\x04\x7a\x07\uffff"+
+        "\x01\x7a\x01\uffff\x01\x7a\x01\uffff\x0b\x7a\x01\uffff\x01\x7a\x01"+
+        "\uffff\x03\x7a\x03\uffff\x03\x7a\x01\uffff\x02\x7a\x01\uffff\x02"+
+        "\x7a\x03\uffff\x02\x7a\x01\uffff\x02\x7a\x02\uffff\x01\x7a\x02\uffff"+
+        "\x02\x7a\x03\uffff\x01\x7a\x02\uffff\x02\x7a\x01\uffff\x03\x7a\x01"+
+        "\uffff\x04\x7a\x02\uffff\x03\x7a\x01\uffff\x01\x7a\x02\uffff\x02"+
+        "\x7a\x01\uffff\x01\x7a\x06\uffff\x04\x7a\x03\uffff\x03\x7a\x01\uffff"+
+        "\x02\x7a\x02\uffff\x01\x7a\x01\uffff\x04\x7a\x01\uffff\x01\x7a\x01"+
+        "\uffff\x07\x7a\x01\uffff\x07\x7a\x01\uffff\x02\x7a\x01\uffff\x01"+
+        "\x7a\x04\uffff\x04\x7a\x02\uffff\x02\x7a\x01\uffff\x02\x7a\x01\uffff"+
+        "\x01\x7a\x02\uffff\x03\x7a\x01\uffff\x01\x7a\x02\uffff\x06\x7a\x02"+
+        "\uffff\x03\x7a\x01\uffff\x05\x7a\x01\uffff\x07\x7a\x03\uffff\x08"+
+        "\x7a\x01\uffff\x01\x7a\x01\uffff\x02\x7a\x01\uffff\x02\x7a\x01\uffff"+
+        "\x07\x7a\x01\uffff\x01\x7a\x01\uffff\x03\x7a\x01\uffff\x02\x7a\x01"+
+        "\uffff\x01\x7a\x01\uffff\x03\x7a\x03\uffff\x01\x7a\x01\uffff\x02"+
+        "\x7a\x01\uffff\x02\x7a\x01\uffff\x02\x7a\x01\uffff";
     const string DFA29_acceptS =
         "\x21\uffff\x01\u0258\x0c\uffff\x01\u026b\x01\u026d\x03\uffff\x01"+
         "\u0274\x01\u0275\x01\u0276\x01\u0278\x01\uffff\x01\u027b\x01\u027c"+
@@ -25340,72 +25339,72 @@ public partial class Cmd3Lexer : Lexer {
         "\uffff\x01\u025b\x19\uffff\x01\u0179\x05\uffff\x01\u0250\x1b\uffff"+
         "\x01\x65\x14\uffff\x01\x5a\x05\uffff\x01\x5b\x0e\uffff\x01\u023b"+
         "\x0c\uffff\x01\u0198\x0e\uffff\x01\u022c\x0a\uffff\x01\u01b6\x11"+
-        "\uffff\x01\u0259\x01\u025a\x01\u0295\x01\u0290\x01\u025c\x01\uffff"+
-        "\x01\u0260\x02\uffff\x01\u025f\x01\uffff\x01\u026c\x01\uffff\x01"+
-        "\u0262\x01\uffff\x01\u0261\x01\u0281\x01\uffff\x01\u0263\x01\u0264"+
-        "\x01\u0265\x01\u028e\x01\u0266\x01\uffff\x01\u0289\x01\u0267\x01"+
-        "\u027e\x01\u0268\x01\u027d\x01\u0269\x01\u0277\x01\u026f\x01\u026a"+
-        "\x01\uffff\x01\u0271\x01\u0287\x01\u0270\x01\u0293\x01\u0272\x01"+
-        "\u0288\x01\u0279\x01\u027a\x01\u0284\x01\u0285\x01\u028a\x01\u028c"+
-        "\x01\u028d\x01\u0294\x01\u028f\x10\uffff\x01\u0170\x17\uffff\x01"+
-        "\u00d1\x01\uffff\x01\u0171\x0b\uffff\x01\u0159\x0f\uffff\x01\u01be"+
-        "\x01\u0174\x04\uffff\x01\u01ce\x01\u01d4\x4e\uffff\x01\x0b\x05\uffff"+
-        "\x01\u0135\x22\uffff\x01\u00fa\x02\uffff\x01\x77\x03\uffff\x01\u00fd"+
-        "\x01\x1a\x03\uffff\x01\u00fe\x06\uffff\x01\u00ff\x06\uffff\x01\u00f7"+
-        "\x03\uffff\x01\x76\x03\uffff\x01\u0197\x06\uffff\x01\u0080\x14\uffff"+
-        "\x01\x59\x27\uffff\x01\u0096\x14\uffff\x01\u021e\x1e\uffff\x01\u0182"+
-        "\x14\uffff\x01\u025e\x02\uffff\x01\u0291\x01\u0292\x01\u026e\x01"+
-        "\u0273\x01\uffff\x01\u0161\x01\x0c\x03\uffff\x01\u015d\x05\uffff"+
-        "\x01\u0163\x03\uffff\x01\u016a\x0e\uffff\x01\u00bd\x01\u010b\x04"+
-        "\uffff\x01\u00c6\x04\uffff\x01\u00cf\x06\uffff\x01\u00ca\x04\uffff"+
-        "\x01\u0151\x01\uffff\x01\u014e\x08\uffff\x01\u0156\x07\uffff\x01"+
-        "\u01c1\x01\u01c2\x04\uffff\x01\u01c5\x03\uffff\x01\u01c8\x03\uffff"+
-        "\x01\u0173\x01\u01bf\x04\uffff\x01\u01d5\x01\x06\x06\uffff\x01\u010f"+
-        "\x0a\uffff\x01\u0116\x04\uffff\x01\x07\x08\uffff\x01\x20\x01\uffff"+
-        "\x01\u0099\x04\uffff\x01\u011e\x0a\uffff\x01\u00db\x03\uffff\x01"+
-        "\u00e0\x01\uffff\x01\u00e2\x02\uffff\x01\u00e3\x0e\uffff\x01\u018f"+
-        "\x01\u0191\x02\uffff\x01\u01f1\x03\uffff\x01\u017e\x09\uffff\x01"+
-        "\u0142\x15\uffff\x01\u01ee\x06\uffff\x01\u01d8\x01\uffff\x01\u01dc"+
-        "\x06\uffff\x01\u01e0\x01\u00b2\x0e\uffff\x01\u0209\x02\uffff\x01"+
-        "\x71\x04\uffff\x01\x73\x01\uffff\x01\x6b\x01\u00f9\x01\u00fb\x03"+
-        "\uffff\x01\x68\x04\uffff\x01\x79\x02\uffff\x01\u0100\x01\u00f8\x01"+
-        "\u00fc\x01\u0101\x04\uffff\x01\u00f5\x01\uffff\x01\u0194\x0e\uffff"+
-        "\x01\u024b\x10\uffff\x01\u0103\x01\uffff\x01\u01a7\x16\uffff\x01"+
-        "\u0091\x02\uffff\x01\u00b1\x04\uffff\x01\u023d\x01\uffff\x01\u023c"+
-        "\x0b\uffff\x01\u01ac\x01\u01b0\x01\uffff\x01\u01b2\x07\uffff\x01"+
-        "\u01a9\x01\uffff\x01\u019d\x1b\uffff\x01\u0227\x01\u0229\x01\u022a"+
-        "\x01\uffff\x01\x34\x0c\uffff\x01\u012c\x15\uffff\x01\u024d\x04\uffff"+
-        "\x01\u025d\x04\uffff\x01\u015c\x02\uffff\x01\u008c\x02\uffff\x01"+
-        "\u016d\x01\u00f3\x02\uffff\x01\u0164\x07\uffff\x01\u0178\x0b\uffff"+
-        "\x01\u00c7\x01\uffff\x01\u00c9\x02\uffff\x01\u00cc\x01\x2b\x06\uffff"+
-        "\x01\u00ba\x02\uffff\x01\u00b7\x01\u00b5\x04\uffff\x01\u00d5\x01"+
-        "\x03\x04\uffff\x01\u0150\x04\uffff\x01\x42\x01\u01d2\x01\uffff\x01"+
-        "\u0154\x03\uffff\x01\u0157\x05\uffff\x01\u01c0\x09\uffff\x01\u01cf"+
-        "\x03\uffff\x01\u01cd\x03\uffff\x01\u00ed\x03\uffff\x01\u0109\x02"+
-        "\uffff\x01\u00e7\x01\u00e9\x01\uffff\x01\u00ea\x01\u00f2\x01\u0110"+
-        "\x02\uffff\x01\u0114\x02\uffff\x01\u0119\x01\u011a\x01\uffff\x01"+
-        "\u011b\x03\uffff\x01\x33\x03\uffff\x01\x1f\x03\uffff\x01\u011f\x02"+
-        "\uffff\x01\u0123\x02\uffff\x01\u0128\x01\u0129\x02\uffff\x01\u00d9"+
-        "\x01\uffff\x01\u00c2\x01\u00d7\x01\uffff\x01\u00dc\x03\uffff\x01"+
-        "\u00e1\x03\uffff\x01\u00f4\x02\uffff\x01\u018b\x02\uffff\x01\u0184"+
-        "\x09\uffff\x01\u017a\x01\u017c\x02\uffff\x01\u0180\x07\uffff\x01"+
-        "\u0140\x01\u0143\x04\uffff\x01\u0148\x08\uffff\x01\u0203\x05\uffff"+
-        "\x01\u0204\x03\uffff\x01\u01ea\x02\uffff\x01\x30\x01\u01ed\x0f\uffff"+
-        "\x01\u018e\x02\uffff\x01\u01f0\x02\uffff\x01\u01f6\x01\u01f7\x07"+
-        "\uffff\x01\u0208\x04\uffff\x01\x15\x0a\uffff\x01\x78\x01\u00f6\x01"+
-        "\u0102\x01\uffff\x01\u0195\x03\uffff\x01\x13\x03\uffff\x01\x7f\x05"+
-        "\uffff\x01\x7c\x05\uffff\x01\u024c\x05\uffff\x01\u024a\x05\uffff"+
-        "\x01\u024f\x02\uffff\x01\u024e\x0b\uffff\x01\u00a6\x01\u0092\x02"+
-        "\uffff\x01\u009b\x05\uffff\x01\u00a9\x02\uffff\x01\u0082\x01\u0083"+
-        "\x01\u0084\x04\uffff\x01\u0089\x04\uffff\x01\x2e\x04\uffff\x01\u0106"+
-        "\x01\uffff\x01\u0240\x01\u0242\x02\uffff\x01\u01b1\x03\uffff\x01"+
-        "\u01ad\x01\uffff\x01\u01b3\x04\uffff\x01\u019b\x04\uffff\x01\u019e"+
-        "\x01\uffff\x01\u01a2\x01\uffff\x01\u01a4\x01\uffff\x01\u01a5\x02"+
-        "\uffff\x01\x32\x02\uffff\x01\u0218\x02\uffff\x01\x63\x02\uffff\x01"+
-        "\u0224\x04\uffff\x01\u020f\x01\uffff\x01\u0211\x01\u0212\x03\uffff"+
-        "\x01\u0214\x01\u0228\x01\u022b\x01\uffff\x01\u014c\x03\uffff\x01"+
-        "\u021a\x01\u0234\x04\uffff\x01\u023a\x03\uffff\x01\u012e\x02\uffff"+
-        "\x01\u012f\x02\uffff\x01\u0134\x01\u0256\x02\uffff\x01\u0243\x06"+
+        "\uffff\x01\u0259\x01\u025a\x01\u0295\x01\u0290\x01\u025c\x04\uffff"+
+        "\x01\u0260\x01\u025f\x01\u026c\x01\uffff\x01\u0262\x01\uffff\x01"+
+        "\u0261\x01\u0281\x01\uffff\x01\u0264\x01\u0263\x01\u0265\x01\u028e"+
+        "\x01\u0266\x01\uffff\x01\u0289\x01\u0267\x01\u027e\x01\u0268\x01"+
+        "\u027d\x01\u0269\x01\u0277\x01\u026f\x01\u026a\x01\uffff\x01\u0271"+
+        "\x01\u0287\x01\u0270\x01\u0293\x01\u0272\x01\u0288\x01\u0279\x01"+
+        "\u027a\x01\u0284\x01\u0285\x01\u028a\x01\u028c\x01\u028d\x01\u0294"+
+        "\x01\u028f\x10\uffff\x01\u0170\x17\uffff\x01\u00d1\x01\uffff\x01"+
+        "\u0171\x0b\uffff\x01\u0159\x0f\uffff\x01\u01be\x01\u0174\x04\uffff"+
+        "\x01\u01ce\x01\u01d4\x4e\uffff\x01\x0b\x05\uffff\x01\u0135\x22\uffff"+
+        "\x01\u00fa\x02\uffff\x01\x77\x03\uffff\x01\u00fd\x01\x1a\x03\uffff"+
+        "\x01\u00fe\x06\uffff\x01\u00ff\x06\uffff\x01\u00f7\x03\uffff\x01"+
+        "\x76\x03\uffff\x01\u0197\x06\uffff\x01\u0080\x14\uffff\x01\x59\x27"+
+        "\uffff\x01\u0096\x14\uffff\x01\u021e\x1e\uffff\x01\u0182\x15\uffff"+
+        "\x01\u025e\x01\uffff\x01\u0291\x01\u0292\x01\u026e\x01\u0273\x01"+
+        "\uffff\x01\u0161\x01\x0c\x03\uffff\x01\u015d\x05\uffff\x01\u0163"+
+        "\x03\uffff\x01\u016a\x0e\uffff\x01\u00bd\x01\u010b\x04\uffff\x01"+
+        "\u00c6\x04\uffff\x01\u00cf\x06\uffff\x01\u00ca\x04\uffff\x01\u0151"+
+        "\x01\uffff\x01\u014e\x08\uffff\x01\u0156\x07\uffff\x01\u01c1\x01"+
+        "\u01c2\x04\uffff\x01\u01c5\x03\uffff\x01\u01c8\x03\uffff\x01\u0173"+
+        "\x01\u01bf\x04\uffff\x01\u01d5\x01\x06\x06\uffff\x01\u010f\x0a\uffff"+
+        "\x01\u0116\x04\uffff\x01\x07\x08\uffff\x01\x20\x01\uffff\x01\u0099"+
+        "\x04\uffff\x01\u011e\x0a\uffff\x01\u00db\x03\uffff\x01\u00e0\x01"+
+        "\uffff\x01\u00e2\x02\uffff\x01\u00e3\x0e\uffff\x01\u018f\x01\u0191"+
+        "\x02\uffff\x01\u01f1\x03\uffff\x01\u017e\x09\uffff\x01\u0142\x15"+
+        "\uffff\x01\u01ee\x06\uffff\x01\u01d8\x01\uffff\x01\u01dc\x06\uffff"+
+        "\x01\u01e0\x01\u00b2\x0e\uffff\x01\u0209\x02\uffff\x01\x71\x04\uffff"+
+        "\x01\x73\x01\uffff\x01\x6b\x01\u00f9\x01\u00fb\x03\uffff\x01\x68"+
+        "\x04\uffff\x01\x79\x02\uffff\x01\u0100\x01\u00f8\x01\u00fc\x01\u0101"+
+        "\x04\uffff\x01\u00f5\x01\uffff\x01\u0194\x0e\uffff\x01\u024b\x10"+
+        "\uffff\x01\u0103\x01\uffff\x01\u01a7\x16\uffff\x01\u0091\x02\uffff"+
+        "\x01\u00b1\x04\uffff\x01\u023d\x01\uffff\x01\u023c\x0b\uffff\x01"+
+        "\u01ac\x01\u01b0\x01\uffff\x01\u01b2\x07\uffff\x01\u01a9\x01\uffff"+
+        "\x01\u019d\x1b\uffff\x01\u0227\x01\u0229\x01\u022a\x01\uffff\x01"+
+        "\x34\x0c\uffff\x01\u012c\x15\uffff\x01\u024d\x03\uffff\x01\u025d"+
+        "\x05\uffff\x01\u015c\x02\uffff\x01\u008c\x02\uffff\x01\u016d\x01"+
+        "\u00f3\x02\uffff\x01\u0164\x07\uffff\x01\u0178\x0b\uffff\x01\u00c7"+
+        "\x01\uffff\x01\u00c9\x02\uffff\x01\u00cc\x01\x2b\x06\uffff\x01\u00ba"+
+        "\x02\uffff\x01\u00b7\x01\u00b5\x04\uffff\x01\u00d5\x01\x03\x04\uffff"+
+        "\x01\u0150\x04\uffff\x01\x42\x01\u01d2\x01\uffff\x01\u0154\x03\uffff"+
+        "\x01\u0157\x05\uffff\x01\u01c0\x09\uffff\x01\u01cf\x03\uffff\x01"+
+        "\u01cd\x03\uffff\x01\u00ed\x03\uffff\x01\u0109\x02\uffff\x01\u00e7"+
+        "\x01\u00e9\x01\uffff\x01\u00ea\x01\u00f2\x01\u0110\x02\uffff\x01"+
+        "\u0114\x02\uffff\x01\u0119\x01\u011a\x01\uffff\x01\u011b\x03\uffff"+
+        "\x01\x33\x03\uffff\x01\x1f\x03\uffff\x01\u011f\x02\uffff\x01\u0123"+
+        "\x02\uffff\x01\u0128\x01\u0129\x02\uffff\x01\u00d9\x01\uffff\x01"+
+        "\u00c2\x01\u00d7\x01\uffff\x01\u00dc\x03\uffff\x01\u00e1\x03\uffff"+
+        "\x01\u00f4\x02\uffff\x01\u018b\x02\uffff\x01\u0184\x09\uffff\x01"+
+        "\u017a\x01\u017c\x02\uffff\x01\u0180\x07\uffff\x01\u0140\x01\u0143"+
+        "\x04\uffff\x01\u0148\x08\uffff\x01\u0203\x05\uffff\x01\u0204\x03"+
+        "\uffff\x01\u01ea\x02\uffff\x01\x30\x01\u01ed\x0f\uffff\x01\u018e"+
+        "\x02\uffff\x01\u01f0\x02\uffff\x01\u01f6\x01\u01f7\x07\uffff\x01"+
+        "\u0208\x04\uffff\x01\x15\x0a\uffff\x01\x78\x01\u00f6\x01\u0102\x01"+
+        "\uffff\x01\u0195\x03\uffff\x01\x13\x03\uffff\x01\x7f\x05\uffff\x01"+
+        "\x7c\x05\uffff\x01\u024c\x05\uffff\x01\u024a\x05\uffff\x01\u024f"+
+        "\x02\uffff\x01\u024e\x0b\uffff\x01\u00a6\x01\u0092\x02\uffff\x01"+
+        "\u009b\x05\uffff\x01\u00a9\x02\uffff\x01\u0082\x01\u0083\x01\u0084"+
+        "\x04\uffff\x01\u0089\x04\uffff\x01\x2e\x04\uffff\x01\u0106\x01\uffff"+
+        "\x01\u0240\x01\u0242\x02\uffff\x01\u01b1\x03\uffff\x01\u01ad\x01"+
+        "\uffff\x01\u01b3\x04\uffff\x01\u019b\x04\uffff\x01\u019e\x01\uffff"+
+        "\x01\u01a2\x01\uffff\x01\u01a4\x01\uffff\x01\u01a5\x02\uffff\x01"+
+        "\x32\x02\uffff\x01\u0218\x02\uffff\x01\x63\x02\uffff\x01\u0224\x04"+
+        "\uffff\x01\u020f\x01\uffff\x01\u0211\x01\u0212\x03\uffff\x01\u0214"+
+        "\x01\u0228\x01\u022b\x01\uffff\x01\u014c\x03\uffff\x01\u021a\x01"+
+        "\u0234\x04\uffff\x01\u023a\x03\uffff\x01\u012e\x02\uffff\x01\u012f"+
+        "\x02\uffff\x01\u0134\x01\uffff\x01\u0256\x01\uffff\x01\u0243\x06"+
         "\uffff\x01\u0225\x01\u022d\x01\uffff\x01\u022e\x01\uffff\x01\u0233"+
         "\x01\u0238\x01\u0253\x01\u0254\x01\u0255\x07\uffff\x01\u016e\x04"+
         "\uffff\x01\u0166\x01\uffff\x01\u016b\x01\uffff\x01\u0175\x02\uffff"+
@@ -25492,13 +25491,13 @@ public partial class Cmd3Lexer : Lexer {
         "\x01\u0207\x06\uffff\x01\x6e\x01\x3b\x03\uffff\x01\u01bc\x05\uffff"+
         "\x01\x29\x07\uffff\x01\u01e7\x01\u01fa\x01\u0105\x08\uffff\x01\u010e"+
         "\x01\uffff\x01\u013b\x02\uffff\x01\u01e4\x02\uffff\x01\u01bb\x07"+
-        "\uffff\x01\u01d9\x01\uffff\x01\u01e5\x01\u023e\x02\uffff\x01\u0130"+
-        "\x02\uffff\x01\u00f0\x01\uffff\x01\u01e2\x02\uffff\x01\u0215\x01"+
-        "\u0131\x01\u00be\x03\uffff\x01\u013c\x02\uffff\x01\x5d\x02\uffff"+
-        "\x01\u0216";
+        "\uffff\x01\u01d9\x01\uffff\x01\u01e5\x03\uffff\x01\u0130\x02\uffff"+
+        "\x01\u00f0\x01\uffff\x01\u01e2\x03\uffff\x01\u0215\x01\u0131\x01"+
+        "\u00be\x01\uffff\x01\u023e\x02\uffff\x01\u013c\x02\uffff\x01\x5d"+
+        "\x02\uffff\x01\u0216";
     const string DFA29_specialS =
         "\x26\uffff\x01\x01\x01\x02\u00f2\uffff\x01\x03\x01\uffff\x01\x05"+
-        "\x02\uffff\x01\x04\u0195\uffff\x01\x00\u07d6\uffff}>";
+        "\x02\uffff\x01\x04\u0195\uffff\x01\x00\u07d8\uffff}>";
     static readonly string[] DFA29_transitionS = {
             "\x02\x21\x01\uffff\x02\x21\x12\uffff\x01\x21\x01\x33\x01\uffff"+
             "\x01\x2b\x01\x3a\x01\x2a\x01\x41\x01\x26\x01\x3c\x01\x3d\x01"+
@@ -25612,16 +25611,16 @@ public partial class Cmd3Lexer : Lexer {
             "\x01\u010f\x04\uffff\x01\u010e\x0d\uffff\x01\u0110",
             "\x0a\x4c\x07\uffff\x1a\x4c\x04\uffff\x01\x4c\x01\uffff\x1a"+
             "\x4c",
-            "\x0a\x24\x07\uffff\x01\u0115\x03\u0117\x01\u0116\x07\u0117"+
-            "\x01\u0113\x03\u0117\x01\u0118\x03\u0117\x01\u0115\x01\u0117"+
-            "\x01\u0118\x03\u0117\x04\uffff\x01\u0117\x01\uffff\x01\u0115"+
-            "\x03\u0117\x01\u0116\x07\u0117\x01\u0113\x03\u0117\x01\u0118"+
-            "\x03\u0117\x01\u0115\x01\u0117\x01\u0118\x03\u0117\x2c\uffff"+
-            "\x01\u0114",
-            "\x01\u0114",
+            "\x0a\x24\x07\uffff\x01\u0115\x03\u0118\x01\u0113\x07\u0118"+
+            "\x01\u0114\x03\u0118\x01\u0116\x03\u0118\x01\u0115\x01\u0118"+
+            "\x01\u0116\x03\u0118\x04\uffff\x01\u0118\x01\uffff\x01\u0115"+
+            "\x03\u0118\x01\u0113\x07\u0118\x01\u0114\x03\u0118\x01\u0116"+
+            "\x03\u0118\x01\u0115\x01\u0118\x01\u0116\x03\u0118\x2c\uffff"+
+            "\x01\u0117",
+            "\x01\u0117",
             "\x27\u011c\x01\u011d\x53\u011c\x01\u011b\x02\u011c\x01\u011a"+
             "\uff81\u011c",
-            "\x27\u011f\x01\u0121\x53\u011f\x01\u0120\uff84\u011f",
+            "\x27\u011f\x01\u0120\x53\u011f\x01\u0121\uff84\u011f",
             "\x01\u0122",
             "\x01\u0125\x12\uffff\x01\u0124",
             "\x01\u0127",
@@ -26066,13 +26065,13 @@ public partial class Cmd3Lexer : Lexer {
             "",
             "",
             "",
-            "\x0a\u02b1",
-            "",
-            "\x0a\u02b2\x07\uffff\x1a\u0117\x04\uffff\x01\u0117\x01\uffff"+
-            "\x1a\u0117",
-            "\x01\u0114\x01\uffff\x01\u0114\x02\uffff\x0a\u02b4",
-            "",
+            "\x01\u0117\x01\uffff\x01\u0117\x02\uffff\x0a\u02b1",
             "\x0a\u02b2",
+            "\x0a\u02b3\x07\uffff\x1a\u0118\x04\uffff\x01\u0118\x01\uffff"+
+            "\x1a\u0118",
+            "\x0a\u02b3",
+            "",
+            "",
             "",
             "\x27\u011c\x01\u011d\x53\u011c\x01\u02b5\x02\u011c\x01\u011a"+
             "\uff81\u011c",
@@ -26081,7 +26080,7 @@ public partial class Cmd3Lexer : Lexer {
             "\uff81\u011c",
             "",
             "",
-            "\x27\u011f\x01\u0121\x53\u011f\x01\u0120\uff84\u011f",
+            "\x27\u011f\x01\u0120\x53\u011f\x01\u0121\uff84\u011f",
             "",
             "",
             "",
@@ -26832,13 +26831,13 @@ public partial class Cmd3Lexer : Lexer {
             "\x4c\x01\uffff\x1a\x4c",
             "\x0a\x4c\x07\uffff\x11\x4c\x01\u046e\x08\x4c\x04\uffff\x01"+
             "\x4c\x01\uffff\x1a\x4c",
-            "\x0a\u02b1\x07\uffff\x03\u0117\x01\u046f\x16\u0117\x04\uffff"+
-            "\x01\u0117\x01\uffff\x03\u0117\x01\u046f\x16\u0117",
-            "\x0a\u02b2\x07\uffff\x1a\u0117\x04\uffff\x01\u0117\x01\uffff"+
-            "\x1a\u0117",
+            "\x0a\u02b1\x07\uffff\x1a\u0118\x04\uffff\x01\u0118\x01\uffff"+
+            "\x1a\u0118",
+            "\x0a\u02b2\x07\uffff\x03\u0118\x01\u0470\x16\u0118\x04\uffff"+
+            "\x01\u0118\x01\uffff\x03\u0118\x01\u0470\x16\u0118",
+            "\x0a\u02b3\x07\uffff\x1a\u0118\x04\uffff\x01\u0118\x01\uffff"+
+            "\x1a\u0118",
             "",
-            "\x0a\u02b4\x07\uffff\x1a\u0117\x04\uffff\x01\u0117\x01\uffff"+
-            "\x1a\u0117",
             "\x7b\u011d\x01\uffff\uff84\u011d",
             "",
             "",
@@ -27462,7 +27461,7 @@ public partial class Cmd3Lexer : Lexer {
             "\uffff\x1a\x4c",
             "\x0a\x4c\x07\uffff\x08\x4c\x01\u05c1\x11\x4c\x04\uffff\x01"+
             "\x4c\x01\uffff\x1a\x4c",
-            "\x0a\x4c\x07\uffff\x0a\x4c\x01\u05c2\x0f\x4c\x04\uffff\x01"+
+            "\x0a\x4c\x07\uffff\x04\x4c\x01\u05c2\x15\x4c\x04\uffff\x01"+
             "\x4c\x01\uffff\x1a\x4c",
             "",
             "\x0a\x4c\x07\uffff\x04\x4c\x01\u05c3\x15\x4c\x04\uffff\x01"+
@@ -27610,8 +27609,8 @@ public partial class Cmd3Lexer : Lexer {
             "\x4c\x01\uffff\x1a\x4c",
             "\x0a\x4c\x07\uffff\x1a\x4c\x04\uffff\x01\x4c\x01\uffff\x1a"+
             "\x4c",
-            "\x0a\x4c\x01\u0611\x06\uffff\x12\x4c\x01\u0612\x07\x4c\x04"+
-            "\uffff\x01\x4c\x01\uffff\x12\x4c\x01\u0612\x07\x4c",
+            "\x0a\x4c\x01\u0612\x06\uffff\x12\x4c\x01\u0611\x07\x4c\x04"+
+            "\uffff\x01\x4c\x01\uffff\x12\x4c\x01\u0611\x07\x4c",
             "\x0a\x4c\x07\uffff\x04\x4c\x01\u0613\x15\x4c\x04\uffff\x01"+
             "\x4c\x01\uffff\x1a\x4c",
             "\x0a\x4c\x07\uffff\x1a\x4c\x04\uffff\x01\x4c\x01\uffff\x1a"+
@@ -27647,8 +27646,8 @@ public partial class Cmd3Lexer : Lexer {
             "\x4c",
             "\x0a\x4c\x07\uffff\x1a\x4c\x04\uffff\x01\x4c\x01\uffff\x1a"+
             "\x4c",
-            "\x0a\u0625",
             "",
+            "\x0a\u0625",
             "\x0a\x4c\x07\uffff\x06\x4c\x01\u0626\x13\x4c\x04\uffff\x01"+
             "\x4c\x01\uffff\x1a\x4c",
             "\x0a\x4c\x07\uffff\x01\u0627\x19\x4c\x04\uffff\x01\x4c\x01"+
@@ -28238,7 +28237,7 @@ public partial class Cmd3Lexer : Lexer {
             "\x4c\x01\uffff\x1a\x4c",
             "\x0a\x4c\x07\uffff\x12\x4c\x01\u073f\x07\x4c\x04\uffff\x01"+
             "\x4c\x01\uffff\x1a\x4c",
-            "\x0a\x4c\x07\uffff\x03\x4c\x01\u0740\x16\x4c\x04\uffff\x01"+
+            "\x0a\x4c\x07\uffff\x15\x4c\x01\u0740\x04\x4c\x04\uffff\x01"+
             "\x4c\x01\uffff\x1a\x4c",
             "\x0a\x4c\x07\uffff\x1a\x4c\x04\uffff\x01\x4c\x01\uffff\x1a"+
             "\x4c",
@@ -28368,9 +28367,9 @@ public partial class Cmd3Lexer : Lexer {
             "\x0a\x4c\x07\uffff\x13\x4c\x01\u0778\x06\x4c\x04\uffff\x01"+
             "\x4c\x01\uffff\x1a\x4c",
             "",
-            "",
             "\x0a\x4c\x01\u0779\x06\uffff\x1a\x4c\x04\uffff\x01\x4c\x01"+
             "\uffff\x1a\x4c",
+            "",
             "\x0a\x4c\x07\uffff\x1a\x4c\x04\uffff\x01\x4c\x01\uffff\x1a"+
             "\x4c",
             "",
@@ -28398,8 +28397,8 @@ public partial class Cmd3Lexer : Lexer {
             "",
             "",
             "",
-            "\x0a\u0625\x07\uffff\x1a\u0117\x04\uffff\x01\u0117\x01\uffff"+
-            "\x1a\u0117",
+            "\x0a\u0625\x07\uffff\x1a\u0118\x04\uffff\x01\u0118\x01\uffff"+
+            "\x1a\u0118",
             "\x0a\x4c\x07\uffff\x1a\x4c\x04\uffff\x01\x4c\x01\uffff\x1a"+
             "\x4c",
             "\x0a\x4c\x07\uffff\x03\x4c\x01\u0785\x16\x4c\x04\uffff\x01"+
@@ -28896,8 +28895,8 @@ public partial class Cmd3Lexer : Lexer {
             "\x4c\x01\uffff\x1a\x4c",
             "\x0a\x4c\x07\uffff\x13\x4c\x01\u0860\x06\x4c\x04\uffff\x01"+
             "\x4c\x01\uffff\x1a\x4c",
-            "\x0a\x4c\x07\uffff\x14\x4c\x01\u0861\x05\x4c\x04\uffff\x01"+
-            "\x4c\x01\uffff\x1a\x4c",
+            "\x0a\x4c\x07\uffff\x01\u0861\x19\x4c\x04\uffff\x01\x4c\x01"+
+            "\uffff\x1a\x4c",
             "",
             "\x0a\x4c\x07\uffff\x0d\x4c\x01\u0862\x0c\x4c\x04\uffff\x01"+
             "\x4c\x01\uffff\x1a\x4c",
@@ -29373,7 +29372,7 @@ public partial class Cmd3Lexer : Lexer {
             "\x4c\x01\uffff\x1a\x4c",
             "\x0a\x4c\x07\uffff\x1a\x4c\x04\uffff\x01\x4c\x01\uffff\x1a"+
             "\x4c",
-            "\x0a\x4c\x07\uffff\x12\x4c\x01\u0922\x07\x4c\x04\uffff\x01"+
+            "\x0a\x4c\x07\uffff\x0b\x4c\x01\u0922\x0e\x4c\x04\uffff\x01"+
             "\x4c\x01\uffff\x1a\x4c",
             "\x0a\x4c\x07\uffff\x1a\x4c\x04\uffff\x01\x4c\x01\uffff\x1a"+
             "\x4c",
@@ -29700,7 +29699,7 @@ public partial class Cmd3Lexer : Lexer {
             "\x0a\x4c\x07\uffff\x02\x4c\x01\u09a9\x17\x4c\x04\uffff\x01"+
             "\x4c\x01\uffff\x1a\x4c",
             "",
-            "\x0a\x4c\x07\uffff\x09\x4c\x01\u09aa\x10\x4c\x04\uffff\x01"+
+            "\x0a\x4c\x07\uffff\x05\x4c\x01\u09aa\x14\x4c\x04\uffff\x01"+
             "\x4c\x01\uffff\x1a\x4c",
             "",
             "\x0a\x4c\x07\uffff\x04\x4c\x01\u09ab\x15\x4c\x04\uffff\x01"+
@@ -29916,7 +29915,7 @@ public partial class Cmd3Lexer : Lexer {
             "\x4c\x01\uffff\x1a\x4c",
             "\x0a\x4c\x07\uffff\x0e\x4c\x01\u09f9\x0b\x4c\x04\uffff\x01"+
             "\x4c\x01\uffff\x1a\x4c",
-            "\x0a\x4c\x07\uffff\x05\x4c\x01\u09fa\x14\x4c\x04\uffff\x01"+
+            "\x0a\x4c\x07\uffff\x14\x4c\x01\u09fa\x05\x4c\x04\uffff\x01"+
             "\x4c\x01\uffff\x1a\x4c",
             "\x0a\x4c\x07\uffff\x1a\x4c\x04\uffff\x01\x4c\x01\uffff\x1a"+
             "\x4c",
@@ -30042,7 +30041,7 @@ public partial class Cmd3Lexer : Lexer {
             "\x4c",
             "\x0a\x4c\x07\uffff\x03\x4c\x01\u0a27\x16\x4c\x04\uffff\x01"+
             "\x4c\x01\uffff\x1a\x4c",
-            "\x0a\x4c\x07\uffff\x0b\x4c\x01\u0a28\x0e\x4c\x04\uffff\x01"+
+            "\x0a\x4c\x07\uffff\x0d\x4c\x01\u0a28\x0c\x4c\x04\uffff\x01"+
             "\x4c\x01\uffff\x1a\x4c",
             "",
             "",
@@ -30118,7 +30117,7 @@ public partial class Cmd3Lexer : Lexer {
             "",
             "\x0a\x4c\x07\uffff\x04\x4c\x01\u0a45\x15\x4c\x04\uffff\x01"+
             "\x4c\x01\uffff\x1a\x4c",
-            "\x0a\x4c\x07\uffff\x10\x4c\x01\u0a46\x09\x4c\x04\uffff\x01"+
+            "\x0a\x4c\x07\uffff\x02\x4c\x01\u0a46\x17\x4c\x04\uffff\x01"+
             "\x4c\x01\uffff\x1a\x4c",
             "\x0a\x4c\x07\uffff\x11\x4c\x01\u0a47\x08\x4c\x04\uffff\x01"+
             "\x4c\x01\uffff\x1a\x4c",
@@ -30167,7 +30166,7 @@ public partial class Cmd3Lexer : Lexer {
             "",
             "\x0a\x4c\x07\uffff\x1a\x4c\x04\uffff\x01\x4c\x01\uffff\x1a"+
             "\x4c",
-            "\x0a\x4c\x07\uffff\x0e\x4c\x01\u0a59\x0b\x4c\x04\uffff\x01"+
+            "\x0a\x4c\x07\uffff\x13\x4c\x01\u0a59\x06\x4c\x04\uffff\x01"+
             "\x4c\x01\uffff\x1a\x4c",
             "\x0a\x4c\x07\uffff\x13\x4c\x01\u0a5a\x06\x4c\x04\uffff\x01"+
             "\x4c\x01\uffff\x1a\x4c",
@@ -30200,7 +30199,7 @@ public partial class Cmd3Lexer : Lexer {
             "",
             "",
             "",
-            "\x02\x4c\x01\u0a68\x07\x4c\x07\uffff\x1a\x4c\x04\uffff\x01"+
+            "\x0a\x4c\x07\uffff\x08\x4c\x01\u0a68\x11\x4c\x04\uffff\x01"+
             "\x4c\x01\uffff\x1a\x4c",
             "\x0a\x4c\x07\uffff\x1a\x4c\x04\uffff\x01\x4c\x01\uffff\x1a"+
             "\x4c",
@@ -30227,8 +30226,8 @@ public partial class Cmd3Lexer : Lexer {
             "",
             "\x0a\x4c\x07\uffff\x1a\x4c\x04\uffff\x01\x4c\x01\uffff\x1a"+
             "\x4c",
-            "\x0a\x4c\x07\uffff\x1a\x4c\x04\uffff\x01\x4c\x01\uffff\x1a"+
-            "\x4c",
+            "\x0a\x4c\x07\uffff\x0e\x4c\x01\u0a74\x0b\x4c\x04\uffff\x01"+
+            "\x4c\x01\uffff\x1a\x4c",
             "",
             "\x0a\x4c\x07\uffff\x01\u0a75\x19\x4c\x04\uffff\x01\x4c\x01"+
             "\uffff\x1a\x4c",
@@ -30248,40 +30247,44 @@ public partial class Cmd3Lexer : Lexer {
             "\x0a\x4c\x07\uffff\x1a\x4c\x04\uffff\x01\x4c\x01\uffff\x1a"+
             "\x4c",
             "",
-            "",
-            "\x0a\x4c\x07\uffff\x13\x4c\x01\u0a7d\x06\x4c\x04\uffff\x01"+
+            "\x0a\x4c\x07\uffff\x0d\x4c\x01\u0a7d\x0c\x4c\x04\uffff\x01"+
             "\x4c\x01\uffff\x1a\x4c",
-            "\x0a\x4c\x07\uffff\x02\x4c\x01\u0a7e\x17\x4c\x04\uffff\x01"+
+            "\x0a\x4c\x07\uffff\x13\x4c\x01\u0a7e\x06\x4c\x04\uffff\x01"+
             "\x4c\x01\uffff\x1a\x4c",
-            "",
-            "\x0a\x4c\x07\uffff\x1a\x4c\x04\uffff\x01\x4c\x01\uffff\x1a"+
-            "\x4c",
-            "\x0a\x4c\x07\uffff\x1a\x4c\x04\uffff\x01\x4c\x01\uffff\x1a"+
-            "\x4c",
-            "",
-            "\x0a\x4c\x07\uffff\x12\x4c\x01\u0a82\x07\x4c\x04\uffff\x01"+
-            "\x4c\x01\uffff\x1a\x4c",
-            "",
-            "\x0a\x4c\x07\uffff\x0e\x4c\x01\u0a83\x0b\x4c\x04\uffff\x01"+
-            "\x4c\x01\uffff\x1a\x4c",
-            "\x0a\x4c\x07\uffff\x07\x4c\x01\u0a84\x12\x4c\x04\uffff\x01"+
-            "\x4c\x01\uffff\x1a\x4c",
-            "",
-            "",
-            "",
-            "\x0a\x4c\x07\uffff\x1a\x4c\x04\uffff\x01\x4c\x01\uffff\x1a"+
-            "\x4c",
-            "\x0a\x4c\x07\uffff\x11\x4c\x01\u0a86\x08\x4c\x04\uffff\x01"+
-            "\x4c\x01\uffff\x1a\x4c",
-            "\x0a\x4c\x07\uffff\x04\x4c\x01\u0a87\x15\x4c\x04\uffff\x01"+
+            "\x0a\x4c\x07\uffff\x02\x4c\x01\u0a7f\x17\x4c\x04\uffff\x01"+
             "\x4c\x01\uffff\x1a\x4c",
             "",
             "\x0a\x4c\x07\uffff\x1a\x4c\x04\uffff\x01\x4c\x01\uffff\x1a"+
             "\x4c",
-            "\x0a\x4c\x07\uffff\x02\x4c\x01\u0a89\x17\x4c\x04\uffff\x01"+
+            "\x0a\x4c\x07\uffff\x1a\x4c\x04\uffff\x01\x4c\x01\uffff\x1a"+
+            "\x4c",
+            "",
+            "\x0a\x4c\x07\uffff\x12\x4c\x01\u0a83\x07\x4c\x04\uffff\x01"+
             "\x4c\x01\uffff\x1a\x4c",
             "",
-            "\x0a\x4c\x07\uffff\x0a\x4c\x01\u0a8a\x0f\x4c\x04\uffff\x01"+
+            "\x0a\x4c\x07\uffff\x1a\x4c\x04\uffff\x01\x4c\x01\uffff\x1a"+
+            "\x4c",
+            "\x0a\x4c\x07\uffff\x0e\x4c\x01\u0a85\x0b\x4c\x04\uffff\x01"+
+            "\x4c\x01\uffff\x1a\x4c",
+            "\x0a\x4c\x07\uffff\x07\x4c\x01\u0a86\x12\x4c\x04\uffff\x01"+
+            "\x4c\x01\uffff\x1a\x4c",
+            "",
+            "",
+            "",
+            "\x0a\x4c\x07\uffff\x1a\x4c\x04\uffff\x01\x4c\x01\uffff\x1a"+
+            "\x4c",
+            "",
+            "\x0a\x4c\x07\uffff\x11\x4c\x01\u0a88\x08\x4c\x04\uffff\x01"+
+            "\x4c\x01\uffff\x1a\x4c",
+            "\x0a\x4c\x07\uffff\x04\x4c\x01\u0a89\x15\x4c\x04\uffff\x01"+
+            "\x4c\x01\uffff\x1a\x4c",
+            "",
+            "\x0a\x4c\x07\uffff\x1a\x4c\x04\uffff\x01\x4c\x01\uffff\x1a"+
+            "\x4c",
+            "\x0a\x4c\x07\uffff\x02\x4c\x01\u0a8b\x17\x4c\x04\uffff\x01"+
+            "\x4c\x01\uffff\x1a\x4c",
+            "",
+            "\x0a\x4c\x07\uffff\x0a\x4c\x01\u0a8c\x0f\x4c\x04\uffff\x01"+
             "\x4c\x01\uffff\x1a\x4c",
             "\x0a\x4c\x07\uffff\x1a\x4c\x04\uffff\x01\x4c\x01\uffff\x1a"+
             "\x4c",
@@ -30314,7 +30317,7 @@ public partial class Cmd3Lexer : Lexer {
 
         override public string Description
         {
-            get { return "1:1: Tokens : ( MAXLAG | DFMIN | LEAD | REKUR | MAXLEAD | FIT | GMS | ELEMENTS | NOMAX | RETURN2 | IN | MAP | STRING2 | REMOTE | ALIAS | OFFSET | DETECT | GRIDSTYLE | BOLD | ITALIC | ASER | ASERIES | XLABELS | YLABELS | ANNUAL | AT2 | BETWEEN | NONANNUAL | CURRENT | DIGITS | GAMS | GDX | GDXOPT | LAGFIX | ADDBANK | SHOWBANK | SHOWFREQ | REBASE | LINESPOINTS | BOXES | FILLEDCURVES | STEPS | DOTS | IMPULSES | CONTINUE | VOID | PROCEDURE | SIZE | SUBTITLE | TICS | GRID | KEY | PALETTE | STACK | BOXWIDTH | BOXGAP | SEPARATE | XLINE | XLINEBEFORE | XLINEAFTER | YMIRROR | YTITLE | YLINE | SHARES | ERRORS | LINE | IGNORE | YMAXHARD | YMAXSOFT | YMINHARD | YMINSOFT | XZEROAXIS | Y2TITLE | Y2LINE | Y2MAXHARD | Y2MAXSOFT | Y2MINHARD | Y2MINSOFT | X2ZEROAXIS | ARROW | PARQUET | DASHTYPE | LINEWIDTH | LINECOLOR | POINTTYPE | POINTSIZE | FILLSTYLE | LABEL | Y2 | X | Y | MDATEFORMAT | THOUSANDSSEPARATOR | XEDIT | IMPOSE | CONSTANT | INTERPOLATE | PRORATE | TRIM | USING | A | DEFAULT | LOGIC | ABS | ABSOLUTE | ACCEPT | ADD | AFTER | AFTER2 | ALIGNCENTER | ALIGNLEFT | ALIGNRIGHT | ALL | ANALYZE | AND | APPEND | AREMOS | OP | AS | AUTO | AVG | INDICATOR | BACKTRACK | BANK | BANK1 | BANK2 | BOWL | BY | CACHE | CALC | CAPS | CELL | CHANGE | CHECKOFF | CLEAR | CLEAR2 | CLIP | CLIPBOARD | CLONE | MOVE | REMOVE | CLOSE | CLOSEALL | CLOSEBANKS | CLS | CODE | COLLAPSE | XTREND | XFLAT | PX | ARRAY | BUGFIX | GCM | COLORS | COLS | DELIMITER | DATEFORMAT | DATETYPE | COMMA | COMMAND | COMMAND1 | COMMAND2 | COMPARE | COMPRESS | CONST | CONV | CONV1 | CONV2 | COPY | COPYLOCAL | LOCAL | GLOBAL | COUNT | CPLOT | CREATE | CREATEVARS | CSV | SDF | CURROW | D | DAMP | DANISH | DATA | DATABANK | DATAWIDTH | DATE | DATES | DEBUG | DEC | DECIMALSEPARATOR | DECOMP | DECOMP2 | DECOMP3 | EVAL | DELETE | DETAILS | DIALOG | DIF | DIFF | DIFPRT | DING | DYN | DIRECT | DISP | GEKKO | DISPLAY | DOC | DOWNLOAD | DP | DUMOF | DUMOFF | DUMON | DUMP | DUMPOPTIONS | EDIT | EFTER | ELSE | ELSEIF | END | ENDO | ENGLISH | ERROR | EXCEL | EXE | EXIT | EXO | EXP | EXPORT | EXTERNAL | FAILSAFE | FAIR | FALSE | FAST | FEED | FEEDBACK | FIELDS | FILE | FILEWIDTH | FILTER | FINDMISSINGDATA | BANKNAME | FLOW | META | ECHO | OBS | A3DP | A3 | A3N | ADP | AL | ADL | A3P | AN | AD | AP | A3D | A3L | A3DL | YOY | EXPAND | VARIABLECODE | VIEW | KEEPTYPES | PREDICT | FIND | PYTHON | DEP | BROWSER | FIRST | FIRSTCOLWIDTH | FIX | FLAT | DATECELL | NAMECELL | FOLDER | FONT | FONTSIZE | FOR | FORMAT | FORWARD | FREQ | FRML | FROM | FUNCTION | GAUSS | GBK | GDIF | GDIFF | GEKKO18 | GEKKO20 | GENR | GEOMETRIC | OVERLAY | GMULPRT | GNUPLOT | GOAL | GOTO | GRAPH | GROWTH | HDG | HEADING | HELP | HIDE | HIDELEFTBORDER | HIDERIGHTBORDER | HORIZON | HPFILTER | HTML | IF | IF_OLD | ASBANK | TOBANK | VARLIST | FROMBANK | IGNOREMISSING | IGNOREMISSINGVARS | IGNOREVARS | IMPORT | INDEX | INFO | INFOFILE | INI | INIT | INTERFACE | INTERNAL | INVERT | ROBUST | ITER | ITERMAX | ITERMIN | ITERSHOW | KEEP | LABELS | LAG | LANGUAGE | LAST | LEV | LINEAR | LINES | LIST | LISTFILE | LOG | LOCK_ | UNLOCK_ | LU | M | MACRO2 | MAIN | MAT | MATRIX | ROWNAMES | COLNAMES | MAX | MAXLINES | MEM | MENU | MENUTABLE | MERGE | MERGECOLS | MESSAGE | METHOD | MIN | MIXED | MISSING | MODE | MODEL | MODERNLOOK | MP | DL | L | RDL | RL | MULBK | MULPCT | MULPRT | MUTE | N | NAME | NAMES | NDEC | NDIFPRT | NEW | NEWTON | NEXT | NFAIR | NO | NOABS | NOCR | NODIF | NODIFF | NOFILTER | NOGDIF | NOGDIFF | NOLEV | NONE | NONMODEL | NOPCH | SAVE | NOT | NOTIFY | NOV | NWIDTH | NYTVINDU | OLS | OPEN | OPTION | OR | P | PARAM | PATCH | PATH | PAUSE | PCH | PCIM | PCIMSTYLE | STYLE | PCTPRT | PDEC | PERIOD | PIPE | PLOT | PLOTCODE | CUT | POINTS | POS | PREFIX | PRETTY | PRI | PRIM | PRINT | OPERATORS | PRN | PROT | PRT | PRTX | PUDVALG | PWIDTH | Q | R | R_EXPORT | R_FILE | R_RUN | PYTHON_EXPORT | PYTHON_FILE | PYTHON_RUN | RD | RDP | READ | REF | REL | RENAME | REORDER | REP | REPEAT | REPLACE | RES | RESET | BLOCK | RESPECT | RESTART | RING | RN | ROWS | GROUP | LEVEL | LINK | WHERE | RP | RUN | LIBRARY | SEARCH | SEC | SECONDCOLWIDTH | SER2 | SER3 | SER | SERIES2 | SERIES3 | SERIES | SET | SETBORDER | SETBOTTOMBORDER | SETDATES | SETLEFTBORDER | SETRIGHTBORDER | SETTEXT | SETTOPBORDER | SETVALUES | SHEET | SHOW | SHOWBORDERS | SHOWPCH | SIGN | SIM | SIMPLE | SKIP | NAN | ENGINE | NORMAL | SMOOTH | SOLVE | SOME | SORT | SOUND | SOURCE | SPECIALMINUS | SPLICE | SPLINE | SPLIT | STACKED | STAMP | STARTFILE | STATIC | CHECK | STEP | STOP | STRIP | SUFFIX | SUGGESTIONS | SWAP | SYS | SYSTEM | TABLE | TABLE1 | TABLE2 | TABLEOLD | TABS | TARGET | TELL | TEMP | TERMINAL | TEST | TESTRANDOMMODEL | TESTRANDOMMODELCHECK | TESTSIM | TIME | TIMEFILTER | UNIT | UNITS | TIMESPAN | TITLE | TO | TOTAL | TRACE | TRACE2 | TRANSLATE | TRANSPOSE | TREL | TRUE | TRUNCATE | TSD | TSDX | TSP | TXT | TYPE | U | UABS | UDIF | UDIFF | UDVALG | UGDIF | UGDIFF | ULEV | UNDO | UNFIX | SPEEDUP | UNSWAP | UPCH | UPDATEFREQ | UPDX | V | VAL | VAR | VAR_KDUSJFLQO2 | VALUE | VERS | VERSION | VPRT | WAIT | WIDTH | WINDOW | WORKING | WPLOT | WRITE | WUDVALG | X12A | XLS | XLSX | YES | YMAX | YMIN | I | Y2MAX | Y2MIN | ZERO | ZOOM | ZVAR | HTTP | HTTPS | WHITESPACE | COMMENT | COMMENT_MULTILINE | Ident | Integer | DigitsEDigits | DateDef | IdentStartingWithInt | Double | StringInQuotes | StringInQuotes1 | StringInQuotes2 | StringInQuotes3 | PLUSEQUAL | STAREQUAL | PERCENTEQUAL | HASHEQUAL | HATEQUAL | GLUE | GLUEDOT | GLUEDOTNUMBER | GLUESTAR | LEFTANGLESPECIAL | GLUEBACKSLASH | ISEQUAL | ISNOTQUAL | ISLARGEROREQUAL | ISSMALLEROREQUAL | EXCLAMATION | TILDE | AT | HAT | SEMICOLON | COLONGLUE | COLON | COMMA2 | DOT | HASH | PERCENT | DOLLAR | LEFTCURLY | RIGHTCURLY | LEFTPAREN | RIGHTPAREN | LEFTBRACKETGLUE | LEFTBRACKET | RIGHTBRACKET | LEFTANGLESIMPLE | RIGHTANGLE | STAR | DOUBLEVERTICALBAR1 | DOUBLEAND | DOUBLEVERTICALBAR2 | VERTICALBAR | PLUS | MINUS | DIV | TRIPLESTARS | STARS | EQUAL | MINUSEQUAL | DIVEQUAL | BACKSLASH | QUESTION );"; }
+            get { return "1:1: Tokens : ( MAXLAG | DFMIN | LEAD | REKUR | MAXLEAD | FIT | GMS | ELEMENTS | NOMAX | RETURN2 | IN | MAP | STRING2 | REMOTE | ALIAS | OFFSET | DETECT | GRIDSTYLE | BOLD | ITALIC | ASER | ASERIES | XLABELS | YLABELS | ANNUAL | AT2 | BETWEEN | NONANNUAL | CURRENT | DIGITS | GAMS | GDX | GDXOPT | LAGFIX | ADDBANK | SHOWBANK | SHOWFREQ | REBASE | LINESPOINTS | BOXES | FILLEDCURVES | STEPS | DOTS | IMPULSES | CONTINUE | VOID | PROCEDURE | SIZE | SUBTITLE | TICS | GRID | KEY | PALETTE | STACK | BOXWIDTH | BOXGAP | SEPARATE | XLINE | XLINEBEFORE | XLINEAFTER | YMIRROR | YTITLE | YLINE | SHARES | ERRORS | LINE | IGNORE | YMAXHARD | YMAXSOFT | YMINHARD | YMINSOFT | XZEROAXIS | Y2TITLE | Y2LINE | Y2MAXHARD | Y2MAXSOFT | Y2MINHARD | Y2MINSOFT | X2ZEROAXIS | ARROW | PARQUET | DASHTYPE | LINEWIDTH | LINECOLOR | POINTTYPE | POINTSIZE | FILLSTYLE | LABEL | Y2 | X | Y | MDATEFORMAT | THOUSANDSSEPARATOR | XEDIT | IMPOSE | CONSTANT | INTERPOLATE | PRORATE | TRIM | USING | A | DEFAULT | LOGIC | ABS | ABSOLUTE | ACCEPT | ADD | AFTER | AFTER2 | ALIGNCENTER | ALIGNLEFT | ALIGNRIGHT | ALL | ANALYZE | AND | APPEND | AREMOS | OP | AS | AUTO | AVG | INDICATOR | BACKTRACK | BANK | BANK1 | BANK2 | BOWL | BY | CACHE | CALC | CAPS | CELL | CHANGE | CHECKOFF | CLEAR | CLEAR2 | CLIP | CLIPBOARD | CLONE | MOVE | REMOVE | CLOSE | CLOSEALL | CLOSEBANKS | CLS | CODE | COLLAPSE | XTREND | XFLAT | PX | ARRAY | BUGFIX | GCM | COLORS | COLS | DELIMITER | DATEFORMAT | DATETYPE | COMMA | COMMAND | COMMAND1 | COMMAND2 | COMPARE | COMPRESS | CONST | CONV | CONV1 | CONV2 | COPY | COPYLOCAL | LOCAL | GLOBAL | COUNT | CPLOT | CREATE | CREATEVARS | CSV | SDF | CURROW | D | DAMP | DANISH | DATA | DATABANK | DATAWIDTH | DATE | DATES | DEBUG | DEC | DECIMALSEPARATOR | DECOMP | DECOMP2 | DECOMP3 | EVAL | DELETE | DETAILS | DIALOG | DIF | DIFF | DIFPRT | DING | DYN | DIRECT | DISP | GEKKO | DISPLAY | DOC | DOWNLOAD | DP | DUMOF | DUMOFF | DUMON | DUMP | DUMPOPTIONS | EDIT | EFTER | ELSE | ELSEIF | END | ENDO | ENGLISH | ERROR | EXCEL | EXE | EXIT | EXO | EXP | EXPORT | EXTERNAL | FAILSAFE | FAIR | FALSE | FAST | FEED | FEEDBACK | FIELDS | FILE | FILEWIDTH | FILTER | FINDMISSINGDATA | BANKNAME | FLOW | META | ECHO | OBS | A3DP | A3 | A3N | ADP | AL | ADL | A3P | AN | AD | AP | A3D | A3L | A3DL | YOY | EXPAND | VARIABLECODE | VIEW | KEEPTYPES | PREDICT | FIND | PYTHON | DEP | BROWSER | FIRST | FIRSTCOLWIDTH | FIX | FLAT | DATECELL | NAMECELL | FOLDER | FONT | FONTSIZE | FOR | FORMAT | FORWARD | FREQ | FRML | FROM | FUNCTION | GAUSS | GBK | GDIF | GDIFF | GEKKO18 | GEKKO20 | GENR | GEOMETRIC | OVERLAY | GMULPRT | GNUPLOT | GOAL | GOTO | GRAPH | GROWTH | HDG | HEADING | HELP | HIDE | HIDELEFTBORDER | HIDERIGHTBORDER | HORIZON | HPFILTER | HTML | IF | IF_OLD | ASBANK | TOBANK | VARLIST | FROMBANK | IGNOREMISSING | IGNOREMISSINGVARS | IGNOREVARS | IMPORT | INDEX | INFO | INFOFILE | INI | INIT | INTERFACE | INTERNAL | INVERT | ROBUST | ITER | ITERMAX | ITERMIN | ITERSHOW | KEEP | LABELS | LAG | LANGUAGE | LAST | LEV | LINEAR | LINES | LIST | LISTFILE | LOG | LOCK_ | UNLOCK_ | LU | M | MACRO2 | MAIN | MAT | MATRIX | ROWNAMES | COLNAMES | MAX | MAXLINES | MEM | MENU | MENUTABLE | MERGE | MERGECOLS | MESSAGE | METHOD | MIN | MIXED | MISSING | MODE | MODEL | MODERNLOOK | MP | DL | L | RDL | RL | MULBK | MULPCT | MULPRT | MUTE | N | NAME | NAMES | NDEC | NDIFPRT | NEW | NEWTON | NEXT | NFAIR | NO | NOABS | NOCR | NODIF | NODIFF | NOFILTER | NOGDIF | NOGDIFF | NOLEV | NONE | NONMODEL | NOPCH | SAVE | NOT | NOTIFY | NOV | NWIDTH | NYTVINDU | OLS | OPEN | OPTION | OR | P | PARAM | PATCH | PATH | PAUSE | PCH | PCIM | PCIMSTYLE | STYLE | PCTPRT | PDEC | PERIOD | PIPE | PLOT | PLOTCODE | CUT | POINTS | POS | PREFIX | PRETTY | PRI | PRIM | PRINT | OPERATORS | PRN | PROT | PRT | PRTX | PUDVALG | PWIDTH | Q | R | R_EXPORT | R_FILE | R_RUN | PYTHON_EXPORT | PYTHON_FILE | PYTHON_RUN | RD | RDP | READ | REF | REL | RENAME | REORDER | REP | REPEAT | REPLACE | RES | RESET | BLOCK | RESPECT | RESTART | RING | RN | ROWS | GROUP | LEVEL | LINK | WHERE | RP | RUN | LIBRARY | SEARCH | SEC | SECONDCOLWIDTH | SER2 | SER3 | SER | SERIES2 | SERIES3 | SERIES | SET | SETBORDER | SETBOTTOMBORDER | SETDATES | SETLEFTBORDER | SETRIGHTBORDER | SETTEXT | SETTOPBORDER | SETVALUES | SHEET | SHOW | SHOWBORDERS | SHOWPCH | SIGN | SIM | SIMPLE | SKIP | NAN | ENGINE | NORMAL | SMOOTH | SOLVE | SOME | SORT | SOUND | SOURCE | SPECIALMINUS | SPLICE | SPLINE | SPLIT | STACKED | STAMP | STARTFILE | STATIC | CHECK | STEP | STOP | STRIP | SUFFIX | SUGGESTIONS | SWAP | SYS | SYSTEM | TABLE | TABLE1 | TABLE2 | TABLEOLD | TABS | TARGET | TELL | TEMP | TERMINAL | TEST | TESTRANDOMMODEL | TESTRANDOMMODELCHECK | TESTSIM | TIME | TIMEFILTER | UNIT | UNITS | TIMESPAN | TITLE | TO | TOTAL | TRACE | TRACE2 | TRANSLATE | TRANSPOSE | TREL | TRUE | TRUNCATE | TSD | TSDX | TSP | TXT | TYPE | U | UABS | UDIF | UDIFF | UDVALG | UGDIF | UGDIFF | ULEV | UNDO | UNFIX | SPEEDUP | UNSWAP | UPCH | UPDATEFREQ | UPDX | V | VAL | VAR | VAR_EVALFUNCTION | VALUE | VERS | VERSION | VPRT | WAIT | WIDTH | WINDOW | WORKING | WPLOT | WRITE | WUDVALG | X12A | XLS | XLSX | YES | YMAX | YMIN | I | Y2MAX | Y2MIN | ZERO | ZOOM | ZVAR | HTTP | HTTPS | WHITESPACE | COMMENT | COMMENT_MULTILINE | Ident | Integer | DigitsEDigits | DateDef | IdentStartingWithInt | Double | StringInQuotes | StringInQuotes1 | StringInQuotes2 | StringInQuotes3 | PLUSEQUAL | STAREQUAL | PERCENTEQUAL | HASHEQUAL | HATEQUAL | GLUE | GLUEDOT | GLUEDOTNUMBER | GLUESTAR | LEFTANGLESPECIAL | GLUEBACKSLASH | ISEQUAL | ISNOTQUAL | ISLARGEROREQUAL | ISSMALLEROREQUAL | EXCLAMATION | TILDE | AT | HAT | SEMICOLON | COLONGLUE | COLON | COMMA2 | DOT | HASH | PERCENT | DOLLAR | LEFTCURLY | RIGHTCURLY | LEFTPAREN | RIGHTPAREN | LEFTBRACKETGLUE | LEFTBRACKET | RIGHTBRACKET | LEFTANGLESIMPLE | RIGHTANGLE | STAR | DOUBLEVERTICALBAR1 | DOUBLEAND | DOUBLEVERTICALBAR2 | VERTICALBAR | PLUS | MINUS | DIV | TRIPLESTARS | STARS | EQUAL | MINUSEQUAL | DIVEQUAL | BACKSLASH | QUESTION );"; }
         }
 
     }
@@ -30369,9 +30372,9 @@ public partial class Cmd3Lexer : Lexer {
                    	s = -1;
                    	if ( ((LA29_39 >= '\u0000' && LA29_39 <= '&') || (LA29_39 >= '(' && LA29_39 <= 'z') || (LA29_39 >= '|' && LA29_39 <= '\uFFFF')) && (( stringCounter == 1 )) ) { s = 287; }
 
-                   	else if ( (LA29_39 == '{') && (( stringCounter == 1 )) ) { s = 288; }
+                   	else if ( (LA29_39 == '\'') && (( stringCounter == 1 )) ) { s = 288; }
 
-                   	else if ( (LA29_39 == '\'') && (( stringCounter == 1 )) ) { s = 289; }
+                   	else if ( (LA29_39 == '{') && (( stringCounter == 1 )) ) { s = 289; }
 
                    	else s = 286;
 
@@ -30400,11 +30403,11 @@ public partial class Cmd3Lexer : Lexer {
                    	int index29_287 = input.Index();
                    	input.Rewind();
                    	s = -1;
-                   	if ( (LA29_287 == '\'') && (( stringCounter == 1 )) ) { s = 289; }
+                   	if ( (LA29_287 == '{') && (( stringCounter == 1 )) ) { s = 289; }
 
                    	else if ( ((LA29_287 >= '\u0000' && LA29_287 <= '&') || (LA29_287 >= '(' && LA29_287 <= 'z') || (LA29_287 >= '|' && LA29_287 <= '\uFFFF')) && (( stringCounter == 1 )) ) { s = 287; }
 
-                   	else if ( (LA29_287 == '{') && (( stringCounter == 1 )) ) { s = 288; }
+                   	else if ( (LA29_287 == '\'') && (( stringCounter == 1 )) ) { s = 288; }
 
                    	 
                    	input.Seek(index29_287);

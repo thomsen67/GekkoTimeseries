@@ -505,7 +505,7 @@ namespace Gekko.Parser.Gek
                                         isInsideNonControlledSumFunction = true;
                                     }
                                 }
-                                else if (node2.Text == "ASTPRTELEMENT" || node2.Text == "ASTLEFTSIDE" || node2.Text == "ASTEVAL" || (node2.Text == "ASTASSIGNMENT" && G.Equal(node2[3].Text, "VAR_KDUSJFLQO2")))  //Note: we cannot have both of these in the same tree, they are always separate
+                                else if (node2.Text == "ASTPRTELEMENT" || node2.Text == "ASTLEFTSIDE" || node2.Text == "ASTEVAL" || (node2.Text == "ASTASSIGNMENT" && G.Equal(node2[3].Text, Globals.evalName1)))  //Note: we cannot have both of these in the same tree, they are always separate
                                 {
                                     //The #i in x[#i] or similar does not seem to be controlled from an outer sum(#i, ...) function
                                     //Here we check if it is inside a more normal sum() function like for instance sum({#i}) or sum(x{#i}).
@@ -1875,7 +1875,7 @@ namespace Gekko.Parser.Gek
                             {
                                 //must probably always be so
                                 ASTNode gparent = node.Parent.Parent;
-                                if (G.Equal(gparent[3].Text, "VAR_KDUSJFLQO2"))
+                                if (G.Equal(gparent[3].Text, Globals.evalName1))
                                 {
                                     gparent.loopCodeCs = node[1].Code.ToString();
                                 }
@@ -3572,7 +3572,7 @@ namespace Gekko.Parser.Gek
                             }
 
                             string methodName = null;
-                            if (G.Equal(type, "VAR_KDUSJFLQO2"))
+                            if (G.Equal(type, Globals.evalName1))
                             {
                                 methodName = "Evalcode" + ++Globals.counter;
                                 node.Code.A("var " + methodName + " = new List<Func<GekkoSmpl, IVariable>>();");
@@ -3589,7 +3589,7 @@ namespace Gekko.Parser.Gek
                             //is set after any array-series loop, for we get this after the foreach (...)
                             node.Code.A("Globals.precedentsSeries = null;" + G.NL);  //wiping it out
 
-                            if (G.Equal(type, "VAR_KDUSJFLQO2"))
+                            if (G.Equal(type, Globals.evalName1))
                             {
                                 //Special EVAL code
 
@@ -3660,7 +3660,7 @@ namespace Gekko.Parser.Gek
                                 }
                             }
 
-                            if (G.Equal(type, "VAR_KDUSJFLQO2"))
+                            if (G.Equal(type, Globals.evalName1))
                             {
                                 node.Code.A("Globals.expressions = " + methodName + ";" + G.NL);
                             }
@@ -5929,7 +5929,7 @@ ASTPLACEHOLDER [0]
                     if (parent.Text == "ASTASSIGNMENT")
                     {                        
                         type = parent[3].Text;
-                        if (G.Equal(type, "VAR_KDUSJFLQO2")) type = "var";
+                        if (G.Equal(type, Globals.evalName1)) type = "var";
                         break;
                     }
                     parent = parent.Parent;

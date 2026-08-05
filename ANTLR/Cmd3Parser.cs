@@ -1,4 +1,4 @@
-// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g 2026-06-29 18:16:39
+// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g 2026-08-05 20:39:49
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 168, 219
@@ -1419,7 +1419,7 @@ public partial class Cmd3Parser : Parser
 		"V", 
 		"VAL", 
 		"VAR", 
-		"VAR_KDUSJFLQO2", 
+		"VAR_EVALFUNCTION", 
 		"VALUE", 
 		"VERS", 
 		"VERSION", 
@@ -1805,6 +1805,7 @@ public partial class Cmd3Parser : Parser
     public const int ASTOPT_STRING_POINTTYPE = 543;
     public const int SETVALUES = 1310;
     public const int EXIT = 1046;
+    public const int VAR_EVALFUNCTION = 1396;
     public const int ASTPRTELEMENTY2 = 681;
     public const int ASTOPT_VAL_DEC = 644;
     public const int PERIOD = 1241;
@@ -2178,7 +2179,6 @@ public partial class Cmd3Parser : Parser
     public const int TSD = 1373;
     public const int ASTMODELFILE = 456;
     public const int XLINE = 879;
-    public const int VAR_KDUSJFLQO2 = 1396;
     public const int ASTNAMEWITHDOT = 470;
     public const int ASTSERIESQUESTION = 710;
     public const int ASTTUPLEFUNCTIONSIMPLE = 772;
@@ -3305,7 +3305,7 @@ public partial class Cmd3Parser : Parser
 
 
             			    		// AST REWRITE
-            			    		// elements:          lbla, additiveExpression
+            			    		// elements:          additiveExpression, lbla
             			    		// token labels:      
             			    		// rule labels:       retval, lbla
             			    		// token list labels: 
@@ -3355,7 +3355,7 @@ public partial class Cmd3Parser : Parser
 
 
             			    		// AST REWRITE
-            			    		// elements:          lblb, additiveExpression
+            			    		// elements:          additiveExpression, lblb
             			    		// token labels:      
             			    		// rule labels:       retval, lblb
             			    		// token list labels: 
@@ -3407,7 +3407,7 @@ public partial class Cmd3Parser : Parser
 
 
             			    		// AST REWRITE
-            			    		// elements:          additiveExpression, lblb
+            			    		// elements:          lblb, additiveExpression
             			    		// token labels:      
             			    		// rule labels:       retval, lblb
             			    		// token list labels: 
@@ -3676,7 +3676,7 @@ public partial class Cmd3Parser : Parser
 
 
             			    		// AST REWRITE
-            			    		// elements:          multiplicativeExpression, lblb
+            			    		// elements:          lblb, multiplicativeExpression
             			    		// token labels:      
             			    		// rule labels:       retval, lblb
             			    		// token list labels: 
@@ -4157,7 +4157,7 @@ public partial class Cmd3Parser : Parser
 
 
             			    	// AST REWRITE
-            			    	// elements:          lbla, dollarExpression
+            			    	// elements:          dollarExpression, lbla
             			    	// token labels:      
             			    	// rule labels:       retval, lbla
             			    	// token list labels: 
@@ -5056,7 +5056,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          stringInQuotesWithCurliesB, stringInQuotesWithCurliesC, stringInQuotesWithCurliesA
+            	// elements:          stringInQuotesWithCurliesB, stringInQuotesWithCurliesA, stringInQuotesWithCurliesC
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -5741,7 +5741,7 @@ public partial class Cmd3Parser : Parser
 
 
                     			    	// AST REWRITE
-                    			    	// elements:          lbla, leftSideDollarExpression
+                    			    	// elements:          leftSideDollarExpression, lbla
                     			    	// token labels:      
                     			    	// rule labels:       retval, lbla
                     			    	// token list labels: 
@@ -5901,7 +5901,7 @@ public partial class Cmd3Parser : Parser
 
 
             			    	// AST REWRITE
-            			    	// elements:          bankvarnameIndexer, lbla
+            			    	// elements:          lbla, bankvarnameIndexer
             			    	// token labels:      
             			    	// rule labels:       retval, lbla
             			    	// token list labels: 
@@ -6914,7 +6914,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          listHelper, repExpression
+                    	// elements:          repExpression, listHelper
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -7813,7 +7813,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          mapItem, mapHelper
+                    	// elements:          mapHelper, mapItem
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -8708,7 +8708,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fargs, ident, libraryWithColon
+                    	// elements:          fargs, libraryWithColon, ident
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -8818,7 +8818,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          libraryWithColon, ident, fargs
+                    	// elements:          libraryWithColon, fargs, ident
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -9187,7 +9187,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          ident, libraryWithColon, fargs
+                    	// elements:          libraryWithColon, fargs, ident
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -9889,7 +9889,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, dates
+                    	// elements:          dates, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -11363,7 +11363,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seqItem7Naked, repN
+                    	// elements:          repN, seqItem7Naked
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -11444,7 +11444,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          repN, seqItem7Naked
+                    	// elements:          seqItem7Naked, repN
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -11517,7 +11517,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seqNumber, repN
+                    	// elements:          repN, seqNumber
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -11833,7 +11833,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          freq7Naked, indexer7Naked, indexer7Naked1, bank7Naked, name7
+            	// elements:          indexer7Naked1, freq7Naked, bank7Naked, indexer7Naked, name7
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -12391,7 +12391,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          indexerHelper7, plus7
+            	// elements:          plus7, indexerHelper7
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -12670,7 +12670,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          double2, minus
+                    	// elements:          minus, double2
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -12738,7 +12738,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          minus, Integer
+                    	// elements:          Integer, minus
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -13155,7 +13155,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          indexer71, bank7, indexer7, wildcard7
+                    	// elements:          indexer7, bank7, wildcard7, indexer71
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -19703,7 +19703,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          bankColon, varname
+            	// elements:          varname, bankColon
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -20007,7 +20007,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          ident, sigil
+            	// elements:          sigil, ident
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -21802,7 +21802,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, expression, ifOperator
+                    	// elements:          expression, ifOperator, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -25500,7 +25500,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seriesOpt1, nakedList, leftSide, assignmentType
+                    	// elements:          assignmentType, seriesOpt1, leftSide, nakedList
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -25624,7 +25624,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seriesOpt1, assignmentType, expression, leftSide
+                    	// elements:          expression, seriesOpt1, assignmentType, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -25724,7 +25724,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, seriesOpt1, leftSide, nakedList, assignmentType
+                    	// elements:          seriesOpt1, leftSide, leftSide, assignmentType, nakedList
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -25857,7 +25857,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, leftSide, seriesOpt1, assignmentType, expression
+                    	// elements:          assignmentType, leftSide, leftSide, expression, seriesOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -25966,7 +25966,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          nakedList, seriesOpt1, leftSide, assignmentType, leftSide
+                    	// elements:          leftSide, seriesOpt1, assignmentType, leftSide, nakedList
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -26099,7 +26099,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, leftSide, assignmentType, seriesOpt1, expression
+                    	// elements:          assignmentType, leftSide, expression, leftSide, seriesOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -26230,7 +26230,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seriesOpt1, nakedList, leftSide, assignmentType, leftSide
+                    	// elements:          assignmentType, leftSide, nakedList, leftSide, seriesOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -26385,7 +26385,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seriesOpt1, assignmentType, leftSide, expression, leftSide
+                    	// elements:          expression, leftSide, seriesOpt1, leftSide, assignmentType
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -26494,7 +26494,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seriesOpt1, nakedList, assignmentType, leftSide, leftSide
+                    	// elements:          nakedList, leftSide, seriesOpt1, assignmentType, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -26627,7 +26627,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seriesOpt1, leftSide, assignmentType, expression, leftSide
+                    	// elements:          assignmentType, expression, leftSide, seriesOpt1, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -26738,7 +26738,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          assignmentType, seriesOpt1, leftSide, nakedList
+                    	// elements:          seriesOpt1, nakedList, leftSide, assignmentType
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -26864,7 +26864,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, leftSide, seriesOpt1, assignmentType
+                    	// elements:          leftSide, seriesOpt1, expression, assignmentType
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -26964,7 +26964,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          nakedList, assignmentType, seriesOpt1, leftSide
+                    	// elements:          seriesOpt1, nakedList, leftSide, assignmentType
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -27088,7 +27088,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, assignmentType, seriesOpt1, expression
+                    	// elements:          expression, leftSide, assignmentType, seriesOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -27190,7 +27190,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          assignmentType, seriesOpt1, leftSide, nakedList
+                    	// elements:          assignmentType, leftSide, nakedList, seriesOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -27316,7 +27316,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, assignmentType, leftSide, seriesOpt1
+                    	// elements:          seriesOpt1, leftSide, assignmentType, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -27397,7 +27397,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          nakedList, leftSide, assignmentType, seriesOpt1
+                    	// elements:          assignmentType, nakedList, leftSide, seriesOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -27496,7 +27496,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seriesOpt1, expression, assignmentType, leftSide
+                    	// elements:          seriesOpt1, assignmentType, expression, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -27571,7 +27571,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          nakedList, leftSide, leftSide, seriesOpt1, assignmentType
+                    	// elements:          nakedList, leftSide, assignmentType, seriesOpt1, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -27679,7 +27679,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seriesOpt1, expression, assignmentType, leftSide, leftSide
+                    	// elements:          assignmentType, leftSide, expression, seriesOpt1, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -27763,7 +27763,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, seriesOpt1, assignmentType, leftSide, nakedList
+                    	// elements:          leftSide, leftSide, nakedList, seriesOpt1, assignmentType
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -27871,7 +27871,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, leftSide, leftSide, seriesOpt1, assignmentType
+                    	// elements:          leftSide, assignmentType, expression, leftSide, seriesOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -27955,7 +27955,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          nakedList, leftSide, seriesOpt1, leftSide, assignmentType
+                    	// elements:          leftSide, nakedList, seriesOpt1, assignmentType, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -28063,7 +28063,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, leftSide, assignmentType, seriesOpt1, leftSide
+                    	// elements:          assignmentType, expression, leftSide, leftSide, seriesOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -28147,7 +28147,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, leftSide, nakedList, seriesOpt1, assignmentType
+                    	// elements:          leftSide, leftSide, seriesOpt1, nakedList, assignmentType
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -28255,7 +28255,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          assignmentType, seriesOpt1, leftSide, expression, leftSide
+                    	// elements:          assignmentType, expression, seriesOpt1, leftSide, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -28341,7 +28341,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seriesOpt1, nakedList, leftSide, assignmentType
+                    	// elements:          leftSide, nakedList, seriesOpt1, assignmentType
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -28442,7 +28442,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seriesOpt1, assignmentType, expression, leftSide
+                    	// elements:          leftSide, seriesOpt1, assignmentType, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -28517,7 +28517,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, nakedList, seriesOpt1, assignmentType
+                    	// elements:          nakedList, assignmentType, seriesOpt1, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -28616,7 +28616,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, leftSide, seriesOpt1, assignmentType
+                    	// elements:          assignmentType, expression, leftSide, seriesOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -28693,7 +28693,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          nakedList, assignmentType, seriesOpt1, leftSide
+                    	// elements:          seriesOpt1, nakedList, assignmentType, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -28794,7 +28794,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seriesOpt1, assignmentType, leftSide, expression
+                    	// elements:          assignmentType, seriesOpt1, leftSide, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -28869,7 +28869,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seriesOpt1a, assignmentType, nakedList, leftSide
+                    	// elements:          leftSide, assignmentType, nakedList, seriesOpt1a
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -28968,7 +28968,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seriesOpt1a, expression, leftSide, assignmentType
+                    	// elements:          expression, assignmentType, seriesOpt1a, leftSide
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -29080,7 +29080,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          leftSide, assignmentType, ident, expression, seriesOpt1a
+                    	// elements:          expression, leftSide, assignmentType, ident, seriesOpt1a
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -29212,7 +29212,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          assignmentType, seriesOpt1, expression, ident, leftSide
+                    	// elements:          seriesOpt1, expression, leftSide, ident, assignmentType
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -29331,7 +29331,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seriesOpt1, ident, leftSide, assignmentType, expression
+                    	// elements:          seriesOpt1, assignmentType, leftSide, ident, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -29521,7 +29521,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          assignmentType, seriesOpt1, leftSide, expression
+            	// elements:          leftSide, seriesOpt1, assignmentType, expression
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -29788,7 +29788,7 @@ public partial class Cmd3Parser : Parser
     };
 
     // $ANTLR start "assignmentTypeNotEmpty"
-    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:2854:1: assignmentTypeNotEmpty : ( SER | SERIES | STRING2 | VAL | DATE | LIST | MAP | MATRIX | VAR | VAR_KDUSJFLQO2 | -> ASTPLACEHOLDER );
+    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:2854:1: assignmentTypeNotEmpty : ( SER | SERIES | STRING2 | VAL | DATE | LIST | MAP | MATRIX | VAR | VAR_EVALFUNCTION | -> ASTPLACEHOLDER );
     public Cmd3Parser.assignmentTypeNotEmpty_return assignmentTypeNotEmpty() // throws RecognitionException [1]
     {   
         Cmd3Parser.assignmentTypeNotEmpty_return retval = new Cmd3Parser.assignmentTypeNotEmpty_return();
@@ -29805,7 +29805,7 @@ public partial class Cmd3Parser : Parser
         IToken MAP866 = null;
         IToken MATRIX867 = null;
         IToken VAR868 = null;
-        IToken VAR_KDUSJFLQO2869 = null;
+        IToken VAR_EVALFUNCTION869 = null;
 
         object SER860_tree=null;
         object SERIES861_tree=null;
@@ -29816,7 +29816,7 @@ public partial class Cmd3Parser : Parser
         object MAP866_tree=null;
         object MATRIX867_tree=null;
         object VAR868_tree=null;
-        object VAR_KDUSJFLQO2869_tree=null;
+        object VAR_EVALFUNCTION869_tree=null;
 
         try 
     	{
@@ -29824,7 +29824,7 @@ public partial class Cmd3Parser : Parser
     	    {
     	    	return retval; 
     	    }
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:2854:23: ( SER | SERIES | STRING2 | VAL | DATE | LIST | MAP | MATRIX | VAR | VAR_KDUSJFLQO2 | -> ASTPLACEHOLDER )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:2854:23: ( SER | SERIES | STRING2 | VAL | DATE | LIST | MAP | MATRIX | VAR | VAR_EVALFUNCTION | -> ASTPLACEHOLDER )
             int alt186 = 11;
             alt186 = dfa186.Predict(input);
             switch (alt186) 
@@ -29947,14 +29947,14 @@ public partial class Cmd3Parser : Parser
                     }
                     break;
                 case 10 :
-                    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:2863:29: VAR_KDUSJFLQO2
+                    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:2863:29: VAR_EVALFUNCTION
                     {
                     	root_0 = (object)adaptor.GetNilNode();
 
-                    	VAR_KDUSJFLQO2869=(IToken)Match(input,VAR_KDUSJFLQO2,FOLLOW_VAR_KDUSJFLQO2_in_assignmentTypeNotEmpty30905); if (state.failed) return retval;
+                    	VAR_EVALFUNCTION869=(IToken)Match(input,VAR_EVALFUNCTION,FOLLOW_VAR_EVALFUNCTION_in_assignmentTypeNotEmpty30905); if (state.failed) return retval;
                     	if ( state.backtracking == 0 )
-                    	{VAR_KDUSJFLQO2869_tree = (object)adaptor.Create(VAR_KDUSJFLQO2869);
-                    		adaptor.AddChild(root_0, VAR_KDUSJFLQO2869_tree);
+                    	{VAR_EVALFUNCTION869_tree = (object)adaptor.Create(VAR_EVALFUNCTION869);
+                    		adaptor.AddChild(root_0, VAR_EVALFUNCTION869_tree);
                     	}
 
                     }
@@ -30333,7 +30333,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seriesOpt1h, localOptions
+                    	// elements:          localOptions, seriesOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -30465,7 +30465,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          dates, localOptions, seriesOpt1h
+                    	// elements:          localOptions, dates, seriesOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -30792,7 +30792,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seriesOpt1h, localOptions
+                    	// elements:          localOptions, seriesOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -32485,7 +32485,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          varname, acceptType, expression
+            	// elements:          expression, varname, acceptType
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -32731,7 +32731,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          analyzeOpt1, analyzeExpression
+            	// elements:          analyzeExpression, analyzeOpt1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -33140,7 +33140,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          analyzeOpt1h, localOptions
+                    	// elements:          localOptions, analyzeOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -33279,7 +33279,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          dates, analyzeOpt1h, localOptions
+                    	// elements:          analyzeOpt1h, dates, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -34705,7 +34705,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seqOfBankvarnames, closeOpt1
+                    	// elements:          closeOpt1, seqOfBankvarnames
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -35070,7 +35070,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, closeOpt1h
+                    	// elements:          closeOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -35666,7 +35666,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          collapseOpt1, seqOfBankvarnames2, collapseMethod, seqOfBankvarnames
+            	// elements:          collapseMethod, collapseOpt1, seqOfBankvarnames2, seqOfBankvarnames
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -36353,7 +36353,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          fileName, compareOpt1, seqOfBankvarnames
+            	// elements:          compareOpt1, seqOfBankvarnames, fileName
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -36694,7 +36694,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          compareOpt1h, localOptions
+                    	// elements:          localOptions, compareOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -36829,7 +36829,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          compareOpt1h, localOptions, dates
+                    	// elements:          localOptions, compareOpt1h, dates
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -37704,7 +37704,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          assignmentType, copyOpt1, seqOfBankvarnames, seqOfBankvarnames2
+            	// elements:          assignmentType, seqOfBankvarnames2, seqOfBankvarnames, copyOpt1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -38167,7 +38167,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          dates, copyOpt1h, localOptions
+                    	// elements:          dates, localOptions, copyOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -38821,7 +38821,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          seqOfBankvarnames, countOpt1, assignmentType
+            	// elements:          assignmentType, countOpt1, seqOfBankvarnames
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -39737,7 +39737,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          decompGroup, decompFrom, decompVar1Simple, decompEndo, decompHelper, decompCols, decompRows, decompWhere, decompOpt1
+            	// elements:          decompEndo, decompOpt1, decompWhere, decompHelper, decompCols, decompGroup, decompFrom, decompRows, decompVar1Simple
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -40217,7 +40217,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          seqOfBankvarnamesAlias, decompOpt2, seqOfBankvarnamesOnly1
+            	// elements:          seqOfBankvarnamesOnly1, seqOfBankvarnamesAlias, decompOpt2
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -40403,7 +40403,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          decompExpression2, decompOpt2, seqOfBankvarnamesOnly1Alias
+            	// elements:          decompExpression2, seqOfBankvarnamesOnly1Alias, decompOpt2
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -41540,7 +41540,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          decompWhere1, seqOfBankvarnamesOnly1
+            	// elements:          seqOfBankvarnamesOnly1, decompWhere1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -41802,7 +41802,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          expression, seqOfBankvarnamesOnly1, expression2, seqOfBankvarnamesOnly1
+            	// elements:          expression2, seqOfBankvarnamesOnly1, seqOfBankvarnamesOnly1, expression
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -42272,7 +42272,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, decompOpt1h
+                    	// elements:          decompOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -42407,7 +42407,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, dates, decompOpt1h
+                    	// elements:          dates, decompOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -43994,7 +43994,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, findOpt1h
+                    	// elements:          findOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -44129,7 +44129,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          dates, findOpt1h, localOptions
+                    	// elements:          localOptions, findOpt1h, dates
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -44397,7 +44397,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          deleteOpt1, seqOfBankvarnames
+            	// elements:          seqOfBankvarnames, deleteOpt1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -45071,7 +45071,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          seqOfBankvarnames, assignmentType, dispOpt1
+                    	// elements:          dispOpt1, assignmentType, seqOfBankvarnames
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -45394,7 +45394,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, dispOpt1h
+                    	// elements:          dispOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -45552,7 +45552,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, dates, dispOpt1h
+                    	// elements:          dates, localOptions, dispOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -45940,7 +45940,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          docOpt2, fileName, docOpt1, seqOfBankvarnames
+            	// elements:          docOpt2, seqOfBankvarnames, docOpt1, fileName
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -47273,7 +47273,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          fileName, fileName2, downloadOpt1, url
+            	// elements:          downloadOpt1, fileName2, fileName, url
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -47586,7 +47586,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          downloadOpt1h, localOptions
+                    	// elements:          localOptions, downloadOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -48108,7 +48108,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          eeOpt1, eeHelper
+            	// elements:          eeHelper, eeOpt1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -48690,7 +48690,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          indexerExpression, eeOpt1
+            	// elements:          eeOpt1, indexerExpression
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -49434,7 +49434,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, findmissingdataOpt1h, dates
+                    	// elements:          findmissingdataOpt1h, dates, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -49820,7 +49820,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          functionStatements, forHelper7a
+                    	// elements:          forHelper7a, functionStatements
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -49876,7 +49876,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          forHelper7b, functionStatements
+                    	// elements:          functionStatements, forHelper7b
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -50451,7 +50451,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          forLhs, expression2, expression3, expression
+                    	// elements:          expression3, expression, expression2, forLhs
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -50595,7 +50595,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, forLhs
+                    	// elements:          forLhs, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -50885,7 +50885,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          ident, functionStatements, typeRv, functionArg
+            	// elements:          functionStatements, functionArg, ident, typeRv
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -51131,7 +51131,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          tripleDot, functionArgElement, functionArgElement1
+            	// elements:          functionArgElement1, tripleDot, functionArgElement
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -51539,7 +51539,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          svarname, expression1, typeArg, expression2
+            	// elements:          typeArg, expression1, expression2, svarname
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -52292,7 +52292,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fargs, bankvarname, libraryWithColon, ident
+                    	// elements:          ident, fargs, libraryWithColon, bankvarname
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -52430,7 +52430,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fargs, bankvarname, libraryWithColon, ident
+                    	// elements:          libraryWithColon, ident, fargs, bankvarname
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -52632,7 +52632,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          versionAndDate, andOr, ifOperator, versionAndDate, ifOperator
+            	// elements:          ifOperator, ifOperator, andOr, versionAndDate, versionAndDate
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -53467,7 +53467,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          logical, functionStatements2, functionStatements
+                    	// elements:          functionStatements, logical, functionStatements2
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -53639,7 +53639,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          functionStatements, functionStatements2, logical, logical, functionStatements
+                    	// elements:          functionStatements, functionStatements, logical, functionStatements2, logical
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -53667,10 +53667,10 @@ public partial class Cmd3Parser : Parser
 
                     	    adaptor.AddChild(root_1, root_2);
                     	    }
-                    	    if ( !(stream_logical.HasNext() || stream_functionStatements.HasNext()) ) {
+                    	    if ( !(stream_functionStatements.HasNext() || stream_logical.HasNext()) ) {
                     	        throw new RewriteEarlyExitException();
                     	    }
-                    	    while ( stream_logical.HasNext() || stream_functionStatements.HasNext() )
+                    	    while ( stream_functionStatements.HasNext() || stream_logical.HasNext() )
                     	    {
                     	        adaptor.AddChild(root_1, stream_logical.NextTree());
                     	        // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:3308:284: ^( ASTELSEIFSTATEMENTS functionStatements )
@@ -53684,8 +53684,8 @@ public partial class Cmd3Parser : Parser
                     	        }
 
                     	    }
-                    	    stream_logical.Reset();
                     	    stream_functionStatements.Reset();
+                    	    stream_logical.Reset();
                     	    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:3308:328: ^( ASTELSESTATEMENTS ( functionStatements2 )? )
                     	    {
                     	    object root_2 = (object)adaptor.GetNilNode();
@@ -53772,7 +53772,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          functionStatements2, logical, functionStatements
+                    	// elements:          logical, functionStatements, functionStatements2
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -54497,7 +54497,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          indexOpt1, seqOfBankvarnames, assignmentType, seqOfBankvarnames2
+            	// elements:          seqOfBankvarnames2, seqOfBankvarnames, indexOpt1, assignmentType
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -54820,7 +54820,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, indexOpt1h
+                    	// elements:          indexOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -55592,7 +55592,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          interpolateMethod2, seqOfBankvarnames2, interpolateOpt1, seqOfBankvarnames, interpolateMethod, seqOfBankvarnames3
+            	// elements:          seqOfBankvarnames3, interpolateMethod, seqOfBankvarnames, interpolateOpt1, interpolateMethod2, seqOfBankvarnames2
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -56367,7 +56367,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          seqOfBankvarnames, dates
+            	// elements:          dates, seqOfBankvarnames
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -56527,7 +56527,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          localOpt1, seqOfBankvarnames
+            	// elements:          seqOfBankvarnames, localOpt1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -56840,7 +56840,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, localOpt1h
+                    	// elements:          localOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -57905,7 +57905,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          libraryOpt1, libraryHelper
+                    	// elements:          libraryHelper, libraryOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -58250,7 +58250,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          fileNameStar, name
+            	// elements:          name, fileNameStar
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -59332,7 +59332,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          fileNameStar, modelOpt1
+            	// elements:          modelOpt1, fileNameStar
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -59789,7 +59789,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          modelOpt1h, localOptions, dates
+                    	// elements:          dates, modelOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -60474,7 +60474,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          olsImpose, olsOpt1, olsExpression
+                    	// elements:          olsExpression, olsImpose, olsOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -60699,7 +60699,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          olsExpression, olsImpose, name, olsOpt1
+                    	// elements:          olsExpression, olsOpt1, name, olsImpose
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -61830,7 +61830,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          openHelper, openOpt1
+            	// elements:          openOpt1, openHelper
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -61971,7 +61971,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          seqOfBankvarnames, seqOfFileNamesStar
+            	// elements:          seqOfFileNamesStar, seqOfBankvarnames
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -62278,7 +62278,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, openOpt1h
+                    	// elements:          openOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -65953,7 +65953,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          predictOpt1, seqOfBankvarnames
+            	// elements:          seqOfBankvarnames, predictOpt1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -66510,7 +66510,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          libraryWithColon, fargs_proc, identWithoutCommand
+                    	// elements:          fargs_proc, libraryWithColon, identWithoutCommand
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -66616,7 +66616,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          libraryWithColon, identWithoutCommand, fargs_proc
+                    	// elements:          fargs_proc, identWithoutCommand, libraryWithColon
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -66875,7 +66875,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          libraryWithColon, fargs, ident
+                    	// elements:          fargs, ident, libraryWithColon
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -66985,7 +66985,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fargs, libraryWithColon, ident
+                    	// elements:          fargs, ident, libraryWithColon
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -67138,7 +67138,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          procedureArg, procedureStatements, identWithoutCommand
+            	// elements:          procedureStatements, procedureArg, identWithoutCommand
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -67384,7 +67384,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          procedureArgElement1, tripleDot, procedureArgElement
+            	// elements:          procedureArgElement, tripleDot, procedureArgElement1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -67792,7 +67792,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          svarname, expression2, typeArg, expression1
+            	// elements:          expression1, expression2, svarname, typeArg
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -68117,7 +68117,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          prtOpt2, prtElements, prtHelper, prtOpt1
+            	// elements:          prtOpt1, prtOpt2, prtElements, prtHelper
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -68540,7 +68540,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          gekkoLabel, expression, prtElementOptionField
+            	// elements:          prtElementOptionField, expression, gekkoLabel
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -69001,7 +69001,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          prtOpt1Helper, localOptions
+                    	// elements:          localOptions, prtOpt1Helper
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -69136,7 +69136,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          dates, localOptions, prtOpt1Helper
+                    	// elements:          prtOpt1Helper, localOptions, dates
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -82622,7 +82622,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, r_exportOpt1h
+                    	// elements:          r_exportOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -82940,7 +82940,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          r_runOpt1, fileName, seqOfBankvarnames
+                    	// elements:          fileName, r_runOpt1, seqOfBankvarnames
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -83063,7 +83063,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fileName, r_runOpt1
+                    	// elements:          r_runOpt1, fileName
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -83379,7 +83379,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, r_runOpt1h
+                    	// elements:          r_runOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -83799,7 +83799,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fileName, seqOfBankvarnames, python_runOpt1
+                    	// elements:          python_runOpt1, fileName, seqOfBankvarnames
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -85159,7 +85159,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, rebaseOpt1h
+                    	// elements:          rebaseOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -85772,7 +85772,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          seqOfBankvarnames, assignmentType, seqOfBankvarnames2, renameOpt1
+            	// elements:          renameOpt1, seqOfBankvarnames, seqOfBankvarnames2, assignmentType
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -86804,7 +86804,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          readHelper, readOpt1, fileNameStar, nameOrStar
+            	// elements:          readOpt1, fileNameStar, readHelper, nameOrStar
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -87200,7 +87200,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, readOpt1h
+                    	// elements:          readOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -87327,7 +87327,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, readOpt1h, dates
+                    	// elements:          dates, localOptions, readOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -90629,7 +90629,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          runOpt1h, localOptions
+                    	// elements:          localOptions, runOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -90868,7 +90868,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          fileName, sheetImportOpt1, seqOfBankvarnames
+            	// elements:          seqOfBankvarnames, sheetImportOpt1, fileName
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -91236,7 +91236,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          sheetImportOpt1h, dates, localOptions
+                    	// elements:          localOptions, sheetImportOpt1h, dates
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -92909,7 +92909,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          dates, localOptions, simOpt1h
+                    	// elements:          dates, simOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -93702,7 +93702,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          seqOfBankvarnames2, seqOfBankvarnames3, smoothOpt2, seqOfBankvarnames
+            	// elements:          seqOfBankvarnames3, smoothOpt2, seqOfBankvarnames2, seqOfBankvarnames
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -94531,7 +94531,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          spliceOpt1, expression, seqOfBankvarnames
+            	// elements:          seqOfBankvarnames, expression, spliceOpt1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -95496,7 +95496,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fileName, expression, sysOpt1
+                    	// elements:          sysOpt1, expression, fileName
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -96577,7 +96577,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          tableCurrow, expression, expression
+                    	// elements:          expression, expression, tableCurrow
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -96635,7 +96635,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          tableCurrow, expression
+                    	// elements:          expression, tableCurrow
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -96700,7 +96700,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, expression, tableCurrow
+                    	// elements:          expression, tableCurrow, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -97104,7 +97104,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          tableCurrow, expression, expression
+                    	// elements:          expression, expression, tableCurrow
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -97162,7 +97162,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          tableCurrow, expression
+                    	// elements:          expression, tableCurrow
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -97219,7 +97219,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, tableCurrow
+                    	// elements:          tableCurrow, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -97276,7 +97276,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, tableCurrow
+                    	// elements:          tableCurrow, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -97341,7 +97341,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, expression, tableCurrow
+                    	// elements:          tableCurrow, expression, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -97415,7 +97415,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          tableCurrow, expression, expression, expression
+                    	// elements:          expression, expression, tableCurrow, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -97522,7 +97522,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          expression, expression, expression, expression, expression, expression, tableCurrow, expression
+                    	// elements:          tableCurrow, expression, expression, expression, expression, expression, expression, expression
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -97605,7 +97605,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          tableOpt1, fileName
+                    	// elements:          fileName, tableOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -97686,7 +97686,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fileName, tableOpt1
+                    	// elements:          tableOpt1, fileName
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -98000,7 +98000,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, tableOpt1h
+                    	// elements:          tableOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -98135,7 +98135,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, tableOpt1h, dates
+                    	// elements:          tableOpt1h, localOptions, dates
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -99093,7 +99093,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          tellOpt1h, localOptions
+                    	// elements:          localOptions, tellOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -101819,7 +101819,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          writeOpt1, seqOfBankvarnames2, fileName, writeHelper, seqOfBankvarnames
+                    	// elements:          fileName, seqOfBankvarnames2, writeOpt1, seqOfBankvarnames, writeHelper
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -101935,7 +101935,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          writeHelper, fileName, writeOpt1
+                    	// elements:          fileName, writeHelper, writeOpt1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -102475,7 +102475,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, dates, writeOpt1h
+                    	// elements:          localOptions, writeOpt1h, dates
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -105355,7 +105355,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          truncateOpt1h, localOptions
+                    	// elements:          localOptions, truncateOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -105688,7 +105688,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          x12aOpt1, seqOfBankvarnames
+            	// elements:          seqOfBankvarnames, x12aOpt1
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -106008,7 +106008,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          x12aOpt1h, localOptions
+                    	// elements:          localOptions, x12aOpt1h
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -106158,7 +106158,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          localOptions, x12aOpt1h, dates
+                    	// elements:          dates, x12aOpt1h, localOptions
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -106701,7 +106701,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          FILE, GBK, fileName, INTERNAL, DATABANK
+                    	// elements:          DATABANK, fileName, GBK, FILE, INTERNAL
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -106796,7 +106796,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          FOLDER, BANK, fileName
+                    	// elements:          fileName, BANK, FOLDER
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -106873,7 +106873,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          FOLDER, BANK1, fileName
+                    	// elements:          FOLDER, fileName, BANK1
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -106950,7 +106950,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          BANK2, FOLDER, fileName
+                    	// elements:          fileName, FOLDER, BANK2
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -107104,7 +107104,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          COMMAND1, fileName, FOLDER
+                    	// elements:          fileName, COMMAND1, FOLDER
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -107258,7 +107258,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fileName, FOLDER, HELP
+                    	// elements:          fileName, HELP, FOLDER
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -107412,7 +107412,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fileName, FOLDER, MODEL
+                    	// elements:          FOLDER, MODEL, fileName
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -107489,7 +107489,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          PIPE, fileName, FOLDER
+                    	// elements:          PIPE, FOLDER, fileName
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -107566,7 +107566,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fileName, TABLE, FOLDER
+                    	// elements:          FOLDER, fileName, TABLE
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -107877,7 +107877,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          GAMS, fileName, EXE, FOLDER
+                    	// elements:          FOLDER, fileName, EXE, GAMS
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -107966,7 +107966,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          REMOTE, FILE, INTERFACE, fileName
+                    	// elements:          INTERFACE, REMOTE, fileName, FILE
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -108052,7 +108052,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          STARTFILE, fileName, MENU
+                    	// elements:          MENU, STARTFILE, fileName
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -108129,7 +108129,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          PLOT, fileName, USING
+                    	// elements:          fileName, PLOT, USING
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -108209,7 +108209,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          FOLDER, fileName, EXE, PYTHON
+                    	// elements:          FOLDER, fileName, PYTHON, EXE
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -108298,7 +108298,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fileName, EXE, R, FOLDER
+                    	// elements:          FOLDER, R, EXE, fileName
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -108509,7 +108509,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          ident, question
+                    	// elements:          question, ident
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -108618,7 +108618,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          ident, name
+                    	// elements:          name, ident
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -110527,7 +110527,7 @@ public partial class Cmd3Parser : Parser
 
 
                     	// AST REWRITE
-                    	// elements:          fileNameFirstPart, fileNamePart
+                    	// elements:          fileNamePart, fileNameFirstPart
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -110794,7 +110794,7 @@ public partial class Cmd3Parser : Parser
 
 
             	// AST REWRITE
-            	// elements:          name, fileNamePart
+            	// elements:          fileNamePart, name
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -115889,7 +115889,7 @@ public partial class Cmd3Parser : Parser
     };
 
     // $ANTLR start "ident2"
-    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:4412:1: ident2 : ( Ident | ACCEPT | ANALYZE | CHECKOFF | CLEAR | CLIP | CLONE | CLOSE | CLS | COLLAPSE | COMPARE | COPY | COUNT | CREATE | CUT | DATE | DECOMP | DECOMP2 | DECOMP3 | EVAL | DELETE | DISP | GEKKO | DOC | DOWNLOAD | EDIT | ENDO | END | EXIT | EXO | EXPORT | FINDMISSINGDATA | BANKNAME | FLOW | META | ECHO | OBS | A3DP | A3 | ADP | AL | ADL | A3P | AD | AP | A3D | A3L | A3DL | YOY | CLOSEALL | VIEW | LIBRARY | KEEPTYPES | PREDICT | FIND | PYTHON | BROWSER | FOR | FUNCTION | GOTO | GLOBAL | HDG | HELP | IF | IF_OLD | IMPORT | INDEX | INI | INTERPOLATE | ITERSHOW | LIST | LOCK_ | LOCAL | MATRIX | MEM | MENU | MODEL | MODE | MULPRT | NAME | OLS | OPEN | OPTION | PAUSE | PIPE | PLOT | PRINT | PRI | PROCEDURE | PRT | P | R_EXPORT | R_FILE | R_RUN | PYTHON_EXPORT | PYTHON_FILE | PYTHON_RUN | READ | REBASE | RENAME | RESET | BLOCK | RESTART | RETURN2 | RUN | SERIES | SER | SHEET | SHOW | SIGN | SIM | SMOOTH | SPLICE | STOP | STRING2 | SYS | TABLE | TARGET | TELL | TIMEFILTER | TIME | TRACE | TRACE2 | TRANSLATE | TRUNCATE | UNFIX | SPEEDUP | UNLOCK_ | UNSWAP | VAL | WRITE | X12A | XEDIT | ABS | GEOMETRIC | OVERLAY | ADDBANK | SHOWBANK | SHOWFREQ | ADD | AFTER2 | AFTER | ALIGNCENTER | ALIGNLEFT | ALIGNRIGHT | ALL | AND | ANNUAL | APPEND | AREMOS | OP | ARRAY | ARROW | PARQUET | ASERIES | ASER | AS | AT2 | AUTO | AVG | A | BACKTRACK | INDICATOR | BANK1 | BANK2 | BANK | BETWEEN | BOLD | BOWL | BOXES | BOXGAP | BOXWIDTH | BUGFIX | GCM | BY | CACHE | CALC | CAPS | CELL | CHANGE | CLEAR2 | CLIPBOARD | CLOSEBANKS | CODE | MOVE | REMOVE | COLNAMES | COLORS | COLS | DELIMITER | DATEFORMAT | DATETYPE | COMMAND1 | COMMAND2 | COMMAND | COMMA | COMPRESS | CONSTANT | CONST | CONTINUE | CONV1 | CONV2 | CONV | COPYLOCAL | CPLOT | CREATEVARS | CSV | SDF | CURROW | DAMP | DANISH | DASHTYPE | DATABANK | DATAWIDTH | DATA | DATES | DEBUG | DECIMALSEPARATOR | DEC | DEFAULT | DETAILS | DETECT | DIALOG | DIFF | DIFPRT | DIF | DIGITS | DING | DYN | DIRECT | DISPLAY | DOTS | DP | DUMOFF | DUMOF | DUMON | DUMP | DUMPOPTIONS | D | EFTER | ELEMENTS | ELSE | ELSEIF | ENGLISH | ERROR | EXCEL | EXE | EXP | EXPAND | EXTERNAL | FAILSAFE | FAIR | FAST | FEEDBACK | FEED | FIELDS | FILEWIDTH | VARIABLECODE | FILE | FILLEDCURVES | FILLSTYLE | FILTER | FIRSTCOLWIDTH | FIRST | FIX | FLAT | NAMECELL | DATECELL | DEP | FOLDER | FONTSIZE | FONT | FORMAT | FORWARD | FREQ | FRML | FROM | GAMS | GAUSS | GBK | GDIFF | GDIF | GDXOPT | GDX | GEKKO18 | GEKKO20 | GENR | GMS | GMULPRT | GNUPLOT | GOAL | GRAPH | GRIDSTYLE | GRID | GROWTH | HEADING | HIDELEFTBORDER | HIDERIGHTBORDER | HIDE | HORIZON | HPFILTER | HTML | ASBANK | TOBANK | VARLIST | FROMBANK | IGNOREMISSINGVARS | IGNOREMISSING | IGNOREVARS | IMPOSE | IMPULSES | IN | INFOFILE | INFO | INIT | INTERFACE | INTERNAL | INVERT | ROBUST | ITALIC | ITERMAX | ITERMIN | ITER | KEEP | MAP | KEY | LABELS | LABEL | LAGFIX | LAG | LANGUAGE | LAST | LEV | LINEAR | LINECOLOR | LINESPOINTS | LINES | LINEWIDTH | LISTFILE | LOGIC | LOG | LU | MACRO2 | MAIN | MAXLINES | MAX | MDATEFORMAT | MENUTABLE | MERGECOLS | MERGE | MESSAGE | METHOD | MIN | MISSING | MIXED | MODERNLOOK | MP | DL | L | RDL | RL | MULBK | MULPCT | MUTE | M | NAMES | NDEC | NDIFPRT | NEWTON | NEW | NEXT | NFAIR | NOABS | NOCR | NODIFF | NODIF | NOFILTER | NOGDIFF | NOGDIF | NOLEV | NOMAX | MAXLAG | DFMIN | LEAD | REKUR | MAXLEAD | FIT | NONANNUAL | CURRENT | NONE | NONMODEL | NOPCH | NOTIFY | NOT | NOV | NO | NWIDTH | NYTVINDU | N | OFFSET | OR | PALETTE | PARAM | PATCH | PATH | PCH | PCIMSTYLE | STYLE | PCIM | PCTPRT | PDEC | PERIOD | PLOTCODE | POINTSIZE | POINTS | POINTTYPE | POS | PREFIX | PRETTY | PRIM | OPERATORS | PRN | PRORATE | PROT | PRTX | PUDVALG | PWIDTH | PX | Q | RDP | RD | REF | REL | REMOTE | ALIAS | REORDER | REPLACE | REPEAT | REP | RESPECT | RES | RING | RN | ROWNAMES | ROWS | GROUP | LEVEL | LINK | WHERE | RP | R | SAVE | SEARCH | SECONDCOLWIDTH | SEC | SEPARATE | SER2 | SER3 | SERIES2 | SERIES3 | SETBORDER | SETBOTTOMBORDER | SETDATES | SETLEFTBORDER | SETRIGHTBORDER | SETTEXT | SETTOPBORDER | SETVALUES | SET | SHOWBORDERS | SHOWPCH | SIMPLE | SIZE | SKIP | NAN | ENGINE | NORMAL | SOLVE | SOME | SORT | SOUND | SOURCE | SPECIALMINUS | SPLINE | SPLIT | STACKED | STACK | STAMP | STARTFILE | STATIC | CHECK | STEPS | STEP | STRIP | SUBTITLE | SUFFIX | SUGGESTIONS | SWAP | SYSTEM | TABLE1 | TABLE2 | TABLEOLD | TABS | TEMP | TERMINAL | TESTRANDOMMODELCHECK | TESTRANDOMMODEL | TESTSIM | TEST | THOUSANDSSEPARATOR | TICS | TIMESPAN | TITLE | TOTAL | TO | TRANSPOSE | TREL | TRIM | TSDX | TSD | TSP | TXT | TYPE | UABS | UDIFF | UDIF | UDVALG | UGDIFF | UGDIF | ULEV | UNDO | UPCH | UPDATEFREQ | UPDX | USING | U | VALUE | VAR | VAR_KDUSJFLQO2 | VERSION | VERS | VOID | VPRT | V | WAIT | WIDTH | WINDOW | WORKING | WPLOT | WUDVALG | X2ZEROAXIS | XLABELS | XLINEAFTER | XLINEBEFORE | XLINE | XLSX | XLS | XZEROAXIS | X | XTREND | XFLAT | Y2LINE | Y2MAXHARD | Y2MAXSOFT | Y2MAX | Y2MINHARD | Y2MINSOFT | Y2MIN | Y2TITLE | Y2 | YES | YLABELS | YLINE | SHARES | ERRORS | IGNORE | YMAXHARD | YMAXSOFT | YMAX | LINE | YMINHARD | YMINSOFT | YMIN | I | YMIRROR | YTITLE | Y | ZERO | ZOOM | ZVAR );
+    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:4412:1: ident2 : ( Ident | ACCEPT | ANALYZE | CHECKOFF | CLEAR | CLIP | CLONE | CLOSE | CLS | COLLAPSE | COMPARE | COPY | COUNT | CREATE | CUT | DATE | DECOMP | DECOMP2 | DECOMP3 | EVAL | DELETE | DISP | GEKKO | DOC | DOWNLOAD | EDIT | ENDO | END | EXIT | EXO | EXPORT | FINDMISSINGDATA | BANKNAME | FLOW | META | ECHO | OBS | A3DP | A3 | ADP | AL | ADL | A3P | AD | AP | A3D | A3L | A3DL | YOY | CLOSEALL | VIEW | LIBRARY | KEEPTYPES | PREDICT | FIND | PYTHON | BROWSER | FOR | FUNCTION | GOTO | GLOBAL | HDG | HELP | IF | IF_OLD | IMPORT | INDEX | INI | INTERPOLATE | ITERSHOW | LIST | LOCK_ | LOCAL | MATRIX | MEM | MENU | MODEL | MODE | MULPRT | NAME | OLS | OPEN | OPTION | PAUSE | PIPE | PLOT | PRINT | PRI | PROCEDURE | PRT | P | R_EXPORT | R_FILE | R_RUN | PYTHON_EXPORT | PYTHON_FILE | PYTHON_RUN | READ | REBASE | RENAME | RESET | BLOCK | RESTART | RETURN2 | RUN | SERIES | SER | SHEET | SHOW | SIGN | SIM | SMOOTH | SPLICE | STOP | STRING2 | SYS | TABLE | TARGET | TELL | TIMEFILTER | TIME | TRACE | TRACE2 | TRANSLATE | TRUNCATE | UNFIX | SPEEDUP | UNLOCK_ | UNSWAP | VAL | WRITE | X12A | XEDIT | ABS | GEOMETRIC | OVERLAY | ADDBANK | SHOWBANK | SHOWFREQ | ADD | AFTER2 | AFTER | ALIGNCENTER | ALIGNLEFT | ALIGNRIGHT | ALL | AND | ANNUAL | APPEND | AREMOS | OP | ARRAY | ARROW | PARQUET | ASERIES | ASER | AS | AT2 | AUTO | AVG | A | BACKTRACK | INDICATOR | BANK1 | BANK2 | BANK | BETWEEN | BOLD | BOWL | BOXES | BOXGAP | BOXWIDTH | BUGFIX | GCM | BY | CACHE | CALC | CAPS | CELL | CHANGE | CLEAR2 | CLIPBOARD | CLOSEBANKS | CODE | MOVE | REMOVE | COLNAMES | COLORS | COLS | DELIMITER | DATEFORMAT | DATETYPE | COMMAND1 | COMMAND2 | COMMAND | COMMA | COMPRESS | CONSTANT | CONST | CONTINUE | CONV1 | CONV2 | CONV | COPYLOCAL | CPLOT | CREATEVARS | CSV | SDF | CURROW | DAMP | DANISH | DASHTYPE | DATABANK | DATAWIDTH | DATA | DATES | DEBUG | DECIMALSEPARATOR | DEC | DEFAULT | DETAILS | DETECT | DIALOG | DIFF | DIFPRT | DIF | DIGITS | DING | DYN | DIRECT | DISPLAY | DOTS | DP | DUMOFF | DUMOF | DUMON | DUMP | DUMPOPTIONS | D | EFTER | ELEMENTS | ELSE | ELSEIF | ENGLISH | ERROR | EXCEL | EXE | EXP | EXPAND | EXTERNAL | FAILSAFE | FAIR | FAST | FEEDBACK | FEED | FIELDS | FILEWIDTH | VARIABLECODE | FILE | FILLEDCURVES | FILLSTYLE | FILTER | FIRSTCOLWIDTH | FIRST | FIX | FLAT | NAMECELL | DATECELL | DEP | FOLDER | FONTSIZE | FONT | FORMAT | FORWARD | FREQ | FRML | FROM | GAMS | GAUSS | GBK | GDIFF | GDIF | GDXOPT | GDX | GEKKO18 | GEKKO20 | GENR | GMS | GMULPRT | GNUPLOT | GOAL | GRAPH | GRIDSTYLE | GRID | GROWTH | HEADING | HIDELEFTBORDER | HIDERIGHTBORDER | HIDE | HORIZON | HPFILTER | HTML | ASBANK | TOBANK | VARLIST | FROMBANK | IGNOREMISSINGVARS | IGNOREMISSING | IGNOREVARS | IMPOSE | IMPULSES | IN | INFOFILE | INFO | INIT | INTERFACE | INTERNAL | INVERT | ROBUST | ITALIC | ITERMAX | ITERMIN | ITER | KEEP | MAP | KEY | LABELS | LABEL | LAGFIX | LAG | LANGUAGE | LAST | LEV | LINEAR | LINECOLOR | LINESPOINTS | LINES | LINEWIDTH | LISTFILE | LOGIC | LOG | LU | MACRO2 | MAIN | MAXLINES | MAX | MDATEFORMAT | MENUTABLE | MERGECOLS | MERGE | MESSAGE | METHOD | MIN | MISSING | MIXED | MODERNLOOK | MP | DL | L | RDL | RL | MULBK | MULPCT | MUTE | M | NAMES | NDEC | NDIFPRT | NEWTON | NEW | NEXT | NFAIR | NOABS | NOCR | NODIFF | NODIF | NOFILTER | NOGDIFF | NOGDIF | NOLEV | NOMAX | MAXLAG | DFMIN | LEAD | REKUR | MAXLEAD | FIT | NONANNUAL | CURRENT | NONE | NONMODEL | NOPCH | NOTIFY | NOT | NOV | NO | NWIDTH | NYTVINDU | N | OFFSET | OR | PALETTE | PARAM | PATCH | PATH | PCH | PCIMSTYLE | STYLE | PCIM | PCTPRT | PDEC | PERIOD | PLOTCODE | POINTSIZE | POINTS | POINTTYPE | POS | PREFIX | PRETTY | PRIM | OPERATORS | PRN | PRORATE | PROT | PRTX | PUDVALG | PWIDTH | PX | Q | RDP | RD | REF | REL | REMOTE | ALIAS | REORDER | REPLACE | REPEAT | REP | RESPECT | RES | RING | RN | ROWNAMES | ROWS | GROUP | LEVEL | LINK | WHERE | RP | R | SAVE | SEARCH | SECONDCOLWIDTH | SEC | SEPARATE | SER2 | SER3 | SERIES2 | SERIES3 | SETBORDER | SETBOTTOMBORDER | SETDATES | SETLEFTBORDER | SETRIGHTBORDER | SETTEXT | SETTOPBORDER | SETVALUES | SET | SHOWBORDERS | SHOWPCH | SIMPLE | SIZE | SKIP | NAN | ENGINE | NORMAL | SOLVE | SOME | SORT | SOUND | SOURCE | SPECIALMINUS | SPLINE | SPLIT | STACKED | STACK | STAMP | STARTFILE | STATIC | CHECK | STEPS | STEP | STRIP | SUBTITLE | SUFFIX | SUGGESTIONS | SWAP | SYSTEM | TABLE1 | TABLE2 | TABLEOLD | TABS | TEMP | TERMINAL | TESTRANDOMMODELCHECK | TESTRANDOMMODEL | TESTSIM | TEST | THOUSANDSSEPARATOR | TICS | TIMESPAN | TITLE | TOTAL | TO | TRANSPOSE | TREL | TRIM | TSDX | TSD | TSP | TXT | TYPE | UABS | UDIFF | UDIF | UDVALG | UGDIFF | UGDIF | ULEV | UNDO | UPCH | UPDATEFREQ | UPDX | USING | U | VALUE | VAR | VAR_EVALFUNCTION | VERSION | VERS | VOID | VPRT | V | WAIT | WIDTH | WINDOW | WORKING | WPLOT | WUDVALG | X2ZEROAXIS | XLABELS | XLINEAFTER | XLINEBEFORE | XLINE | XLSX | XLS | XZEROAXIS | X | XTREND | XFLAT | Y2LINE | Y2MAXHARD | Y2MAXSOFT | Y2MAX | Y2MINHARD | Y2MINSOFT | Y2MIN | Y2TITLE | Y2 | YES | YLABELS | YLINE | SHARES | ERRORS | IGNORE | YMAXHARD | YMAXSOFT | YMAX | LINE | YMINHARD | YMINSOFT | YMIN | I | YMIRROR | YTITLE | Y | ZERO | ZOOM | ZVAR );
     public Cmd3Parser.ident2_return ident2() // throws RecognitionException [1]
     {   
         Cmd3Parser.ident2_return retval = new Cmd3Parser.ident2_return();
@@ -115907,7 +115907,7 @@ public partial class Cmd3Parser : Parser
     	    {
     	    	return retval; 
     	    }
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:4412:7: ( Ident | ACCEPT | ANALYZE | CHECKOFF | CLEAR | CLIP | CLONE | CLOSE | CLS | COLLAPSE | COMPARE | COPY | COUNT | CREATE | CUT | DATE | DECOMP | DECOMP2 | DECOMP3 | EVAL | DELETE | DISP | GEKKO | DOC | DOWNLOAD | EDIT | ENDO | END | EXIT | EXO | EXPORT | FINDMISSINGDATA | BANKNAME | FLOW | META | ECHO | OBS | A3DP | A3 | ADP | AL | ADL | A3P | AD | AP | A3D | A3L | A3DL | YOY | CLOSEALL | VIEW | LIBRARY | KEEPTYPES | PREDICT | FIND | PYTHON | BROWSER | FOR | FUNCTION | GOTO | GLOBAL | HDG | HELP | IF | IF_OLD | IMPORT | INDEX | INI | INTERPOLATE | ITERSHOW | LIST | LOCK_ | LOCAL | MATRIX | MEM | MENU | MODEL | MODE | MULPRT | NAME | OLS | OPEN | OPTION | PAUSE | PIPE | PLOT | PRINT | PRI | PROCEDURE | PRT | P | R_EXPORT | R_FILE | R_RUN | PYTHON_EXPORT | PYTHON_FILE | PYTHON_RUN | READ | REBASE | RENAME | RESET | BLOCK | RESTART | RETURN2 | RUN | SERIES | SER | SHEET | SHOW | SIGN | SIM | SMOOTH | SPLICE | STOP | STRING2 | SYS | TABLE | TARGET | TELL | TIMEFILTER | TIME | TRACE | TRACE2 | TRANSLATE | TRUNCATE | UNFIX | SPEEDUP | UNLOCK_ | UNSWAP | VAL | WRITE | X12A | XEDIT | ABS | GEOMETRIC | OVERLAY | ADDBANK | SHOWBANK | SHOWFREQ | ADD | AFTER2 | AFTER | ALIGNCENTER | ALIGNLEFT | ALIGNRIGHT | ALL | AND | ANNUAL | APPEND | AREMOS | OP | ARRAY | ARROW | PARQUET | ASERIES | ASER | AS | AT2 | AUTO | AVG | A | BACKTRACK | INDICATOR | BANK1 | BANK2 | BANK | BETWEEN | BOLD | BOWL | BOXES | BOXGAP | BOXWIDTH | BUGFIX | GCM | BY | CACHE | CALC | CAPS | CELL | CHANGE | CLEAR2 | CLIPBOARD | CLOSEBANKS | CODE | MOVE | REMOVE | COLNAMES | COLORS | COLS | DELIMITER | DATEFORMAT | DATETYPE | COMMAND1 | COMMAND2 | COMMAND | COMMA | COMPRESS | CONSTANT | CONST | CONTINUE | CONV1 | CONV2 | CONV | COPYLOCAL | CPLOT | CREATEVARS | CSV | SDF | CURROW | DAMP | DANISH | DASHTYPE | DATABANK | DATAWIDTH | DATA | DATES | DEBUG | DECIMALSEPARATOR | DEC | DEFAULT | DETAILS | DETECT | DIALOG | DIFF | DIFPRT | DIF | DIGITS | DING | DYN | DIRECT | DISPLAY | DOTS | DP | DUMOFF | DUMOF | DUMON | DUMP | DUMPOPTIONS | D | EFTER | ELEMENTS | ELSE | ELSEIF | ENGLISH | ERROR | EXCEL | EXE | EXP | EXPAND | EXTERNAL | FAILSAFE | FAIR | FAST | FEEDBACK | FEED | FIELDS | FILEWIDTH | VARIABLECODE | FILE | FILLEDCURVES | FILLSTYLE | FILTER | FIRSTCOLWIDTH | FIRST | FIX | FLAT | NAMECELL | DATECELL | DEP | FOLDER | FONTSIZE | FONT | FORMAT | FORWARD | FREQ | FRML | FROM | GAMS | GAUSS | GBK | GDIFF | GDIF | GDXOPT | GDX | GEKKO18 | GEKKO20 | GENR | GMS | GMULPRT | GNUPLOT | GOAL | GRAPH | GRIDSTYLE | GRID | GROWTH | HEADING | HIDELEFTBORDER | HIDERIGHTBORDER | HIDE | HORIZON | HPFILTER | HTML | ASBANK | TOBANK | VARLIST | FROMBANK | IGNOREMISSINGVARS | IGNOREMISSING | IGNOREVARS | IMPOSE | IMPULSES | IN | INFOFILE | INFO | INIT | INTERFACE | INTERNAL | INVERT | ROBUST | ITALIC | ITERMAX | ITERMIN | ITER | KEEP | MAP | KEY | LABELS | LABEL | LAGFIX | LAG | LANGUAGE | LAST | LEV | LINEAR | LINECOLOR | LINESPOINTS | LINES | LINEWIDTH | LISTFILE | LOGIC | LOG | LU | MACRO2 | MAIN | MAXLINES | MAX | MDATEFORMAT | MENUTABLE | MERGECOLS | MERGE | MESSAGE | METHOD | MIN | MISSING | MIXED | MODERNLOOK | MP | DL | L | RDL | RL | MULBK | MULPCT | MUTE | M | NAMES | NDEC | NDIFPRT | NEWTON | NEW | NEXT | NFAIR | NOABS | NOCR | NODIFF | NODIF | NOFILTER | NOGDIFF | NOGDIF | NOLEV | NOMAX | MAXLAG | DFMIN | LEAD | REKUR | MAXLEAD | FIT | NONANNUAL | CURRENT | NONE | NONMODEL | NOPCH | NOTIFY | NOT | NOV | NO | NWIDTH | NYTVINDU | N | OFFSET | OR | PALETTE | PARAM | PATCH | PATH | PCH | PCIMSTYLE | STYLE | PCIM | PCTPRT | PDEC | PERIOD | PLOTCODE | POINTSIZE | POINTS | POINTTYPE | POS | PREFIX | PRETTY | PRIM | OPERATORS | PRN | PRORATE | PROT | PRTX | PUDVALG | PWIDTH | PX | Q | RDP | RD | REF | REL | REMOTE | ALIAS | REORDER | REPLACE | REPEAT | REP | RESPECT | RES | RING | RN | ROWNAMES | ROWS | GROUP | LEVEL | LINK | WHERE | RP | R | SAVE | SEARCH | SECONDCOLWIDTH | SEC | SEPARATE | SER2 | SER3 | SERIES2 | SERIES3 | SETBORDER | SETBOTTOMBORDER | SETDATES | SETLEFTBORDER | SETRIGHTBORDER | SETTEXT | SETTOPBORDER | SETVALUES | SET | SHOWBORDERS | SHOWPCH | SIMPLE | SIZE | SKIP | NAN | ENGINE | NORMAL | SOLVE | SOME | SORT | SOUND | SOURCE | SPECIALMINUS | SPLINE | SPLIT | STACKED | STACK | STAMP | STARTFILE | STATIC | CHECK | STEPS | STEP | STRIP | SUBTITLE | SUFFIX | SUGGESTIONS | SWAP | SYSTEM | TABLE1 | TABLE2 | TABLEOLD | TABS | TEMP | TERMINAL | TESTRANDOMMODELCHECK | TESTRANDOMMODEL | TESTSIM | TEST | THOUSANDSSEPARATOR | TICS | TIMESPAN | TITLE | TOTAL | TO | TRANSPOSE | TREL | TRIM | TSDX | TSD | TSP | TXT | TYPE | UABS | UDIFF | UDIF | UDVALG | UGDIFF | UGDIF | ULEV | UNDO | UPCH | UPDATEFREQ | UPDX | USING | U | VALUE | VAR | VAR_KDUSJFLQO2 | VERSION | VERS | VOID | VPRT | V | WAIT | WIDTH | WINDOW | WORKING | WPLOT | WUDVALG | X2ZEROAXIS | XLABELS | XLINEAFTER | XLINEBEFORE | XLINE | XLSX | XLS | XZEROAXIS | X | XTREND | XFLAT | Y2LINE | Y2MAXHARD | Y2MAXSOFT | Y2MAX | Y2MINHARD | Y2MINSOFT | Y2MIN | Y2TITLE | Y2 | YES | YLABELS | YLINE | SHARES | ERRORS | IGNORE | YMAXHARD | YMAXSOFT | YMAX | LINE | YMINHARD | YMINSOFT | YMIN | I | YMIRROR | YTITLE | Y | ZERO | ZOOM | ZVAR )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:4412:7: ( Ident | ACCEPT | ANALYZE | CHECKOFF | CLEAR | CLIP | CLONE | CLOSE | CLS | COLLAPSE | COMPARE | COPY | COUNT | CREATE | CUT | DATE | DECOMP | DECOMP2 | DECOMP3 | EVAL | DELETE | DISP | GEKKO | DOC | DOWNLOAD | EDIT | ENDO | END | EXIT | EXO | EXPORT | FINDMISSINGDATA | BANKNAME | FLOW | META | ECHO | OBS | A3DP | A3 | ADP | AL | ADL | A3P | AD | AP | A3D | A3L | A3DL | YOY | CLOSEALL | VIEW | LIBRARY | KEEPTYPES | PREDICT | FIND | PYTHON | BROWSER | FOR | FUNCTION | GOTO | GLOBAL | HDG | HELP | IF | IF_OLD | IMPORT | INDEX | INI | INTERPOLATE | ITERSHOW | LIST | LOCK_ | LOCAL | MATRIX | MEM | MENU | MODEL | MODE | MULPRT | NAME | OLS | OPEN | OPTION | PAUSE | PIPE | PLOT | PRINT | PRI | PROCEDURE | PRT | P | R_EXPORT | R_FILE | R_RUN | PYTHON_EXPORT | PYTHON_FILE | PYTHON_RUN | READ | REBASE | RENAME | RESET | BLOCK | RESTART | RETURN2 | RUN | SERIES | SER | SHEET | SHOW | SIGN | SIM | SMOOTH | SPLICE | STOP | STRING2 | SYS | TABLE | TARGET | TELL | TIMEFILTER | TIME | TRACE | TRACE2 | TRANSLATE | TRUNCATE | UNFIX | SPEEDUP | UNLOCK_ | UNSWAP | VAL | WRITE | X12A | XEDIT | ABS | GEOMETRIC | OVERLAY | ADDBANK | SHOWBANK | SHOWFREQ | ADD | AFTER2 | AFTER | ALIGNCENTER | ALIGNLEFT | ALIGNRIGHT | ALL | AND | ANNUAL | APPEND | AREMOS | OP | ARRAY | ARROW | PARQUET | ASERIES | ASER | AS | AT2 | AUTO | AVG | A | BACKTRACK | INDICATOR | BANK1 | BANK2 | BANK | BETWEEN | BOLD | BOWL | BOXES | BOXGAP | BOXWIDTH | BUGFIX | GCM | BY | CACHE | CALC | CAPS | CELL | CHANGE | CLEAR2 | CLIPBOARD | CLOSEBANKS | CODE | MOVE | REMOVE | COLNAMES | COLORS | COLS | DELIMITER | DATEFORMAT | DATETYPE | COMMAND1 | COMMAND2 | COMMAND | COMMA | COMPRESS | CONSTANT | CONST | CONTINUE | CONV1 | CONV2 | CONV | COPYLOCAL | CPLOT | CREATEVARS | CSV | SDF | CURROW | DAMP | DANISH | DASHTYPE | DATABANK | DATAWIDTH | DATA | DATES | DEBUG | DECIMALSEPARATOR | DEC | DEFAULT | DETAILS | DETECT | DIALOG | DIFF | DIFPRT | DIF | DIGITS | DING | DYN | DIRECT | DISPLAY | DOTS | DP | DUMOFF | DUMOF | DUMON | DUMP | DUMPOPTIONS | D | EFTER | ELEMENTS | ELSE | ELSEIF | ENGLISH | ERROR | EXCEL | EXE | EXP | EXPAND | EXTERNAL | FAILSAFE | FAIR | FAST | FEEDBACK | FEED | FIELDS | FILEWIDTH | VARIABLECODE | FILE | FILLEDCURVES | FILLSTYLE | FILTER | FIRSTCOLWIDTH | FIRST | FIX | FLAT | NAMECELL | DATECELL | DEP | FOLDER | FONTSIZE | FONT | FORMAT | FORWARD | FREQ | FRML | FROM | GAMS | GAUSS | GBK | GDIFF | GDIF | GDXOPT | GDX | GEKKO18 | GEKKO20 | GENR | GMS | GMULPRT | GNUPLOT | GOAL | GRAPH | GRIDSTYLE | GRID | GROWTH | HEADING | HIDELEFTBORDER | HIDERIGHTBORDER | HIDE | HORIZON | HPFILTER | HTML | ASBANK | TOBANK | VARLIST | FROMBANK | IGNOREMISSINGVARS | IGNOREMISSING | IGNOREVARS | IMPOSE | IMPULSES | IN | INFOFILE | INFO | INIT | INTERFACE | INTERNAL | INVERT | ROBUST | ITALIC | ITERMAX | ITERMIN | ITER | KEEP | MAP | KEY | LABELS | LABEL | LAGFIX | LAG | LANGUAGE | LAST | LEV | LINEAR | LINECOLOR | LINESPOINTS | LINES | LINEWIDTH | LISTFILE | LOGIC | LOG | LU | MACRO2 | MAIN | MAXLINES | MAX | MDATEFORMAT | MENUTABLE | MERGECOLS | MERGE | MESSAGE | METHOD | MIN | MISSING | MIXED | MODERNLOOK | MP | DL | L | RDL | RL | MULBK | MULPCT | MUTE | M | NAMES | NDEC | NDIFPRT | NEWTON | NEW | NEXT | NFAIR | NOABS | NOCR | NODIFF | NODIF | NOFILTER | NOGDIFF | NOGDIF | NOLEV | NOMAX | MAXLAG | DFMIN | LEAD | REKUR | MAXLEAD | FIT | NONANNUAL | CURRENT | NONE | NONMODEL | NOPCH | NOTIFY | NOT | NOV | NO | NWIDTH | NYTVINDU | N | OFFSET | OR | PALETTE | PARAM | PATCH | PATH | PCH | PCIMSTYLE | STYLE | PCIM | PCTPRT | PDEC | PERIOD | PLOTCODE | POINTSIZE | POINTS | POINTTYPE | POS | PREFIX | PRETTY | PRIM | OPERATORS | PRN | PRORATE | PROT | PRTX | PUDVALG | PWIDTH | PX | Q | RDP | RD | REF | REL | REMOTE | ALIAS | REORDER | REPLACE | REPEAT | REP | RESPECT | RES | RING | RN | ROWNAMES | ROWS | GROUP | LEVEL | LINK | WHERE | RP | R | SAVE | SEARCH | SECONDCOLWIDTH | SEC | SEPARATE | SER2 | SER3 | SERIES2 | SERIES3 | SETBORDER | SETBOTTOMBORDER | SETDATES | SETLEFTBORDER | SETRIGHTBORDER | SETTEXT | SETTOPBORDER | SETVALUES | SET | SHOWBORDERS | SHOWPCH | SIMPLE | SIZE | SKIP | NAN | ENGINE | NORMAL | SOLVE | SOME | SORT | SOUND | SOURCE | SPECIALMINUS | SPLINE | SPLIT | STACKED | STACK | STAMP | STARTFILE | STATIC | CHECK | STEPS | STEP | STRIP | SUBTITLE | SUFFIX | SUGGESTIONS | SWAP | SYSTEM | TABLE1 | TABLE2 | TABLEOLD | TABS | TEMP | TERMINAL | TESTRANDOMMODELCHECK | TESTRANDOMMODEL | TESTSIM | TEST | THOUSANDSSEPARATOR | TICS | TIMESPAN | TITLE | TOTAL | TO | TRANSPOSE | TREL | TRIM | TSDX | TSD | TSP | TXT | TYPE | UABS | UDIFF | UDIF | UDVALG | UGDIFF | UGDIF | ULEV | UNDO | UPCH | UPDATEFREQ | UPDX | USING | U | VALUE | VAR | VAR_EVALFUNCTION | VERSION | VERS | VOID | VPRT | V | WAIT | WIDTH | WINDOW | WORKING | WPLOT | WUDVALG | X2ZEROAXIS | XLABELS | XLINEAFTER | XLINEBEFORE | XLINE | XLSX | XLS | XZEROAXIS | X | XTREND | XFLAT | Y2LINE | Y2MAXHARD | Y2MAXSOFT | Y2MAX | Y2MINHARD | Y2MINSOFT | Y2MIN | Y2TITLE | Y2 | YES | YLABELS | YLINE | SHARES | ERRORS | IGNORE | YMAXHARD | YMAXSOFT | YMAX | LINE | YMINHARD | YMINSOFT | YMIN | I | YMIRROR | YTITLE | Y | ZERO | ZOOM | ZVAR )
             // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:
             {
             	root_0 = (object)adaptor.GetNilNode();
@@ -115965,7 +115965,7 @@ public partial class Cmd3Parser : Parser
     };
 
     // $ANTLR start "ident3"
-    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5016:1: ident3 : ( Ident | META | ASBANK | TOBANK | VARLIST | FROMBANK | ABS | GEOMETRIC | OVERLAY | ADDBANK | SHOWBANK | SHOWFREQ | ADD | AFTER2 | AFTER | ALIGNCENTER | ALIGNLEFT | ALIGNRIGHT | ALL | AND | ANNUAL | APPEND | AREMOS | OP | ARRAY | ARROW | PARQUET | ASERIES | ASER | AS | AT2 | AUTO | AVG | A | BACKTRACK | INDICATOR | BANK1 | BANK2 | BANK | BETWEEN | BOLD | BOWL | BOXES | BOXGAP | BOXWIDTH | BUGFIX | GCM | BY | CACHE | CALC | CAPS | CELL | CHANGE | CLIPBOARD | CLOSEBANKS | CODE | MOVE | REMOVE | COLNAMES | COLORS | COLS | DELIMITER | DATEFORMAT | DATETYPE | COMMAND1 | COMMAND2 | COMMAND | COMMA | COMPRESS | CONSTANT | CONST | CONTINUE | CONV1 | CONV2 | CONV | COPYLOCAL | CPLOT | CREATEVARS | CSV | SDF | CURROW | DAMP | DANISH | DASHTYPE | DATABANK | DATAWIDTH | DATA | DATES | DEBUG | DECIMALSEPARATOR | DEC | DEFAULT | DETAILS | DETECT | DIALOG | DIFF | DIFPRT | DIF | DIGITS | DING | DYN | DIRECT | DISPLAY | DOTS | DP | D | EFTER | ELEMENTS | ENGLISH | ERROR | EXCEL | EXE | EXP | EXPAND | EXTERNAL | FAILSAFE | FAIR | FAST | FEEDBACK | FEED | FIELDS | FILEWIDTH | VARIABLECODE | FILE | FILLEDCURVES | FILLSTYLE | FILTER | FIRSTCOLWIDTH | FIRST | FIX | FLAT | DATECELL | DEP | NAMECELL | FOLDER | FONTSIZE | FONT | FORMAT | FORWARD | FREQ | FRML | FROM | GAMS | GAUSS | GBK | GDIFF | GDIF | GDXOPT | GDX | GEKKO18 | GEKKO20 | GENR | GMS | GNUPLOT | GOAL | GRAPH | GRIDSTYLE | GRID | GROWTH | HEADING | HIDELEFTBORDER | HIDERIGHTBORDER | HIDE | HORIZON | HPFILTER | HTML | IGNOREMISSINGVARS | IGNOREMISSING | IGNOREVARS | IMPOSE | IMPULSES | I | IN | INFOFILE | INFO | INIT | INTERFACE | INTERNAL | INVERT | ROBUST | ITALIC | ITERMAX | ITERMIN | ITER | KEEP | KEY | LABELS | LABEL | LAGFIX | LAG | LANGUAGE | LAST | LEV | LINECOLOR | LINESPOINTS | LINES | LINEWIDTH | LISTFILE | LOGIC | LOG | LU | MACRO2 | MAIN | MAXLINES | MAX | MDATEFORMAT | MENUTABLE | MERGECOLS | MERGE | MESSAGE | METHOD | MIN | MISSING | MIXED | MODERNLOOK | MP | DL | L | RDL | RL | MULBK | MULPCT | MUTE | M | NAMES | NDEC | NDIFPRT | NEWTON | NEW | NEXT | NFAIR | NOABS | NOCR | NODIFF | NODIF | NOFILTER | NOGDIFF | NOGDIF | NOLEV | NOMAX | MAXLAG | DFMIN | LEAD | REKUR | MAXLEAD | FIT | PYTHON | NONANNUAL | CURRENT | NONE | NONMODEL | NOPCH | NOTIFY | NOT | NOV | NO | NWIDTH | NYTVINDU | N | OFFSET | OR | PALETTE | PARAM | PATCH | PATH | PCH | PCIMSTYLE | STYLE | PCIM | PCTPRT | PDEC | PERIOD | PLOTCODE | POINTSIZE | POINTS | POINTTYPE | POS | PREFIX | PRETTY | PRIM | OPERATORS | PRN | PRORATE | PROT | PRTX | PUDVALG | PWIDTH | PX | Q | RDP | RD | REF | REL | REMOTE | ALIAS | REORDER | REPLACE | REPEAT | REP | RESPECT | RES | RING | RN | ROWNAMES | ROWS | GROUP | LEVEL | LINK | WHERE | RP | R | SAVE | SEARCH | SECONDCOLWIDTH | SEC | SEPARATE | SETBORDER | SETBOTTOMBORDER | SETDATES | SETLEFTBORDER | SETRIGHTBORDER | SETTEXT | SETTOPBORDER | SETVALUES | SET | SHOWBORDERS | SHOWPCH | SIMPLE | SIZE | SKIP | NAN | ENGINE | NORMAL | SOLVE | SOME | SORT | SOUND | SOURCE | SPECIALMINUS | SPLIT | STACKED | STACK | STAMP | STARTFILE | STATIC | CHECK | STEPS | STEP | STRIP | SUBTITLE | SUFFIX | SUGGESTIONS | SWAP | SYSTEM | TABLE1 | TABLE2 | TABLEOLD | TABS | TEMP | TERMINAL | TESTRANDOMMODELCHECK | TESTRANDOMMODEL | TESTSIM | TEST | THOUSANDSSEPARATOR | TICS | TIMESPAN | TITLE | TOTAL | TO | TRANSPOSE | TREL | TRIM | TSDX | TSD | TSP | TXT | TYPE | UABS | UDIFF | UDIF | UDVALG | UGDIFF | UGDIF | ULEV | UNDO | UPCH | UPDATEFREQ | UPDX | USING | U | VALUE | VAR | VAR_KDUSJFLQO2 | VERSION | VERS | VOID | VPRT | V | WAIT | WIDTH | WINDOW | WORKING | WPLOT | WUDVALG | X2ZEROAXIS | XLABELS | XLINEAFTER | XLINEBEFORE | XLINE | XLSX | XLS | XZEROAXIS | X | XTREND | XFLAT | Y2LINE | Y2MAXHARD | Y2MAXSOFT | Y2MAX | Y2MINHARD | Y2MINSOFT | Y2MIN | Y2TITLE | Y2 | YES | YLABELS | YLINE | SHARES | ERRORS | IGNORE | YMAXHARD | YMAXSOFT | YMAX | LINE | YMINHARD | YMINSOFT | YMIN | YMIRROR | YTITLE | Y | ZERO | ZOOM | ZVAR );
+    // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5016:1: ident3 : ( Ident | META | ASBANK | TOBANK | VARLIST | FROMBANK | ABS | GEOMETRIC | OVERLAY | ADDBANK | SHOWBANK | SHOWFREQ | ADD | AFTER2 | AFTER | ALIGNCENTER | ALIGNLEFT | ALIGNRIGHT | ALL | AND | ANNUAL | APPEND | AREMOS | OP | ARRAY | ARROW | PARQUET | ASERIES | ASER | AS | AT2 | AUTO | AVG | A | BACKTRACK | INDICATOR | BANK1 | BANK2 | BANK | BETWEEN | BOLD | BOWL | BOXES | BOXGAP | BOXWIDTH | BUGFIX | GCM | BY | CACHE | CALC | CAPS | CELL | CHANGE | CLIPBOARD | CLOSEBANKS | CODE | MOVE | REMOVE | COLNAMES | COLORS | COLS | DELIMITER | DATEFORMAT | DATETYPE | COMMAND1 | COMMAND2 | COMMAND | COMMA | COMPRESS | CONSTANT | CONST | CONTINUE | CONV1 | CONV2 | CONV | COPYLOCAL | CPLOT | CREATEVARS | CSV | SDF | CURROW | DAMP | DANISH | DASHTYPE | DATABANK | DATAWIDTH | DATA | DATES | DEBUG | DECIMALSEPARATOR | DEC | DEFAULT | DETAILS | DETECT | DIALOG | DIFF | DIFPRT | DIF | DIGITS | DING | DYN | DIRECT | DISPLAY | DOTS | DP | D | EFTER | ELEMENTS | ENGLISH | ERROR | EXCEL | EXE | EXP | EXPAND | EXTERNAL | FAILSAFE | FAIR | FAST | FEEDBACK | FEED | FIELDS | FILEWIDTH | VARIABLECODE | FILE | FILLEDCURVES | FILLSTYLE | FILTER | FIRSTCOLWIDTH | FIRST | FIX | FLAT | DATECELL | DEP | NAMECELL | FOLDER | FONTSIZE | FONT | FORMAT | FORWARD | FREQ | FRML | FROM | GAMS | GAUSS | GBK | GDIFF | GDIF | GDXOPT | GDX | GEKKO18 | GEKKO20 | GENR | GMS | GNUPLOT | GOAL | GRAPH | GRIDSTYLE | GRID | GROWTH | HEADING | HIDELEFTBORDER | HIDERIGHTBORDER | HIDE | HORIZON | HPFILTER | HTML | IGNOREMISSINGVARS | IGNOREMISSING | IGNOREVARS | IMPOSE | IMPULSES | I | IN | INFOFILE | INFO | INIT | INTERFACE | INTERNAL | INVERT | ROBUST | ITALIC | ITERMAX | ITERMIN | ITER | KEEP | KEY | LABELS | LABEL | LAGFIX | LAG | LANGUAGE | LAST | LEV | LINECOLOR | LINESPOINTS | LINES | LINEWIDTH | LISTFILE | LOGIC | LOG | LU | MACRO2 | MAIN | MAXLINES | MAX | MDATEFORMAT | MENUTABLE | MERGECOLS | MERGE | MESSAGE | METHOD | MIN | MISSING | MIXED | MODERNLOOK | MP | DL | L | RDL | RL | MULBK | MULPCT | MUTE | M | NAMES | NDEC | NDIFPRT | NEWTON | NEW | NEXT | NFAIR | NOABS | NOCR | NODIFF | NODIF | NOFILTER | NOGDIFF | NOGDIF | NOLEV | NOMAX | MAXLAG | DFMIN | LEAD | REKUR | MAXLEAD | FIT | PYTHON | NONANNUAL | CURRENT | NONE | NONMODEL | NOPCH | NOTIFY | NOT | NOV | NO | NWIDTH | NYTVINDU | N | OFFSET | OR | PALETTE | PARAM | PATCH | PATH | PCH | PCIMSTYLE | STYLE | PCIM | PCTPRT | PDEC | PERIOD | PLOTCODE | POINTSIZE | POINTS | POINTTYPE | POS | PREFIX | PRETTY | PRIM | OPERATORS | PRN | PRORATE | PROT | PRTX | PUDVALG | PWIDTH | PX | Q | RDP | RD | REF | REL | REMOTE | ALIAS | REORDER | REPLACE | REPEAT | REP | RESPECT | RES | RING | RN | ROWNAMES | ROWS | GROUP | LEVEL | LINK | WHERE | RP | R | SAVE | SEARCH | SECONDCOLWIDTH | SEC | SEPARATE | SETBORDER | SETBOTTOMBORDER | SETDATES | SETLEFTBORDER | SETRIGHTBORDER | SETTEXT | SETTOPBORDER | SETVALUES | SET | SHOWBORDERS | SHOWPCH | SIMPLE | SIZE | SKIP | NAN | ENGINE | NORMAL | SOLVE | SOME | SORT | SOUND | SOURCE | SPECIALMINUS | SPLIT | STACKED | STACK | STAMP | STARTFILE | STATIC | CHECK | STEPS | STEP | STRIP | SUBTITLE | SUFFIX | SUGGESTIONS | SWAP | SYSTEM | TABLE1 | TABLE2 | TABLEOLD | TABS | TEMP | TERMINAL | TESTRANDOMMODELCHECK | TESTRANDOMMODEL | TESTSIM | TEST | THOUSANDSSEPARATOR | TICS | TIMESPAN | TITLE | TOTAL | TO | TRANSPOSE | TREL | TRIM | TSDX | TSD | TSP | TXT | TYPE | UABS | UDIFF | UDIF | UDVALG | UGDIFF | UGDIF | ULEV | UNDO | UPCH | UPDATEFREQ | UPDX | USING | U | VALUE | VAR | VAR_EVALFUNCTION | VERSION | VERS | VOID | VPRT | V | WAIT | WIDTH | WINDOW | WORKING | WPLOT | WUDVALG | X2ZEROAXIS | XLABELS | XLINEAFTER | XLINEBEFORE | XLINE | XLSX | XLS | XZEROAXIS | X | XTREND | XFLAT | Y2LINE | Y2MAXHARD | Y2MAXSOFT | Y2MAX | Y2MINHARD | Y2MINSOFT | Y2MIN | Y2TITLE | Y2 | YES | YLABELS | YLINE | SHARES | ERRORS | IGNORE | YMAXHARD | YMAXSOFT | YMAX | LINE | YMINHARD | YMINSOFT | YMIN | YMIRROR | YTITLE | Y | ZERO | ZOOM | ZVAR );
     public Cmd3Parser.ident3_return ident3() // throws RecognitionException [1]
     {   
         Cmd3Parser.ident3_return retval = new Cmd3Parser.ident3_return();
@@ -115983,7 +115983,7 @@ public partial class Cmd3Parser : Parser
     	    {
     	    	return retval; 
     	    }
-            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5016:7: ( Ident | META | ASBANK | TOBANK | VARLIST | FROMBANK | ABS | GEOMETRIC | OVERLAY | ADDBANK | SHOWBANK | SHOWFREQ | ADD | AFTER2 | AFTER | ALIGNCENTER | ALIGNLEFT | ALIGNRIGHT | ALL | AND | ANNUAL | APPEND | AREMOS | OP | ARRAY | ARROW | PARQUET | ASERIES | ASER | AS | AT2 | AUTO | AVG | A | BACKTRACK | INDICATOR | BANK1 | BANK2 | BANK | BETWEEN | BOLD | BOWL | BOXES | BOXGAP | BOXWIDTH | BUGFIX | GCM | BY | CACHE | CALC | CAPS | CELL | CHANGE | CLIPBOARD | CLOSEBANKS | CODE | MOVE | REMOVE | COLNAMES | COLORS | COLS | DELIMITER | DATEFORMAT | DATETYPE | COMMAND1 | COMMAND2 | COMMAND | COMMA | COMPRESS | CONSTANT | CONST | CONTINUE | CONV1 | CONV2 | CONV | COPYLOCAL | CPLOT | CREATEVARS | CSV | SDF | CURROW | DAMP | DANISH | DASHTYPE | DATABANK | DATAWIDTH | DATA | DATES | DEBUG | DECIMALSEPARATOR | DEC | DEFAULT | DETAILS | DETECT | DIALOG | DIFF | DIFPRT | DIF | DIGITS | DING | DYN | DIRECT | DISPLAY | DOTS | DP | D | EFTER | ELEMENTS | ENGLISH | ERROR | EXCEL | EXE | EXP | EXPAND | EXTERNAL | FAILSAFE | FAIR | FAST | FEEDBACK | FEED | FIELDS | FILEWIDTH | VARIABLECODE | FILE | FILLEDCURVES | FILLSTYLE | FILTER | FIRSTCOLWIDTH | FIRST | FIX | FLAT | DATECELL | DEP | NAMECELL | FOLDER | FONTSIZE | FONT | FORMAT | FORWARD | FREQ | FRML | FROM | GAMS | GAUSS | GBK | GDIFF | GDIF | GDXOPT | GDX | GEKKO18 | GEKKO20 | GENR | GMS | GNUPLOT | GOAL | GRAPH | GRIDSTYLE | GRID | GROWTH | HEADING | HIDELEFTBORDER | HIDERIGHTBORDER | HIDE | HORIZON | HPFILTER | HTML | IGNOREMISSINGVARS | IGNOREMISSING | IGNOREVARS | IMPOSE | IMPULSES | I | IN | INFOFILE | INFO | INIT | INTERFACE | INTERNAL | INVERT | ROBUST | ITALIC | ITERMAX | ITERMIN | ITER | KEEP | KEY | LABELS | LABEL | LAGFIX | LAG | LANGUAGE | LAST | LEV | LINECOLOR | LINESPOINTS | LINES | LINEWIDTH | LISTFILE | LOGIC | LOG | LU | MACRO2 | MAIN | MAXLINES | MAX | MDATEFORMAT | MENUTABLE | MERGECOLS | MERGE | MESSAGE | METHOD | MIN | MISSING | MIXED | MODERNLOOK | MP | DL | L | RDL | RL | MULBK | MULPCT | MUTE | M | NAMES | NDEC | NDIFPRT | NEWTON | NEW | NEXT | NFAIR | NOABS | NOCR | NODIFF | NODIF | NOFILTER | NOGDIFF | NOGDIF | NOLEV | NOMAX | MAXLAG | DFMIN | LEAD | REKUR | MAXLEAD | FIT | PYTHON | NONANNUAL | CURRENT | NONE | NONMODEL | NOPCH | NOTIFY | NOT | NOV | NO | NWIDTH | NYTVINDU | N | OFFSET | OR | PALETTE | PARAM | PATCH | PATH | PCH | PCIMSTYLE | STYLE | PCIM | PCTPRT | PDEC | PERIOD | PLOTCODE | POINTSIZE | POINTS | POINTTYPE | POS | PREFIX | PRETTY | PRIM | OPERATORS | PRN | PRORATE | PROT | PRTX | PUDVALG | PWIDTH | PX | Q | RDP | RD | REF | REL | REMOTE | ALIAS | REORDER | REPLACE | REPEAT | REP | RESPECT | RES | RING | RN | ROWNAMES | ROWS | GROUP | LEVEL | LINK | WHERE | RP | R | SAVE | SEARCH | SECONDCOLWIDTH | SEC | SEPARATE | SETBORDER | SETBOTTOMBORDER | SETDATES | SETLEFTBORDER | SETRIGHTBORDER | SETTEXT | SETTOPBORDER | SETVALUES | SET | SHOWBORDERS | SHOWPCH | SIMPLE | SIZE | SKIP | NAN | ENGINE | NORMAL | SOLVE | SOME | SORT | SOUND | SOURCE | SPECIALMINUS | SPLIT | STACKED | STACK | STAMP | STARTFILE | STATIC | CHECK | STEPS | STEP | STRIP | SUBTITLE | SUFFIX | SUGGESTIONS | SWAP | SYSTEM | TABLE1 | TABLE2 | TABLEOLD | TABS | TEMP | TERMINAL | TESTRANDOMMODELCHECK | TESTRANDOMMODEL | TESTSIM | TEST | THOUSANDSSEPARATOR | TICS | TIMESPAN | TITLE | TOTAL | TO | TRANSPOSE | TREL | TRIM | TSDX | TSD | TSP | TXT | TYPE | UABS | UDIFF | UDIF | UDVALG | UGDIFF | UGDIF | ULEV | UNDO | UPCH | UPDATEFREQ | UPDX | USING | U | VALUE | VAR | VAR_KDUSJFLQO2 | VERSION | VERS | VOID | VPRT | V | WAIT | WIDTH | WINDOW | WORKING | WPLOT | WUDVALG | X2ZEROAXIS | XLABELS | XLINEAFTER | XLINEBEFORE | XLINE | XLSX | XLS | XZEROAXIS | X | XTREND | XFLAT | Y2LINE | Y2MAXHARD | Y2MAXSOFT | Y2MAX | Y2MINHARD | Y2MINSOFT | Y2MIN | Y2TITLE | Y2 | YES | YLABELS | YLINE | SHARES | ERRORS | IGNORE | YMAXHARD | YMAXSOFT | YMAX | LINE | YMINHARD | YMINSOFT | YMIN | YMIRROR | YTITLE | Y | ZERO | ZOOM | ZVAR )
+            // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:5016:7: ( Ident | META | ASBANK | TOBANK | VARLIST | FROMBANK | ABS | GEOMETRIC | OVERLAY | ADDBANK | SHOWBANK | SHOWFREQ | ADD | AFTER2 | AFTER | ALIGNCENTER | ALIGNLEFT | ALIGNRIGHT | ALL | AND | ANNUAL | APPEND | AREMOS | OP | ARRAY | ARROW | PARQUET | ASERIES | ASER | AS | AT2 | AUTO | AVG | A | BACKTRACK | INDICATOR | BANK1 | BANK2 | BANK | BETWEEN | BOLD | BOWL | BOXES | BOXGAP | BOXWIDTH | BUGFIX | GCM | BY | CACHE | CALC | CAPS | CELL | CHANGE | CLIPBOARD | CLOSEBANKS | CODE | MOVE | REMOVE | COLNAMES | COLORS | COLS | DELIMITER | DATEFORMAT | DATETYPE | COMMAND1 | COMMAND2 | COMMAND | COMMA | COMPRESS | CONSTANT | CONST | CONTINUE | CONV1 | CONV2 | CONV | COPYLOCAL | CPLOT | CREATEVARS | CSV | SDF | CURROW | DAMP | DANISH | DASHTYPE | DATABANK | DATAWIDTH | DATA | DATES | DEBUG | DECIMALSEPARATOR | DEC | DEFAULT | DETAILS | DETECT | DIALOG | DIFF | DIFPRT | DIF | DIGITS | DING | DYN | DIRECT | DISPLAY | DOTS | DP | D | EFTER | ELEMENTS | ENGLISH | ERROR | EXCEL | EXE | EXP | EXPAND | EXTERNAL | FAILSAFE | FAIR | FAST | FEEDBACK | FEED | FIELDS | FILEWIDTH | VARIABLECODE | FILE | FILLEDCURVES | FILLSTYLE | FILTER | FIRSTCOLWIDTH | FIRST | FIX | FLAT | DATECELL | DEP | NAMECELL | FOLDER | FONTSIZE | FONT | FORMAT | FORWARD | FREQ | FRML | FROM | GAMS | GAUSS | GBK | GDIFF | GDIF | GDXOPT | GDX | GEKKO18 | GEKKO20 | GENR | GMS | GNUPLOT | GOAL | GRAPH | GRIDSTYLE | GRID | GROWTH | HEADING | HIDELEFTBORDER | HIDERIGHTBORDER | HIDE | HORIZON | HPFILTER | HTML | IGNOREMISSINGVARS | IGNOREMISSING | IGNOREVARS | IMPOSE | IMPULSES | I | IN | INFOFILE | INFO | INIT | INTERFACE | INTERNAL | INVERT | ROBUST | ITALIC | ITERMAX | ITERMIN | ITER | KEEP | KEY | LABELS | LABEL | LAGFIX | LAG | LANGUAGE | LAST | LEV | LINECOLOR | LINESPOINTS | LINES | LINEWIDTH | LISTFILE | LOGIC | LOG | LU | MACRO2 | MAIN | MAXLINES | MAX | MDATEFORMAT | MENUTABLE | MERGECOLS | MERGE | MESSAGE | METHOD | MIN | MISSING | MIXED | MODERNLOOK | MP | DL | L | RDL | RL | MULBK | MULPCT | MUTE | M | NAMES | NDEC | NDIFPRT | NEWTON | NEW | NEXT | NFAIR | NOABS | NOCR | NODIFF | NODIF | NOFILTER | NOGDIFF | NOGDIF | NOLEV | NOMAX | MAXLAG | DFMIN | LEAD | REKUR | MAXLEAD | FIT | PYTHON | NONANNUAL | CURRENT | NONE | NONMODEL | NOPCH | NOTIFY | NOT | NOV | NO | NWIDTH | NYTVINDU | N | OFFSET | OR | PALETTE | PARAM | PATCH | PATH | PCH | PCIMSTYLE | STYLE | PCIM | PCTPRT | PDEC | PERIOD | PLOTCODE | POINTSIZE | POINTS | POINTTYPE | POS | PREFIX | PRETTY | PRIM | OPERATORS | PRN | PRORATE | PROT | PRTX | PUDVALG | PWIDTH | PX | Q | RDP | RD | REF | REL | REMOTE | ALIAS | REORDER | REPLACE | REPEAT | REP | RESPECT | RES | RING | RN | ROWNAMES | ROWS | GROUP | LEVEL | LINK | WHERE | RP | R | SAVE | SEARCH | SECONDCOLWIDTH | SEC | SEPARATE | SETBORDER | SETBOTTOMBORDER | SETDATES | SETLEFTBORDER | SETRIGHTBORDER | SETTEXT | SETTOPBORDER | SETVALUES | SET | SHOWBORDERS | SHOWPCH | SIMPLE | SIZE | SKIP | NAN | ENGINE | NORMAL | SOLVE | SOME | SORT | SOUND | SOURCE | SPECIALMINUS | SPLIT | STACKED | STACK | STAMP | STARTFILE | STATIC | CHECK | STEPS | STEP | STRIP | SUBTITLE | SUFFIX | SUGGESTIONS | SWAP | SYSTEM | TABLE1 | TABLE2 | TABLEOLD | TABS | TEMP | TERMINAL | TESTRANDOMMODELCHECK | TESTRANDOMMODEL | TESTSIM | TEST | THOUSANDSSEPARATOR | TICS | TIMESPAN | TITLE | TOTAL | TO | TRANSPOSE | TREL | TRIM | TSDX | TSD | TSP | TXT | TYPE | UABS | UDIFF | UDIF | UDVALG | UGDIFF | UGDIF | ULEV | UNDO | UPCH | UPDATEFREQ | UPDX | USING | U | VALUE | VAR | VAR_EVALFUNCTION | VERSION | VERS | VOID | VPRT | V | WAIT | WIDTH | WINDOW | WORKING | WPLOT | WUDVALG | X2ZEROAXIS | XLABELS | XLINEAFTER | XLINEBEFORE | XLINE | XLSX | XLS | XZEROAXIS | X | XTREND | XFLAT | Y2LINE | Y2MAXHARD | Y2MAXSOFT | Y2MAX | Y2MINHARD | Y2MINSOFT | Y2MIN | Y2TITLE | Y2 | YES | YLABELS | YLINE | SHARES | ERRORS | IGNORE | YMAXHARD | YMAXSOFT | YMAX | LINE | YMINHARD | YMINSOFT | YMIN | YMIRROR | YTITLE | Y | ZERO | ZOOM | ZVAR )
             // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:
             {
             	root_0 = (object)adaptor.GetNilNode();
@@ -121570,10 +121570,10 @@ public partial class Cmd3Parser : Parser
 
     // $ANTLR start "synpred369_Cmd3"
     public void synpred369_Cmd3_fragment() {
-        // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:2863:29: ( VAR_KDUSJFLQO2 )
-        // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:2863:29: VAR_KDUSJFLQO2
+        // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:2863:29: ( VAR_EVALFUNCTION )
+        // c:\\Thomas\\Gekko\\GekkoCS\\ANTLR\\Cmd3.g:2863:29: VAR_EVALFUNCTION
         {
-        	Match(input,VAR_KDUSJFLQO2,FOLLOW_VAR_KDUSJFLQO2_in_synpred369_Cmd330905); if (state.failed) return ;
+        	Match(input,VAR_EVALFUNCTION,FOLLOW_VAR_EVALFUNCTION_in_synpred369_Cmd330905); if (state.failed) return ;
 
         }
     }
@@ -141310,7 +141310,7 @@ public partial class Cmd3Parser : Parser
 
         override public string Description
         {
-            get { return "2854:1: assignmentTypeNotEmpty : ( SER | SERIES | STRING2 | VAL | DATE | LIST | MAP | MATRIX | VAR | VAR_KDUSJFLQO2 | -> ASTPLACEHOLDER );"; }
+            get { return "2854:1: assignmentTypeNotEmpty : ( SER | SERIES | STRING2 | VAL | DATE | LIST | MAP | MATRIX | VAR | VAR_EVALFUNCTION | -> ASTPLACEHOLDER );"; }
         }
 
     }
@@ -156837,7 +156837,7 @@ public partial class Cmd3Parser : Parser
     public static readonly BitSet FOLLOW_MAP_in_assignmentTypeNotEmpty30848 = new BitSet(new ulong[]{0x0000000000000002UL});
     public static readonly BitSet FOLLOW_MATRIX_in_assignmentTypeNotEmpty30861 = new BitSet(new ulong[]{0x0000000000000002UL});
     public static readonly BitSet FOLLOW_VAR_in_assignmentTypeNotEmpty30874 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_VAR_KDUSJFLQO2_in_assignmentTypeNotEmpty30905 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_VAR_EVALFUNCTION_in_assignmentTypeNotEmpty30905 = new BitSet(new ulong[]{0x0000000000000002UL});
     public static readonly BitSet FOLLOW_assignmentTypeNotEmpty_in_assignmentType30951 = new BitSet(new ulong[]{0x0000000000000002UL});
     public static readonly BitSet FOLLOW_leftAngle2_in_seriesOpt1a31036 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000000000UL,0x0000000000001000UL});
     public static readonly BitSet FOLLOW_localOptions_in_seriesOpt1a31038 = new BitSet(new ulong[]{0x0000000000000002UL});
@@ -160002,7 +160002,7 @@ public partial class Cmd3Parser : Parser
     public static readonly BitSet FOLLOW_MAP_in_synpred366_Cmd330848 = new BitSet(new ulong[]{0x0000000000000002UL});
     public static readonly BitSet FOLLOW_MATRIX_in_synpred367_Cmd330861 = new BitSet(new ulong[]{0x0000000000000002UL});
     public static readonly BitSet FOLLOW_VAR_in_synpred368_Cmd330874 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_VAR_KDUSJFLQO2_in_synpred369_Cmd330905 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_VAR_EVALFUNCTION_in_synpred369_Cmd330905 = new BitSet(new ulong[]{0x0000000000000002UL});
     public static readonly BitSet FOLLOW_assignmentTypeNotEmpty_in_synpred370_Cmd330951 = new BitSet(new ulong[]{0x0000000000000002UL});
     public static readonly BitSet FOLLOW_dates_in_synpred376_Cmd331112 = new BitSet(new ulong[]{0x0000000000000002UL});
     public static readonly BitSet FOLLOW_dates_in_synpred384_Cmd331332 = new BitSet(new ulong[]{0x0000000000000002UL});

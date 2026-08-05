@@ -20537,7 +20537,7 @@ namespace Gekko
                 c = "$ (" + conditionals + ")";
             }
             string s = c + " = " + statement;
-            Program.RunGekkoCommands("VAR_KDUSJFLQO2 deleteme " + s, "", 0, new P()); //produces Func<> Globals.expression with the expression             
+            Program.RunGekkoCommands(Globals.evalName1 + " " + Globals.evalName2 + " " + s, "", 0, new P()); //produces Func<> Globals.expression with the expression             
         }
 
         /// <summary>
