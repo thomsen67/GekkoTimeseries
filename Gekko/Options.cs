@@ -333,7 +333,7 @@ namespace Gekko
         public int splice_obs = 0; //max number of overlapping observations.
         //
         public int system_code_split = 20; //20 seems good
-        public bool system_code_compile_ram = true; //Roslyn
+        public bool system_code_compile_ram = true; //Use Roslyn, RAM only
         public bool system_clone = true; //y = f(#x); #x[2] = ...; No side-effect.
         public string system_read_encoding = "auto";  //[ansi | utf8 | auto] (ansi is windows-1252). Auto will taste the file to see if it is UTF-8. If not, it will convert 
         public string system_write_encoding = "utf8"; // [ansi | utf8]       (ansi is windows-1252). Option is set to "utf8" for Gekko 3.3.1.
