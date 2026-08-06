@@ -2042,21 +2042,10 @@ namespace Gekko
                     scalarValueWork = ivWork.GetVal(GekkoTime.tNull);
                 }
                 else
-                {
-                    IVariable scale = null;
+                {                    
                     if (scaleCode != null)
                     {
-                        tsWork = tsWork.DeepClone(0, null, null) as Series; //Otherwise, the real timeseries in the databank is changed!
-                        scale = Program.Eval(smpl, scaleCode);
-                        //Use smpl.bankNumber if <r> etc.                
-                        //Get this out of the function and calculated only 1 time                
-                        //We get 4 combinations of series or value...! Maybe just do them.
-                        Series ts = scale as Series;
-                        foreach (GekkoTime t in new GekkoTimeIterator(smpl.t0, smpl.t3))
-                        {
-                            double d = ts.GetDataSimple(t);
-                            tsWork.SetData(t, d * tsWork.GetDataSimple(t));
-                        }
+                        tsWork = ScaleSeries(smpl, scaleCode, 0, tsWork);
                     }
                 }
             }
@@ -2071,8 +2060,28 @@ namespace Gekko
                 }
                 else
                 {
+                    if (scaleCode != null)
+                    {
+                        tsRef = ScaleSeries(smpl, scaleCode, 1, tsRef);
+                    }
                 }
             }
+        }
+
+        private static Series ScaleSeries(GekkoSmpl smpl, string scaleCode, int bankNumber, Series ts)
+        {
+            //TODO: freq mismatch
+            ts = ts.DeepClone(0, null, null) as Series; //Otherwise, the real timeseries in the databank may be changed!
+            GekkoSmpl smplTemp = new GekkoSmpl(smpl.t1, smpl.t2);
+            smplTemp.bankNumber = bankNumber;
+            IVariable scale = Program.Eval(smplTemp, scaleCode); //A bit slack, since it could be calculated 1 time regardless of j                        
+            Series scale_ts = scale as Series; //TODO: scalar...
+            foreach (GekkoTime t in new GekkoTimeIterator(smpl.t0.Add(-Globals.decompLagAddition), smpl.t3))
+            {
+                double d = scale_ts.GetDataSimple(t);
+                ts.SetData(t, d * ts.GetDataSimple(t));
+            }
+            return ts;
         }
 
         public static double PrintHelperTransform(GekkoSmpl smpl, Series tsWork, Series tsRef, GekkoTime t, string operator2, bool logTransform, string isYoy, GekkoTime index, EPrtCollapseTypes collapse, int sumOver, int[] skipCounter)
