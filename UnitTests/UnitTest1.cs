@@ -34769,15 +34769,41 @@ print(df2)
         [TestMethod]
         public void _Test_PrtPlotScale()
         {
-            I("reset;");
-            I("time 2001 2003;");
-            I("x1 = 2, 3, 4;");
-            I("x2 = 12, 13, 14;");
-            I("i = 1.02, 1.04, 1.07;");
-            I("prt <scale = '1/i'> x1, x2;");
-            Gekko.Table table = Globals.lastPrtOrMulprtTable;
-            double deltaHere = 0.0001d;            
-            Assert.AreEqual(table.Get(2, 2).number, 2d/1.02d, deltaHere);
+            Gekko.Table table = null;
+            double deltaHere = 0.0001d;
+            for (int i = 0; i < 3; i++)
+            {
+                I("reset;");
+                I("time 2001 2003;");
+                I("x1 = 2, 3, 4;");
+                I("x2 = 12, 13, 14;");
+                I("i = 1.02, 1.04, 1.07;");
+                I("%s = '1/i';");
+                if (i == 0) I("prt <scale = 1/i> x1, x2;");
+                else if (i == 1) I("prt <scale = '1/i'> x1, x2;");
+                else if (i == 2) I("prt <scale = %s> x1, x2;");
+                table = Globals.lastPrtOrMulprtTable;
+                Assert.AreEqual(table.Get(2, 2).number, 2d / 1.02d, deltaHere);
+                Assert.AreEqual(table.Get(3, 2).number, 3d / 1.04d, deltaHere);
+                Assert.AreEqual(table.Get(4, 2).number, 4d / 1.07d, deltaHere);
+                Assert.AreEqual(table.Get(2, 4).number, 12d / 1.02d, deltaHere);
+                Assert.AreEqual(table.Get(3, 4).number, 13d / 1.04d, deltaHere);
+                Assert.AreEqual(table.Get(4, 4).number, 14d / 1.07d, deltaHere);
+            }
+            for (int i = 0; i < 3; i++)
+            {
+                I("reset;");
+                I("time 2001 2003;");
+                I("x1 = 2, 3, 4;");
+                I("%g = 0.02;");
+                if (i == 0) I("prt <scale = 1/(1+%g)**(time()-2001)> x1;");
+                else if (i == 1) I("prt <scale = 1/(1+%g)**(time(2001))> x1;");
+                else if (i == 2) I("prt <scale = 1/growth(%g, 2001)> x1;");
+                table = Globals.lastPrtOrMulprtTable;
+                Assert.AreEqual(table.Get(2, 2).number, 2d, deltaHere);
+                Assert.AreEqual(table.Get(3, 2).number, 3d / 1.02d, deltaHere);
+                Assert.AreEqual(table.Get(4, 2).number, 4d / 1.02d / 1.02d, deltaHere);
+            }
         }
 
         [TestMethod]

@@ -302,6 +302,8 @@ namespace Gekko
         public static double guiPlotExtraMinimumWidth = 580d;
         public static double guiPlotExtraMinimumHeigth = 350d;
 
+        public static bool guiIsDoingEvalForPlot = false;
+
         public static int tempFilesCounter = 0;  //used when unzipping files. Do not set to 0 for reset: it is better that it is only set to 0 when Gekko starts up (because then the previous files are probably not blocked).
         public static string tempFiles = Program.CreateTempFolderPath("tempfiles");  //used with tempFilesCounter
         public static int goodBufferSizeForShaHashCode = 50000;  //some use 1200000 but 50000 seems just enough (tested --> 20% faster than using 4096 which is default)

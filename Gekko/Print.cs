@@ -2156,8 +2156,31 @@ namespace Gekko
                 scale = new Series(ESeriesType.Timeless, smpl.t1.freq, null, 1d); //Just for speed when scaling with 1 (default for PRT/PLOT)
             }
             else
-            {
-                scale = Program.Eval(smplTemp, scaleCode); //A bit slack, since it could be calculated 1 time regardless of j                
+            {                
+                try
+                {
+                    if (o.prtType == "plot") Globals.guiIsDoingEvalForPlot = true;
+                    scale = Program.Eval(smplTemp, scaleCode);
+                }
+                finally
+                {
+                    if (o.prtType == "plot") Globals.guiIsDoingEvalForPlot = false;
+                }
+
+                if (scale.Type() == EVariableType.String)
+                {
+                    //Instead of <scale=1/pc>, allows to state <scale='1/pc'> or <scale=%s> where %s = '1/pc'.
+                    string s = O.ConvertToString(scale);
+                    try
+                    {
+                        if (o.prtType == "plot") Globals.guiIsDoingEvalForPlot = true;
+                        scale = Program.Eval(smplTemp, s);
+                    }
+                    finally
+                    {
+                        if (o.prtType == "plot") Globals.guiIsDoingEvalForPlot = false;
+                    }
+                }
             }
             o.scale[bankNumber] = scale; //for reuse
             return scale;

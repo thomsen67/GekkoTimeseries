@@ -68,10 +68,21 @@ namespace Gekko.Parser.Gek
 
             List<Statement> statements = GetStatements(ph);
 
+            bool isEval = false;
+            foreach (Statement statement in statements)
+            {
+                if (statement.text.Contains(Globals.evalName1)) isEval = true;
+            }
+            if (Globals.guiIsDoingEvalForPlot && isEval)
+            {
+                System.Windows.Forms.MessageBox.Show("The scale expression syntax failed. To see why it fails, you may call PLOT with <scale=...> where ... is the expression.");
+                return false;
+            }
+            
             int linesWithErrors = 0;
             foreach (Statement statement in statements)
             {
-                //new Writeln(statement.text);
+                if (statement.text.Contains(Globals.evalName1)) isEval = true;
 
                 bool startFor = false;
                 bool startIf = false;
@@ -430,9 +441,12 @@ namespace Gekko.Parser.Gek
                                 string indent = start2;
                                 indent = "";
 
-                                using (Writeln txt = new Writeln("+++ ", -12345, Color.Red, true, ETabs.Main))
+                                if (!G.Contains(help, "{VAR¤var.htm}"))
                                 {
-                                    txt.MainAdd("Statement note: " + extra + help);
+                                    using (Writeln txt = new Writeln("+++ ", -12345, Color.Red, true, ETabs.Main))
+                                    {
+                                        txt.MainAdd("Statement note: " + extra + help);
+                                    }
                                 }
                             }
                         }

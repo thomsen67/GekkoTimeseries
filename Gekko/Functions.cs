@@ -3616,11 +3616,32 @@ namespace Gekko
 
         public static IVariable time(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
+            return time(smpl, _t1, _t2, null);
+        }
+
+        public static IVariable time(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable t0)
+        {
             if (_t1 != null || _t2 != null) new Error("time() function does not accept local time period");
+            GekkoTime gt0 = GekkoTime.tNull;
+            if (t0 != null) gt0 = O.ConvertToDate(t0, O.GetDateChoices.Strict);
             Series x = new Series(ESeriesType.Light, smpl.t0, smpl.t2);
             foreach (GekkoTime t in new GekkoTimeIterator(smpl.t0, smpl.t2))
             {
-                x.SetData(t, helper_time(t).ConvertToVal());
+                if (gt0.IsNull()) x.SetData(t, helper_time(t).ConvertToVal());
+                else x.SetData(t, helper_time(t).ConvertToVal() - helper_time(gt0).ConvertToVal());
+            }
+            return x;
+        }
+
+        public static IVariable growth(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable rate, IVariable t0)
+        {
+            if (_t1 != null || _t2 != null) new Error("growth() function does not accept local time period");
+            double g = O.ConvertToVal(rate);
+            GekkoTime gt0 = O.ConvertToDate(t0, O.GetDateChoices.Strict);
+            Series x = new Series(ESeriesType.Light, smpl.t0, smpl.t2);
+            foreach (GekkoTime t in new GekkoTimeIterator(smpl.t0, smpl.t2))
+            {
+                x.SetData(t, Math.Pow((1 + g), helper_time(t).ConvertToVal() - helper_time(gt0).ConvertToVal()));
             }
             return x;
         }
