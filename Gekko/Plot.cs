@@ -1190,6 +1190,7 @@ namespace Gekko
                     graphOptions.precedents = null;
                     graphOptions.tEnd = o.t2;
                     graphOptions.tStart = o.t1;
+                    graphOptions.scaleCode = o.scaleCode;
                     graphOptions.graphVars = null;
                     graphOptions.graphVarsNames = labelsNonBroken;
                     graphOptions.title = null;
@@ -1285,6 +1286,7 @@ namespace Gekko
                     graphOptions.precedents = null;
                     graphOptions.tEnd = o.t2;
                     graphOptions.tStart = o.t1;
+                    graphOptions.scaleCode = o.scaleCode;
                     graphOptions.graphVars = null;
                     graphOptions.graphVarsNames = labelsNonBroken;
                     graphOptions.title = null;

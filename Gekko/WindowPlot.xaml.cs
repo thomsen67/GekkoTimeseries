@@ -13,6 +13,7 @@ namespace Gekko
         public bool? isYoy = false;
         public bool? isPoints = true;  //This is default
         public string period = "";
+        public string scaleCode = "";
         public bool? isIndex = null;
         public bool? isRef = false;
         public bool? isAll = false;
@@ -30,6 +31,7 @@ namespace Gekko
             r.isYoy = this.isYoy;
             r.isPoints = this.isPoints;
             r.period = this.period;
+            r.scaleCode = this.scaleCode;
             r.isIndex = this.isIndex;
             r.isRef = this.isRef;
             r.isAll = this.isAll;
@@ -115,7 +117,7 @@ namespace Gekko
         {
             bool isQOrM = false;
             if (graphOptions == null) isQOrM = true;  //We must assume so to activate YoY
-            else if (graphOptions.tStart.freq == EFreq.Q || graphOptions.tStart.freq == EFreq.M) isQOrM = true;
+            else if (graphOptions.tStart.freq == EFreq.Q || graphOptions.tStart.freq == EFreq.M) isQOrM = true;            
 
             CheckBox_ref.IsChecked = false;
             CheckBox_ref.IsEnabled = true;
@@ -138,6 +140,7 @@ namespace Gekko
             CheckBox_points.Opacity = 1d;
 
             TextBox_period.Text = StringPeriod(graphOptions);
+            TextBox_scaleCode.Text = StringScale(graphOptions);
 
             CheckBox_index.IsChecked = false;
             CheckBox_index.IsEnabled = true;
@@ -330,6 +333,11 @@ namespace Gekko
         private string StringPeriod(GraphOptions graphOptions)
         {
             return graphOptions.tStart.ToString() + " " + graphOptions.tEnd.ToString();
+        }
+
+        private string StringScale(GraphOptions graphOptions)
+        {
+            return graphOptions.scaleCode;
         }
 
         protected override void OnContentRendered(EventArgs e)
@@ -558,6 +566,7 @@ namespace Gekko
             refresh.isYoy= CheckBox_yoy.IsChecked;
             refresh.isPoints= CheckBox_points.IsChecked;
             refresh.period = TextBox_period.Text;
+            refresh.scaleCode = TextBox_scaleCode.Text;
             refresh.fontScaling = fontScaling;
             refresh.sizeScaling = sizeScaling;
             refresh.isRefreshing = true;  //so we do not get a new plot window
@@ -598,11 +607,13 @@ namespace Gekko
                 //and the window will not have been changed.
                 refresh = _refresh.Clone();
                 refresh.isRefreshing = true;
-                refresh.period = StringPeriod(_graphOptions);                                
+                refresh.period = StringPeriod(_graphOptions);
+                refresh.scaleCode = StringScale(_graphOptions);
                 _graphOptions.code = refresh.op;
             };
 
             O.GetPeriods(_graphOptions.tStart.freq, refresh.period, out _graphOptions.tStart, out _graphOptions.tEnd);
+            O.GetScale(refresh.scaleCode, out _graphOptions.scaleCode);
             Globals.disableRadioButtons = 1;
             try
             {
@@ -625,6 +636,7 @@ namespace Gekko
             refresh.isPoints = CheckBox_points.IsChecked;
             refresh.isRefreshing = true;  //so we do not get a new plot window                        
             refresh.period = TextBox_period.Text;
+            refresh.scaleCode = TextBox_scaleCode.Text;
         }
 
         private string Refresh(GraphHelper gh, bool updatePlotWindow)
@@ -833,6 +845,14 @@ namespace Gekko
 
         // Called when Enter is pressed in the editable box
         private void TextBox_period_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                Refresh();
+            }
+        }
+
+        private void TextBox_scaleCode_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {

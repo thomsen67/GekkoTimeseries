@@ -603,6 +603,7 @@ namespace Gekko
         public bool? points = null;
         public double scaleDecomp = 1d;
         public double scaleGeneral = 1d;
+        public string scaleCode = null;
 
         public bool windowIsShown = false;
         public long counter = -12345;

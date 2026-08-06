@@ -3585,6 +3585,15 @@ namespace Gekko
             }            
         }
 
+        /// <summary>
+        /// Used in PLOT, dynamic code.
+        /// </summary>
+        /// <param name="s"></param>
+        public static void GetScale(string s1, out string s2)
+        {
+            s2 = s1;
+        }
+
         public static void GetPeriods2(O.Prt o0, GraphHelper gh)
         {
             string s = gh.period;
