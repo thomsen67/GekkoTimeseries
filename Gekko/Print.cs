@@ -2040,6 +2040,10 @@ namespace Gekko
                 if (tsWork == null)
                 {
                     scalarValueWork = ivWork.GetVal(GekkoTime.tNull);
+                    if (scaleCode != null)
+                    {
+                        tsWork = ScaleVal(smpl, scaleCode, 0, scalarValueWork) as Series;
+                    }
                 }
                 else
                 {                    
@@ -2070,18 +2074,58 @@ namespace Gekko
 
         private static Series ScaleSeries(GekkoSmpl smpl, string scaleCode, int bankNumber, Series ts)
         {
-            //TODO: freq mismatch
+            //TODO: freq mismatch            
             ts = ts.DeepClone(0, null, null) as Series; //Otherwise, the real timeseries in the databank may be changed!
             GekkoSmpl smplTemp = new GekkoSmpl(smpl.t1, smpl.t2);
             smplTemp.bankNumber = bankNumber;
-            IVariable scale = Program.Eval(smplTemp, scaleCode); //A bit slack, since it could be calculated 1 time regardless of j                        
-            Series scale_ts = scale as Series; //TODO: scalar...
-            foreach (GekkoTime t in new GekkoTimeIterator(smpl.t0.Add(-Globals.decompLagAddition), smpl.t3))
+            IVariable scale = Program.Eval(smplTemp, scaleCode); //A bit slack, since it could be calculated 1 time regardless of j
+
+            if (scale.Type() == EVariableType.Series)
             {
-                double d = scale_ts.GetDataSimple(t);
-                ts.SetData(t, d * ts.GetDataSimple(t));
+                Series scale_ts = scale as Series;
+                foreach (GekkoTime t in new GekkoTimeIterator(smpl.t0.Add(-Globals.decompLagAddition), smpl.t3))
+                {
+                    ts.SetData(t, scale_ts.GetDataSimple(t) * ts.GetDataSimple(t));
+                }
             }
+            else if (scale.Type() == EVariableType.Val)
+            {
+                ScalarVal scale_val = scale as ScalarVal;
+                foreach (GekkoTime t in new GekkoTimeIterator(smpl.t0.Add(-Globals.decompLagAddition), smpl.t3))
+                {
+                    ts.SetData(t, scale_val.GetVal(GekkoTime.tNull) * ts.GetDataSimple(t));
+                }
+            }            
             return ts;
+        }
+
+        private static Series ScaleVal(GekkoSmpl smpl, string scaleCode, int bankNumber, double ts)
+        {         
+            //ts = ts.DeepClone(0, null, null) as ScalarVal; //NECESSARY??? --> Otherwise, the real timeseries in the databank may be changed!
+            Series tss = null;
+            GekkoSmpl smplTemp = new GekkoSmpl(smpl.t1, smpl.t2);
+            smplTemp.bankNumber = bankNumber;
+            IVariable scale = Program.Eval(smplTemp, scaleCode); //A bit slack, since it could be calculated 1 time regardless of j
+            
+            if (scale.Type() == EVariableType.Series)
+            {                
+                Series scale_ts = scale as Series;
+                tss = new Series(scale_ts.freq, null);
+                foreach (GekkoTime t in new GekkoTimeIterator(smpl.t0.Add(-Globals.decompLagAddition), smpl.t3))
+                {
+                    tss.SetData(t, scale_ts.GetDataSimple(t) * ts);
+                }
+            }
+            else if (scale.Type() == EVariableType.Val)
+            {
+                ScalarVal scale_val = scale as ScalarVal;
+                tss = new Series(Program.options.freq, null); //What else regarding freq?
+                foreach (GekkoTime t in new GekkoTimeIterator(smpl.t0.Add(-Globals.decompLagAddition), smpl.t3))
+                {
+                    tss.SetData(t, scale_val.GetVal(GekkoTime.tNull) * ts);
+                }
+            }
+            return tss;
         }
 
         public static double PrintHelperTransform(GekkoSmpl smpl, Series tsWork, Series tsRef, GekkoTime t, string operator2, bool logTransform, string isYoy, GekkoTime index, EPrtCollapseTypes collapse, int sumOver, int[] skipCounter)
