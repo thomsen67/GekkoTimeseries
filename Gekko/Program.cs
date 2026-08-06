@@ -29708,7 +29708,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 EFreq freqColumn;
                 double scalarValueWork, scalarValueRef;
                 Series tsWork, tsRef;
-                Print.PrintPrepareColumn(smpl, type, containerExplode, j, o.scaleCode, out cc, out operator2, out label, out format, out freqColumn, out scalarValueWork, out tsWork, out scalarValueRef, out tsRef);
+                Print.PrintPrepareColumn(smpl, type, containerExplode, j, o, out cc, out operator2, out label, out format, out freqColumn, out scalarValueWork, out tsWork, out scalarValueRef, out tsRef);
 
                 bool isScalar = tsWork == null && tsRef == null;
 
