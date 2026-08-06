@@ -29795,11 +29795,10 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             return tt;
         }
 
-
         public static void NonSeriesHandling(O.Prt oPrt)
         {
+            if (oPrt.scaleCode != null) new Error("At the moment, <scale=...> can only scale timeseries variables, not scalars or other types of variables");
             Matrix matrix = MatrixSheet();
-            List list = ListSheet();
             if (matrix != null)
             {
                 //SHEET #m, with matrix
