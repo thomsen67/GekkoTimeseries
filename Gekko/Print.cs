@@ -2084,10 +2084,7 @@ namespace Gekko
 
             if (o.scale[bankNumber] == null)
             {
-                GekkoSmpl smplTemp = new GekkoSmpl(smpl.t1, smpl.t2);
-                smplTemp.bankNumber = bankNumber;
-                scale = Program.Eval(smplTemp, scaleCode); //A bit slack, since it could be calculated 1 time regardless of j                
-                o.scale[bankNumber] = scale; //for reuse
+                scale = EvalHelper(smpl, scaleCode, bankNumber, o);
             }
             else
             {
@@ -2112,18 +2109,15 @@ namespace Gekko
             }
             else new Error("Scale is of type " + scale.Type().ToString().ToLower());
             return ts;
-        }
+        }        
 
         private static Series ScaleVal(GekkoSmpl smpl, string scaleCode, int bankNumber, double d, O.Prt o)
         {            
             Series tss = null;
             IVariable scale = null;
             if (o.scale[bankNumber] == null)
-            {                
-                GekkoSmpl smplTemp = new GekkoSmpl(smpl.t1, smpl.t2);
-                smplTemp.bankNumber = bankNumber;
-                scale = Program.Eval(smplTemp, scaleCode);
-                o.scale[bankNumber] = scale; //for reuse
+            {
+                scale = EvalHelper(smpl, scaleCode, bankNumber, o);
             }
             else
             {
@@ -2150,6 +2144,23 @@ namespace Gekko
             }
             else new Error("Scale is of type " + scale.Type().ToString().ToLower());
             return tss;
+        }
+
+        private static IVariable EvalHelper(GekkoSmpl smpl, string scaleCode, int bankNumber, O.Prt o)
+        {
+            IVariable scale;
+            GekkoSmpl smplTemp = new GekkoSmpl(smpl.t1, smpl.t2);
+            smplTemp.bankNumber = bankNumber;
+            if (scaleCode.Trim() == "1")
+            {
+                scale = new Series(ESeriesType.Timeless, smpl.t1.freq, null, 1d); //Just for speed when scaling with 1 (default for PRT/PLOT)
+            }
+            else
+            {
+                scale = Program.Eval(smplTemp, scaleCode); //A bit slack, since it could be calculated 1 time regardless of j                
+            }
+            o.scale[bankNumber] = scale; //for reuse
+            return scale;
         }
 
         public static double PrintHelperTransform(GekkoSmpl smpl, Series tsWork, Series tsRef, GekkoTime t, string operator2, bool logTransform, string isYoy, GekkoTime index, EPrtCollapseTypes collapse, int sumOver, int[] skipCounter)

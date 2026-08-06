@@ -3594,14 +3594,21 @@ namespace Gekko
             s2 = s1;
         }
 
-        public static void GetPeriods2(O.Prt o0, GraphHelper gh)
+        public static void GetPeriods2(O.Prt o, GraphHelper gh)
         {
             string s = gh.period;
             if (G.NullOrBlanks(s)) return;
             GekkoTime t1_temp = GekkoTime.tNull; GekkoTime t2_temp = GekkoTime.tNull;            
-            try { O.GetPeriods(o0.t1.freq, s, out t1_temp, out t2_temp); } catch { }
-            if (!t1_temp.IsNull() && !t2_temp.IsNull()) { o0.t1 = t1_temp; o0.t2 = t2_temp; }
+            try { O.GetPeriods(o.t1.freq, s, out t1_temp, out t2_temp); } catch { }
+            if (!t1_temp.IsNull() && !t2_temp.IsNull()) { o.t1 = t1_temp; o.t2 = t2_temp; }
             else new Error("Could not parse the period '" + s + "'");
+        }
+
+        public static void GetScale2(O.Prt o, GraphHelper gh)
+        {
+            string s = gh.scaleCode;
+            if (s == null) return; //When called without <scale=...>
+            o.scaleCode = s;            
         }
 
         /// <summary>

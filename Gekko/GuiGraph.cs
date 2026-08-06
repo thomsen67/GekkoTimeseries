@@ -46,6 +46,7 @@ namespace Gekko
         public bool? isYoy = null;
         public bool? isPoints = null;
         public string period = "";
+        public string scaleCode = null;
         public double fontScaling = 1d;
         public double sizeScaling = 1d;
         public bool? isIndex = null;
@@ -66,6 +67,7 @@ namespace Gekko
             this.isYoy = refresh.isYoy == true;
             this.isPoints = refresh.isPoints == true;
             this.period = refresh.period;
+            this.scaleCode = refresh.scaleCode;
             this.fontScaling = refresh.fontScaling;
             this.sizeScaling=refresh.sizeScaling;
             this.isIndex = refresh.isIndex;

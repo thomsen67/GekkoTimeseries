@@ -2910,6 +2910,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("if (gh.fileName != null) { o" + Num(node) + ".opt_filename = gh.fileName; }");                            
 
                             node.Code.A("O.GetPeriods2(o" + Num(node) + ", gh);" + G.NL);
+                            node.Code.A("O.GetScale2(o" + Num(node) + ", gh);" + G.NL);
 
                             node.Code.A(LocalCode3(Num(node)));
 

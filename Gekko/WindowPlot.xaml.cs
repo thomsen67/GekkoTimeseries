@@ -337,6 +337,7 @@ namespace Gekko
 
         private string StringScale(GraphOptions graphOptions)
         {
+            if (graphOptions.scaleCode == null) return "1";
             return graphOptions.scaleCode;
         }
 
