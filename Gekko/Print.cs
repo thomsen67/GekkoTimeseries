@@ -2096,6 +2096,7 @@ namespace Gekko
             if (scale.Type() == EVariableType.Series)
             {
                 Series scale_ts = scale as Series;
+                if (scale_ts.freq != ts.freq) new Error("Scale frequency (" + scale_ts.freq.ToString() + ") is not compatible");
                 foreach (GekkoTime t in new GekkoTimeIterator(smpl.t0.Add(-Globals.decompLagAddition), smpl.t3))
                 {
                     ts.SetData(t, scale_ts.GetDataSimple(t) * ts.GetDataSimple(t));
@@ -2108,11 +2109,12 @@ namespace Gekko
                 {
                     ts.SetData(t, scale_val.GetVal(GekkoTime.tNull) * ts.GetDataSimple(t));
                 }
-            }            
+            }
+            else new Error("Scale is of type " + scale.Type().ToString().ToLower());
             return ts;
         }
 
-        private static Series ScaleVal(GekkoSmpl smpl, string scaleCode, int bankNumber, double ts, O.Prt o)
+        private static Series ScaleVal(GekkoSmpl smpl, string scaleCode, int bankNumber, double d, O.Prt o)
         {            
             Series tss = null;
             IVariable scale = null;
@@ -2131,10 +2133,10 @@ namespace Gekko
             if (scale.Type() == EVariableType.Series)
             {                
                 Series scale_ts = scale as Series;
-                tss = new Series(scale_ts.freq, null);
+                tss = new Series(scale_ts.freq, null);                
                 foreach (GekkoTime t in new GekkoTimeIterator(smpl.t0.Add(-Globals.decompLagAddition), smpl.t3))
                 {
-                    tss.SetData(t, scale_ts.GetDataSimple(t) * ts);
+                    tss.SetData(t, scale_ts.GetDataSimple(t) * d);
                 }
             }
             else if (scale.Type() == EVariableType.Val)
@@ -2143,9 +2145,10 @@ namespace Gekko
                 tss = new Series(Program.options.freq, null); //What else regarding freq?
                 foreach (GekkoTime t in new GekkoTimeIterator(smpl.t0.Add(-Globals.decompLagAddition), smpl.t3))
                 {
-                    tss.SetData(t, scale_val.GetVal(GekkoTime.tNull) * ts);
+                    tss.SetData(t, scale_val.GetVal(GekkoTime.tNull) * d);
                 }
             }
+            else new Error("Scale is of type " + scale.Type().ToString().ToLower());
             return tss;
         }
 
