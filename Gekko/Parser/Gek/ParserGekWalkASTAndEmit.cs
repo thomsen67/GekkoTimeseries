@@ -4223,6 +4223,12 @@ ASTPLACEHOLDER [0]
                         GetCodeFromAllChildren(node);
                     }
                     break;
+                case "ASTSCALE": //Special treatment
+                    {                        
+                        //StripQuotes omitted here
+                        node.Code.A("o" + Num(node) + ".scaleCode = @`" + G.ReplaceGlueSymbols(node.specialExpressionAndLabelInfo[1], true) + "`;" + G.NL);
+                    }
+                    break;
                 case "ASTOPN":
                     {
                         node.Code.A("`n`");

@@ -151,7 +151,8 @@ tokens {
 	ASTOPT_LIST_XFLAT;
 
 	ASTOPT_VAR_DEP;
-
+    
+    ASTSCALE;
 	ASTDOUBLE;
 	ASTDOLLARCONDITIONALVARIABLE;
 	ASTINDEXERELEMENTIDENT;
@@ -1196,6 +1197,7 @@ Y2                    = 'Y2'                       ;
     FILEWIDTH        = 'FILEWIDTH'       ;
     FILTER        = 'FILTER'       ;
     FINDMISSINGDATA      = 'FINDMISSINGDATA'     ;    
+    SCALE      = 'SCALE'     ;    
     BANKNAME      = 'BANKNAME'     ;    
     FLOW      = 'FLOW'     ;   
     META = 'META';
@@ -1872,6 +1874,7 @@ d.Add("Y" ,Y);
 										d.Add("variablecode"               , VARIABLECODE );
                                         d.Add("filter"               , FILTER  );
 										d.Add("findmissingdata"               , FINDMISSINGDATA  );
+                                        d.Add("scale"               , SCALE  );
                                         d.Add("bankname"               , BANKNAME  );
                                         d.Add("flow"               , FLOW  );
                                         d.Add("meta"               , META  );
@@ -3668,7 +3671,8 @@ prtOpt1Helper:              filter
 						  | I (EQUAL expression)? -> ^(ASTOPT_DATE_I expression?)
                           | YOY (EQUAL yesNo)? -> ^(ASTOPT_STRING_YOY yesNo?)
                           | LABEL (EQUAL yesNo)? -> ^(ASTOPT_STRING_LABEL yesNo?)	
-                          | META EQUAL name -> ^(ASTOPT_STRING_META name)	                          
+                          | META EQUAL name -> ^(ASTOPT_STRING_META name)
+                          | SCALE EQUAL expression -> ^({token("ASTSCALE¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTSCALE, 0)} expression)
 						    ;
 linetypeHelper:             LINESPOINTS -> ASTLINESPOINTS
 						  | LINES -> ASTLINES
@@ -4443,6 +4447,7 @@ ident2: 					Ident |
   EXO|
   EXPORT|
   FINDMISSINGDATA|
+  SCALE|
   BANKNAME|
   FLOW|
   META|

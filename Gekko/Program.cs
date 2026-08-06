@@ -20523,6 +20523,22 @@ namespace Gekko
             return ss5;
         }
 
+        public static IVariable Eval(GekkoSmpl smpl, string code)
+        {
+            IVariable iv;
+            code = code.Trim();
+            if (!code.EndsWith(";")) code += ";";
+            Globals.expressions = null;  //maybe not necessary
+            Program.CallEval(null, code);
+            List<Func<GekkoSmpl, IVariable>> rv = new List<Func<GekkoSmpl, IVariable>>(Globals.expressions);  //probably needs cloning/copying as it is done here
+            if (rv.Count > 1) new Error("The eval() argument returns a list of variables");
+            Globals.expressions = null;  //maybe not necessary                              
+            O.AdjustT0(smpl, -Globals.decompLagAddition);
+            iv = rv[0](smpl);
+            O.AdjustT0(smpl, Globals.decompLagAddition);
+            return iv;
+        }
+
         /// <summary>
         /// Helper for eval function that transforms a statement (as a string) into a Func with the C# code.
         /// This method is also used by the "new" DECOMP.
@@ -29692,7 +29708,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 EFreq freqColumn;
                 double scalarValueWork, scalarValueRef;
                 Series tsWork, tsRef;
-                Print.PrintPrepareColumn(type, containerExplode, j, out cc, out operator2, out label, out format, out freqColumn, out scalarValueWork, out tsWork, out scalarValueRef, out tsRef);
+                Print.PrintPrepareColumn(smpl, type, containerExplode, j, o.scaleCode, out cc, out operator2, out label, out format, out freqColumn, out scalarValueWork, out tsWork, out scalarValueRef, out tsRef);
 
                 bool isScalar = tsWork == null && tsRef == null;
 

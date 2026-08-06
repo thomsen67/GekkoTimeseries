@@ -34765,6 +34765,21 @@ print(df2)
 
         }
 
+
+        [TestMethod]
+        public void _Test_PrtPlotScale()
+        {
+            I("reset;");
+            I("time 2001 2003;");
+            I("x1 = 2, 3, 4;");
+            I("x2 = 12, 13, 14;");
+            I("i = 1.02, 1.04, 1.07;");
+            I("prt <scale = '1/i'> x1, x2;");
+            Gekko.Table table = Globals.lastPrtOrMulprtTable;
+            double deltaHere = 0.0001d;            
+            Assert.AreEqual(table.Get(2, 2).number, 2d/1.02d, deltaHere);
+        }
+
         [TestMethod]
         public void _Test_PlotCombo()
         {

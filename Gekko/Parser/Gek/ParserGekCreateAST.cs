@@ -1706,6 +1706,10 @@ namespace Gekko.Parser.Gek
                     {
                         flag = true;
                     }
+                    else if (ast.Text.StartsWith("ASTSCALE" + Globals.parserExpressionSeparator))
+                    {
+                        flag = true;
+                    }
                     //#jasdf89uoasfjd
                 }                
                 

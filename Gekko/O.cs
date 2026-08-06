@@ -9807,6 +9807,7 @@ namespace Gekko
             public string opt_yoy = "no"; //<yoy>
             public string opt_label = null;  //<label>
             public string opt_meta = null;  //<meta>
+            public string scaleCode = null; //string: "1/x" used as eval("1/x"), "'1/x'" used as eval("1/x"), "%s1+%s2" used as eval(eval("s1+%s2"))
 
             public void Exe()
             {

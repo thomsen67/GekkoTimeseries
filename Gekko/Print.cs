@@ -775,7 +775,7 @@ namespace Gekko
                 EFreq freqColumn;
                 double scalarValueWork, scalarValueRef;
                 Series tsWork, tsRef;
-                PrintPrepareColumn(type, containerExplode, j, out cc, out operator2, out label, out format, out freqColumn, out scalarValueWork, out tsWork, out scalarValueRef, out tsRef);
+                PrintPrepareColumn(smpl, type, containerExplode, j, o.scaleCode, out cc, out operator2, out label, out format, out freqColumn, out scalarValueWork, out tsWork, out scalarValueRef, out tsRef);
 
                 int i = 0;
 
@@ -925,7 +925,7 @@ namespace Gekko
                 EFreq freqColumn;
                 double scalarValueWork, scalarValueRef;
                 Series tsWork, tsRef;
-                PrintPrepareColumn(type, containerExplode, j, out cc, out operator2, out label, out format, out freqColumn, out scalarValueWork, out tsWork, out scalarValueRef, out tsRef);
+                PrintPrepareColumn(smpl, type, containerExplode, j, o.scaleCode, out cc, out operator2, out label, out format, out freqColumn, out scalarValueWork, out tsWork, out scalarValueRef, out tsRef);
 
                 int i = 0;
 
@@ -1091,7 +1091,7 @@ namespace Gekko
                 EFreq freqColumn;
                 double scalarValueWork, scalarValueRef;
                 Series tsWork, tsRef;
-                PrintPrepareColumn(type, containerExplode, j, out cc, out operator2, out label, out format, out freqColumn, out scalarValueWork, out tsWork, out scalarValueRef, out tsRef);
+                PrintPrepareColumn(smpl, type, containerExplode, j, o.scaleCode, out cc, out operator2, out label, out format, out freqColumn, out scalarValueWork, out tsWork, out scalarValueRef, out tsRef);
 
                 int i = 0;
 
@@ -1547,7 +1547,6 @@ namespace Gekko
                                 }
                                 else
                                 {
-
                                     PrintHelper3(smpl, type, sameFreq, table, n, i, j, iPlot, operator2, o.guiGraphIsLogTransform, o.opt_yoy, o.opt_i, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, collapse, sumOver, skipCounter, cc);
                                 }
                             }
@@ -1975,7 +1974,7 @@ namespace Gekko
             else if (t.freq == EFreq.M) skipCounter[3] = 0;
         }
 
-        public static void PrintPrepareColumn(EPrintTypes type, List<O.Prt.Element> containerExplode, int j, out O.Prt.Element cc, out string operator2, out List<string> label, out string format, out EFreq freqColumn, out double scalarValueWork, out Series tsWork, out double scalarValueRef, out Series tsRef)
+        public static void PrintPrepareColumn(GekkoSmpl smpl, EPrintTypes type, List<O.Prt.Element> containerExplode, int j, string scaleCode, out O.Prt.Element cc, out string operator2, out List<string> label, out string format, out EFreq freqColumn, out double scalarValueWork, out Series tsWork, out double scalarValueRef, out Series tsRef)
         {
             cc = null;
             IVariable ivWork = null;
@@ -2031,21 +2030,48 @@ namespace Gekko
                         freqColumn = Program.options.freq;
                     }
                 }
-            }
-
+            }            
+            
             scalarValueWork = double.NaN;
             tsWork = null;
             if (ivWork != null)
             {
                 tsWork = ivWork as Series;  //remember that the first col has phoney null IVariable
-                if (tsWork == null) scalarValueWork = ivWork.GetVal(GekkoTime.tNull);
+                if (tsWork == null)
+                {
+                    scalarValueWork = ivWork.GetVal(GekkoTime.tNull);
+                }
+                else
+                {
+                    IVariable scale = null;
+                    if (scaleCode != null)
+                    {
+                        tsWork = tsWork.DeepClone(0, null, null) as Series; //Otherwise, the real timeseries in the databank is changed!
+                        scale = Program.Eval(smpl, scaleCode);
+                        //Use smpl.bankNumber if <r> etc.                
+                        //Get this out of the function and calculated only 1 time                
+                        //We get 4 combinations of series or value...! Maybe just do them.
+                        Series ts = scale as Series;
+                        foreach (GekkoTime t in new GekkoTimeIterator(smpl.t0, smpl.t3))
+                        {
+                            double d = ts.GetDataSimple(t);
+                            tsWork.SetData(t, d * tsWork.GetDataSimple(t));
+                        }
+                    }
+                }
             }
             scalarValueRef = double.NaN;
             tsRef = null;
             if (ivRef != null)
             {
                 tsRef = ivRef as Series;  //remember that the first col has phoney null IVariable
-                if (tsRef == null) scalarValueRef = ivRef.GetVal(GekkoTime.tNull);
+                if (tsRef == null)
+                {
+                    scalarValueRef = ivRef.GetVal(GekkoTime.tNull);
+                }
+                else
+                {
+                }
             }
         }
 

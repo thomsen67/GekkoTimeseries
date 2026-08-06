@@ -6810,30 +6810,13 @@ namespace Gekko
         }
 
         public static IVariable eval(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
-        {            
+        {
             //GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
             IVariable iv = null;
             string code = O.ConvertToString(x);
-            //try
-            //{
-                code = code.Trim();
-                if (!code.EndsWith(";")) code += ";";
-                Globals.expressions = null;  //maybe not necessary
-                Program.CallEval(null, code);
-                List<Func<GekkoSmpl, IVariable>> rv = new List<Func<GekkoSmpl, IVariable>>(Globals.expressions);  //probably needs cloning/copying as it is done here
-                if (rv.Count > 1) new Error("The eval() argument returns a list of variables");
-                Globals.expressions = null;  //maybe not necessary                              
-                O.AdjustT0(smpl, -Globals.decompLagAddition);
-                iv = rv[0](smpl);
-                O.AdjustT0(smpl, Globals.decompLagAddition);
-            //}
-            //catch
-            //{
-            //    new Error("Eval() function failed");
-            //}
-            //if (iv == null) new Error("Eval() function failed");
+            iv = Program.Eval(smpl, code);
             return iv;
-        }
+        }        
 
         private static string Helper_GetLabel(string s)
         {
