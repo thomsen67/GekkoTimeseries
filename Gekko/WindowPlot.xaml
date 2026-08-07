@@ -225,9 +225,41 @@
 
             <StackPanel Orientation="Vertical" Margin="10,0,0,0">
 
-                <TextBox Name="TextBox_period" Width="75" Height="17" Margin="-4,10,0,0" Opacity="0.7" FontFamily="Courier New" FontSize="9" VerticalContentAlignment="Center" KeyDown="TextBox_period_KeyDown" ToolTip="Change time period (press [Enter] or the 'Refresh' button afterwards).">2010q1 2030q4</TextBox>
+                <TextBox Name="TextBox_period" Width="100" HorizontalAlignment="Left" Height="17" Margin="2,10,0,0" Opacity="0.7" FontFamily="Courier New" FontSize="9" VerticalContentAlignment="Center" KeyDown="TextBox_period_KeyDown" ToolTip="Change time period (press [Enter] or the 'Refresh' button afterwards).">2010q1 2030q4</TextBox>
 
-                <TextBox Name="TextBox_scaleCode" Width="75" Height="17" Margin="-4,10,0,0" Opacity="0.7" FontFamily="Courier New" FontSize="9" VerticalContentAlignment="Center" KeyDown="TextBox_scaleCode_KeyDown" ToolTip="Scale (&lt;scale=...>) all series with the given expression (press [Enter] or the 'Refresh' button afterwards).">1</TextBox>
+                <TextBox Name="TextBox_scaleCode" Width="100" HorizontalAlignment="Left" Height="25" Margin="2,10,0,0" Opacity="0.7" FontFamily="Courier New" FontSize="9" VerticalContentAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Auto" KeyDown="TextBox_scaleCode_KeyDown" ToolTip="Scale (&lt;scale=...>) all series with the given expression (press [Enter] or the 'Refresh' button afterwards).">
+                    <!--    <TextBox.Resources>
+                        --><!-- Shrink horizontal scrollbar height --><!--
+                        <Style TargetType="{x:Type ScrollBar}">
+                            <Style.Triggers>
+                                <Trigger Property="Orientation" Value="Horizontal">
+                                    <Setter Property="Height" Value="8" />
+                                    <Setter Property="MinHeight" Value="8" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBox.Resources>-->
+
+                <TextBox.Resources>
+                    <!-- Shrink horizontal scrollbar height to 8px -->
+                    <Style TargetType="{x:Type ScrollBar}">
+                            <Setter Property="Opacity" Value="0.4" />
+                            <Style.Triggers>
+                            <Trigger Property="Orientation" Value="Horizontal">
+                                <Setter Property="Height" Value="8" />
+                                <Setter Property="MinHeight" Value="8" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+
+                    <!-- Hide arrow buttons -->
+                    <Style TargetType="{x:Type RepeatButton}">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                    </Style>
+                </TextBox.Resources>
+
+                1
+                </TextBox>
 
                 <ComboBox Name="ZoomComboBox"
                   IsEditable="True"

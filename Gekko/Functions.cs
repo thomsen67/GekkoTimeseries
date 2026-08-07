@@ -3623,7 +3623,7 @@ namespace Gekko
         {
             if (_t1 != null || _t2 != null) new Error("time() function does not accept local time period");
             GekkoTime gt0 = GekkoTime.tNull;
-            if (t0 != null) gt0 = O.ConvertToDate(t0, O.GetDateChoices.Strict);
+            if (t0 != null) gt0 = Helper_GetT0(smpl, t0);
             Series x = new Series(ESeriesType.Light, smpl.t0, smpl.t2);
             foreach (GekkoTime t in new GekkoTimeIterator(smpl.t0, smpl.t2))
             {
@@ -3633,17 +3633,48 @@ namespace Gekko
             return x;
         }
 
+        public static IVariable growth(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable rate)
+        {
+            return growth(smpl, _t1, _t2, rate, null);
+        }
+        
         public static IVariable growth(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable rate, IVariable t0)
         {
             if (_t1 != null || _t2 != null) new Error("growth() function does not accept local time period");
             double g = O.ConvertToVal(rate);
-            GekkoTime gt0 = O.ConvertToDate(t0, O.GetDateChoices.Strict);
+            GekkoTime gt0 = GekkoTime.tNull;
+            if (t0 != null) gt0 = Helper_GetT0(smpl, t0);
+            else gt0 = smpl.t1;
             Series x = new Series(ESeriesType.Light, smpl.t0, smpl.t2);
             foreach (GekkoTime t in new GekkoTimeIterator(smpl.t0, smpl.t2))
             {
                 x.SetData(t, Math.Pow((1 + g), helper_time(t).ConvertToVal() - helper_time(gt0).ConvertToVal()));
             }
             return x;
+        }
+
+        private static GekkoTime Helper_GetT0(GekkoSmpl smpl, IVariable t0)
+        {
+            GekkoTime gt0 = GekkoTime.tNull;
+            if (t0.Type() == EVariableType.String)
+            {
+                string s = O.ConvertToString(t0);
+                if (G.Equal(s, "start"))
+                {
+                    gt0 = smpl.t1;
+                }
+                else if (G.Equal(s, "end"))
+                {
+                    gt0 = smpl.t2;
+                }
+                else new Error("growth(): Expcted 'start' or 'end', not '" + s + "'");
+            }
+            else
+            {
+                gt0 = O.ConvertToDate(t0, O.GetDateChoices.Strict);
+            }
+
+            return gt0;
         }
 
         public static IVariable iif(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable i1, IVariable op, IVariable i2, IVariable o1, IVariable o2)
