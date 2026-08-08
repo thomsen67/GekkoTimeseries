@@ -787,14 +787,15 @@ namespace Deploy2
 
             //!!! Also change in same list below, #lkafas7df8. If new is added, it may have to be manually loaded in Gekcel, see the same hash there in Program.cs.
             // ------------------------------------------------------
-
-
+                        
             files.Add("Antlr3.Runtime.dll");
             files.Add("EPPlus.dll");
             files.Add("GAMS.net4.dll");
             files.Add("IronCompress.dll"); //Needed for parquet files
             files.Add("MathNet.Numerics.dll");
             files.Add("Microsoft.Bcl.AsyncInterfaces.dll"); //Needed for parquet files
+            files.Add("Microsoft.CodeAnalysis.dll"); //Needed for compiling
+            files.Add("Microsoft.CodeAnalysis.CSharp.dll"); //Needed for compiling
             files.Add("Microsoft.IO.RecyclableMemoryStream.dll"); //Needed for parquet files
             files.Add("Parquet.dll"); //Needed for parquet files
             files.Add("protobuf-net.dll");
@@ -803,7 +804,8 @@ namespace Deploy2
             files.Add("System.Buffers.dll"); //needed for parallel protobuf
             files.Add("System.Collections.Immutable.dll"); //needed for parallel protobuf
             files.Add("System.Memory.dll"); //needed for parallel protobuf
-            files.Add("System.Runtime.CompilerServices.Unsafe.dll"); //needed for parallel protobuf
+            files.Add("System.Reflection.Metadata.dll"); //needed for Roslyn
+            files.Add("System.Runtime.CompilerServices.Unsafe.dll"); //needed for parallel protobuf            
             files.Add("System.Threading.Tasks.Extensions.dll"); //Needed for parquet files
             // ------------------------------------------------------
 
@@ -847,16 +849,19 @@ namespace Deploy2
             files.Add(path1 + "IronCompress.dll"); 
             files.Add(path1 + "MathNet.Numerics.dll");
             files.Add(path1 + "Microsoft.Bcl.AsyncInterfaces.dll");
+            files.Add(path1 + "Microsoft.CodeAnalysis.dll");
+            files.Add(path1 + "Microsoft.CodeAnalysis.CSharp.dll");
             files.Add(path1 + "Microsoft.IO.RecyclableMemoryStream.dll");
             files.Add(path1 + "Parquet.dll");
             files.Add(path1 + "protobuf-net.dll");
-            files.Add(path1 + "protobuf-net.Core.dll");
+            files.Add(path1 + "protobuf-net.Core.dll");            
             files.Add(path1 + "Snappier.dll"); //Needed for parquet files
             files.Add(path1 + "System.Buffers.dll");
             files.Add(path1 + "System.Collections.Immutable.dll");
             files.Add(path1 + "System.Memory.dll");
+            files.Add(path1 + "System.Reflection.Metadata.dll"); //needed for Roslyn            
             files.Add(path1 + "System.Runtime.CompilerServices.Unsafe.dll");
-            files.Add(path1 + "System.Threading.Tasks.Extensions.dll");
+            files.Add(path1 + "System.Threading.Tasks.Extensions.dll");            
             // ------------------------------------------------------
 
 

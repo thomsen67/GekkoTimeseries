@@ -2978,18 +2978,7 @@ namespace Gekko
         public static void Tell(string text, bool nocr)
         {
             if (Globals.runningOnTTComputer)
-            {
-                GekkoSmpl smpl = new GekkoSmpl(new GekkoTime(EFreq.A, 2016, 1), new GekkoTime(EFreq.A, 2026, 1));
-                Globals.expressions = null;  //maybe not necessary
-                Program.CallEval(null, "x/(x+1);");
-                List<Func<GekkoSmpl, IVariable>>  xxx = new List<Func<GekkoSmpl, IVariable>>(Globals.expressions);  //probably needs cloning/copying as it is done here
-                Globals.expressions = null;  //maybe not necessary   
-                O.AdjustT0(smpl, -2);
-                IVariable iv = xxx[0](smpl);
-                O.AdjustT0(smpl, 2);
-                Series ts = iv as Series;
-                double d2 = ts.GetDataSimple(new GekkoTime(EFreq.A, 2020, 1));
-
+            {                
                 if (false)
                 {
                     Program.ProgramFolderRunning();

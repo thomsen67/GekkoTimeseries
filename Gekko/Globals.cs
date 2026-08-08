@@ -47,7 +47,7 @@ namespace Gekko
         
         public const string smpl = "§¤£";   //this line must be at top
 
-        public static List<string> hardLoadedDlls = new List<string>() { "System.Memory", "System.Runtime.CompilerServices.Unsafe", "System.Threading.Tasks.Extensions" }; //!!! If a new is added, see also #lkafas7df8 to add it in Deploy2 (Gekko project), in the file MainWindow.xaml.cs.
+        public static List<string> hardLoadedDlls = new List<string>() { "System.Memory", "System.Runtime.CompilerServices.Unsafe", "System.Threading.Tasks.Extensions", "System.Collections.Immutable" }; //!!! If a new is added, see also #lkafas7df8 to add it in Deploy2 (Gekko project), in the file MainWindow.xaml.cs.
 
         public static bool greuHack = false;  //Year must be YYYY, digits
 

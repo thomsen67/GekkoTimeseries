@@ -225,9 +225,9 @@
 
             <StackPanel Orientation="Vertical" Margin="10,0,0,0">
 
-                <TextBox Name="TextBox_period" Width="100" HorizontalAlignment="Left" Height="17" Margin="2,10,0,0" Opacity="0.7" FontFamily="Courier New" FontSize="9" VerticalContentAlignment="Center" KeyDown="TextBox_period_KeyDown" ToolTip="Change time period (press [Enter] or the 'Refresh' button afterwards).">2010q1 2030q4</TextBox>
+                <TextBox Name="TextBox_period" Width="100" HorizontalAlignment="Left" Height="17" Margin="2,10,0,0" Opacity="0.7" FontFamily="Courier New" FontSize="9" VerticalContentAlignment="Center" KeyDown="TextBox_period_KeyDown" ToolTip="Change time period. Press [Enter] or the 'Refresh' button afterwards.">2010q1 2030q4</TextBox>
 
-                <TextBox Name="TextBox_scaleCode" Width="100" HorizontalAlignment="Left" Height="25" Margin="2,10,0,0" Opacity="0.7" FontFamily="Courier New" FontSize="9" VerticalContentAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Auto" KeyDown="TextBox_scaleCode_KeyDown" ToolTip="Scale (&lt;scale=...>) all series with the given expression (press [Enter] or the 'Refresh' button afterwards).">
+                <TextBox Name="TextBox_scaleCode" Width="100" HorizontalAlignment="Left" Height="25" Margin="2,10,0,0" Opacity="0.7" FontFamily="Courier New" FontSize="9" VerticalContentAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Auto" KeyDown="TextBox_scaleCode_KeyDown" ToolTip="Scale (&lt;scale=...>) all series with the given series or expression. Use for instance 1/growth(0.02) to downscale with 2% annually. Press [Enter] or the 'Refresh' button afterwards.">
                     <!--    <TextBox.Resources>
                         --><!-- Shrink horizontal scrollbar height --><!--
                         <Style TargetType="{x:Type ScrollBar}">
