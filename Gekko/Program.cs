@@ -23457,21 +23457,51 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             if (Program.options.databank_dlink)
             {
                 //Note: just because a .dlink file is constructed, this it not the same
-                //      as that it has to go into blobs storage.
+                //      as that it has to go into blobs storage.                
                 
-                
+                // =========== PROGS PATH ======================================================
                 //f2 --> c:\Tools\K\MAKROBK\tth\test\makrobk_grunddata\biver\_progs                
                 string f2 = G.CleanupFolderName(O.ConvertToString(Functions.Helper_Runfolder(new IVariable[0], p)), false); //.dlink file, c:\Thomas\Gekko\BlobsTest\tth\staging
-                string s = f2;
-                s = G.Replace(s, "\\makrobk_grunddata", "", StringComparison.OrdinalIgnoreCase, 1);
-                s = G.Replace(s, "c:\\Tools\\K\\MAKROBK", "", StringComparison.OrdinalIgnoreCase, 1);
-                s = G.Replace(s, "\\_progs", "", StringComparison.OrdinalIgnoreCase, 1);
-                //f1 --> K:\MAKROBK_KILDE\2025_10_01\tth\test\biver\_uddata\x.csv
-                string f1 = G.CleanupFolderName(Program.options.databank_dlink_folder_data, false) + s;
-                
-                string blobFileNameAndPath1 = G.DLinkRelativePath(fileNameAndPath, f1, f2, "Regarding ." + Program.options.databank_dlink_name + " file, the folder '" + f1 + "' does not seem to be part of '" + fileNameAndPath + "'", true);                
+                if (G.NullOrBlanks(f2)) f2 = Program.options.folder_working; //Run directly: in that case we must assume the working folder
+                if (Globals.runningOnTTComputer) f2 = G.Replace(f2, "c:\\Tools\\K\\MAKROBK", "K:\\MAKROBK", StringComparison.OrdinalIgnoreCase, 1);
+                if (!f2.StartsWith(Program.options.databank_dlink_folder_progs.Trim(), StringComparison.OrdinalIgnoreCase)) new Error("Problem with .dlink: the data file path '" + f2 + "' was expected was expected to start with the path '" + Program.options.databank_dlink_folder_progs.Trim() + "'");
+                string s2 = f2;
+                s2 = G.Replace(s2, Program.options.databank_dlink_folder_progs.Trim(), "", StringComparison.OrdinalIgnoreCase, 1);
+                s2 = G.Replace(s2, "\\_progs", "", StringComparison.OrdinalIgnoreCase, 1);
+                string s2a = s2;
+                if (!G.NullOrBlanks(Program.options.databank_dlink_folder_remove))
+                {
+                    s2a = G.Replace(s2, "\\" + Program.options.databank_dlink_folder_remove.Trim() + "\\", "\\", StringComparison.OrdinalIgnoreCase, 1);
+                }
+                string s3 = Path.Combine(Program.options.databank_dlink_folder_data, s2a.TrimStart('\\'));
+                // =============================================================================
 
-                if (blobFileNameAndPath1 == null)
+                //f2:                K:\MAKROBK\tth\test\makrobk_grunddata\biver\_progs
+                //s2:                \tth\test\makrobk_grunddata\biver  
+                //s2a:               \tth\test\biver   
+                //s3:                K:\MAKROBK_KILDE\2025_10_01\tth\test\biver
+                //fileNameAndPath:   K:\MAKROBK_KILDE\2025_10_01\tth\test\biver\_uddata\x.csv
+                //s4:                \_uddata\x.csv
+                //s5:                k:\MAKROBK\tth\test\makrobk_grunddata\biver\_progs\_uddata_dlink\x.csv
+
+                if (!fileNameAndPath.StartsWith(s3 + "\\", StringComparison.OrdinalIgnoreCase)) new Error("Problem with .dlink file path: based on the .gcm file path, the datafile path '" + fileNameAndPath + "' was expected to start with the path '" + s3 + "'");
+                string s4 = G.Replace(fileNameAndPath, s3, "", StringComparison.OrdinalIgnoreCase, 1);
+                string s5 = Path.Combine(Program.options.databank_dlink_folder_progs, s2.TrimStart('\\'), "_progs", s4.TrimStart('\\'));
+                s5 = G.Replace(s5, "\\_uddata\\", "\\_uddata_dlink\\", StringComparison.OrdinalIgnoreCase, 1);
+                s5 = G.Replace(s5, "\\_inddata\\", "\\_inddata_dlink\\", StringComparison.OrdinalIgnoreCase, 1);
+                s5 = s5 + "." + Program.options.databank_dlink_name;
+
+                if (true)
+                {
+                    // =========== DATA PATH =======================================================
+                    //f1 --> K:\MAKROBK_KILDE\2025_10_01\tth\test\biver\_uddata\x.csv
+                    string f1 = G.CleanupFolderName(Program.options.databank_dlink_folder_data, false) + s2a;
+                    string s1 = G.DLinkRelativePath(fileNameAndPath, f1, f2, "Regarding ." + Program.options.databank_dlink_name + " file, the folder '" + f1 + "' does not seem to be part of '" + fileNameAndPath + "'", true);
+                    s1 = s1 + "." + Program.options.databank_dlink_name;
+                    // =============================================================================
+                }
+
+                if (s5 == null)
                 {
                     //Do nothing: may be a databank on some other drive
                 }
@@ -23482,22 +23512,21 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                         hash = BlobsHash(fileNameAndPath, true); //TODO: WithWait or WaitFor...
                     }
                     size = (new FileInfo(fileNameAndPath)).Length;
-                    string blobFileNameAndPath2 = blobFileNameAndPath1 + "." + Program.options.databank_dlink_name;
-                    if (!Directory.Exists(Path.GetDirectoryName(blobFileNameAndPath2)))
+                    if (!Directory.Exists(Path.GetDirectoryName(s5)))
                     {
                         if (true)
                         {
-                            MessageBox.Show("The folder '" + Path.GetDirectoryName(blobFileNameAndPath2) + "' is created");
-                            Directory.CreateDirectory(Path.GetDirectoryName(blobFileNameAndPath2));
+                            MessageBox.Show("The folder '" + Path.GetDirectoryName(s5) + "' is created");
+                            Directory.CreateDirectory(Path.GetDirectoryName(s5));
                         }
                         else
                         {
-                            MessageBox.Show("The folder '" + Path.GetDirectoryName(blobFileNameAndPath2) + "' does not exist for ." + Program.options.databank_dlink_name + " file writing");
+                            MessageBox.Show("The folder '" + Path.GetDirectoryName(s5) + "' does not exist for ." + Program.options.databank_dlink_name + " file writing");
                             new Error();
                         }
                     }
                     DlinkFile blobInfo = new DlinkFile(hash, size, stamp, nVariables, null);
-                    G.YamlWriter<DlinkFile>(blobInfo, blobFileNameAndPath2);
+                    G.YamlWriter<DlinkFile>(blobInfo, s5);
                 }
             }
         }

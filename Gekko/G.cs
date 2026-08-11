@@ -4209,7 +4209,7 @@ namespace Gekko
 
                     sb.AppendLine(" Bitness: " + Program.Get64Bitness(0));
 
-                    if (Globals.runningOnTTComputer)
+                    if (false && Globals.runningOnTTComputer)
                     {
                         sb.AppendLine(Program.IsJit());
                     }

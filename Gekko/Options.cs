@@ -82,8 +82,10 @@ namespace Gekko
 
         public bool databank_dlink = false;
         public string databank_dlink_name = "dlink";
+        public string databank_dlink_folder_progs = "k:\\MAKROBK";
         public string databank_dlink_folder_data = "k:\\MAKROBK_KILDE\\2025_10_01";
         public string databank_dlink_folder_blobs = "k:\\MAKROBK_KILDE\\blobs";
+        public string databank_dlink_folder_remove = "makrobk_grunddata";
 
         public bool databank_trace = true;
         public bool databank_trace_dublets = false; //
@@ -448,8 +450,10 @@ namespace Gekko
 
             Add("DATABANK DLINK", Globals.xbool);
             Add("DATABANK DLINK NAME", Globals.xnameOrString, "dlink");
-            Add("DATABANK DLINK FOLDER DATA", Globals.xnameOrString, "dlink");
             Add("DATABANK DLINK FOLDER BLOBS", Globals.xnameOrString, "dlink");
+            Add("DATABANK DLINK FOLDER DATA", Globals.xnameOrString, "dlink");
+            Add("DATABANK DLINK FOLDER PROGS", Globals.xnameOrString, "dlink");
+            Add("DATABANK DLINK FOLDER REMOVE", Globals.xnameOrString, "dlink");            
 
             Add("DATABANK TRACE", Globals.xbool);
             Add("DATABANK TRACE DUBLETS", Globals.xbool); 
