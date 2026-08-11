@@ -3637,7 +3637,7 @@ namespace Gekko
         {
             return growth(smpl, _t1, _t2, rate, null);
         }
-        
+
         public static IVariable growth(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable rate, IVariable t0)
         {
             if (_t1 != null || _t2 != null) new Error("growth() function does not accept local time period");
@@ -6868,7 +6868,7 @@ namespace Gekko
             string code = O.ConvertToString(x);
             iv = Program.Eval(smpl, code);
             return iv;
-        }        
+        }
 
         private static string Helper_GetLabel(string s)
         {
@@ -7544,6 +7544,13 @@ namespace Gekko
             List<string> m = Stringlist.GetListOfStringsFromList(x2);
             string s = string.Join(sep, m);
             return new ScalarString(s);
+        }
+
+        public static IVariable Helper_Runfolder(IVariable[] vars, P p)
+        {
+            GekkoSmpl smpl = new GekkoSmpl(); //periods are not used
+            smpl.p = p;
+            return Helper_Runfolder(smpl, null, null, vars);
         }
 
         public static IVariable Helper_Runfolder(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable[] vars)

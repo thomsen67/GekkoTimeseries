@@ -6818,7 +6818,7 @@ namespace Gekko
                 {
                     //READ. We cannot handle OPEN here, because an OPENed databank may be edited before CLOSE.
                     //      So CLOSE handles this.
-                    Blob(blob, databank.storage.Count());
+                    Blob(blob, databank.storage.Count(), p);
                 }
             }  //for each bank in list
 
@@ -7667,7 +7667,7 @@ namespace Gekko
                 O.AddIVariableWithOverwriteFromString(collectionName, output);
                 G.Writeln2("Imported " + type.ToString().ToLower() + " " + collectionName + " (" + rr + "x" + cc + " elements)");
             }
-            Blob(blob, null);
+            Blob(blob, null, o.p);
         }
 
         /// <summary>
@@ -13540,7 +13540,6 @@ namespace Gekko
             //    }
             //}
             //DateTime t0 = DateTime.Now;
-
 
             int i, imax = 0, j, k, n = lu.GetLength(0);
             double big, temp1, temp2;
@@ -22797,7 +22796,7 @@ namespace Gekko
         /// <param name="per2_input"></param>
         /// <param name="op"></param>
         /// <param name="file"></param>
-        public static void WriteGcm(List<Tuple<string, IVariable>> list2, GekkoTime per1_input, GekkoTime per2_input, string op, string file)
+        public static void WriteGcm(List<Tuple<string, IVariable>> list2, GekkoTime per1_input, GekkoTime per2_input, string op, string file, P p)
         {
             if (op == null) op = "n";
             if (op == "#") new Error("The '#' operator is not supported in EXPORT<series>");
@@ -23036,7 +23035,7 @@ namespace Gekko
                 //}
             }
             G.Writeln2("Exported " + list2.Count + " series to file " + pathAndFilename);
-            Blob(blob, list2.Count);
+            Blob(blob, list2.Count, p);
         }
 
         /// <summary>
@@ -23450,7 +23449,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// Handles blobs, for .dlink
         /// </summary>
         /// <param name="fileNameAndPath"></param>
-        private static void Blob(string fileNameAndPath, long? nVariables)
+        private static void Blob(string fileNameAndPath, long? nVariables, P p)
         {
             string hash = null;
             long? size = null;
@@ -23459,9 +23458,19 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             {
                 //Note: just because a .dlink file is constructed, this it not the same
                 //      as that it has to go into blobs storage.
-                string f1 = G.CleanupFolderName(G.CleanupFolderName(Program.options.databank_dlink_folder_data, false) + "\\tth\\test\\biver", false); //.gbk original, 'c:\Tools\Blobs\tth\staging'
-                string f2 = G.CleanupFolderName(Program.ProgramFolderRunning(), false); //.dlink file, c:\Thomas\Gekko\BlobsTest\tth\staging                                            
-                string blobFileNameAndPath1 = G.DLinkRelativePath(fileNameAndPath, f1, f2, "Regarding ." + Program.options.databank_dlink_name + " file, the folder '" + f1 + "' does not seem to be part of '" + fileNameAndPath + "'", true);
+                
+                
+                //f2 --> c:\Tools\K\MAKROBK\tth\test\makrobk_grunddata\biver\_progs                
+                string f2 = G.CleanupFolderName(O.ConvertToString(Functions.Helper_Runfolder(new IVariable[0], p)), false); //.dlink file, c:\Thomas\Gekko\BlobsTest\tth\staging
+                string s = f2;
+                s = G.Replace(s, "\\makrobk_grunddata", "", StringComparison.OrdinalIgnoreCase, 1);
+                s = G.Replace(s, "c:\\Tools\\K\\MAKROBK", "", StringComparison.OrdinalIgnoreCase, 1);
+                s = G.Replace(s, "\\_progs", "", StringComparison.OrdinalIgnoreCase, 1);
+                //f1 --> K:\MAKROBK_KILDE\2025_10_01\tth\test\biver\_uddata\x.csv
+                string f1 = G.CleanupFolderName(Program.options.databank_dlink_folder_data, false) + s;
+                
+                string blobFileNameAndPath1 = G.DLinkRelativePath(fileNameAndPath, f1, f2, "Regarding ." + Program.options.databank_dlink_name + " file, the folder '" + f1 + "' does not seem to be part of '" + fileNameAndPath + "'", true);                
+
                 if (blobFileNameAndPath1 == null)
                 {
                     //Do nothing: may be a databank on some other drive
@@ -24630,7 +24639,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     if (G.Equal(o.opt_csv, "yes")) format = EdataFormat.Csv;
                     else if (G.Equal(o.opt_prn, "yes")) format = EdataFormat.Prn;
                     CheckSomethingToWrite(list2Sorted.Count);
-                    return CsvPrnWrite(list2Sorted, fileName, tStart, tEnd, format, G.Equal(o.opt_cols, "yes"), o.opt_dateformat);
+                    return CsvPrnWrite(list2Sorted, fileName, tStart, tEnd, format, G.Equal(o.opt_cols, "yes"), o.opt_dateformat, o.p);
                 }
                 else if (G.Equal(o.opt_xls, "yes") || G.Equal(o.opt_xlsx, "yes"))
                 {
@@ -24655,14 +24664,14 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     //
                     ErrorIfMatrix(variablesType);
                     CheckSomethingToWrite(list2Sorted.Count);
-                    return GnuplotWrite(list2Sorted, fileName, tStart, tEnd);
+                    return GnuplotWrite(list2Sorted, fileName, tStart, tEnd, o.p);
                 }
                 else if (G.Equal(o.opt_tsp, "yes"))
                 {
                     //RECORDS
                     ErrorIfMatrix(variablesType);
                     CheckSomethingToWrite(list2Sorted.Count);
-                    return Tspwrite(list2Sorted, fileName, tStart, tEnd, isCaps);
+                    return Tspwrite(list2Sorted, fileName, tStart, tEnd, isCaps, o.p);
                 }
                 else if (o.opt_gdx != null)
                 {
@@ -24684,7 +24693,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     {
                         GamsData.WriteGdxSlow(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list1Sorted); //probably cannot handle list2
                     }
-                    Blob(blob, list1Sorted?.Count ?? 0);
+                    Blob(blob, list1Sorted?.Count ?? 0, o.p);
                     return 0;
                 }
                 else if (o.opt_arrow != null)
@@ -24712,7 +24721,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                         }
                         throw;
                     }
-                    Blob(blob, list2Sorted?.Count ?? 0);
+                    Blob(blob, list2Sorted?.Count ?? 0, o.p);
                     return 0;
                 }
                 else if (o.opt_parquet != null)
@@ -24740,7 +24749,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                         }
                         throw;
                     }
-                    Blob(blob, list2Sorted?.Count ?? 0);
+                    Blob(blob, list2Sorted?.Count ?? 0, o.p);
                     return 0;
                 }
                 else if (isRecordsFormat)
@@ -24754,16 +24763,16 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                         return WriteGbk(o.p, list, Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, writeOption, writeAllVariables, false, G.Equal(o.opt_trace, "no"));
                     }
                     if (writeType == EDatabankWriteType.Tsd)
-                    {
-                        return WriteTsd(list, Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, writeOption, writeAllVariables, false);
+                    {                        
+                        return WriteTsd(list, Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, writeOption, writeAllVariables, false, o.p);
                     }
                     else if (writeType == EDatabankWriteType.Flat)
                     {
-                        return WriteFlat(list2Sorted, tStart, tEnd, fileName);
+                        return WriteFlat(list2Sorted, tStart, tEnd, fileName, o.p);
                     }
                     else if (writeType == EDatabankWriteType.Gcm)
                     {
-                        Program.WriteGcm(list2Sorted, tStart, tEnd, o.opt_op, fileName);
+                        Program.WriteGcm(list2Sorted, tStart, tEnd, o.opt_op, fileName, o.p);
                         return 0;
                     }
                     else
@@ -24915,7 +24924,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 }
                 file.Flush();
             }
-            Blob(blob, null);
+            Blob(blob, null, o.p);
             G.Writeln2("R export of " + o.list1.Count() + " matrices, " + fullFileName);            
         }
 
@@ -24964,7 +24973,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 }
                 file.Flush();
             }
-            Blob(blob, null);
+            Blob(blob, null, o.p);
             G.Writeln2("Python export of " + o.list1.Count() + " matrices, " + fullFileName);
         }
 
@@ -25331,7 +25340,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 }
             }
 
-            Blob(blob, count);
+            Blob(blob, count, p);
             return count;
         }
 
@@ -25363,7 +25372,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             }
         }
 
-        public static int WriteTsd(List<ToFrom> list, Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, string writeOption, bool writeAllVariables, bool isCloseCommand)
+        public static int WriteTsd(List<ToFrom> list, Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, string writeOption, bool writeAllVariables, bool isCloseCommand, P p)
         {
             if (databank.storage.Count == 0)
             {
@@ -25413,11 +25422,11 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     }
                 }
             }
-            Blob(blob, count);
+            Blob(blob, count, p);
             return count;
         }
 
-        public static int WriteFlat(List<Tuple<string, IVariable>> list2, GekkoTime yr1, GekkoTime yr2, string file)
+        public static int WriteFlat(List<Tuple<string, IVariable>> list2, GekkoTime yr1, GekkoTime yr2, string file, P p)
         {
             file = G.StripQuotes(file);
             bool isUsingOptionFolderBank = false;
@@ -25454,7 +25463,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     }
                 }
             }
-            Blob(blob, count);
+            Blob(blob, count, p);
             return count;
         }
 
@@ -26232,7 +26241,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             return;
         }
 
-        private static int CsvPrnWrite(List<Tuple<string, IVariable>> vars, string filename, GekkoTime per1, GekkoTime per2, EdataFormat fileType, bool cols, string dateformat)
+        private static int CsvPrnWrite(List<Tuple<string, IVariable>> vars, string filename, GekkoTime per1, GekkoTime per2, EdataFormat fileType, bool cols, string dateformat, P p)
         {           
             bool isFirst = true;
             string format = SplitDateFormatInTwo(dateformat, ref isFirst);
@@ -26519,7 +26528,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             }
 
             G.Writeln("Wrote " + counter + " variables to " + pathAndFilename);
-            Blob(blob, counter);
+            Blob(blob, counter, p);
             return counter;
         }        
 
@@ -26609,7 +26618,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             }
         }
 
-        private static int GnuplotWrite(List<Tuple<string, IVariable>> list2, string filename, GekkoTime per1, GekkoTime per2)
+        private static int GnuplotWrite(List<Tuple<string, IVariable>> list2, string filename, GekkoTime per1, GekkoTime per2, P p)
         {
             int prnWidth = 18;           
 
@@ -26666,7 +26675,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             }
 
             G.Writeln("Wrote " + list2.Count + " variables to " + pathAndFilename);
-            Blob(blob, list2.Count);
+            Blob(blob, list2.Count, p);
             return list2.Count;
         }
 
@@ -26707,7 +26716,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             return s;
         }
 
-        private static int Tspwrite(List<Tuple<string, IVariable>> list2, string filename, GekkoTime per1, GekkoTime per2, bool isCaps)
+        private static int Tspwrite(List<Tuple<string, IVariable>> list2, string filename, GekkoTime per1, GekkoTime per2, bool isCaps, P p)
         {
             //Databank work = Program.databanks.GetFirst();
             filename = filename;
@@ -26758,7 +26767,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             }
 
             if (true) G.Writeln("Wrote " + counter + " variables to " + pathAndFilename);
-            Blob(blob, counter);
+            Blob(blob, counter, p);
             return counter;
         }
 
@@ -26889,7 +26898,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     Program.WriteRemovedDatabank(p, removed, noTrace);
                     if (File.Exists(removed.FileNameWithPath)) //probably always exists...
                     {
-                        Blob(removed.FileNameWithPath, removed.storage.Count());
+                        Blob(removed.FileNameWithPath, removed.storage.Count(), p);
                     }
                 }
             }
@@ -33434,7 +33443,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         {
             if (G.Equal(Program.options.sheet_engine, "internal"))
             {
-                return WriteExcel_EPPlus(eo, oPrt, isMulprt, isMatrix, dateformat, datetype);
+                return WriteExcel_EPPlus(eo, oPrt, isMulprt, isMatrix, dateformat, datetype, oPrt.p);
             }
             else
             {
@@ -33450,7 +33459,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 {
                     new Error("Option 'datetype' can only be used with 'option sheet engine = internal'.");
                 }
-                return WriteExcel_Interop(eo, oPrt, isMulprt);
+                return WriteExcel_Interop(eo, oPrt, isMulprt, oPrt.p);
             }
         }
 
@@ -33466,7 +33475,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// <returns></returns>        
         //Just before this method, regarding SHEET, eo.excelData has been made from a Table containing
         //the SHEET output.
-        private static ExcelDataForClip WriteExcel_EPPlus(ExcelOptions eo, O.Prt oPrt, bool isMulprt, bool isMatrix, string dateformat, string datetype)
+        private static ExcelDataForClip WriteExcel_EPPlus(ExcelOptions eo, O.Prt oPrt, bool isMulprt, bool isMatrix, string dateformat, string datetype, P p)
         {
             //
             // NOTE: IsClipOrDna() is always false, these are not done here
@@ -33901,7 +33910,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                                 if (File.Exists(fileNameWithPathOriginal)) WaitForFileDelete(fileNameWithPathOriginal);  //probably not necessary
                                 WaitForFileCopy(fileNameWithPath, fileNameWithPathOriginal);
                                 if (true) G.Writeln2("Wrote dataset with " + dataRows + " rows and " + dataCols + " cols to " + fileNameWithPathOriginal);
-                                Blob(blob, null);
+                                Blob(blob, null, p);
                             }
                             catch (Exception e)
                             {
@@ -34057,7 +34066,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// <param name="oPrt"></param>
         /// <param name="isMulprt"></param> 
         /// <returns></returns>
-        private static ExcelDataForClip WriteExcel_Interop(ExcelOptions eo, O.Prt oPrt, bool isMulprt)
+        private static ExcelDataForClip WriteExcel_Interop(ExcelOptions eo, O.Prt oPrt, bool isMulprt, P p)
         {
             Excel.Workbook objBook = null;
 
@@ -34528,7 +34537,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
                         ExcelCleanup(ref objBook, ref objBooks, ref objSheets, ref objSheet, ref range, ref newSheet, ref range0);
                         if (true) G.Writeln2("Wrote dataset with " + dataRows + " rows and " + dataCols + " cols to " + fileNameOriginalFile);
-                        Blob(blob, null);
+                        Blob(blob, null, p);
                     }
                     return null;
                 }

@@ -2865,6 +2865,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("{" + G.NL);  //start Action
                                                         
                             node.Code.A("O.Prt o" + Num(node) + " = new O.Prt();" + G.NL);
+                            node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                             node.Code.A("O.DatabankSearchHelper1();" + G.NL);
 
                             node.Code.A("" + Globals.labelCounter + " = 0;");

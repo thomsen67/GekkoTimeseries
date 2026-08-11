@@ -9825,6 +9825,7 @@ namespace Gekko
             public string opt_meta = null;  //<meta>
             public string scaleCode = null; //string: "1/x" used as eval("1/x"), "'1/x'" used as eval("1/x"), "%s1+%s2" used as eval(eval("s1+%s2"))
             public IVariable[] scale = new IVariable[] { null, null }; //derived from scaleCode: first element is work, second is ref
+            public P p = null;
 
             public void Exe()
             {
