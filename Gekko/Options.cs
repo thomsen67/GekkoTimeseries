@@ -84,7 +84,7 @@ namespace Gekko
         public string databank_dlink_name = "dlink";
         public string databank_dlink_folder_progs = "k:\\MAKROBK";
         public string databank_dlink_folder_data = "k:\\MAKROBK_KILDE\\2025_10_01";
-        public string databank_dlink_folder_blobs = "k:\\MAKROBK_KILDE\\blobs";
+        public string databank_dlink_folder_blobs = "k:\\MAKROBK_KILDE\\2025_10_01\\_blobs";
         public string databank_dlink_folder_remove = "makrobk_grunddata";
 
         public bool databank_trace = true;

@@ -23044,42 +23044,7 @@ namespace Gekko
         /// </summary>
         /// <param name="args"></param>
         public static void DLinkCalledFromGitHook(string[] args)
-        {
-            //Versionering af data
-
-            // -----------------------------------
-            // TESTING on TTH pc
-            // -----------------------------------
-            // + Create new repo on https://github.com/thomsen67, for instance Blobs2
-            // + On c:\Tools, create \Makrobk and \Makrobk_kilde
-            // + In c:\Tools\Makrobk\tth\test, clone Blobs2 so \.git ends at c:\Tools\Makrobk\tth\test\.git
-            // + In \.git\config put this line in [core] if not already there: hooksPath = makrobk_grunddata/_utilities/githooks
-            // + Create c:\Tools\Makrobk_kilde\2025_10_01\_blobs and 
-            //   c:\Tools\Makrobk_kilde\2025_10_01\tth\test\biver\_uddata
-            // + In c:\Tools\Makrobk_kilde\2025_10_01\_blobs\_blobs, put a blobsroot.ini
-            // + From c:\Tools\Hooks copy the \makrobk_grunddata folder to c:\Tools\Makrobk\tth\test                                    
-            // In Globals.cs, set these:
-            //     public static string dlink_programFolderGit = G.CleanupFolderName(@"c:\Tools\Makrobk\tth\test\", false);
-            //     public static string dlink_programFolderRoot = G.CleanupFolderName(@"c:\Tools\Makrobk\tth\test\makrobk_grunddata\", false);
-            //     public static string dlink_programFolderRunning = G.CleanupFolderName(@"c:\Tools\Makrobk\tth\test\makrobk_grunddata\biver", false);
-            //     public static string dlink_dataFolder = G.CleanupFolderName(@"c:\Tools\Makrobk_kilde\2025_10_01\tth\test\biver", false);
-            //     public static string dlink_blobsFolder = G.CleanupFolderName(@"c:\Tools\Makrobk_kilde\2025_10_01\_blobs", false);            
-            // + Start Gekko 3 in folder c:\Tools\Makrobk\tth\test\makrobk_grunddata\biver\_progs, and run run_modul.gcm.
-            //     - This produces c:\Tools\Makrobk\tth\test\makrobk_grunddata\biver\_uddata_dlink\x1.csv.dlink
-            //     - Git-add run_modul.gcm and x1.csv.dlink
-            //     - Git-commit
-            // + Now there should be a file in: c:\Tools\Makrobk_kilde\2025_10_01\_blobs somewhere (with csv == 101 insisde)
-            // +   and also c:\Tools\Makrobk_kilde\2025_10_01\tth\test\biver\_uddata\x1.csv == 101.
-            // + Now change in run_modul.gcm from 101 to 202, run the file, commit .gcm and .dlink.
-            // +   check the .csv, .csv.dlink and a new file in \_blobs.
-            // + Check out the previous commit, where x1 was set to 101.
-            // + The .csv.dlink file should revert, and the .csv file too!
-            //
-            // TODO: Make githooks() method being called, adding hooks            
-            // TODO: .dlink: tilføj antal serier fordelt på frekvens, dataperioder for hver frekvens, "tabel". Tabel for array og subseries.
-            // TODO: Med en ny gbk med samme hash og ældre dato, læg den nye ind (pga. metadata). Eller hvad?
-            // TODO: Stier hvordan ?
-            // TODO: Man skal kunne aborte mht. indlæggelse af ændrede datafiler
+        {           
 
             // -----
             string cacheIndexDlinkFile = Path.Combine(Program.ProgramFolderGit(), ".git", "index_dlink");
@@ -23121,8 +23086,9 @@ namespace Gekko
                     new Error();
                 }
                 DlinkFile dlinkFileData = G.YamlReader<DlinkFile>(dLinkFileWithPath);
-                string dataFile2 = G.DLinkRelativePath(dLinkFileWithPath, Program.ProgramFolderRunning(), G.CleanupFolderName(Program.options.databank_dlink_folder_data, false) + "\\tth\\test\\biver", "The file '" + dLinkFileWithPath + "' does not reside inside the folder '" + Program.ProgramFolderGit() + "'", false);
-                string dataFile = Path.ChangeExtension(dataFile2, null).Replace("\\_inddata_dlink\\", "\\_inddata\\").Replace("\\_uddata_dlink\\", "\\_uddata\\");
+                string dataFile = Dlink_FromDlinkFileToDataFile(dLinkFileWithPath);
+                //string dataFile2 = G.DLinkRelativePath(dLinkFileWithPath, Program.ProgramFolderRunning(), G.CleanupFolderName(Program.options.databank_dlink_folder_data, false) + "\\tth\\test\\biver", "The file '" + dLinkFileWithPath + "' does not reside inside the folder '" + Program.ProgramFolderGit() + "'", false);
+                //string dataFile = Path.ChangeExtension(dataFile2, null).Replace("\\_inddata_dlink\\", "\\_inddata\\").Replace("\\_uddata_dlink\\", "\\_uddata\\");
                 datafiles.Add(dataFile, false); //for cleanup purposes
                 if (G.NullOrBlanks(dataFile))
                 {
@@ -23223,7 +23189,7 @@ namespace Gekko
         {
             string hooksFolder = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), "_utilities", "githooks").Replace("\\", "/");
             string configFile = Path.Combine(parentOfGitFolder, ".git", "config");
-            MessageBox.Show("GitHooks() called with " + parentOfGitFolder + ", " + hooksFolder + ", configfile=" + configFile);
+            if (Globals.tthDlink) MessageBox.Show("GitHooks() called with " + parentOfGitFolder + ", " + hooksFolder + ", configfile=" + configFile);
             if (!File.Exists(configFile))
             {
                 MessageBox.Show("Git config file '" + configFile + "' does not exist");
@@ -23334,20 +23300,22 @@ namespace Gekko
 
         public static void GitHooksFiles(string parentPath, string hooksFolder)
         {
-            MessageBox.Show("parentPath = " + parentPath + ", hooksFolder = " + hooksFolder);
+            if(Globals.tthDlink) MessageBox.Show("DLINK: parentPath = " + parentPath + ", hooksFolder = " + hooksFolder);
 
             try
             {
                 // ----------------------------------------------------------------------------------------------------------                            
                 string parentPath2 = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), "_utilities", "githooks").Replace("\\", "/");
+                string parentPath3 = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), "_utilities", "Gekko").Replace("\\", "/");
                 string gekkoExePath = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), "_utilities", "Gekko", "Gekko.exe").Replace("\\", "/");
                 string _common = @$"
 #!/bin/sh
-ROOT_DIR=""$GIT_DIR""
-STAGED_FILES=$(git -C ""{{ROOT_DIR}}"" ls-files --cached -- ':(icase)*.dlink')
+ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null)
+STAGED_FILES=$(git -C ""${{ROOT_DIR}}"" ls-files --cached -- ':(icase)*.dlink')
 FORMATTED_FILES=$(echo ""$STAGED_FILES"" | sed ""s/^/'/;s/$/'/"" | paste -sd, -)
-powershell.exe -Command ""(New-Object -ComObject WScript.Shell).Popup('... ' + $FORMATTED_FILES, 0, 'Message', 64)""
-cmd.exe //c ""{gekkoExePath}"" ""-dlink:'$1',$FORMATTED_FILES""
+#powershell.exe -Command ""(New-Object -ComObject WScript.Shell).Popup('... ' + $FORMATTED_FILES, 0, 'Message', 64)""
+#powershell.exe -Command ""(New - Object - ComObject WScript.Shell).Popup('.1. ' + $FORMATTED_FILES, 0, 'Message', 64)""
+cmd.exe //c ""{gekkoExePath}"" ""-dlink:'$1',$FORMATTED_FILES"" ""-dlinkw:'$ROOT_DIR'""
 ";
                 // ----------------------------------------------------------------------------------------------------------
                 string post_checkout = $@"
@@ -23381,6 +23349,8 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 { "pre-push", pre_push }
             };
 
+                Directory.CreateDirectory(parentPath2);
+                Directory.CreateDirectory(parentPath3);
                 foreach (var hook in hooks)
                 {
                     string filePath = Path.Combine(parentPath2, hook.Key);
@@ -23448,8 +23418,8 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// <summary>
         /// Handles blobs, for .dlink
         /// </summary>
-        /// <param name="fileNameAndPath"></param>
-        private static void Blob(string fileNameAndPath, long? nVariables, P p)
+        /// <param name="dataFile"></param>
+        private static void Blob(string dataFile, long? nVariables, P p)
         {
             string hash = null;
             long? size = null;
@@ -23457,98 +23427,138 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             if (Program.options.databank_dlink)
             {
                 //Note: just because a .dlink file is constructed, this it not the same
-                //      as that it has to go into blobs storage.                
-                
-                // =========== PROGS PATH ======================================================
-                //f2 --> c:\Tools\K\MAKROBK\tth\test\makrobk_grunddata\biver\_progs                
-                string f2 = G.CleanupFolderName(O.ConvertToString(Functions.Helper_Runfolder(new IVariable[0], p)), false); //.dlink file, c:\Thomas\Gekko\BlobsTest\tth\staging
-                if (G.NullOrBlanks(f2)) f2 = Program.options.folder_working; //Run directly: in that case we must assume the working folder
-                if (Globals.runningOnTTComputer) f2 = G.Replace(f2, "c:\\Tools\\K\\MAKROBK", "K:\\MAKROBK", StringComparison.OrdinalIgnoreCase, 1);
-                if (!f2.StartsWith(Program.options.databank_dlink_folder_progs.Trim(), StringComparison.OrdinalIgnoreCase)) new Error("Problem with .dlink: the data file path '" + f2 + "' was expected was expected to start with the path '" + Program.options.databank_dlink_folder_progs.Trim() + "'");
-                string s2 = f2;
-                s2 = G.Replace(s2, Program.options.databank_dlink_folder_progs.Trim(), "", StringComparison.OrdinalIgnoreCase, 1);
-                s2 = G.Replace(s2, "\\_progs", "", StringComparison.OrdinalIgnoreCase, 1);
-                string s2a = s2;
-                if (!G.NullOrBlanks(Program.options.databank_dlink_folder_remove))
-                {
-                    s2a = G.Replace(s2, "\\" + Program.options.databank_dlink_folder_remove.Trim() + "\\", "\\", StringComparison.OrdinalIgnoreCase, 1);
-                }
-                string s3 = Path.Combine(Program.options.databank_dlink_folder_data, s2a.TrimStart('\\'));
-                // =============================================================================
+                //      as that it has to go into blobs storage.
 
-                //f2:                K:\MAKROBK\tth\test\makrobk_grunddata\biver\_progs
-                //s2:                \tth\test\makrobk_grunddata\biver  
-                //s2a:               \tth\test\biver   
-                //s3:                K:\MAKROBK_KILDE\2025_10_01\tth\test\biver
-                //fileNameAndPath:   K:\MAKROBK_KILDE\2025_10_01\tth\test\biver\_uddata\x.csv
-                //s4:                \_uddata\x.csv
-                //s5:                k:\MAKROBK\tth\test\makrobk_grunddata\biver\_progs\_uddata_dlink\x.csv
+                string dlinkFile = Dlink_FromDataFileToDlinkFile(dataFile, p);
 
-                if (!fileNameAndPath.StartsWith(s3 + "\\", StringComparison.OrdinalIgnoreCase)) new Error("Problem with .dlink file path: based on the .gcm file path, the datafile path '" + fileNameAndPath + "' was expected to start with the path '" + s3 + "'");
-                string s4 = G.Replace(fileNameAndPath, s3, "", StringComparison.OrdinalIgnoreCase, 1);
-                string s5 = Path.Combine(Program.options.databank_dlink_folder_progs, s2.TrimStart('\\'), "_progs", s4.TrimStart('\\'));
-                s5 = G.Replace(s5, "\\_uddata\\", "\\_uddata_dlink\\", StringComparison.OrdinalIgnoreCase, 1);
-                s5 = G.Replace(s5, "\\_inddata\\", "\\_inddata_dlink\\", StringComparison.OrdinalIgnoreCase, 1);
-                s5 = s5 + "." + Program.options.databank_dlink_name;
+                //string dataFile2 = Dlink_FromDlinkFileToDataFile(@"k:\MAKROBK\tth\test\makrobk_grunddata\biver\_progs\_uddata_dlink\x.csv.dlink", p);
 
                 if (true)
                 {
-                    // =========== DATA PATH =======================================================
-                    //f1 --> K:\MAKROBK_KILDE\2025_10_01\tth\test\biver\_uddata\x.csv
-                    string f1 = G.CleanupFolderName(Program.options.databank_dlink_folder_data, false) + s2a;
-                    string s1 = G.DLinkRelativePath(fileNameAndPath, f1, f2, "Regarding ." + Program.options.databank_dlink_name + " file, the folder '" + f1 + "' does not seem to be part of '" + fileNameAndPath + "'", true);
-                    s1 = s1 + "." + Program.options.databank_dlink_name;
-                    // =============================================================================
+                    //// =========== DATA PATH =======================================================
+                    ////f1 --> K:\MAKROBK_KILDE\2025_10_01\tth\test\biver\_uddata\x.csv
+                    //string f1 = G.CleanupFolderName(Program.options.databank_dlink_folder_data, false) + s2a;
+                    //string s1 = G.DLinkRelativePath(fileNameAndPath, f1, f2, "Regarding ." + Program.options.databank_dlink_name + " file, the folder '" + f1 + "' does not seem to be part of '" + fileNameAndPath + "'", true);
+                    //s1 = s1 + "." + Program.options.databank_dlink_name;
+                    //// =============================================================================
                 }
 
-                if (s5 == null)
+                if (dlinkFile == null)
                 {
                     //Do nothing: may be a databank on some other drive
                 }
                 else
                 {
-                    if (File.Exists(fileNameAndPath))
+                    if (File.Exists(dataFile))
                     {
-                        hash = BlobsHash(fileNameAndPath, true); //TODO: WithWait or WaitFor...
+                        hash = BlobsHash(dataFile, true); //TODO: WithWait or WaitFor...
                     }
-                    size = (new FileInfo(fileNameAndPath)).Length;
-                    if (!Directory.Exists(Path.GetDirectoryName(s5)))
+                    size = (new FileInfo(dataFile)).Length;
+                    if (!Directory.Exists(Path.GetDirectoryName(dlinkFile)))
                     {
                         if (true)
                         {
-                            MessageBox.Show("The folder '" + Path.GetDirectoryName(s5) + "' is created");
-                            Directory.CreateDirectory(Path.GetDirectoryName(s5));
+                            MessageBox.Show("The folder '" + Path.GetDirectoryName(dlinkFile) + "' is created");
+                            Directory.CreateDirectory(Path.GetDirectoryName(dlinkFile));
                         }
                         else
                         {
-                            MessageBox.Show("The folder '" + Path.GetDirectoryName(s5) + "' does not exist for ." + Program.options.databank_dlink_name + " file writing");
+                            MessageBox.Show("The folder '" + Path.GetDirectoryName(dlinkFile) + "' does not exist for ." + Program.options.databank_dlink_name + " file writing");
                             new Error();
                         }
                     }
                     DlinkFile blobInfo = new DlinkFile(hash, size, stamp, nVariables, null);
-                    G.YamlWriter<DlinkFile>(blobInfo, s5);
+                    G.YamlWriter<DlinkFile>(blobInfo, dlinkFile);
                 }
             }
+        }
+
+        private static string Dlink_FromDataFileToDlinkFile(string dataFile, P p)
+        {
+            //dataFile:          K:\MAKROBK_KILDE\2025_10_01\tth\test\biver\_uddata\x.csv
+            //f2:                K:\MAKROBK\tth\test\makrobk_grunddata\biver\_progs
+            //s2:                \tth\test\makrobk_grunddata\biver  
+            //s2a:               \tth\test\biver   
+            //s3:                K:\MAKROBK_KILDE\2025_10_01\tth\test\biver
+            //s4:                \_uddata\x.csv
+            //s5:                K:\MAKROBK\tth\test\makrobk_grunddata\biver\_progs\_uddata_dlink\x.csv.dlink
+            string f2 = G.CleanupFolderName(O.ConvertToString(Functions.Helper_Runfolder(new IVariable[0], p)), false); //.dlink file, c:\Thomas\Gekko\BlobsTest\tth\staging
+            if (G.NullOrBlanks(f2)) f2 = Program.options.folder_working; //Run directly: in that case we must assume the working folder
+            string s2 = Dlink_HandleProgsPath(f2);
+            string s2a = Dlink_HandleRemove(s2);
+            string s3 = Path.Combine(Program.options.databank_dlink_folder_data, s2a.TrimStart('\\'));
+            if (!dataFile.StartsWith(s3 + "\\", StringComparison.OrdinalIgnoreCase)) new Error("Problem with .dlink file path: based on the .gcm file path, the datafile path '" + dataFile + "' was expected to start with the path '" + s3 + "'");
+            string s4 = G.Replace(dataFile, s3, "", StringComparison.OrdinalIgnoreCase, 1);
+            string s5 = Path.Combine(Program.options.databank_dlink_folder_progs, s2.TrimStart('\\'), "_progs", s4.TrimStart('\\'));
+            s5 = G.Replace(s5, "\\_uddata\\", "\\_uddata_dlink\\", StringComparison.OrdinalIgnoreCase, 1);
+            s5 = G.Replace(s5, "\\_inddata\\", "\\_inddata_dlink\\", StringComparison.OrdinalIgnoreCase, 1);
+            s5 = s5 + "." + Program.options.databank_dlink_name;
+            return s5;
+        }        
+
+        private static string Dlink_FromDlinkFileToDataFile(string dlinkFile)
+        {
+            //dlinkFile:         K:\MAKROBK\tth\test\makrobk_grunddata\biver\_progs\_uddata_dlink\x.csv.dlink
+            //s2a:               \tth\test\biver\_uddata_dlink\x.csv.dlink
+
+            //fileNameAndPath:   K:\MAKROBK_KILDE\2025_10_01\tth\test\biver\_uddata\x.csv
+            //f2:                K:\MAKROBK\tth\test\makrobk_grunddata\biver\_progs
+            //s2:                \tth\test\makrobk_grunddata\biver  
+            //s2a:               \tth\test\biver   
+            //s3:                K:\MAKROBK_KILDE\2025_10_01\tth\test\biver
+            //s4:                \_uddata\x.csv
+            //s5:                
+
+            string s2 = Dlink_HandleProgsPath(dlinkFile);
+            string s2a = Dlink_HandleRemove(s2);
+            string s3 = Path.Combine(Program.options.databank_dlink_folder_data, s2a.TrimStart('\\'));
+            s3 = G.Replace(s3, "\\_uddata_dlink\\", "\\_uddata\\", StringComparison.OrdinalIgnoreCase, 1);
+            s3 = G.Replace(s3, "\\_inddata_dlink\\", "\\_inddata\\", StringComparison.OrdinalIgnoreCase, 1);
+            if (!s3.EndsWith("." + Program.options.databank_dlink_name, StringComparison.OrdinalIgnoreCase)) new Error("Expected dlink file to end with " + "." + Program.options.databank_dlink_name);            
+            string s4 = s3.Substring(0, s3.Length - ("." + Program.options.databank_dlink_name).Length);
+            return s4;
+        }
+
+        private static string Dlink_HandleRemove(string s2)
+        {
+            //\tth\test\makrobk_grunddata\biver  -->   \tth\test\biver   
+            string s2a = s2;
+            if (!G.NullOrBlanks(Program.options.databank_dlink_folder_remove))
+            {
+                s2a = G.Replace(s2, "\\" + Program.options.databank_dlink_folder_remove.Trim() + "\\", "\\", StringComparison.OrdinalIgnoreCase, 1);
+            }
+            return s2a;
+        }
+
+        private static string Dlink_HandleProgsPath(string f2)
+        {
+            //K:\MAKROBK\tth\test\makrobk_grunddata\biver\_progs  -->  \tth\test\makrobk_grunddata\biver  
+            if (Globals.tthDlink) f2 = G.Replace(f2, "c:\\Tools\\K\\MAKROBK", "K:\\MAKROBK", StringComparison.OrdinalIgnoreCase, 1);
+            if (!f2.StartsWith(Program.options.databank_dlink_folder_progs.Trim(), StringComparison.OrdinalIgnoreCase)) new Error("Problem with .dlink: the data file path '" + f2 + "' was expected was expected to start with the path '" + Program.options.databank_dlink_folder_progs.Trim() + "'");
+            string s2 = f2;
+            s2 = G.Replace(s2, Program.options.databank_dlink_folder_progs.Trim(), "", StringComparison.OrdinalIgnoreCase, 1);
+            s2 = G.Replace(s2, "\\_progs", "", StringComparison.OrdinalIgnoreCase, 1);
+            return s2;
         }
 
         public static string ProgramFolderRunning()
         {
             string s = O.ConvertToString(Functions.runfolder(null, null, null));
-            MessageBox.Show("ProgramFolderRunning(): " + s);
+            if (Globals.tthDlink) MessageBox.Show("ProgramFolderRunning(): " + s);
             return s;
         }
 
         public static string ProgramFolderGit()
         {
             string s = O.ConvertToString(Functions.root(null, null, null, new ScalarString("git")));
-            MessageBox.Show("ProgramFolderGit(): " + s);
+            if (Globals.tthDlink) MessageBox.Show("ProgramFolderGit(): " + s);
             return s;
         }
 
         public static string ProgramFolderRunningRelative()
         {
             string s = O.ConvertToString(Functions.runfolder(null, null, null, new ScalarString("rel")));
-            MessageBox.Show("ProgramFolderRunningRelative(): " + s);
+            if (Globals.tthDlink) MessageBox.Show("ProgramFolderRunningRelative(): " + s);
             return s;
         }
 

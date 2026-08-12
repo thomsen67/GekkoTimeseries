@@ -53,6 +53,7 @@ namespace Gekko
 
         // -------------------------------------
 
+        public static bool tthDlink = true;
         //public static string dlink_programFolderGit = Program.ProgramFolderGit(); //G.CleanupFolderName(@"k:\MAKROBK\" + "tth\\test", false);
         //public static string dlink_programFolderRunning = Program.ProgramFolderRunning(); // G.CleanupFolderName(dlink_programFolderGit + "\\makrobk_grunddata\\biver", false);
 

@@ -7503,18 +7503,7 @@ namespace Gekko
         public static IVariable runfolder(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] vars)
         {
             return Helper_Runfolder(smpl, _t1, _t2, vars);
-        }
-
-        //public static IVariable xxx(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] vars)
-        //{
-        //    return new ScalarString(smpl?.p?.GetExecutingGcmFile(ERunningGcm.IncludeProcFunc));
-        //}
-
-        //public static IVariable yyy(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] vars)
-        //{
-        //    return new ScalarString(smpl?.p?.GetExecutingGcmFile(ERunningGcm.ExcludeProcFuncCheckExistence));
-        //}
-
+        }               
 
         /// <summary>
         /// Chops up a part as a list of strings.
@@ -7701,6 +7690,7 @@ namespace Gekko
             RootHelper rootHelper1 = new RootHelper();
             rootHelper1.rootFileName = rootFileName;
             if (G.Equal(rootFileName, ".git")) rootHelper1.onlyOne = true;
+            //if (Globals.runningOnTTComputer) System.Windows.Forms.MessageBox.Show(rootFileName + " --- " + rootHelper1.rootFileName);
             helper_root(new DirectoryInfo(folder1), rootHelper1);
 
             //From gcm file

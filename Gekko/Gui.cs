@@ -248,9 +248,23 @@ namespace Gekko
         [STAThread]
         public static void Main(string[] args)
         {
-            if (args.Length == 1 && args[0].StartsWith("-dlink:"))
+            if (Globals.tthDlink)
             {
-                //MessageBox.Show(Stringlist.GetListWithCommas(args));
+                MessageBox.Show("DLINK --> " + Stringlist.GetListWithCommas(args));
+                args = new string[] { "-dlink:'pre-commit','makrobk_grunddata/biver/_progs/_uddata_dlink/x.csv.dlink'", "-dlinkw:'C:/Tools/K/MAKROBK/tth/test'" };                
+                //
+                // -dlinkw:C:/Tools/K/MAKROBK/tth/test
+                //
+
+            }
+            if (args.Length >= 1 && args[0].StartsWith("-dlink:"))
+            {
+                if(Globals.tthDlink) MessageBox.Show("DLINK: " + Stringlist.GetListWithCommas(args));
+                if (args.Length >= 2 && args[1].StartsWith("-dlinkw:"))
+                {
+                    string w = G.StripQuotes(args[1].Substring("-dlinkw:".Length));
+                    Program.options.folder_working = w;
+                }
                 Program.DLinkCalledFromGitHook(args);
                 return;
             }
