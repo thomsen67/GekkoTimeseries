@@ -23190,109 +23190,112 @@ namespace Gekko
             string hooksFolder = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), "_utilities", "githooks").Replace("\\", "/");
             string configFile = Path.Combine(parentOfGitFolder, ".git", "config");
             if (Globals.tthDlink) MessageBox.Show("GitHooks() called with " + parentOfGitFolder + ", " + hooksFolder + ", configfile=" + configFile);
-            if (!File.Exists(configFile))
+            if (false)
             {
-                MessageBox.Show("Git config file '" + configFile + "' does not exist");
-                new Error();
-            }
-
-            try
-            {
-
-                bool writeFile = true;
-                var lines = File.ReadAllLines(configFile);
-
-                bool insideCoreSection = false;
-                bool hasHooksPathLine = false;
-                bool hooksPathIsCorrect = false;
-                int targetLineIndex = -1;
-                int endOfCoreIndex = -1;
-
-                // --- PASS 1: Analyze the file structure ---
-                for (int i = 0; i < lines.Length; i++)
+                if (!File.Exists(configFile))
                 {
-                    string trimmedLine = lines[i].Trim();
-                    string cleanValue = trimmedLine.Replace(" ", "").Replace("\t", "");
-                    if (trimmedLine.StartsWith("[") && trimmedLine.EndsWith("]"))
-                    {
-                        if (insideCoreSection)
-                        {
-                            // We are leaving [core] and entering a new section. 
-                            // Mark where the [core] section naturally ended.
-                            endOfCoreIndex = i;
-                            insideCoreSection = false;
-                        }
-                        if (G.Equal(trimmedLine, "[core]"))
-                        {
-                            insideCoreSection = true;
-                        }
-                    }
-                    else if (insideCoreSection)
-                    {
-                        // Track the last valid line index inside [core] in case we need to append
-                        if (!string.IsNullOrWhiteSpace(trimmedLine))
-                        {
-                            endOfCoreIndex = i + 1;
-                        }
+                    MessageBox.Show("Git config file '" + configFile + "' does not exist");
+                    new Error();
+                }
 
-                        // Check if a hooksPath directive already exists here
-                        if (cleanValue.StartsWith("hooksPath=", StringComparison.OrdinalIgnoreCase))
+                try
+                {
+
+                    bool writeFile = true;
+                    var lines = File.ReadAllLines(configFile);
+
+                    bool insideCoreSection = false;
+                    bool hasHooksPathLine = false;
+                    bool hooksPathIsCorrect = false;
+                    int targetLineIndex = -1;
+                    int endOfCoreIndex = -1;
+
+                    // --- PASS 1: Analyze the file structure ---
+                    for (int i = 0; i < lines.Length; i++)
+                    {
+                        string trimmedLine = lines[i].Trim();
+                        string cleanValue = trimmedLine.Replace(" ", "").Replace("\t", "");
+                        if (trimmedLine.StartsWith("[") && trimmedLine.EndsWith("]"))
                         {
-                            hasHooksPathLine = true;
-                            targetLineIndex = i; // Save exactly where it sits                        
-                            if (G.Equal(cleanValue, "hooksPath=" + hooksFolder + ""))
+                            if (insideCoreSection)
                             {
-                                hooksPathIsCorrect = true;
+                                // We are leaving [core] and entering a new section. 
+                                // Mark where the [core] section naturally ended.
+                                endOfCoreIndex = i;
+                                insideCoreSection = false;
+                            }
+                            if (G.Equal(trimmedLine, "[core]"))
+                            {
+                                insideCoreSection = true;
+                            }
+                        }
+                        else if (insideCoreSection)
+                        {
+                            // Track the last valid line index inside [core] in case we need to append
+                            if (!string.IsNullOrWhiteSpace(trimmedLine))
+                            {
+                                endOfCoreIndex = i + 1;
+                            }
+
+                            // Check if a hooksPath directive already exists here
+                            if (cleanValue.StartsWith("hooksPath=", StringComparison.OrdinalIgnoreCase))
+                            {
+                                hasHooksPathLine = true;
+                                targetLineIndex = i; // Save exactly where it sits                        
+                                if (G.Equal(cleanValue, "hooksPath=" + hooksFolder + ""))
+                                {
+                                    hooksPathIsCorrect = true;
+                                }
                             }
                         }
                     }
-                }
 
-                // Handle the edge case where [core] is at the very bottom of the file
-                if (insideCoreSection && endOfCoreIndex == -1)
-                {
-                    endOfCoreIndex = lines.Length;
-                }
+                    // Handle the edge case where [core] is at the very bottom of the file
+                    if (insideCoreSection && endOfCoreIndex == -1)
+                    {
+                        endOfCoreIndex = lines.Length;
+                    }
 
-                // --- PASS 2: Determine if changes are needed ---
+                    // --- PASS 2: Determine if changes are needed ---
 
-                // Scenario A: It already exists and it's exactly what you want. Do absolutely nothing!
-                if (hasHooksPathLine && hooksPathIsCorrect)
-                {
-                    writeFile = false;
-                }
+                    // Scenario A: It already exists and it's exactly what you want. Do absolutely nothing!
+                    if (hasHooksPathLine && hooksPathIsCorrect)
+                    {
+                        writeFile = false;
+                    }
 
-                var outputLines = new List<string>(lines);
+                    var outputLines = new List<string>(lines);
 
-                // Scenario B: The line exists, but it points to the wrong directory.
-                // Overwrite it in place without moving it.
-                if (hasHooksPathLine && !hooksPathIsCorrect)
-                {
-                    outputLines[targetLineIndex] = "\thooksPath = " + hooksFolder + "";
-                }
-                // Scenario C: The line doesn't exist at all.
-                // Insert it safely at the very end of the [core] section.
-                else if (!hasHooksPathLine && endOfCoreIndex != -1)
-                {
-                    outputLines.Insert(endOfCoreIndex, "\thooksPath = " + hooksFolder + "");
-                }
-                // Scenario D: Extreme edge-case where [core] section doesn't exist in the file at all.
-                else
-                {
-                    outputLines.Insert(0, "[core]");
-                    outputLines.Insert(1, "\thooksPath = " + hooksFolder + "");
-                }
+                    // Scenario B: The line exists, but it points to the wrong directory.
+                    // Overwrite it in place without moving it.
+                    if (hasHooksPathLine && !hooksPathIsCorrect)
+                    {
+                        outputLines[targetLineIndex] = "\thooksPath = " + hooksFolder + "";
+                    }
+                    // Scenario C: The line doesn't exist at all.
+                    // Insert it safely at the very end of the [core] section.
+                    else if (!hasHooksPathLine && endOfCoreIndex != -1)
+                    {
+                        outputLines.Insert(endOfCoreIndex, "\thooksPath = " + hooksFolder + "");
+                    }
+                    // Scenario D: Extreme edge-case where [core] section doesn't exist in the file at all.
+                    else
+                    {
+                        outputLines.Insert(0, "[core]");
+                        outputLines.Insert(1, "\thooksPath = " + hooksFolder + "");
+                    }
 
-                if (writeFile)
-                {
-                    // Commit changes to disk
-                    File.WriteAllLines(configFile, outputLines);
+                    if (writeFile)
+                    {
+                        // Commit changes to disk
+                        File.WriteAllLines(configFile, outputLines);
+                    }
                 }
-            }
-            catch
-            {
-                MessageBox.Show("Failed to write to Git config file '" + configFile + "'");
-                new Error();
+                catch
+                {
+                    MessageBox.Show("Failed to write to Git config file '" + configFile + "'");
+                    new Error();
+                }
             }
 
             GitHooksFiles(parentOfGitFolder, hooksFolder);
@@ -23308,8 +23311,7 @@ namespace Gekko
                 string parentPath2 = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), "_utilities", "githooks").Replace("\\", "/");
                 string parentPath3 = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), "_utilities", "Gekko").Replace("\\", "/");
                 string gekkoExePath = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), "_utilities", "Gekko", "Gekko.exe").Replace("\\", "/");
-                string _common = @$"
-#!/bin/sh
+                string _common = @$"#!/bin/sh
 ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null)
 STAGED_FILES=$(git -C ""${{ROOT_DIR}}"" ls-files --cached -- ':(icase)*.dlink')
 FORMATTED_FILES=$(echo ""$STAGED_FILES"" | sed ""s/^/'/;s/$/'/"" | paste -sd, -)
@@ -23318,23 +23320,19 @@ FORMATTED_FILES=$(echo ""$STAGED_FILES"" | sed ""s/^/'/;s/$/'/"" | paste -sd, -)
 cmd.exe //c ""{gekkoExePath}"" ""-dlink:'$1',$FORMATTED_FILES"" ""-dlinkw:'$ROOT_DIR'""
 ";
                 // ----------------------------------------------------------------------------------------------------------
-                string post_checkout = $@"
-#!/bin/sh
+                string post_checkout = $@"#!/bin/sh
 bash ""$(dirname ""$0"")/_common"" ""post-checkout""
 ";
                 // ----------------------------------------------------------------------------------------------------------
-                string post_merge = $@"
-#!/bin/sh
+                string post_merge = $@"#!/bin/sh
 bash ""$(dirname ""$0"")/_common"" ""post-merge""
 ";
                 // ----------------------------------------------------------------------------------------------------------
-                string pre_commit = $@"
-#!/bin/sh
+                string pre_commit = $@"#!/bin/sh
 bash ""$(dirname ""$0"")/_common"" ""pre-commit""
 ";
                 // ----------------------------------------------------------------------------------------------------------
-                string pre_push = $@"
-#!/bin/sh
+                string pre_push = $@"#!/bin/sh
 # Only for extra safety, not strictly necessary
 bash ""$(dirname ""$0"")/_common"" ""pre-push""
 ";
@@ -23349,11 +23347,11 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 { "pre-push", pre_push }
             };
 
-                Directory.CreateDirectory(parentPath2);
+                //Directory.CreateDirectory(parentPath2);
                 Directory.CreateDirectory(parentPath3);
                 foreach (var hook in hooks)
                 {
-                    string filePath = Path.Combine(parentPath2, hook.Key);
+                    string filePath = Path.Combine(parentPath, ".git", "hooks", hook.Key);
                     string contentToWrite = hook.Value;
                     G.WriteIfChanged(filePath, contentToWrite);
                 }
