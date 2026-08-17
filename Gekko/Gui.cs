@@ -248,13 +248,13 @@ namespace Gekko
         [STAThread]
         public static void Main(string[] args)
         {
-            if (Globals.tthDlink)
+            if (G.DlinkDebug())
             {
                 MessageBox.Show("DLINK1 --> " + Stringlist.GetListWithCommas(args));
             }
             if (args.Length >= 1 && args[0].StartsWith("-dlink:"))
             {
-                if(Globals.tthDlink) MessageBox.Show("DLINK2: " + Stringlist.GetListWithCommas(args));
+                if(G.DlinkDebug()) MessageBox.Show("DLINK2: " + Stringlist.GetListWithCommas(args));
                 if (args.Length >= 2 && args[1].StartsWith("-dlinkw:"))
                 {
                     string w = G.StripQuotes(args[1].Substring("-dlinkw:".Length));

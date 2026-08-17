@@ -23041,21 +23041,21 @@ namespace Gekko
         public static string ProgramFolderRunning()
         {
             string s = O.ConvertToString(Functions.runfolder(null, null, null));
-            if (Globals.tthDlink) MessageBox.Show("ProgramFolderRunning(): " + s);
+            if (G.DlinkDebug()) MessageBox.Show("ProgramFolderRunning(): " + s);
             return s;
         }
 
         public static string ProgramFolderGit()
         {
             string s = O.ConvertToString(Functions.root(null, null, null, new ScalarString("git")));
-            if (Globals.tthDlink) MessageBox.Show("ProgramFolderGit(): " + s);
+            if (G.DlinkDebug()) MessageBox.Show("ProgramFolderGit(): " + s);
             return s;
         }
 
         public static string ProgramFolderRunningRelative()
         {
             string s = O.ConvertToString(Functions.runfolder(null, null, null, new ScalarString("rel")));
-            if (Globals.tthDlink) MessageBox.Show("ProgramFolderRunningRelative(): " + s);
+            if (G.DlinkDebug()) MessageBox.Show("ProgramFolderRunningRelative(): " + s);
             return s;
         }        
 

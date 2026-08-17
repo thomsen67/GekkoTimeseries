@@ -40,7 +40,7 @@ namespace Gekko
         /// <param name="parentOfGitFolder"></param>
         public static void DlinkFunction(string parentOfGitFolder, bool activate)
         {
-            if (Globals.tthDlink) MessageBox.Show("GitHooks() called with " + parentOfGitFolder + ", activate " + activate);
+            if (G.DlinkDebug()) MessageBox.Show("GitHooks() called with " + parentOfGitFolder + ", activate " + activate);
 
             string hooksPath = Path.Combine(parentOfGitFolder, ".git", "hooks");
             if (!Directory.Exists(hooksPath)) new Error("Could not find folder '" + hooksPath + "'");
@@ -229,7 +229,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 }
                 catch
                 {
-                    if (Globals.tthDlink) MessageBox.Show("Loading " + cacheIndexDlinkFile + " failed");
+                    if (G.DlinkDebug()) MessageBox.Show("Loading " + cacheIndexDlinkFile + " failed");
                 }
             }
 
@@ -298,7 +298,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             }
             catch
             {
-                if (Globals.tthDlink) MessageBox.Show("Writing " + cacheIndexDlinkFile + " failed");
+                if (G.DlinkDebug()) MessageBox.Show("Writing " + cacheIndexDlinkFile + " failed");
             }
             DLinkCalledFromGitHookReporting(type, getFilesNew, getFilesOverwrite, putFiles);
         }

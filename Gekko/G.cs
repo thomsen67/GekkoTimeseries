@@ -4413,6 +4413,12 @@ namespace Gekko
                 return FindParent<T>(parentObject);
         }
 
+        public bool DlinkDebug() 
+        {
+            if (Directory.Exists("p:\\tth\\ny\\dlinkdebug.txt")) return true;
+            else return false;
+        }
+
         public static bool WriteIfChanged(string filePath, string content)
         {
             bool shouldWrite = true;
