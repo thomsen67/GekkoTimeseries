@@ -4413,7 +4413,7 @@ namespace Gekko
                 return FindParent<T>(parentObject);
         }
 
-        public static void WriteIfChanged(string filePath, string content)
+        public static bool WriteIfChanged(string filePath, string content)
         {
             bool shouldWrite = true;
             if (File.Exists(filePath))
@@ -4435,6 +4435,7 @@ namespace Gekko
                     file.Write(content);
                 }
             }
+            return shouldWrite;
         }
 
         /// <summary>
@@ -5919,34 +5920,6 @@ namespace Gekko
                 attributes |= FileAttributes.ReadOnly;
                 File.SetAttributes(fileName, attributes);
             }
-        }
-
-        /// <summary>
-        /// In a path name input, the start f1 is replaced by f2. For instance, if
-        /// input = "c:\a1\a2\a3\a4", f1 = "c:\a1\a2" and f2 = "x:\b1", the output
-        /// will be "x:\b1\a3\a4". Note: for folder names, the input paths must not end with "\" --> then use
-        /// CleanupFolderName() to clean them up first.
-        /// </summary>
-        /// <param name="input"></param>
-        /// <param name="f1"></param>
-        /// <param name="f2"></param>
-        /// <param name="warningIncongruent"></param>
-        /// 
-        /// <returns></returns>
-        public static string DLinkRelativePath(string input, string f1, string f2, string warningIncongruent, bool replace)
-        {
-            string output = null;
-            if (input.StartsWith(f1, StringComparison.OrdinalIgnoreCase))
-            {
-                string temp = G.Substring(input, f1.Length + 1, input.Length - 1);
-                output = Path.Combine(f2, temp);
-                if (replace) output = output.Replace("\\_inddata\\", "\\_inddata" + "_" + Program.options.databank_dlink_name + "\\").Replace("\\_uddata\\", "\\_uddata" + "_" + Program.options.databank_dlink_name + "\\");
-            }
-            else
-            {
-                G.Warning("w45.1", warningIncongruent);
-            }
-            return output;
         }
 
         public static T YamlReader<T>(string fileName)

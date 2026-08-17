@@ -428,6 +428,7 @@
   <ItemGroup>
     <Compile Include="Arrow.cs" />
     <Compile Include="Decomp_OLD.cs" />
+    <Compile Include="Dlink.cs" />
     <Compile Include="EquationBrowser.cs" />
     <Compile Include="Estimation.cs" />
     <Compile Include="GamsWrappers.cs" />

@@ -85,7 +85,12 @@ namespace Gekko
         public string databank_dlink_folder_progs = "k:\\MAKROBK";
         public string databank_dlink_folder_data = "k:\\MAKROBK_KILDE\\2025_10_01";
         public string databank_dlink_folder_blobs = "k:\\MAKROBK_KILDE\\2025_10_01\\_blobs";
-        public string databank_dlink_folder_remove = "makrobk_grunddata";
+        public string databank_dlink_folder_remove1 = "makrobk_grunddata";
+        public string databank_dlink_folder_remove2 = "_progs";
+        public string databank_dlink_folder_replace1a = "_inddata";
+        public string databank_dlink_folder_replace1b = "_inddata_dlink";
+        public string databank_dlink_folder_replace2a = "_uddata";
+        public string databank_dlink_folder_replace2b = "_uddata_dlink";
 
         public bool databank_trace = true;
         public bool databank_trace_dublets = false; //
@@ -452,8 +457,13 @@ namespace Gekko
             Add("DATABANK DLINK NAME", Globals.xnameOrString, "dlink");
             Add("DATABANK DLINK FOLDER BLOBS", Globals.xnameOrString, "dlink");
             Add("DATABANK DLINK FOLDER DATA", Globals.xnameOrString, "dlink");
-            Add("DATABANK DLINK FOLDER PROGS", Globals.xnameOrString, "dlink");
-            Add("DATABANK DLINK FOLDER REMOVE", Globals.xnameOrString, "dlink");            
+            Add("DATABANK DLINK FOLDER PROGS", Globals.xnameOrString, "dlink");            
+            Add("DATABANK DLINK FOLDER REMOVE1", Globals.xnameOrString, "dlink");
+            Add("DATABANK DLINK FOLDER REMOVE2", Globals.xnameOrString, "dlink");
+            Add("DATABANK DLINK FOLDER REPLACE1A", Globals.xnameOrString, "dlink");
+            Add("DATABANK DLINK FOLDER REPLACE1B", Globals.xnameOrString, "dlink");
+            Add("DATABANK DLINK FOLDER REPLACE2A", Globals.xnameOrString, "dlink");
+            Add("DATABANK DLINK FOLDER REPLACE2B", Globals.xnameOrString, "dlink");        
 
             Add("DATABANK TRACE", Globals.xbool);
             Add("DATABANK TRACE DUBLETS", Globals.xbool); 

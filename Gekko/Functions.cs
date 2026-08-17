@@ -6856,9 +6856,21 @@ namespace Gekko
         /// <param name="smpl"></param>
         /// <param name="_t1"></param>
         /// <param name="_t2"></param>
-        public static void githooks(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        public static void dlink(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
-            Program.GitHooks(O.ConvertToString(root(smpl, _t1, _t2, new ScalarString("git"))));
+            string s = O.ConvertToString(x);
+            if (G.Equal(s, "activate"))
+            {
+                DlinkSetup.DlinkFunction(O.ConvertToString(root(smpl, _t1, _t2, new ScalarString("git"))), true);
+            }
+            else if (G.Equal(s, "deactivate"))
+            {
+                DlinkSetup.DlinkFunction(O.ConvertToString(root(smpl, _t1, _t2, new ScalarString("git"))), false);
+            }
+            else
+            {
+                new Error("Expected dlink() argument to be 'activate' or 'deactivate'");
+            }
         }
 
         public static IVariable eval(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)

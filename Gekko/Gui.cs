@@ -251,7 +251,6 @@ namespace Gekko
             if (Globals.tthDlink)
             {
                 MessageBox.Show("DLINK1 --> " + Stringlist.GetListWithCommas(args));
-                //args = new string[] { "-dlink:'pre-commit','makrobk_grunddata/biver/_progs/_uddata_dlink/x.csv.dlink'", "-dlinkw:'C:/Tools/K/MAKROBK/tth/test'" };                
             }
             if (args.Length >= 1 && args[0].StartsWith("-dlink:"))
             {
@@ -261,7 +260,7 @@ namespace Gekko
                     string w = G.StripQuotes(args[1].Substring("-dlinkw:".Length));
                     Program.options.folder_working = w;
                 }
-                Program.DLinkCalledFromGitHook(args);
+                DlinkHooks.DLinkCalledFromGitHook(args);
                 return;
             }
 
