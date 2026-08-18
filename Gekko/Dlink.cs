@@ -54,8 +54,6 @@ namespace Gekko
 ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null)
 STAGED_FILES=$(git -C ""${{ROOT_DIR}}"" ls-files --cached -- ':(icase)*.dlink')
 FORMATTED_FILES=$(echo ""$STAGED_FILES"" | sed ""s/^/'/;s/$/'/"" | paste -sd, -)
-#powershell.exe -Command ""(New-Object -ComObject WScript.Shell).Popup('... ' + $FORMATTED_FILES, 0, 'Message', 64)""
-#powershell.exe -Command ""(New - Object - ComObject WScript.Shell).Popup('.1. ' + $FORMATTED_FILES, 0, 'Message', 64)""
 cmd.exe //c ""{gekkoExePath}"" ""-dlink:'$1',$FORMATTED_FILES"" ""-dlinkw:'$ROOT_DIR'""
 ";
                 // ----------------------------------------------------------------------------------------------------------
