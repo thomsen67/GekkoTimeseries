@@ -2979,18 +2979,18 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer)
             {
-                if (true)
-                {
-                    //string hash = DlinkHooks.BlobsHash(@"k:\MAKROBK_KILDE\2025_10_01\tth\test\biver\_uddata\y.gbk", true); //TODO: WithWait or WaitFor...
-                    List<string> args = new List<string>();
-                    //args.Add("-dlink:'pre-commit'");
-                    //args.Add("'makrobk_grunddata/biver/_uddata_dlink/x.csv.dlink'");
-                    //args.Add("'makrobk_grunddata/biver/_uddata_dlink/y.gbk.dlink'");
-                    //args.Add("-dlinkw:'C:/Tools/K/MAKROBK/tth/test'");
-                    args.Add("-dlink:'pre-commit','makrobk_grunddata/biver/_uddata_dlink/x.csv.dlink','makrobk_grunddata/biver/_uddata_dlink/y.gbk.dlink'");
-                    args.Add("-dlinkw:'C:/Tools/K/MAKROBK/tth/test'");
-                    DlinkHooks.DLinkCalledFromGitHook(args.ToArray());
-                }                               
+                //if (true)
+                //{
+                //    //string hash = DlinkHooks.BlobsHash(@"k:\MAKROBK_KILDE\2025_10_01\tth\test\biver\_uddata\y.gbk", true); //TODO: WithWait or WaitFor...
+                //    List<string> args = new List<string>();
+                //    //args.Add("-dlink:'pre-commit'");
+                //    //args.Add("'makrobk_grunddata/biver/_uddata_dlink/x.csv.dlink'");
+                //    //args.Add("'makrobk_grunddata/biver/_uddata_dlink/y.gbk.dlink'");
+                //    //args.Add("-dlinkw:'C:/Tools/K/MAKROBK/tth/test'");
+                //    args.Add("-dlink:'pre-commit','makrobk_grunddata/biver/_uddata_dlink/x.csv.dlink','makrobk_grunddata/biver/_uddata_dlink/y.gbk.dlink'");
+                //    args.Add("-dlinkw:'C:/Tools/K/MAKROBK/tth/test'");
+                //    DlinkHooks.DLinkCalledFromGitHook(args.ToArray());
+                //}                               
 
                 // -----------------------------------------------------------
                 // Kør tell't1', tell't2', tell't3'.
@@ -6824,7 +6824,7 @@ namespace Gekko
                 {
                     //READ. We cannot handle OPEN here, because an OPENed databank may be edited before CLOSE.
                     //      So CLOSE handles this.
-                    DlinkAutoDlinkFiles.Blob(blob, databank.storage.Count());
+                    DlinkAutoDlinkFiles.Blob(blob, databank.storage.Count(), false);
                 }
             }  //for each bank in list
 
@@ -7673,7 +7673,7 @@ namespace Gekko
                 O.AddIVariableWithOverwriteFromString(collectionName, output);
                 G.Writeln2("Imported " + type.ToString().ToLower() + " " + collectionName + " (" + rr + "x" + cc + " elements)");
             }
-            DlinkAutoDlinkFiles.Blob(blob, null);
+            DlinkAutoDlinkFiles.Blob(blob, null, false);
         }
 
         /// <summary>
@@ -23046,7 +23046,7 @@ namespace Gekko
                 //}
             }
             G.Writeln2("Exported " + list2.Count + " series to file " + pathAndFilename);
-            DlinkAutoDlinkFiles.Blob(blob, list2.Count);
+            DlinkAutoDlinkFiles.Blob(blob, list2.Count, false);
         }
 
         public static string ProgramFolderRunning()
@@ -24071,7 +24071,7 @@ namespace Gekko
                     {
                         GamsData.WriteGdxSlow(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list1Sorted); //probably cannot handle list2
                     }
-                    DlinkAutoDlinkFiles.Blob(blob, list1Sorted?.Count ?? 0);
+                    DlinkAutoDlinkFiles.Blob(blob, list1Sorted?.Count ?? 0, false);
                     return 0;
                 }
                 else if (o.opt_arrow != null)
@@ -24099,7 +24099,7 @@ namespace Gekko
                         }
                         throw;
                     }
-                    DlinkAutoDlinkFiles.Blob(blob, list2Sorted?.Count ?? 0);
+                    DlinkAutoDlinkFiles.Blob(blob, list2Sorted?.Count ?? 0, false);
                     return 0;
                 }
                 else if (o.opt_parquet != null)
@@ -24127,7 +24127,7 @@ namespace Gekko
                         }
                         throw;
                     }
-                    DlinkAutoDlinkFiles.Blob(blob, list2Sorted?.Count ?? 0);
+                    DlinkAutoDlinkFiles.Blob(blob, list2Sorted?.Count ?? 0, false);
                     return 0;
                 }
                 else if (isRecordsFormat)
@@ -24302,7 +24302,7 @@ namespace Gekko
                 }
                 file.Flush();
             }
-            DlinkAutoDlinkFiles.Blob(blob, null);
+            DlinkAutoDlinkFiles.Blob(blob, null, false);
             G.Writeln2("R export of " + o.list1.Count() + " matrices, " + fullFileName);            
         }
 
@@ -24351,7 +24351,7 @@ namespace Gekko
                 }
                 file.Flush();
             }
-            DlinkAutoDlinkFiles.Blob(blob, null);
+            DlinkAutoDlinkFiles.Blob(blob, null, false);
             G.Writeln2("Python export of " + o.list1.Count() + " matrices, " + fullFileName);
         }
 
@@ -24718,7 +24718,7 @@ namespace Gekko
                 }
             }
 
-            DlinkAutoDlinkFiles.Blob(blob, count);
+            DlinkAutoDlinkFiles.Blob(blob, count, false);
             return count;
         }
 
@@ -24800,7 +24800,7 @@ namespace Gekko
                     }
                 }
             }
-            DlinkAutoDlinkFiles.Blob(blob, count);
+            DlinkAutoDlinkFiles.Blob(blob, count, false);
             return count;
         }
 
@@ -24841,7 +24841,7 @@ namespace Gekko
                     }
                 }
             }
-            DlinkAutoDlinkFiles.Blob(blob, count);
+            DlinkAutoDlinkFiles.Blob(blob, count, false);
             return count;
         }
 
@@ -25906,7 +25906,7 @@ namespace Gekko
             }
 
             G.Writeln("Wrote " + counter + " variables to " + pathAndFilename);
-            DlinkAutoDlinkFiles.Blob(blob, counter);
+            DlinkAutoDlinkFiles.Blob(blob, counter, false);
             return counter;
         }        
 
@@ -26053,7 +26053,7 @@ namespace Gekko
             }
 
             G.Writeln("Wrote " + list2.Count + " variables to " + pathAndFilename);
-            DlinkAutoDlinkFiles.Blob(blob, list2.Count);
+            DlinkAutoDlinkFiles.Blob(blob, list2.Count, false);
             return list2.Count;
         }
 
@@ -26145,7 +26145,7 @@ namespace Gekko
             }
 
             if (true) G.Writeln("Wrote " + counter + " variables to " + pathAndFilename);
-            DlinkAutoDlinkFiles.Blob(blob, counter);
+            DlinkAutoDlinkFiles.Blob(blob, counter, false);
             return counter;
         }
 
@@ -26276,7 +26276,7 @@ namespace Gekko
                     Program.WriteRemovedDatabank(p, removed, noTrace);
                     if (File.Exists(removed.FileNameWithPath)) //probably always exists...
                     {
-                        DlinkAutoDlinkFiles.Blob(removed.FileNameWithPath, removed.storage.Count());
+                        DlinkAutoDlinkFiles.Blob(removed.FileNameWithPath, removed.storage.Count(), false);
                     }
                 }
             }
@@ -33288,7 +33288,7 @@ namespace Gekko
                                 if (File.Exists(fileNameWithPathOriginal)) WaitForFileDelete(fileNameWithPathOriginal);  //probably not necessary
                                 WaitForFileCopy(fileNameWithPath, fileNameWithPathOriginal);
                                 if (true) G.Writeln2("Wrote dataset with " + dataRows + " rows and " + dataCols + " cols to " + fileNameWithPathOriginal);
-                                DlinkAutoDlinkFiles.Blob(blob, null);
+                                DlinkAutoDlinkFiles.Blob(blob, null, false);
                             }
                             catch (Exception e)
                             {
@@ -33915,7 +33915,7 @@ namespace Gekko
 
                         ExcelCleanup(ref objBook, ref objBooks, ref objSheets, ref objSheet, ref range, ref newSheet, ref range0);
                         if (true) G.Writeln2("Wrote dataset with " + dataRows + " rows and " + dataCols + " cols to " + fileNameOriginalFile);
-                        DlinkAutoDlinkFiles.Blob(blob, null);
+                        DlinkAutoDlinkFiles.Blob(blob, null, false);
                     }
                     return null;
                 }

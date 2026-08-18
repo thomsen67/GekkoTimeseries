@@ -54,7 +54,7 @@ namespace Gekko
 ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null)
 STAGED_FILES=$(git -C ""${{ROOT_DIR}}"" ls-files --cached -- ':(icase)*.dlink')
 FORMATTED_FILES=$(echo ""$STAGED_FILES"" | sed ""s/^/'/;s/$/'/"" | paste -sd, -)
-cmd.exe //c ""{gekkoExePath}"" ""-dlink:'$1',$FORMATTED_FILES"" ""-dlinkw:'$ROOT_DIR'""
+cmd.exe //c ""{gekkoExePath}"" ""-dlink:'$1',$FORMATTED_FILES""
 ";
                 // ----------------------------------------------------------------------------------------------------------
                 string post_checkout = $@"#!/bin/sh
@@ -127,12 +127,12 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// Handles blobs, for .dlink
         /// </summary>
         /// <param name="dataFile"></param>
-        public static void Blob(string dataFile, long? nVariables)
+        public static void Blob(string dataFile, long? nVariables, bool force)
         {
             string hash = null;
             long? size = null;
             DateTime? stamp = null;
-            if (Program.options.databank_dlink)
+            if (force || Program.options.databank_dlink)
             {
                 //Note: just because a .dlink file is constructed, this it not the same
                 //      as that it has to go into blobs storage.
@@ -147,7 +147,11 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 {
                     if (File.Exists(dataFile))
                     {
-                        hash = DlinkHooks.BlobsHash(dataFile); //TODO: WithWait or WaitFor...
+                        hash = DlinkHooks.GetFileHash(dataFile); //TODO: WithWait or WaitFor...
+                    }
+                    else
+                    {
+                        new Error("The file '" + dataFile + "' does not exist for .dlink file construction");
                     }
                     size = (new FileInfo(dataFile)).Length;
                     if (!Directory.Exists(Path.GetDirectoryName(dlinkFile)))
@@ -201,19 +205,63 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
     public static class DlinkHooks
     {
+
+        public static void DLinkFilesCalledFromExe(string[] args, bool function)
+        {
+            List<string> dlinkFiles = new List<string>();
+            if (function)
+            {
+                dlinkFiles = args.ToList();
+            }
+            else
+            {
+                if (G.DlinkDebug()) MessageBox.Show("Producing .dlink");
+                string s2 = args[0].Substring("dlinkfiles:".Length);
+                MatchCollection matches = Regex.Matches(s2, @"'([^']*)'");                
+                for (int i = 0; i < matches.Count; i++)
+                {
+                    string s = matches[i].Groups[1].Value;
+                    dlinkFiles.Add(s);
+                }
+            }
+
+            if (dlinkFiles.Count == 0)
+            {
+                string s2 = "Producing 0 dlink files";
+                if (function) new Error(s2);
+                MessageBox.Show("*** ERROR: " + s2); //We want this to show
+                return;
+            }
+
+            try
+            {
+                foreach (string dlinkFile2 in dlinkFiles) //Could probably be parallelized
+                {
+                    DlinkAutoDlinkFiles.Blob(dlinkFile2, null, true); //We do not know the number of variables, so it is set to null
+                }
+            }
+            catch
+            {
+                string s2 = "Producing " + dlinkFiles.Count + " dlink file" + G.S(dlinkFiles.Count) + " failed";
+                if (function) new Error(s2);
+                else MessageBox.Show("*** ERROR: " + s2); //We want this to show
+                return;
+            }
+            string s3 = "Producing " + dlinkFiles.Count + " dlink file" + G.S(dlinkFiles.Count) + " succeeded";
+            if (function) new Writeln(s3);
+            else Console.WriteLine(s3); //This will probably not show in output, but never mind
+
+        }
+        
         /// <summary>
         /// DLink() must be fed with a list of .dlink files to update. The list comes from Git via a Git hook. In principle, Gekko
         /// could look at all .dlink files, but some of these may be irrelevant and not versioned.
         /// </summary>
         /// <param name="args"></param>
         public static void DLinkCalledFromGitHook(string[] args)
-        {
-            string cacheIndexDlinkFile = Path.Combine(Program.ProgramFolderGit(), ".git", "index_dlink");
-            string gitConfigFile = Path.Combine(Program.ProgramFolderGit(), ".git", "config");
+        {            
             string s2 = args[0].Substring("dlink:".Length);
-            MatchCollection matches = Regex.Matches(s2, @"'([^']*)'");
-            if (G.DlinkDebug()) MessageBox.Show("xxx " + Stringlist.GetListWithCommas(args));
-            if (G.DlinkDebug()) MessageBox.Show("yyy " + matches.Count);
+            MatchCollection matches = Regex.Matches(s2, @"'([^']*)'");            
             List<string> dlinkFiles = new List<string>();
             string type = matches[0].Groups[1].Value;
             for (int i = 1; i < matches.Count; i++)
@@ -221,26 +269,12 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 string s = matches[i].Groups[1].Value;
                 if (G.NullOrBlanks(s)) continue; //First time, it can have a '' as the first element
                 dlinkFiles.Add(s);
-            }
-            if (G.DlinkDebug()) MessageBox.Show("zzz " + dlinkFiles.Count);
+            }            
             List<string> getFilesNew = new List<string>();
             List<string> getFilesOverwrite = new List<string>();
-            List<string> putFiles = new List<string>();
-
-            CacheIndexDlink cacheIndexDlink = new CacheIndexDlink(); //empty
-            if (File.Exists(cacheIndexDlinkFile))
-            {
-                try
-                {
-                    cacheIndexDlink = Program.ProtobufRead<CacheIndexDlink>(cacheIndexDlinkFile);
-                }
-                catch
-                {
-                    if (G.DlinkDebug()) MessageBox.Show("Loading " + cacheIndexDlinkFile + " failed");
-                }
-            }
-
-            GekkoDictionary<string, bool> datafiles = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            List<string> putFiles = new List<string>();            
+            
+            //GekkoDictionary<string, bool> datafiles = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             foreach (string dlinkFile2 in dlinkFiles) //Could probably be parallelized
             {
                 string dlinkFile = G.CleanupFolderName(dlinkFile2, false);
@@ -252,14 +286,21 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 }
                 DlinkFile dlinkFileData = G.YamlReader<DlinkFile>(dLinkFileWithPath);
                 string dataFile = Dlink_FromDlinkFileToDataFile(dLinkFileWithPath);
-                datafiles.Add(dataFile, false); //for cleanup purposes
+                //datafiles.Add(dataFile, false); //for cleanup purposes
                 if (G.NullOrBlanks(dataFile))
                 {
                     MessageBox.Show("Datafile string is null"); new Error();
                 }
 
-                FileInfo fi1 = new FileInfo(dataFile); //File may not exist
-                RealFile realFile = new RealFile(fi1.FullName, null, fi1.Length, fi1.LastWriteTimeUtc, fi1.Exists);
+                FileInfo fi1 = new FileInfo(dataFile); //File may not exist                
+                bool exists = fi1.Exists;
+                RealFile realFile = new RealFile(
+                    fi1.FullName,
+                    null,
+                    exists ? fi1.Length : 0,
+                    exists ? fi1.LastWriteTimeUtc : DateTime.MinValue,
+                    exists
+                );                
 
                 // --------------------------------------------------------------------------------------------------
                 //                              datafile exists
@@ -273,40 +314,24 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 //  C: May just be a datafile copied into datafiles, not being read by Gekko yet
                 //  D: Not relevant
                 //  Note: were are obvisously in A or B here, since we are handling a .dlink file.
-                // --------------------------------------------------------------------------------------------------                
-                CacheIndexDlinkElement cacheIndexDlinkElement = null;
-                cacheIndexDlink.storage.TryGetValue(realFile.name, out cacheIndexDlinkElement);
+                // --------------------------------------------------------------------------------------------------                                
+                
                 //After this method call, realFile may change regarding .hash and .exists fields (and only those)
-                bool isDataFileOk = IsDLlinkHelperFileOk(realFile.name, dlinkFileData, cacheIndexDlinkElement, ref realFile); //regarding last two args: either both non-null or both null
+                bool isDataFileOk = IsDLlinkHelperFileOk(realFile.name, dlinkFileData, ref realFile); //regarding last two args: either both non-null or both null
                 if (isDataFileOk)
                 {
                     //Check that we have the file in blobs folder, else add it there
-                    BlobsFile(false, realFile.name, dlinkFileData.hash, G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), getFilesNew, getFilesOverwrite, putFiles);
-                    //Force-update the cache entry
-                    cacheIndexDlink.storage[realFile.name] = new CacheIndexDlinkElement(realFile.name, realFile.hash, realFile.size, realFile.stamp);
+                    SyncBlobs(false, realFile.name, dlinkFileData.hash, G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), getFilesNew, getFilesOverwrite, putFiles);                    
                 }
                 else
                 {
                     //Get it from blobs (A or B)
-                    BlobsFile(true, realFile.name, dlinkFileData.hash, G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), getFilesNew, getFilesOverwrite, putFiles);
+                    SyncBlobs(true, realFile.name, dlinkFileData.hash, G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), getFilesNew, getFilesOverwrite, putFiles);
                     FileInfo fi2 = new FileInfo(realFile.name);
                     //We update the realFile, because its contents have changed
-                    realFile = new RealFile(realFile.name, dlinkFileData.hash, fi2.Length, fi2.LastWriteTimeUtc, true);
-                    //Force-update the cache entry              
-                    cacheIndexDlink.storage[realFile.name] = new CacheIndexDlinkElement(realFile.name, dlinkFileData.hash, realFile.size, realFile.stamp);
+                    realFile = new RealFile(realFile.name, dlinkFileData.hash, fi2.Length, fi2.LastWriteTimeUtc, true);                    
                 }
-            }
-
-            List<string> filesToRemove = cacheIndexDlink.storage.Keys.Where(key => !datafiles.ContainsKey(key)).ToList();
-            foreach (var fileToRemove in filesToRemove) cacheIndexDlink.storage.Remove(fileToRemove); //Else the storage will always grow
-            try
-            {
-                Program.ProtobufWrite(cacheIndexDlink, cacheIndexDlinkFile); //always refresh the file
-            }
-            catch
-            {
-                if (G.DlinkDebug()) MessageBox.Show("Writing " + cacheIndexDlinkFile + " failed");
-            }
+            }            
             DLinkCalledFromGitHookReporting(type, getFilesNew, getFilesOverwrite, putFiles);
         }
 
@@ -348,46 +373,25 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// <param name="dlinkFileData"></param>
         /// <param name="fi"></param>
         /// <returns></returns>
-        public static bool IsDLlinkHelperFileOk(string dataFile, DlinkFile dlinkFileData, CacheIndexDlinkElement cacheIndexDlinkElement, ref RealFile realFile)
+        public static bool IsDLlinkHelperFileOk(string dataFile, DlinkFile dlinkFileData, ref RealFile realFile)
         {
             //When this method is called, dataFile does not have a hash code because it is costly to compute
             //We try to take the hash code from cache
             if (!realFile.exists)
-            {
-                if (G.DlinkDebug()) MessageBox.Show("FALSE: exists");
+            {                
                 return false; //In that case, realFile.stamp etc. are null too
             }
             if (realFile.size != dlinkFileData.size)
-            {
-                if (G.DlinkDebug()) MessageBox.Show("FALSE: size");
+            {                
                 return false;
-            }
-            //Here we know that the data file exists and is of the right size. Now we check stamp.
-            double krit = 2d; //2s: Krit can be quite small: it is taken from the acutual timestamp in the user folder (with \.git folder), on the same server. If the files are copied somewhere else, some precision may be lost, so therefore 2s.
-            string realHash;
-            if (cacheIndexDlinkElement != null)
-            {
-                if (G.DlinkDebug()) MessageBox.Show("CACHE SIZES: " + cacheIndexDlinkElement.size + "  " + realFile.size);
-                if (G.DlinkDebug()) MessageBox.Show("CACHE TIMEDIF: " + ((DateTime)realFile.stamp - (DateTime)cacheIndexDlinkElement.stamp).TotalSeconds + "  " + (DateTime)realFile.stamp + "  " + (DateTime)cacheIndexDlinkElement.stamp);
-            }
-            if (cacheIndexDlinkElement != null && cacheIndexDlinkElement.size == realFile.size && cacheIndexDlinkElement.stamp != null && Math.Abs(((DateTime)realFile.stamp - (DateTime)cacheIndexDlinkElement.stamp).TotalSeconds) < krit)
-            {
-                if (G.DlinkDebug()) MessageBox.Show("EASY");
-                //EASY way
-                //dataFileSha256 is ok as taken from index_dlink file, but the hash must still be checked against the .dlink file hash
-                realHash = cacheIndexDlinkElement.hash;
-            }
-            else
-            {
-                if (G.DlinkDebug()) MessageBox.Show("HARD");
-                //HARD way
-                //We now need to calc the sha256 physically.                
-                realHash = BlobsHash(dataFile);
-            }
+            }            
+            //HARD way
+            //We now need to calc the sha256 physically.                
+            string realHash = GetFileHash(dataFile);
             realFile = new RealFile(realFile.name, realHash, realFile.size, realFile.stamp, true);
             if (dlinkFileData.hash != realHash)
             {
-                if (G.DlinkDebug()) MessageBox.Show("FALSE: hash " + dlinkFileData.hash + "  " + realHash);
+                MessageBox.Show("FALSE --> hash, dlink=" + dlinkFileData.hash + " just gotten realhash=" + realHash);
                 return false;
             }
             return true;
@@ -398,7 +402,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             string s = null;
             if (filesNew.Count + filesOverwritten.Count > 0)
             {
-                s = "User data file folder: ";
+                s = "User data file folder sync: ";
                 string s2a = "are"; if (filesNew.Count < 2) s2a = "is";
                 string s2b = "are"; if (filesOverwritten.Count < 2) s2b = "is";
                 if (filesNew.Count > 0 && filesOverwritten.Count == 0)
@@ -414,7 +418,6 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     s += filesNew.Count + " new file" + G.S(filesNew.Count) + " " + s2a + " added, " + filesOverwritten.Count + " file" + G.S(filesOverwritten.Count) + " " + s2b + " overwritten ";
                 }
                 s += " (" + type + ")";
-                s += G.NL;
                 foreach (string f in filesNew)
                 {
                     s += G.NL + f + " (added)";
@@ -426,9 +429,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             }
             else
             {
-                s = "User data file folder: no data files added or overwritten.";
-                //s += G.NL + G.NL;
-                //s += "(For now, this message is kept --> may be omitted when data versioning has matured).";
+                s = "User data file folder sync: no data files added or overwritten.";
             }
 
             if (putFiles.Count > 0)
@@ -453,52 +454,55 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             w.ShowDialog();
         }
 
-        public static string BlobsHash(string filePath)
-        {            
-            string hash = null;
-            bool hasTraces = false;
+        public static string GetFileHash(string filePath)
+        {
+
+            if (G.DlinkDebug()) MessageBox.Show("Getting hash from " + filePath);
+            string hash = null;            
             bool isGbk = G.Equal(Path.GetExtension(filePath), ".gbk");
 
             if (isGbk)
             {
-                try
+                using (ZipArchive archive = ZipFile.OpenRead(filePath))
                 {
-                    using (ZipArchive archive = ZipFile.OpenRead(filePath))
+                    foreach (ZipArchiveEntry entry in archive.Entries)
                     {
-                        foreach (ZipArchiveEntry entry in archive.Entries)
-                        {                            
-                            if (G.Equal(entry.Name, Globals.protobufFileName3))
+                        if (G.Equal(entry.Name, Globals.databankInfoName))
+                        {
+                            try //So that hasTraces has a chance to become == true
                             {
-                                hasTraces = true;
+                                Program.ReadInfo readInfo = new Program.ReadInfo();
+                                string databankVersion = null;
+                                string traceVersion = null;
+                                string tempFileNameWithPath = Program.WaitForZipExtractFileEntryToTempFile(entry, filePath);
+                                Program.GetDatabankInfo(readInfo, tempFileNameWithPath, out databankVersion, out traceVersion);
+                                hash = readInfo.dataHashFull;
                             }
-                            else if (G.Equal(entry.Name, Globals.databankInfoName))
+                            catch
                             {
-                                try //So that hasTraces has a chance to become == true
-                                {
-                                    Program.ReadInfo readInfo = new Program.ReadInfo();
-                                    string databankVersion = null;
-                                    string traceVersion = null;
-                                    string tempFileNameWithPath = Program.WaitForZipExtractFileEntryToTempFile(entry, filePath);
-                                    Program.GetDatabankInfo(readInfo, tempFileNameWithPath, out databankVersion, out traceVersion);
-                                    hash = readInfo.dataHashFull;
-                                }
-                                catch { }
+                                MessageBox.Show("Could not extract data hash from inside .gbk file (" + Globals.databankInfoName + ").\nFile: " + filePath);
+                                throw;
                             }
                         }
                     }
                 }
-                catch
-                {
-                    //No failing
-                }
             }
 
-            if (hash == null) hash = G.GetSha256FromFile(filePath);
+            if (hash == null)
+            {
+                //if .gbk, this means that data hash is not implemented for that file
+                if (G.DlinkDebug()) MessageBox.Show("Getting hash from physical file");
+                hash = G.GetSha256FromFile(filePath);
+            }
+            else
+            {
+                if (G.DlinkDebug()) MessageBox.Show("Getting hash from xml");
+            }
 
             return hash;
         }
         
-        public static void BlobsFile(bool isGet, string fileName, string sha256, string blobsFolder, List<string> getFilesNew, List<string> getFilesOverwrite, List<string> putFiles)
+        public static void SyncBlobs(bool isGet, string fileName, string sha256, string blobsFolder, List<string> getFilesNew, List<string> getFilesOverwrite, List<string> putFiles)
         {
             // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
             // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
@@ -619,42 +623,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             }
             G.ReadOnlySet(blobsFile);
         }
-    }
-
-    [ProtoContract]
-    public class CacheIndexDlink
-    {
-        [ProtoMember(1)]
-        public string version = "1.0";
-        [ProtoMember(2)]
-        public GekkoDictionary<string, CacheIndexDlinkElement> storage = new GekkoDictionary<string, CacheIndexDlinkElement>(StringComparer.OrdinalIgnoreCase);
-    }
-
-    [ProtoContract]
-    public class CacheIndexDlinkElement
-    {
-        [ProtoMember(1)]
-        public readonly string name = null;
-        [ProtoMember(2)]
-        public readonly string hash = null;
-        [ProtoMember(3)]
-        public readonly long? size = null;
-        [ProtoMember(4)]
-        public readonly DateTime? stamp = null;
-
-        public CacheIndexDlinkElement()
-        {
-            //For protobuf
-        }
-
-        public CacheIndexDlinkElement(string name, string hash, long? size, DateTime? stamp)
-        {
-            this.name = name;
-            this.hash = hash;
-            this.size = size;
-            this.stamp = stamp;
-        }
-    }
+    }    
 
     public class DlinkFile
     {

@@ -6851,7 +6851,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Calls GitHooks() on the first \.git folder found as a parent folder
+        /// Calls DlinkFunction() on the first \.git folder found as a parent folder
         /// </summary>
         /// <param name="smpl"></param>
         /// <param name="_t1"></param>
@@ -6869,16 +6869,21 @@ namespace Gekko
             }
             else
             {
-                new Error("Expected dlink() argument to be 'activate' or 'deactivate'");
-                //try
-                //{
-                //    Path.GetFullPath(s);
-                //}
-                //catch
-                //{
-                //    new Error("Expected dlink() argument to be 'activate' or 'deactivate' or valid valid file path name");
-                //}
+                new Error("Expected dlink() argument to be 'activate' or 'deactivate'");                
             }
+        }
+
+        /// <summary>
+        /// Calls DlinkFunction() on the first \.git folder found as a parent folder
+        /// </summary>
+        /// <param name="smpl"></param>
+        /// <param name="_t1"></param>
+        /// <param name="_t2"></param>
+        public static void dlinkfiles(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {
+            List<IVariable> m1 = O.ConvertToList(x);
+            string[] m2 = Stringlist.GetListOfStringsFromListOfIvariables(m1.ToArray());
+            DlinkHooks.DLinkFilesCalledFromExe(m2, true);
         }
 
         public static IVariable eval(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)

@@ -247,23 +247,19 @@ namespace Gekko
         ///
         [STAThread]
         public static void Main(string[] args)
-        {
-            if (G.DlinkDebug())
-            {
-                foreach (string s in args)
-                {
-                    MessageBox.Show("DLINK{i} --> [[[" + s + "]]]");
-                }                
-            }
+        {            
             if (args.Length >= 1 && args[0].StartsWith("-dlink:"))
             {
-                if(G.DlinkDebug()) MessageBox.Show("DLINK2: " + Stringlist.GetListWithCommas(args));
-                if (args.Length >= 2 && args[1].StartsWith("-dlinkw:"))
-                {
-                    string w = G.StripQuotes(args[1].Substring("-dlinkw:".Length));
-                    Program.options.folder_working = w;
-                }
+                if(G.DlinkDebug()) MessageBox.Show("DLINK2: " + Stringlist.GetListWithCommas(args));                
+                Program.SetupGekkoForNonGuiUse(); //necessary because of temp folders and more
                 DlinkHooks.DLinkCalledFromGitHook(args);
+                return;
+            }
+
+            if (args.Length >= 1 && args[0].StartsWith("-dlinkfiles:"))
+            {                
+                Program.SetupGekkoForNonGuiUse(); //necessary because of temp folders and more
+                DlinkHooks.DLinkFilesCalledFromExe(args, false);
                 return;
             }
 
