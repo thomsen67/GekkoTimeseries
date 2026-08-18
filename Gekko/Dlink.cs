@@ -129,7 +129,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// Handles blobs, for .dlink
         /// </summary>
         /// <param name="dataFile"></param>
-        public static void Blob(string dataFile, long? nVariables, P p)
+        public static void Blob(string dataFile, long? nVariables)
         {
             string hash = null;
             long? size = null;
@@ -435,14 +435,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         }
 
         public static string BlobsHash(string filePath)
-        {
-            //
-            // TODO: here we could do datahash for .gbk files instead (and handle specialFlagForTraces too)
-            // If we can loop through all IVariables, while sorting dict keys before calling children, we
-            // can use an incremental sha256 engine. For series, we need to stamp/inject the first observation as
-            // a freq + super + sub + subsub. We need to rempace G.IsNumericalError() with double.NaN.
-            // Also, scalars and matrices and maps. Labels for matrices? Should we truncate precision?
-            //
+        {            
             string hash = null;
             bool hasTraces = false;
             bool isGbk = G.Equal(Path.GetExtension(filePath), ".gbk");
@@ -481,43 +474,11 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 }
             }
 
-            // The trace hash is baked in now
-            //if (isGbk)
-            //{
-            //    if (hash == null) hash = G.GetSha256FromFile(filePath); //Then we take the file hash instead
-            //    if (specialFlagForTraces)
-            //    {
-            //        //Below it is ensured that two files with same datahash, but where
-            //        //there are traces in one file and not in another will have different hashes.
-            //        if (hasTraces)
-            //        {
-            //            hash = hash.Substring(0, hash.Length - 1) + "1"; //always ends with 1
-            //        }
-            //        else
-            //        {
-            //            hash = hash.Substring(0, hash.Length - 1) + "0"; //always ends with 0
-            //        }
-            //    }
-            //}
-            //else
-            //{
-            //    hash = G.GetSha256FromFile(filePath);
-            //}
-
             if (hash == null) hash = G.GetSha256FromFile(filePath);
 
             return hash;
         }
-
-        /// <summary>
-        /// Returns true if 
-        /// </summary>
-        /// <param name="isGet"></param>
-        /// <param name="fileName"></param>
-        /// <param name="sha256"></param>
-        /// <param name="blobsFolder"></param>
-        /// <param name="getFilesNew"></param>
-        /// <param name="getFilesOverwrite"></param>
+        
         public static void BlobsFile(bool isGet, string fileName, string sha256, string blobsFolder, List<string> getFilesNew, List<string> getFilesOverwrite, List<string> putFiles)
         {
             // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
@@ -641,10 +602,6 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         }
     }
 
-    public class DlinkCommon 
-    {        
-    }
-
     [ProtoContract]
     public class CacheIndexDlink
     {
@@ -720,5 +677,4 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             this.exists = exists;
         }
     }
-
 }
