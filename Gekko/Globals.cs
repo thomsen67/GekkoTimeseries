@@ -475,6 +475,8 @@ namespace Gekko
         public static string protobufFileName = "databank.bin";
         public static string protobufFileName2 = "databank.data"; //In Gekko 2.2 it might be wise to change to for instance databank.data, this setting is only for reading, and it tests Program.options.databank_file_gbk_internal too
         public static string protobufFileName3 = "trace.data";
+        public static string databankInfoName = "DatabankInfo.xml";
+
 
         public static List<string> r_fileContent = null;
         public static List<string> python_fileContent = null;        
@@ -562,7 +564,7 @@ namespace Gekko
         public const int timeStringsStart = 1900;
         public const int timeStringsEnd = 2500;
         public static string[] timeStrings = null;  //stores "1900" to "2500" for easy access and reuse
-        public static List<string> alreadyZipped = new List<string>() { "gbk", "xlsx", "parquet" };
+        public static List<string> alreadyZipped = new List<string>() { ".gbk", ".xlsx", ".parquet" };
 
         public static ConcurrentDictionary<int, bool> browserCompleted = new ConcurrentDictionary<int, bool>();
         public static int browserWatermark = -1;

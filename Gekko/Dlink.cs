@@ -139,7 +139,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 //Note: just because a .dlink file is constructed, this it not the same
                 //      as that it has to go into blobs storage.
 
-                string dlinkFile = Dlink_FromDataFileToDlinkFile(dataFile, p);
+                string dlinkFile = Dlink_FromDataFileToDlinkFile(dataFile);
 
                 if (dlinkFile == null)
                 {
@@ -149,7 +149,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 {
                     if (File.Exists(dataFile))
                     {
-                        hash = DlinkHooks.BlobsHash(dataFile, true); //TODO: WithWait or WaitFor...
+                        hash = DlinkHooks.BlobsHash(dataFile); //TODO: WithWait or WaitFor...
                     }
                     size = (new FileInfo(dataFile)).Length;
                     if (!Directory.Exists(Path.GetDirectoryName(dlinkFile)))
@@ -171,27 +171,59 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             }
         }
 
-        private static string Dlink_FromDataFileToDlinkFile(string dataFile, P p)
+        private static string Dlink_FromDataFileToDlinkFile(string dataFile)
         {
-            //dataFile:          K:\MAKROBK_KILDE\2025_10_01\tth\test\biver\_uddata\x.csv
-            //f2:                K:\MAKROBK\tth\test\makrobk_grunddata\biver\_progs
-            //s2:                \tth\test\makrobk_grunddata\biver  
-            //s2a:               \tth\test\biver   
-            //s3:                K:\MAKROBK_KILDE\2025_10_01\tth\test\biver
-            //s4:                \_uddata\x.csv
-            //s5:                K:\MAKROBK\tth\test\makrobk_grunddata\biver\_progs\_uddata_dlink\x.csv.dlink
-            string f2 = G.CleanupFolderName(O.ConvertToString(Functions.Helper_Runfolder(new IVariable[0], p)), false); //.dlink file, c:\Thomas\Gekko\BlobsTest\tth\staging
-            if (G.NullOrBlanks(f2)) f2 = Program.options.folder_working; //Run directly: in that case we must assume the working folder
-            string s2 = DlinkCommon.Dlink_HandleProgsPath(f2);
-            string s2a = DlinkCommon.Dlink_HandleRemove(s2);
-            string s3 = Path.Combine(Program.options.databank_dlink_folder_data, s2a.TrimStart('\\'));
-            if (!dataFile.StartsWith(s3 + "\\", StringComparison.OrdinalIgnoreCase)) new Error("Problem with .dlink file path: based on the .gcm file path, the datafile path '" + dataFile + "' was expected to start with the path '" + s3 + "'");
-            string s4 = G.Replace(dataFile, s3, "", StringComparison.OrdinalIgnoreCase, 1);
-            //string s5 = Path.Combine(Program.options.databank_dlink_folder_progs, s2.TrimStart('\\'), "_progs", s4.TrimStart('\\'));
-            string s5 = Path.Combine(Program.options.databank_dlink_folder_progs, s2.TrimStart('\\'), s4.TrimStart('\\'));
-            s5 = DlinkCommon.AddOrRemoveDlinkFromInddataOrUddata(s5, true);
-            s5 = s5 + "." + Program.options.databank_dlink_name;
-            return s5;
+            // datastart1  k:\\MAKROBK_KILDE\\2025_10_01
+            // datastart2  k:\\MAKROBK
+            // m           K:\MAKROBK_KILDE\2025_10_01\tth\test\biver\_uddata\x.csv
+            // m2          tth\test\biver\_uddata\x.csv
+            // m3          tth\test\makrobk_grunddata\biver\_uddata\x.csv
+            // m4          tth\test\makrobk_grunddata\biver\_uddata_dlink\x.csv
+            // m5          tth\test\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink
+            // m6          k:\\MAKROBK\tth\test\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink   (output)            
+
+            if (!Path.IsPathRooted(Program.options.databank_dlink_folder_data)) new Error("Expected path '" + Program.options.databank_dlink_folder_data + "' to be absolute");
+            List<string> dataStart1 = Stringlist.Path_FromStringToList(Program.options.databank_dlink_folder_data);
+            if (!Path.IsPathRooted(Program.options.databank_dlink_folder_progs)) new Error("Expected path '" + Program.options.databank_dlink_folder_progs + "' to be absolute");
+            List<string> dataStart2 = Stringlist.Path_FromStringToList(Program.options.databank_dlink_folder_progs);            
+            if (!Path.IsPathRooted(dataFile)) new Error("Expected path '" + dataFile + "' to be absolute");
+            List<string> m1 = Stringlist.Path_FromStringToList(dataFile);
+            List<string> m2 = Stringlist.Path_RemoveStart(m1, dataStart1);
+            List<string> m3 = m2.ToList(); //copy
+            if (!G.NullOrBlanks(Program.options.databank_dlink_folder_remove1))
+            {
+                //Add this in the middle...
+                m3.Insert(2, Program.options.databank_dlink_folder_remove1);
+            }            
+            List<string> m4 = Stringlist.Path_ReplaceString(m3, Program.options.databank_dlink_folder_replace1a, Program.options.databank_dlink_folder_replace1b, 1);
+            m4 = Stringlist.Path_ReplaceString(m4, Program.options.databank_dlink_folder_replace2a, Program.options.databank_dlink_folder_replace2b, 1);
+            List<string> m5 = m4.ToList();
+            m5[m5.Count - 1] += "." + Program.options.databank_dlink_name;
+            List<string> m6 = m5.ToList();
+            m6.InsertRange(0, dataStart2);
+            return Stringlist.Path_FromListToString(m6, "\\");
+
+            ////string s1 = G.Replace(dataFile, Program.options.databank_dlink_folder_data, "", 1);
+
+            ////dataFile:          K:\MAKROBK_KILDE\2025_10_01\tth\test\biver\_uddata\x.csv
+            ////f2:                K:\MAKROBK\tth\test\makrobk_grunddata\biver\_progs
+            ////s2:                \tth\test\makrobk_grunddata\biver  
+            ////s2a:               \tth\test\biver   
+            ////s3:                K:\MAKROBK_KILDE\2025_10_01\tth\test\biver
+            ////s4:                \_uddata\x.csv
+            ////s5:                K:\MAKROBK\tth\test\makrobk_grunddata\biver\_progs\_uddata_dlink\x.csv.dlink
+            //string f2 = G.CleanupFolderName(O.ConvertToString(Functions.Helper_Runfolder(new IVariable[0], p)), false); //.dlink file, c:\Thomas\Gekko\BlobsTest\tth\staging
+            //if (G.NullOrBlanks(f2)) f2 = Program.options.folder_working; //Run directly: in that case we must assume the working folder
+            //string s2 = DlinkCommon.Dlink_HandleProgsPath(f2);
+            //string s2a = DlinkCommon.Dlink_HandleRemove(s2);
+            //string s3 = Path.Combine(Program.options.databank_dlink_folder_data, s2a.TrimStart('\\'));
+            //if (!dataFile.StartsWith(s3 + "\\", StringComparison.OrdinalIgnoreCase)) new Error("Problem with .dlink file path: based on the .gcm file path, the datafile path '" + dataFile + "' was expected to start with the path '" + s3 + "'");
+            //string s4 = G.Replace(dataFile, s3, "", StringComparison.OrdinalIgnoreCase, 1);
+            
+            //string s5 = Path.Combine(Program.options.databank_dlink_folder_progs, s2.TrimStart('\\'), s4.TrimStart('\\'));
+            //s5 = DlinkCommon.AddOrRemoveDlinkFromInddataOrUddata(s5, true);
+            //s5 = s5 + "." + Program.options.databank_dlink_name;            
+            //return s5;
         }
     }
 
@@ -208,6 +240,8 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             string gitConfigFile = Path.Combine(Program.ProgramFolderGit(), ".git", "config");
             string s2 = args[0].Substring("dlink:".Length);
             MatchCollection matches = Regex.Matches(s2, @"'([^']*)'");
+            if (G.DlinkDebug()) MessageBox.Show("xxx " + Stringlist.GetListWithCommas(args));
+            if (G.DlinkDebug()) MessageBox.Show("yyy " + matches.Count);
             List<string> dlinkFiles = new List<string>();
             string type = matches[0].Groups[1].Value;
             for (int i = 1; i < matches.Count; i++)
@@ -216,6 +250,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 if (G.NullOrBlanks(s)) continue; //First time, it can have a '' as the first element
                 dlinkFiles.Add(s);
             }
+            if (G.DlinkDebug()) MessageBox.Show("zzz " + dlinkFiles.Count);
             List<string> getFilesNew = new List<string>();
             List<string> getFilesOverwrite = new List<string>();
             List<string> putFiles = new List<string>();
@@ -350,7 +385,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             {
                 //HARD way
                 //We now need to calc the sha256 physically.                
-                realHash = BlobsHash(dataFile, true);
+                realHash = BlobsHash(dataFile);
             }
             realFile = new RealFile(realFile.name, realHash, realFile.size, realFile.stamp, true);
             if (dlinkFileData.hash != realHash) return false;
@@ -362,20 +397,20 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             string s = null;
             if (filesNew.Count + filesOverwritten.Count > 0)
             {
-                s = "Git data versioning and synchronization: ";
+                s = "User data file folder: ";
                 string s2a = "are"; if (filesNew.Count < 2) s2a = "is";
                 string s2b = "are"; if (filesOverwritten.Count < 2) s2b = "is";
                 if (filesNew.Count > 0 && filesOverwritten.Count == 0)
                 {
-                    s += "in the datafile folder, " + filesNew.Count + " new file" + G.S(filesNew.Count) + " " + s2a + " added ";
+                    s += filesNew.Count + " new file" + G.S(filesNew.Count) + " " + s2a + " added ";
                 }
                 else if (filesNew.Count == 0 && filesOverwritten.Count > 0)
                 {
-                    s += "in the datafile folder, " + filesOverwritten.Count + " file" + G.S(filesOverwritten.Count) + " " + s2b + " overwritten ";
+                    s += filesOverwritten.Count + " file" + G.S(filesOverwritten.Count) + " " + s2b + " overwritten ";
                 }
                 else
                 {
-                    s += "in the datafile folder, " + filesNew.Count + " new file" + G.S(filesNew.Count) + " " + s2a + " added, and " + filesOverwritten.Count + " file" + G.S(filesOverwritten.Count) + " " + s2b + " overwritten ";
+                    s += filesNew.Count + " new file" + G.S(filesNew.Count) + " " + s2a + " added, " + filesOverwritten.Count + " file" + G.S(filesOverwritten.Count) + " " + s2b + " overwritten ";
                 }
                 s += " (" + type + ")";
                 s += G.NL;
@@ -390,7 +425,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             }
             else
             {
-                s = "Git data versioning/synchronization: no data files synchronized.";
+                s = "User data file folder: no data files added or overwritten.";
                 //s += G.NL + G.NL;
                 //s += "(For now, this message is kept --> may be omitted when data versioning has matured).";
             }
@@ -398,7 +433,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             if (putFiles.Count > 0)
             {
                 s += G.NL + G.NL;
-                s += "Storage: " + putFiles.Count + " new data file" + G.S(putFiles.Count) + " added to long-term storage:";
+                s += "Versions storage: " + putFiles.Count + " new data file" + G.S(putFiles.Count) + " added to long-term storage:";
                 foreach (string f in putFiles)
                 {
                     s += G.NL + f;
@@ -417,7 +452,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             w.ShowDialog();
         }
 
-        public static string BlobsHash(string filePath, bool specialFlagForTraces)
+        public static string BlobsHash(string filePath)
         {
             //
             // TODO: here we could do datahash for .gbk files instead (and handle specialFlagForTraces too)
@@ -426,43 +461,69 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             // a freq + super + sub + subsub. We need to rempace G.IsNumericalError() with double.NaN.
             // Also, scalars and matrices and maps. Labels for matrices? Should we truncate precision?
             //
-            string hash = G.GetSha256FromFile(filePath);
-
+            string hash = null;
             bool hasTraces = false;
-            bool isGbk = false;
-            if (specialFlagForTraces && G.Equal(Path.GetExtension(filePath), "gbk"))
+            bool isGbk = G.Equal(Path.GetExtension(filePath), ".gbk");
+
+            if (isGbk)
             {
                 try
                 {
-                    using (System.IO.Compression.ZipArchive archive = System.IO.Compression.ZipFile.OpenRead(filePath))
+                    using (ZipArchive archive = ZipFile.OpenRead(filePath))
                     {
-                        foreach (System.IO.Compression.ZipArchiveEntry entry in archive.Entries)
-                        {
-                            isGbk = true;
+                        foreach (ZipArchiveEntry entry in archive.Entries)
+                        {                            
                             if (G.Equal(entry.Name, Globals.protobufFileName3))
                             {
                                 hasTraces = true;
-                                break;
+                            }
+                            else if (G.Equal(entry.Name, Globals.databankInfoName))
+                            {
+                                try //So that hasTraces has a chance to become == true
+                                {
+                                    Program.ReadInfo readInfo = new Program.ReadInfo();
+                                    string databankVersion = null;
+                                    string traceVersion = null;
+                                    string tempFileNameWithPath = Program.WaitForZipExtractFileEntryToTempFile(entry, filePath);
+                                    Program.GetDatabankInfo(readInfo, tempFileNameWithPath, out databankVersion, out traceVersion);
+                                    hash = readInfo.dataHashFull;
+                                }
+                                catch { }
                             }
                         }
                     }
-
                 }
                 catch
                 {
+                    //No failing
                 }
             }
 
-            //We are going to use "datahash" for .gbk. Below it is ensured that two files with same datahash, but where
-            //there are traces in one file and not in another will have different hashes.
-            if (isGbk && hasTraces)
-            {
-                hash = hash.Substring(0, hash.Length - 1) + "1"; //always ends with 1
-            }
-            else if (isGbk)
-            {
-                hash = hash.Substring(0, hash.Length - 1) + "0"; //always ends with 0
-            }
+            // The trace hash is baked in now
+            //if (isGbk)
+            //{
+            //    if (hash == null) hash = G.GetSha256FromFile(filePath); //Then we take the file hash instead
+            //    if (specialFlagForTraces)
+            //    {
+            //        //Below it is ensured that two files with same datahash, but where
+            //        //there are traces in one file and not in another will have different hashes.
+            //        if (hasTraces)
+            //        {
+            //            hash = hash.Substring(0, hash.Length - 1) + "1"; //always ends with 1
+            //        }
+            //        else
+            //        {
+            //            hash = hash.Substring(0, hash.Length - 1) + "0"; //always ends with 0
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            //    hash = G.GetSha256FromFile(filePath);
+            //}
+
+            if (hash == null) hash = G.GetSha256FromFile(filePath);
+
             return hash;
         }
 

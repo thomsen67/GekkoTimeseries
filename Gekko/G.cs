@@ -4413,8 +4413,9 @@ namespace Gekko
                 return FindParent<T>(parentObject);
         }
 
-        public bool DlinkDebug() 
+        public static bool DlinkDebug() 
         {
+            return true;
             if (Directory.Exists("p:\\tth\\ny\\dlinkdebug.txt")) return true;
             else return false;
         }
@@ -6618,7 +6619,7 @@ namespace Gekko
                     }
                 }
             }
-        }
+        }        
 
         /// <summary>
         /// Is it a full path like 'c:\xx\yy.zz'? With drive letter and colon (localhost ok too).

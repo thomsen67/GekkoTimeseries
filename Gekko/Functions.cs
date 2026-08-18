@@ -6870,6 +6870,14 @@ namespace Gekko
             else
             {
                 new Error("Expected dlink() argument to be 'activate' or 'deactivate'");
+                //try
+                //{
+                //    Path.GetFullPath(s);
+                //}
+                //catch
+                //{
+                //    new Error("Expected dlink() argument to be 'activate' or 'deactivate' or valid valid file path name");
+                //}
             }
         }
 
@@ -7529,7 +7537,7 @@ namespace Gekko
         {
             if (vars.Length != 1) new Error("Funtion pathparts() only accepts 1 argument");
             string s = O.ConvertToString(vars[0]);
-            return Stringlist.CreateListFromStrings(Helper_DecomposeFullPath(s).ToArray());
+            return Stringlist.CreateListFromStrings(Stringlist.Path_FromStringToList(s).ToArray());
         }
 
         public static IVariable path(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
@@ -7605,55 +7613,7 @@ namespace Gekko
                 else new Error("Expected argument 'rel'");
             }
             new Error("Failure in " + function + "() function"); return null;  //We should never get to this line
-        }
-
-        /// <summary>
-        /// Chops up a part as a list of strings.         
-        /// For "xx\root.ini" or "\xx\root.ini\", it will return ["xx", "root.ini"].
-        /// For "c:\xx\root.ini", it will return ["c:", "xx", "root.ini"].
-        /// For "\\localhost\b$\xx\root.ini", it will return ["\\localhost\b$", "xx", "root.ini"].
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static List<string> Helper_DecomposeFullPath(string path)
-        {
-            // Check if the path is rooted (starts with C:\, \\server, etc.)
-            if (G.NullOrBlanks(path)) return new List<string>();
-            bool isRooted = Path.IsPathRooted(path);
-            // Get the root part (e.g., "c:\", "\\server\share\")
-            string root = Path.GetPathRoot(path);
-            // List to hold the final parts
-            List<string> finalParts = new List<string>();
-            if (isRooted && !string.IsNullOrEmpty(root))
-            {
-                // 1. Handle Rooted Paths (e.g., "c:\a\b" or "\\server\share\a\b")
-                // Add the clean root component (e.g., "c:" or "\\server\share")
-                // Use TrimEnd to ensure the separator is removed from the root
-                string rootComponent = root.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-                // Handle UNC paths which look like "\\server\share"
-                if (root.StartsWith(@"\\"))
-                {
-                    // For UNC, the root is usually the server and share
-                    // We use the original root because UNC stripping is complex
-                    rootComponent = root.TrimEnd(Path.DirectorySeparatorChar);
-                }
-                else
-                {
-                    // For drive letters, just take the first part
-                    rootComponent = root.Split(Path.DirectorySeparatorChar)[0];
-                }
-                finalParts.Add(rootComponent);
-                // Remove the root part from the path string
-                path = path.Substring(root.Length);
-            }
-            // 2. Split the remaining path (which may be the whole original path if relative)
-            // The replace handles mixed separators like 'a/b\c'
-            string normalizedPath = path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-            string[] directoryParts = normalizedPath.Split(new char[] { Path.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
-            // 3. Add the rest of the segments
-            finalParts.AddRange(directoryParts);
-            return finalParts;
-        }
+        }        
 
         public static IVariable branch(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] vars)
         {

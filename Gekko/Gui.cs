@@ -250,7 +250,10 @@ namespace Gekko
         {
             if (G.DlinkDebug())
             {
-                MessageBox.Show("DLINK1 --> " + Stringlist.GetListWithCommas(args));
+                foreach (string s in args)
+                {
+                    MessageBox.Show("DLINK{i} --> [[[" + s + "]]]");
+                }                
             }
             if (args.Length >= 1 && args[0].StartsWith("-dlink:"))
             {

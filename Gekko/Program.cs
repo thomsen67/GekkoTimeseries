@@ -2978,13 +2978,19 @@ namespace Gekko
         public static void Tell(string text, bool nocr)
         {
             if (Globals.runningOnTTComputer)
-            {                
-                if (false)
+            {
+                if (true)
                 {
-                    Program.ProgramFolderRunning();
-                    Program.ProgramFolderGit();
-                    Program.ProgramFolderRunningRelative();
-                }                
+                    //string hash = DlinkHooks.BlobsHash(@"k:\MAKROBK_KILDE\2025_10_01\tth\test\biver\_uddata\y.gbk", true); //TODO: WithWait or WaitFor...
+                    List<string> args = new List<string>();
+                    //args.Add("-dlink:'pre-commit'");
+                    //args.Add("'makrobk_grunddata/biver/_uddata_dlink/x.csv.dlink'");
+                    //args.Add("'makrobk_grunddata/biver/_uddata_dlink/y.gbk.dlink'");
+                    //args.Add("-dlinkw:'C:/Tools/K/MAKROBK/tth/test'");
+                    args.Add("-dlink:'pre-commit','makrobk_grunddata/biver/_uddata_dlink/x.csv.dlink','makrobk_grunddata/biver/_uddata_dlink/y.gbk.dlink'");
+                    args.Add("-dlinkw:'C:/Tools/K/MAKROBK/tth/test'");
+                    DlinkHooks.DLinkCalledFromGitHook(args.ToArray());
+                }                               
 
                 // -----------------------------------------------------------
                 // Kør tell't1', tell't2', tell't3'.
@@ -7754,145 +7760,12 @@ namespace Gekko
 
             tsdxFile = file;
             file = tempTsdxPath + "\\" + foundTsdFile;
-            string databankVersion = null;
-            string traceVersion = null;
 
-            XmlDocument doc = new XmlDocument();
             //We can presume that DatabankInfo.xml is in UTF-8, since it is typically written by Gekko
             //So no need to use GetTextFromFile()
-            string fileXml = tempTsdxPath + "\\" + "DatabankInfo.xml";
-            using (FileStream fs = WaitForFileStream(fileXml, null, GekkoFileReadOrWrite.Read))
-            {
-                try
-                {
-                    doc.Load(fs);
-                }
-                catch (Exception e)
-                {
-                    new Error("XML file 'DatabankInfo.xml' inside " + Globals.extensionDatabank + " file. " + Program.GetXmlError(e, fileXml));
-                }
-
-                XmlElement root = doc.DocumentElement; //"DatabankInfo"
-
-                databankVersion = root.GetAttribute("databankVersion").Trim();
-                if (databankVersion == "") databankVersion = "1.0";
-                traceVersion = root.GetAttribute("traceVersion").Trim();
-                if (traceVersion == "") traceVersion = "1.0";
-                string gekkoVersion = root.GetAttribute("gekkoVersion").Trim();
-                if (databankVersion != "") readInfo.databankVersion = "(vers: " + databankVersion + ")";
-
-                if (Globals.gbkExtraMetadata)
-                {
-                    XmlNodeList users = doc.GetElementsByTagName("User");
-                    foreach (XmlNode user in users) //should be only 1 in this loop
-                    {
-                        readInfo.user = user.InnerText.Trim();
-                    }
-
-                    XmlNodeList branchs = doc.GetElementsByTagName("Branch");
-                    foreach (XmlNode branch in branchs) //should be only 1 in this loop
-                    {
-                        readInfo.branch = branch.InnerText.Trim();
-                    }
-
-                    XmlNodeList commits = doc.GetElementsByTagName("Commit");
-                    foreach (XmlNode commit in commits) //should be only 1 in this loop
-                    {
-                        readInfo.commit = commit.InnerText.Trim();
-                        if (!G.NullOrBlanks(readInfo.commit)) readInfo.commit = readInfo.commit.Length > 8 ? readInfo.commit.Substring(0, 8) : readInfo.commit;
-                    }
-
-                    XmlNodeList gcms = doc.GetElementsByTagName("Gcm");
-                    foreach (XmlNode gcm in gcms) //should be only 1 in this loop
-                    {
-                        readInfo.gcm = gcm.InnerText.Trim();
-                    }
-                }
-
-                if (!Globals.gbkVersions.Contains(databankVersion))
-                {
-                    using (Error e = new Error())
-                    {
-                        e.MainAdd("The databank version " + databankVersion + " is unknown to this Gekko version (" + Globals.gekkoVersion + ").");
-                        e.MainAdd("Known databank versions: " + Stringlist.GetListWithCommas(Globals.gbkVersions) + ".");
-                        e.MainAdd("The databank seems to have been written by Gekko version " + gekkoVersion + ".");
-                        e.MainAdd("Troubleshooting, try this page: " + Globals.databankformatUrl + ".");
-                    }
-                }
-
-                XmlNodeList descriptions = doc.GetElementsByTagName("Info1");
-                foreach (XmlNode description in descriptions)  //should be only 1 in this loop
-                {
-                    readInfo.info1 = description.InnerText.Trim();
-                }
-
-                XmlNodeList dates5 = doc.GetElementsByTagName("Date");
-                foreach (XmlNode date in dates5) //should be only 1 in this loop
-                {
-                    readInfo.date = date.InnerText.Trim();
-                }
-
-                XmlNodeList dataHashes = doc.GetElementsByTagName("DataHash");
-                foreach (XmlNode dataHash in dataHashes) //should be only 1 in this loop
-                {
-                    readInfo.dataHash = dataHash.InnerText.Trim();
-                    if (!G.NullOrBlanks(readInfo.dataHash)) readInfo.dataHash = readInfo.dataHash.Length > 8 ? readInfo.dataHash.Substring(0, 8) : readInfo.dataHash;
-                }
-
-                XmlNodeList modelNames = doc.GetElementsByTagName("ModelName");
-                foreach (XmlNode modelName in modelNames) //should be only 1 in this loop
-                {
-                    readInfo.modelName = modelName.InnerText.Trim();
-                }
-
-                XmlNodeList modelInfos = doc.GetElementsByTagName("ModelInfo");
-                foreach (XmlNode modelInfo in modelInfos) //should be only 1 in this loop
-                {
-                    readInfo.modelInfo = modelInfo.InnerText.Trim();
-                }
-
-                XmlNodeList modelDates = doc.GetElementsByTagName("ModelDate");
-                foreach (XmlNode modelDate in modelDates) //should be only 1 in this loop
-                {
-                    readInfo.modelDate = modelDate.InnerText.Trim();
-                }
-
-                XmlNodeList modelSignatures = doc.GetElementsByTagName("ModelSignature");
-                foreach (XmlNode modelSignature in modelSignatures) //should be only 1 in this loop
-                {
-                    readInfo.modelSignature = modelSignature.InnerText.Trim();
-                }
-
-                XmlNodeList modelHashs = doc.GetElementsByTagName("ModelHash");
-                foreach (XmlNode modelHash in modelHashs) //should be only 1 in this loop
-                {
-                    readInfo.modelHash = modelHash.InnerText.Trim();
-                }
-
-                XmlNodeList modelLastSimPeriods = doc.GetElementsByTagName("ModelLastSimPeriod");
-                foreach (XmlNode modelLastSimPeriod in modelLastSimPeriods) //should be only 1 in this loop
-                {
-                    readInfo.modelLastSimPeriod = modelLastSimPeriod.InnerText.Trim();
-                }
-
-                XmlNodeList modelLastSimStamps = doc.GetElementsByTagName("ModelLastSimStamp");
-                foreach (XmlNode modelLastSimStamp in modelLastSimStamps) //should be only 1 in this loop
-                {
-                    readInfo.modelLastSimStamp = modelLastSimStamp.InnerText.Trim();
-                }
-
-                XmlNodeList modelLargestLags = doc.GetElementsByTagName("ModelLargestLag");
-                foreach (XmlNode modelLargestLag in modelLargestLags) //should be only 1 in this loop
-                {
-                    readInfo.modelLargestLag = modelLargestLag.InnerText.Trim();
-                }
-
-                XmlNodeList modelLargestLeads = doc.GetElementsByTagName("ModelLargestLead");
-                foreach (XmlNode modelLargestLead in modelLargestLeads) //should be only 1 in this loop
-                {
-                    readInfo.modelLargestLead = modelLargestLead.InnerText.Trim();
-                }
-            }
+            string databankVersion = null;
+            string traceVersion = null;            
+            GetDatabankInfo(readInfo, tempTsdxPath + "\\" + Globals.databankInfoName, out databankVersion, out traceVersion);
 
             Databank deserializedDatabank = null;
             List<Trace2> traces = null;
@@ -8030,6 +7903,144 @@ namespace Gekko
                 cacheParameters.modelLargestLag = readInfo.modelLargestLag;
                 cacheParameters.modelLargestLead = readInfo.modelLargestLead;
                 //Later on, databank.cacheParameters will be set = cacheParameters
+            }
+        }
+
+        public static void GetDatabankInfo(ReadInfo readInfo, string fileXml, out string databankVersion, out string traceVersion)
+        {
+            XmlDocument doc = new XmlDocument();
+            using (FileStream fs = WaitForFileStream(fileXml, null, GekkoFileReadOrWrite.Read))
+            {
+                try
+                {
+                    doc.Load(fs);
+                }
+                catch (Exception e)
+                {
+                    new Error("XML file 'DatabankInfo.xml' inside " + Globals.extensionDatabank + " file. " + Program.GetXmlError(e, fileXml));
+                }
+
+                XmlElement root = doc.DocumentElement; //"DatabankInfo"
+
+                databankVersion = root.GetAttribute("databankVersion").Trim();
+                if (databankVersion == "") databankVersion = "1.0";
+                traceVersion = root.GetAttribute("traceVersion").Trim();
+                if (traceVersion == "") traceVersion = "1.0";
+                string gekkoVersion = root.GetAttribute("gekkoVersion").Trim();
+                if (databankVersion != "") readInfo.databankVersion = "(vers: " + databankVersion + ")";
+
+                if (Globals.gbkExtraMetadata)
+                {
+                    XmlNodeList users = doc.GetElementsByTagName("User");
+                    foreach (XmlNode user in users) //should be only 1 in this loop
+                    {
+                        readInfo.user = user.InnerText.Trim();
+                    }
+
+                    XmlNodeList branchs = doc.GetElementsByTagName("Branch");
+                    foreach (XmlNode branch in branchs) //should be only 1 in this loop
+                    {
+                        readInfo.branch = branch.InnerText.Trim();
+                    }
+
+                    XmlNodeList commits = doc.GetElementsByTagName("Commit");
+                    foreach (XmlNode commit in commits) //should be only 1 in this loop
+                    {
+                        readInfo.commit = commit.InnerText.Trim();
+                        if (!G.NullOrBlanks(readInfo.commit)) readInfo.commit = readInfo.commit.Length > 8 ? readInfo.commit.Substring(0, 8) : readInfo.commit;
+                    }
+
+                    XmlNodeList gcms = doc.GetElementsByTagName("Gcm");
+                    foreach (XmlNode gcm in gcms) //should be only 1 in this loop
+                    {
+                        readInfo.gcm = gcm.InnerText.Trim();
+                    }
+                }
+
+                if (!Globals.gbkVersions.Contains(databankVersion))
+                {
+                    using (Error e = new Error())
+                    {
+                        e.MainAdd("The databank version " + databankVersion + " is unknown to this Gekko version (" + Globals.gekkoVersion + ").");
+                        e.MainAdd("Known databank versions: " + Stringlist.GetListWithCommas(Globals.gbkVersions) + ".");
+                        e.MainAdd("The databank seems to have been written by Gekko version " + gekkoVersion + ".");
+                        e.MainAdd("Troubleshooting, try this page: " + Globals.databankformatUrl + ".");
+                    }
+                }
+
+                XmlNodeList descriptions = doc.GetElementsByTagName("Info1");
+                foreach (XmlNode description in descriptions)  //should be only 1 in this loop
+                {
+                    readInfo.info1 = description.InnerText.Trim();
+                }
+
+                XmlNodeList dates5 = doc.GetElementsByTagName("Date");
+                foreach (XmlNode date in dates5) //should be only 1 in this loop
+                {
+                    readInfo.date = date.InnerText.Trim();
+                }
+
+                XmlNodeList dataHashes = doc.GetElementsByTagName("DataHash");
+                foreach (XmlNode dataHash in dataHashes) //should be only 1 in this loop
+                {
+                    readInfo.dataHashFull = dataHash.InnerText.Trim();
+                    readInfo.dataHash = readInfo.dataHashFull;                    
+                    if (!G.NullOrBlanks(readInfo.dataHash)) readInfo.dataHash = readInfo.dataHash.Length > 8 ? readInfo.dataHash.Substring(0, 8) : readInfo.dataHash;
+                }
+
+                XmlNodeList modelNames = doc.GetElementsByTagName("ModelName");
+                foreach (XmlNode modelName in modelNames) //should be only 1 in this loop
+                {
+                    readInfo.modelName = modelName.InnerText.Trim();
+                }
+
+                XmlNodeList modelInfos = doc.GetElementsByTagName("ModelInfo");
+                foreach (XmlNode modelInfo in modelInfos) //should be only 1 in this loop
+                {
+                    readInfo.modelInfo = modelInfo.InnerText.Trim();
+                }
+
+                XmlNodeList modelDates = doc.GetElementsByTagName("ModelDate");
+                foreach (XmlNode modelDate in modelDates) //should be only 1 in this loop
+                {
+                    readInfo.modelDate = modelDate.InnerText.Trim();
+                }
+
+                XmlNodeList modelSignatures = doc.GetElementsByTagName("ModelSignature");
+                foreach (XmlNode modelSignature in modelSignatures) //should be only 1 in this loop
+                {
+                    readInfo.modelSignature = modelSignature.InnerText.Trim();
+                }
+
+                XmlNodeList modelHashs = doc.GetElementsByTagName("ModelHash");
+                foreach (XmlNode modelHash in modelHashs) //should be only 1 in this loop
+                {
+                    readInfo.modelHash = modelHash.InnerText.Trim();
+                }
+
+                XmlNodeList modelLastSimPeriods = doc.GetElementsByTagName("ModelLastSimPeriod");
+                foreach (XmlNode modelLastSimPeriod in modelLastSimPeriods) //should be only 1 in this loop
+                {
+                    readInfo.modelLastSimPeriod = modelLastSimPeriod.InnerText.Trim();
+                }
+
+                XmlNodeList modelLastSimStamps = doc.GetElementsByTagName("ModelLastSimStamp");
+                foreach (XmlNode modelLastSimStamp in modelLastSimStamps) //should be only 1 in this loop
+                {
+                    readInfo.modelLastSimStamp = modelLastSimStamp.InnerText.Trim();
+                }
+
+                XmlNodeList modelLargestLags = doc.GetElementsByTagName("ModelLargestLag");
+                foreach (XmlNode modelLargestLag in modelLargestLags) //should be only 1 in this loop
+                {
+                    readInfo.modelLargestLag = modelLargestLag.InnerText.Trim();
+                }
+
+                XmlNodeList modelLargestLeads = doc.GetElementsByTagName("ModelLargestLead");
+                foreach (XmlNode modelLargestLead in modelLargestLeads) //should be only 1 in this loop
+                {
+                    readInfo.modelLargestLead = modelLargestLead.InnerText.Trim();
+                }
             }
         }
 
@@ -25041,7 +25052,7 @@ namespace Gekko
             }
 
             string xmlOutput = doc.OuterXml;
-            using (FileStream fs = WaitForFileStream(tempTsdxPath + "\\" + "DatabankInfo.xml", null, GekkoFileReadOrWrite.Write))
+            using (FileStream fs = WaitForFileStream(tempTsdxPath + "\\" + Globals.databankInfoName, null, GekkoFileReadOrWrite.Write))
             {
                 doc.Save(fs);
             }
@@ -25275,7 +25286,7 @@ namespace Gekko
                     tsdFile = fileName2;
                     tsdfilecounter++;
                 }
-                if (string.Compare("DatabankInfo.xml", fileName2, true) == 0)
+                if (string.Compare(Globals.databankInfoName, fileName2, true) == 0)
                 {
                     xmlFile = fileName2;
                 }
@@ -25283,7 +25294,7 @@ namespace Gekko
 
             if (xmlFile == "")
             {
-                new Error("Cannot find xml-file inside zip-file. Expected to find '" + "DatabankInfo.xml" + "' inside '" + originalFileName + "'");
+                new Error("Cannot find xml-file inside zip-file. Expected to find '" + Globals.databankInfoName + "' inside '" + originalFileName + "'");
             }
 
             if (isProtobuf)
@@ -36049,6 +36060,7 @@ namespace Gekko
             public string info1 = null;
             public string date;
             public string dataHash;
+            public string dataHashFull;
             public string user;
             public string branch;
             public string commit;
