@@ -350,25 +350,46 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// <returns></returns>
         public static bool IsDLlinkHelperFileOk(string dataFile, DlinkFile dlinkFileData, CacheIndexDlinkElement cacheIndexDlinkElement, ref RealFile realFile)
         {
-            if (!realFile.exists) return false; //In that case, realFile.stamp etc. are null too
-            if (realFile.size != dlinkFileData.size) return false;
+            //When this method is called, dataFile does not have a hash code because it is costly to compute
+            //We try to take the hash code from cache
+            if (!realFile.exists)
+            {
+                if (G.DlinkDebug()) MessageBox.Show("FALSE: exists");
+                return false; //In that case, realFile.stamp etc. are null too
+            }
+            if (realFile.size != dlinkFileData.size)
+            {
+                if (G.DlinkDebug()) MessageBox.Show("FALSE: size");
+                return false;
+            }
             //Here we know that the data file exists and is of the right size. Now we check stamp.
             double krit = 2d; //2s: Krit can be quite small: it is taken from the acutual timestamp in the user folder (with \.git folder), on the same server. If the files are copied somewhere else, some precision may be lost, so therefore 2s.
             string realHash;
+            if (cacheIndexDlinkElement != null)
+            {
+                if (G.DlinkDebug()) MessageBox.Show("CACHE SIZES: " + cacheIndexDlinkElement.size + "  " + realFile.size);
+                if (G.DlinkDebug()) MessageBox.Show("CACHE TIMEDIF: " + ((DateTime)realFile.stamp - (DateTime)cacheIndexDlinkElement.stamp).TotalSeconds + "  " + (DateTime)realFile.stamp + "  " + (DateTime)cacheIndexDlinkElement.stamp);
+            }
             if (cacheIndexDlinkElement != null && cacheIndexDlinkElement.size == realFile.size && cacheIndexDlinkElement.stamp != null && Math.Abs(((DateTime)realFile.stamp - (DateTime)cacheIndexDlinkElement.stamp).TotalSeconds) < krit)
             {
+                if (G.DlinkDebug()) MessageBox.Show("EASY");
                 //EASY way
                 //dataFileSha256 is ok as taken from index_dlink file, but the hash must still be checked against the .dlink file hash
                 realHash = cacheIndexDlinkElement.hash;
             }
             else
             {
+                if (G.DlinkDebug()) MessageBox.Show("HARD");
                 //HARD way
                 //We now need to calc the sha256 physically.                
                 realHash = BlobsHash(dataFile);
             }
             realFile = new RealFile(realFile.name, realHash, realFile.size, realFile.stamp, true);
-            if (dlinkFileData.hash != realHash) return false;
+            if (dlinkFileData.hash != realHash)
+            {
+                if (G.DlinkDebug()) MessageBox.Show("FALSE: hash " + dlinkFileData.hash + "  " + realHash);
+                return false;
+            }
             return true;
         }
 
