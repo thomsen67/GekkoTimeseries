@@ -190,40 +190,14 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             List<string> m1 = Stringlist.Path_FromStringToList(dataFile);
             List<string> m2 = Stringlist.Path_RemoveStart(m1, dataStart1);
             List<string> m3 = m2.ToList(); //copy
-            if (!G.NullOrBlanks(Program.options.databank_dlink_folder_remove1))
-            {
-                //Add this in the middle...
-                m3.Insert(2, Program.options.databank_dlink_folder_remove1);
-            }            
+            if (!G.NullOrBlanks(Program.options.databank_dlink_folder_remove1)) m3.Insert(2, Program.options.databank_dlink_folder_remove1); //hacky, in middle                        
             List<string> m4 = Stringlist.Path_ReplaceString(m3, Program.options.databank_dlink_folder_replace1a, Program.options.databank_dlink_folder_replace1b, 1);
             m4 = Stringlist.Path_ReplaceString(m4, Program.options.databank_dlink_folder_replace2a, Program.options.databank_dlink_folder_replace2b, 1);
             List<string> m5 = m4.ToList();
             m5[m5.Count - 1] += "." + Program.options.databank_dlink_name;
             List<string> m6 = m5.ToList();
             m6.InsertRange(0, dataStart2);
-            return Stringlist.Path_FromListToString(m6, "\\");
-
-            ////string s1 = G.Replace(dataFile, Program.options.databank_dlink_folder_data, "", 1);
-
-            ////dataFile:          K:\MAKROBK_KILDE\2025_10_01\tth\test\biver\_uddata\x.csv
-            ////f2:                K:\MAKROBK\tth\test\makrobk_grunddata\biver\_progs
-            ////s2:                \tth\test\makrobk_grunddata\biver  
-            ////s2a:               \tth\test\biver   
-            ////s3:                K:\MAKROBK_KILDE\2025_10_01\tth\test\biver
-            ////s4:                \_uddata\x.csv
-            ////s5:                K:\MAKROBK\tth\test\makrobk_grunddata\biver\_progs\_uddata_dlink\x.csv.dlink
-            //string f2 = G.CleanupFolderName(O.ConvertToString(Functions.Helper_Runfolder(new IVariable[0], p)), false); //.dlink file, c:\Thomas\Gekko\BlobsTest\tth\staging
-            //if (G.NullOrBlanks(f2)) f2 = Program.options.folder_working; //Run directly: in that case we must assume the working folder
-            //string s2 = DlinkCommon.Dlink_HandleProgsPath(f2);
-            //string s2a = DlinkCommon.Dlink_HandleRemove(s2);
-            //string s3 = Path.Combine(Program.options.databank_dlink_folder_data, s2a.TrimStart('\\'));
-            //if (!dataFile.StartsWith(s3 + "\\", StringComparison.OrdinalIgnoreCase)) new Error("Problem with .dlink file path: based on the .gcm file path, the datafile path '" + dataFile + "' was expected to start with the path '" + s3 + "'");
-            //string s4 = G.Replace(dataFile, s3, "", StringComparison.OrdinalIgnoreCase, 1);
-            
-            //string s5 = Path.Combine(Program.options.databank_dlink_folder_progs, s2.TrimStart('\\'), s4.TrimStart('\\'));
-            //s5 = DlinkCommon.AddOrRemoveDlinkFromInddataOrUddata(s5, true);
-            //s5 = s5 + "." + Program.options.databank_dlink_name;            
-            //return s5;
+            return Stringlist.Path_FromListToString(m6, "\\");            
         }
     }
 
@@ -340,24 +314,32 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
         private static string Dlink_FromDlinkFileToDataFile(string dlinkFile)
         {
-            //dlinkFile:         K:\MAKROBK\tth\test\makrobk_grunddata\biver\_progs\_uddata_dlink\x.csv.dlink
-            //s2a:               \tth\test\biver\_uddata_dlink\x.csv.dlink
+            //m1                 K:\MAKROBK\tth\test\makrobk_grunddata\biver\_progs\_uddata_dlink\x.csv.dlink
+            //m2                 tth\test\makrobk_grunddata\biver\_progs\_uddata_dlink\x.csv.dlink
+            //m3                 tth\test\biver\_uddata_dlink\x.csv.dlink
+            //m4                 tth\test\biver\_uddata\x.csv.dlink
+            //m5                 tth\test\biver\_uddata\x.csv
+            //m6                 k:\\MAKROBK_KILDE\\2025_10_01\tth\test\biver\_uddata\x.csv
 
-            //fileNameAndPath:   K:\MAKROBK_KILDE\2025_10_01\tth\test\biver\_uddata\x.csv
-            //f2:                K:\MAKROBK\tth\test\makrobk_grunddata\biver\_progs
-            //s2:                \tth\test\makrobk_grunddata\biver  
-            //s2a:               \tth\test\biver   
-            //s3:                K:\MAKROBK_KILDE\2025_10_01\tth\test\biver
-            //s4:                \_uddata\x.csv
-            //s5:                
+            if (Globals.tthDlink) dlinkFile = G.Replace(dlinkFile, "c:\\tools\\k", "K:", StringComparison.OrdinalIgnoreCase, 1);
 
-            string s2 = DlinkCommon.Dlink_HandleProgsPath(dlinkFile);
-            string s2a = DlinkCommon.Dlink_HandleRemove(s2);
-            string s3 = Path.Combine(Program.options.databank_dlink_folder_data, s2a.TrimStart('\\'));
-            s3 = DlinkCommon.AddOrRemoveDlinkFromInddataOrUddata(s3, false);
-            if (!s3.EndsWith("." + Program.options.databank_dlink_name, StringComparison.OrdinalIgnoreCase)) new Error("Expected dlink file to end with " + "." + Program.options.databank_dlink_name);
-            string s4 = s3.Substring(0, s3.Length - ("." + Program.options.databank_dlink_name).Length);
-            return s4;
+            if (!Path.IsPathRooted(Program.options.databank_dlink_folder_progs)) new Error("Expected path '" + Program.options.databank_dlink_folder_progs + "' to be absolute");
+            List<string> dataStart1 = Stringlist.Path_FromStringToList(Program.options.databank_dlink_folder_progs);
+            if (!Path.IsPathRooted(Program.options.databank_dlink_folder_data)) new Error("Expected path '" + Program.options.databank_dlink_folder_data + "' to be absolute");
+            List<string> dataStart2 = Stringlist.Path_FromStringToList(Program.options.databank_dlink_folder_data);            
+            if (!Path.IsPathRooted(dlinkFile)) new Error("Expected path '" + dlinkFile + "' to be absolute");
+            List<string> m1 = Stringlist.Path_FromStringToList(dlinkFile);
+            List<string> m2 = Stringlist.Path_RemoveStart(m1, dataStart1);
+            List<string> m3 = m2.ToList(); //copy
+            if (!G.NullOrBlanks(Program.options.databank_dlink_folder_remove1)) m3 = Stringlist.Path_RemoveString(m3, Program.options.databank_dlink_folder_remove1, 1);
+            if (!G.NullOrBlanks(Program.options.databank_dlink_folder_remove2)) m3 = Stringlist.Path_RemoveString(m3, Program.options.databank_dlink_folder_remove2, 1);
+            List<string> m4 = Stringlist.Path_ReplaceString(m3, Program.options.databank_dlink_folder_replace1b, Program.options.databank_dlink_folder_replace1a, 1);
+            m4 = Stringlist.Path_ReplaceString(m4, Program.options.databank_dlink_folder_replace2b, Program.options.databank_dlink_folder_replace2a, 1);            
+            List<string> m5 = m4.ToList();
+            m5[m5.Count - 1] = m5[m5.Count - 1].Replace("." + Program.options.databank_dlink_name, "");
+            List<string> m6 = m5.ToList();
+            m6.InsertRange(0, dataStart2);
+            return Stringlist.Path_FromListToString(m6, "\\");
         }
 
         /// <summary>
@@ -660,44 +642,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
     }
 
     public class DlinkCommon 
-    {
-
-        public static string Dlink_HandleProgsPath(string f2)
-        {
-            //K:\MAKROBK\tth\test\makrobk_grunddata\biver\_progs  -->  \tth\test\makrobk_grunddata\biver  
-            if (Globals.tthDlink) f2 = G.Replace(f2, "c:\\Tools\\K\\MAKROBK", "K:\\MAKROBK", StringComparison.OrdinalIgnoreCase, 1);
-            if (!f2.StartsWith(Program.options.databank_dlink_folder_progs.Trim(), StringComparison.OrdinalIgnoreCase)) new Error("Problem with .dlink: the data file path '" + f2 + "' was expected was expected to start with the path '" + Program.options.databank_dlink_folder_progs.Trim() + "'");
-            string s2 = f2;
-            s2 = G.Replace(s2, Program.options.databank_dlink_folder_progs.Trim(), "", StringComparison.OrdinalIgnoreCase, 1);
-            s2 = G.Replace(s2, "\\" + Program.options.databank_dlink_folder_remove2 + "", "", StringComparison.OrdinalIgnoreCase, 1);
-            return s2;
-        }
-
-        public static string Dlink_HandleRemove(string s2)
-        {
-            //\tth\test\makrobk_grunddata\biver  -->   \tth\test\biver   
-            string s2a = s2;
-            if (!G.NullOrBlanks(Program.options.databank_dlink_folder_remove1))
-            {
-                s2a = G.Replace(s2, "\\" + Program.options.databank_dlink_folder_remove1.Trim() + "\\", "\\", StringComparison.OrdinalIgnoreCase, 1);
-            }
-            return s2a;
-        }
-
-        public static string AddOrRemoveDlinkFromInddataOrUddata(string s, bool larger)
-        {
-            if (larger)
-            {
-                s = G.Replace(s, "\\" + Program.options.databank_dlink_folder_replace2a + "\\", "\\" + Program.options.databank_dlink_folder_replace2b + "\\", StringComparison.OrdinalIgnoreCase, 1);
-                s = G.Replace(s, "\\" + Program.options.databank_dlink_folder_replace1a + "\\", "\\" + Program.options.databank_dlink_folder_replace1b + "\\", StringComparison.OrdinalIgnoreCase, 1);
-            }
-            else
-            {
-                s = G.Replace(s, "\\" + Program.options.databank_dlink_folder_replace2b + "\\", "\\" + Program.options.databank_dlink_folder_replace2a + "\\", StringComparison.OrdinalIgnoreCase, 1);
-                s = G.Replace(s, "\\" + Program.options.databank_dlink_folder_replace1b + "\\", "\\" + Program.options.databank_dlink_folder_replace1a + "\\", StringComparison.OrdinalIgnoreCase, 1);
-            }
-            return s;
-        }
+    {        
     }
 
     [ProtoContract]
