@@ -54,7 +54,7 @@ namespace Gekko
 ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null)
 STAGED_FILES=$(git -C ""${{ROOT_DIR}}"" ls-files --cached -- ':(icase)*.dlink')
 FORMATTED_FILES=$(echo ""$STAGED_FILES"" | sed ""s/^/'/;s/$/'/"" | paste -sd, -)
-cmd.exe //c ""{gekkoExePath}"" ""-dlink:'$1',$FORMATTED_FILES""
+cmd.exe //c ""{gekkoExePath}"" ""-dlink:'$1',$FORMATTED_FILES"" ""-dlinkw:'$ROOT_DIR'""
 ";
                 // ----------------------------------------------------------------------------------------------------------
                 string post_checkout = $@"#!/bin/sh
@@ -259,7 +259,24 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// </summary>
         /// <param name="args"></param>
         public static void DLinkCalledFromGitHook(string[] args)
-        {            
+        {
+            //MessageBox.Show("!?!");
+            string gitFolder = null;
+            if (args.Length >= 2 && args[1].StartsWith("-dlinkw:"))
+            {
+                gitFolder = G.StripQuotes(args[1].Substring("-dlinkw:".Length)); //The path to \.git is sent from the Git hook
+                //Program.options.folder_working = gitFolder; //Sets working folder --> this will be necessary for root('git') call later on.
+                if (!Directory.Exists(gitFolder))
+                {
+                    MessageBox.Show("*** Error: The folder '" + gitFolder + "' could not be found (parent of \\.git folder)");
+                    new Error();
+                }
+            }
+            if (G.NullOrBlanks(gitFolder))
+            {
+                MessageBox.Show("*** Error: Could not get the path to the \\.git folder)");
+                new Error();
+            }
             string s2 = args[0].Substring("dlink:".Length);
             MatchCollection matches = Regex.Matches(s2, @"'([^']*)'");            
             List<string> dlinkFiles = new List<string>();
@@ -276,9 +293,8 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             
             //GekkoDictionary<string, bool> datafiles = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             foreach (string dlinkFile2 in dlinkFiles) //Could probably be parallelized
-            {
-                string dlinkFile = G.CleanupFolderName(dlinkFile2, false);
-                string dLinkFileWithPath = Path.Combine(Program.ProgramFolderGit(), dlinkFile);
+            {                
+                string dLinkFileWithPath = Path.Combine(G.CleanupFolderName(gitFolder, false), G.CleanupFolderName(dlinkFile2, false));
                 if (!File.Exists(dLinkFileWithPath))
                 {
                     MessageBox.Show("This ." + Program.options.databank_dlink_name + " file does not exist: '" + dLinkFileWithPath + "'");
@@ -391,7 +407,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             realFile = new RealFile(realFile.name, realHash, realFile.size, realFile.stamp, true);
             if (dlinkFileData.hash != realHash)
             {
-                MessageBox.Show("FALSE --> hash, dlink=" + dlinkFileData.hash + " just gotten realhash=" + realHash);
+                //MessageBox.Show("FALSE --> hash, dlink=" + dlinkFileData.hash + " just gotten realhash=" + realHash);
                 return false;
             }
             return true;
@@ -402,7 +418,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             string s = null;
             if (filesNew.Count + filesOverwritten.Count > 0)
             {
-                s = "User data file folder sync: ";
+                s = "Data folder sync: ";
                 string s2a = "are"; if (filesNew.Count < 2) s2a = "is";
                 string s2b = "are"; if (filesOverwritten.Count < 2) s2b = "is";
                 if (filesNew.Count > 0 && filesOverwritten.Count == 0)
@@ -429,13 +445,21 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             }
             else
             {
-                s = "User data file folder sync: no data files added or overwritten.";
+                s = "Data folder sync: no data files added or overwritten.";
             }
 
-            if (putFiles.Count > 0)
+            s += G.NL + G.NL;
+            s += " ------------------------------------------------------------------- ";
+            s += G.NL + G.NL;
+
+            if (putFiles.Count == 0)
             {
-                s += G.NL + G.NL;
-                s += "Versions storage: " + putFiles.Count + " new data file" + G.S(putFiles.Count) + " added to long-term storage:";
+                s += "Versions storage: nothing changed regarding long-term storage.";
+            }
+            else
+            {
+                
+                s += "Versions storage: " + putFiles.Count + " data file" + G.S(putFiles.Count) + " stored in long-term storage:";
                 foreach (string f in putFiles)
                 {
                     s += G.NL + f;
