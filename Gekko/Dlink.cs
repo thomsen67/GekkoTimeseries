@@ -168,7 +168,14 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     {
                         new Error("The file '" + dataFile + "' does not exist for .dlink file construction");
                     }
-                    size = (new FileInfo(dataFile)).Length;
+                    // New: for "data hash" file types (see DlinkHooks.IsDataHashFileType), the byte
+                    // size is not a reliable proxy for "the data is the same" -- two files holding
+                    // the same data can have different byte sizes (e.g. embedded timestamps inside a
+                    // .gbk, or different zip/compression settings). Recording a size that flips back
+                    // and forth for data that has not really changed also means the .dlink file's
+                    // content changes for no real reason -- which shows up in Git as a commit on a
+                    // file that, in reality, is unchanged. Leaving it null avoids both problems.
+                    size = DlinkHooks.IsDataHashFileType(dataFile) ? (long?)null : (new FileInfo(dataFile)).Length;
                     if (!Directory.Exists(Path.GetDirectoryName(dlinkFile)))
                     {
                         if (true)
@@ -407,6 +414,19 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         }
 
         /// <summary>
+        /// New: true for file types whose .dlink hash is a "data hash" -- computed from the actual
+        /// values inside the file rather than from its raw bytes (see the isGbk branch in
+        /// GetFileHash below). For these types, two files with different byte sizes (different
+        /// embedded timestamps, different zip/compression settings, etc.) can legitimately produce
+        /// the same hash, so byte size must NOT be used as a proxy for "this is the same/different
+        /// data" -- see Blob() and IsDLlinkHelperFileOk(), which both consult this.
+        /// </summary>
+        public static bool IsDataHashFileType(string filePath)
+        {
+            return G.Equal(Path.GetExtension(filePath), ".gbk");
+        }
+
+        /// <summary>
         /// Returns true if file is ok, else it must be fetched from blobs
         /// </summary>
         /// <param name="dataFile"></param>
@@ -422,7 +442,10 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             {                
                 return false; //In that case, realFile.stamp etc. are null too
             }
-            if (realFile.bytes != dlinkFileData.bytes)
+            // New: dlinkFileData.bytes is null for "data hash" file types (see IsDataHashFileType /
+            // Blob()), where byte size is not a reliable proxy for "the data is the same". Only gate
+            // on it when we actually have a comparable value recorded.
+            if (dlinkFileData.bytes != null && realFile.bytes != dlinkFileData.bytes)
             {                
                 return false;
             }            
@@ -524,7 +547,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             }            
 
             string hash = null;            
-            bool isGbk = G.Equal(Path.GetExtension(filePath), ".gbk");
+            bool isGbk = IsDataHashFileType(filePath); // New: was "G.Equal(Path.GetExtension(filePath), ".gbk")" inline; now shared with Blob() / IsDLlinkHelperFileOk()
 
             if (isGbk)
             {
