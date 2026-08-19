@@ -1,4 +1,4 @@
-﻿/*
+/*
     Gekko Timeseries Software (www.t-t.dk/gekko)..
     Copyright (C) 2025, Thomas Thomsen, T-T Analyse.
 
@@ -203,6 +203,201 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         }
     }
 
+    // ================================================================================================
+    // NEW: on-disk LRU hash cache.
+    //
+    // GetFileHash() (below, in DlinkHooks) is called once per .dlink file on every single git hook
+    // invocation (post-checkout, post-merge, pre-commit, pre-push all funnel through
+    // DLinkCalledFromGitHook -> IsDLlinkHelperFileOk -> GetFileHash), even for files nothing touched.
+    // This cache lets GetFileHash skip recomputing a SHA-256 (or, for .gbk files, re-extracting the
+    // embedded metadata) when a file's size and last-write-time still match what was recorded the
+    // last time it was hashed.
+    //
+    // It is a plain static cache: one instance per Gekko.exe run, loaded from disk on first use.
+    // Because each hook invocation is its own process (see the "_common" hook script in DlinkSetup,
+    // which shells out to Gekko.exe), the only way a cache can survive between hook runs is on disk --
+    // that's the whole point of persisting it here rather than just keeping it in memory.
+    //
+    // Callers should call Set() per file as usual, then call Save() ONCE after a batch of files, not
+    // once per file -- otherwise every hashed file costs a disk write and most of the benefit is lost.
+    //
+    // Deliberately NOT given the same atomic-write treatment as the blob store (see the TODO in
+    // SyncBlobs below): this cache only ever holds derived data that can always be recomputed from
+    // the file itself, so worst case on a corrupt or half-written cache file is a cold cache next run
+    // (caught below and treated as empty), never a wrong or lost answer.
+    // ================================================================================================
+    public static class DlinkHashCache
+    {
+        public static int countAsk = 0;
+        public static int countHit = 0;
+
+        private const int Capacity = 1000;
+        private static readonly long ToleranceTicks = TimeSpan.FromSeconds(2).Ticks; //Changed from TimeSpan.FromSeconds(2) to TimeSpan.FromSeconds(0).
+        private static readonly DateTime TicksEpoch = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+        private static readonly object _lock = new object(); //cheap insurance if the foreach loops above are ever parallelized
+        private static Dictionary<string, LinkedListNode<HashCacheEntry>> _map;
+        private static LinkedList<HashCacheEntry> _lru; //front = most recently used, back = least recently used
+        private static bool _loaded = false;
+        private static bool _dirty = false;
+
+        private static string CacheFilePath
+        {
+            get
+            {
+                string folder = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), "_utilities", "hashcache");
+                //Per-machine file name: this folder is shared/network storage (databank_dlink_folder_blobs),
+                //and giving each machine its own cache file avoids two machines racing on the same file.
+                //If you'd rather have one shared cache, replace this with a fixed file name -- just be
+                //aware Save() below is a plain overwrite, not an atomic one (see class comment above).
+                return Path.Combine(folder, "hashcache_" + Environment.MachineName + ".yaml");
+            }
+        }
+
+        private static long ToTicksSinceEpoch(DateTime utc)
+        {
+            return (utc - TicksEpoch).Ticks;
+        }
+
+        private static void EnsureLoaded()
+        {
+            //Caller must hold _lock
+            if (_loaded) return;
+            _map = new Dictionary<string, LinkedListNode<HashCacheEntry>>(StringComparer.OrdinalIgnoreCase);
+            _lru = new LinkedList<HashCacheEntry>();
+            try
+            {
+                if (File.Exists(CacheFilePath))
+                {
+                    HashCacheFile cf = G.YamlReader<HashCacheFile>(CacheFilePath);
+                    if (cf != null && cf.entries != null)
+                    {
+                        //File is written oldest-first (see Save() below); AddFirst()'ing in that order
+                        //rebuilds the same most-recently-used-at-front order we had before saving.
+                        foreach (HashCacheEntry e in cf.entries)
+                        {
+                            LinkedListNode<HashCacheEntry> node = _lru.AddFirst(e);
+                            _map[e.path] = node;
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                //A corrupt or unreadable cache file should not break the hook -- just start empty.
+                _map = new Dictionary<string, LinkedListNode<HashCacheEntry>>(StringComparer.OrdinalIgnoreCase);
+                _lru = new LinkedList<HashCacheEntry>();
+            }
+            _loaded = true;
+        }
+
+        /// <summary>
+        /// Returns the cached hash for filePath if it is still fresh (same size, and last-write-time
+        /// within +/- 2 seconds of what was recorded last time). Returns null on a miss.
+        /// </summary>
+        public static string TryGet(string filePath, long size, DateTime lastWriteUtc)
+        {
+            lock (_lock)
+            {
+                countAsk++;
+                EnsureLoaded();
+                LinkedListNode<HashCacheEntry> node;
+                if (!_map.TryGetValue(filePath, out node)) return null;
+
+                HashCacheEntry e = node.Value;
+                if (e.bytes != size) return null;
+                long ticksNow = ToTicksSinceEpoch(lastWriteUtc);
+                if (Math.Abs(ticksNow - e.stamp) > ToleranceTicks) return null;
+
+                //Hit: touch it so it counts as recently used
+                countHit++;
+                _lru.Remove(node);
+                _lru.AddFirst(node);
+                return e.hash;
+            }
+        }
+
+        /// <summary>
+        /// Records/refreshes the hash for filePath. Evicts the least-recently-used entry once the
+        /// cache is over capacity (1000 entries). Does not touch disk -- call Save() once after a
+        /// batch of files.
+        /// </summary>
+        public static void Set(string filePath, long bytes, DateTime lastWriteUtc, string hash)
+        {
+            lock (_lock)
+            {
+                EnsureLoaded();
+                long stamp = ToTicksSinceEpoch(lastWriteUtc);
+
+                LinkedListNode<HashCacheEntry> existing;
+                if (_map.TryGetValue(filePath, out existing))
+                {
+                    existing.Value.bytes = bytes;
+                    existing.Value.stamp = stamp;
+                    existing.Value.hash = hash;
+                    _lru.Remove(existing);
+                    _lru.AddFirst(existing);
+                }
+                else
+                {
+                    HashCacheEntry entry = new HashCacheEntry { path = filePath, bytes = bytes, stamp = stamp, hash = hash };
+                    LinkedListNode<HashCacheEntry> node = _lru.AddFirst(entry);
+                    _map[filePath] = node;
+                    if (_map.Count > Capacity)
+                    {
+                        LinkedListNode<HashCacheEntry> lruNode = _lru.Last;
+                        _lru.RemoveLast();
+                        _map.Remove(lruNode.Value.path);
+                    }
+                }
+                _dirty = true;
+            }
+        }
+
+        /// <summary>
+        /// Persists the cache to disk if anything changed since the last Save(). Cheap no-op
+        /// otherwise. Call this once after processing a batch of files, not once per file.
+        /// </summary>
+        public static void Save()
+        {
+            lock (_lock)
+            {
+                if (!_dirty || _lru == null) return;
+                try
+                {
+                    HashCacheFile cf = new HashCacheFile();
+                    cf.entries = new List<HashCacheEntry>();
+                    //Walk least-recently-used -> most-recently-used (oldest first), so that re-loading
+                    //via the AddFirst() loop in EnsureLoaded() reproduces this exact order.
+                    for (LinkedListNode<HashCacheEntry> node = _lru.Last; node != null; node = node.Previous)
+                    {
+                        cf.entries.Add(node.Value);
+                    }
+                    Directory.CreateDirectory(Path.GetDirectoryName(CacheFilePath));
+                    G.YamlWriter<HashCacheFile>(cf, CacheFilePath);
+                    _dirty = false;
+                }
+                catch
+                {
+                    //Best-effort: a failed cache save should not break the hook. Worst case, next
+                    //run recomputes a few more hashes than strictly necessary.
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns the current number of cached items.
+        /// </summary>
+        public static int Count()
+        {
+            lock (_lock)
+            {
+                EnsureLoaded();
+                return _map.Count;
+            }
+        }
+    }
+
     public static class DlinkHooks
     {
 
@@ -247,6 +442,10 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 else MessageBox.Show("*** ERROR: " + s2); //We want this to show
                 return;
             }
+            finally
+            {
+                DlinkHashCache.Save(); //NEW: persist any hashes computed above, even if the batch failed partway through
+            }
             string s3 = "Producing " + dlinkFiles.Count + " dlink file" + G.S(dlinkFiles.Count) + " succeeded";
             if (function) new Writeln(s3);
             else Console.WriteLine(s3); //This will probably not show in output, but never mind
@@ -265,7 +464,12 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             if (args.Length >= 2 && args[1].StartsWith("-dlinkw:"))
             {
                 gitFolder = G.StripQuotes(args[1].Substring("-dlinkw:".Length)); //The path to \.git is sent from the Git hook
-                //Program.options.folder_working = gitFolder; //Sets working folder --> this will be necessary for root('git') call later on.
+                if (Globals.tthDlink2)
+                {
+                    if (Globals.tthDebug) File.WriteAllText("c:\\b-tth\\test1", gitFolder);
+                    gitFolder = G.Replace(gitFolder, "//nas2/fkontor/", "K:/", StringComparison.OrdinalIgnoreCase, 1);
+                    if (Globals.tthDebug) File.WriteAllText("c:\\b-tth\\test2", gitFolder);
+                }
                 if (!Directory.Exists(gitFolder))
                 {
                     MessageBox.Show("*** Error: The folder '" + gitFolder + "' could not be found (parent of \\.git folder)");
@@ -348,6 +552,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     realFile = new RealFile(realFile.name, dlinkFileData.hash, fi2.Length, fi2.LastWriteTimeUtc, true);                    
                 }
             }            
+            DlinkHashCache.Save(); //NEW: persist any hashes computed while checking this batch of .dlink files
             DLinkCalledFromGitHookReporting(type, getFilesNew, getFilesOverwrite, putFiles);
         }
 
@@ -360,7 +565,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             //m5                 tth\test\biver\_uddata\x.csv
             //m6                 k:\\MAKROBK_KILDE\\2025_10_01\tth\test\biver\_uddata\x.csv
 
-            if (Globals.tthDlink) dlinkFile = G.Replace(dlinkFile, "c:\\tools\\k", "K:", StringComparison.OrdinalIgnoreCase, 1);
+            if (Globals.tthDlink1) dlinkFile = G.Replace(dlinkFile, "c:\\tools\\k", "K:", StringComparison.OrdinalIgnoreCase, 1);
 
             if (!Path.IsPathRooted(Program.options.databank_dlink_folder_progs)) new Error("Expected path '" + Program.options.databank_dlink_folder_progs + "' to be absolute");
             List<string> dataStart1 = Stringlist.Path_FromStringToList(Program.options.databank_dlink_folder_progs);
@@ -397,14 +602,14 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             {                
                 return false; //In that case, realFile.stamp etc. are null too
             }
-            if (realFile.size != dlinkFileData.size)
+            if (realFile.bytes != dlinkFileData.bytes)
             {                
                 return false;
             }            
             //HARD way
             //We now need to calc the sha256 physically.                
             string realHash = GetFileHash(dataFile);
-            realFile = new RealFile(realFile.name, realHash, realFile.size, realFile.stamp, true);
+            realFile = new RealFile(realFile.name, realHash, realFile.bytes, realFile.stamp, true);
             if (dlinkFileData.hash != realHash)
             {
                 //MessageBox.Show("FALSE --> hash, dlink=" + dlinkFileData.hash + " just gotten realhash=" + realHash);
@@ -416,9 +621,10 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         private static void DLinkCalledFromGitHookReporting(string type, List<string> filesNew, List<string> filesOverwritten, List<string> putFiles)
         {
             string s = null;
+            s += " ---------------------- DATA FOLDER SYNC --------------------------- ";
+            s += G.NL + G.NL;
             if (filesNew.Count + filesOverwritten.Count > 0)
-            {
-                s = "Data folder sync: ";
+            {                         
                 string s2a = "are"; if (filesNew.Count < 2) s2a = "is";
                 string s2b = "are"; if (filesOverwritten.Count < 2) s2b = "is";
                 if (filesNew.Count > 0 && filesOverwritten.Count == 0)
@@ -445,26 +651,31 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             }
             else
             {
-                s = "Data folder sync: no data files added or overwritten.";
+                s += "No data files added or overwritten.";
             }
 
             s += G.NL + G.NL;
-            s += " ------------------------------------------------------------------- ";
+            s += " ---------------------- VERSIONS STORAGE --------------------------- ";
             s += G.NL + G.NL;
 
             if (putFiles.Count == 0)
             {
-                s += "Versions storage: nothing changed regarding long-term storage.";
+                s += "Nothing changed regarding long-term storage.";
             }
             else
             {
                 
-                s += "Versions storage: " + putFiles.Count + " data file" + G.S(putFiles.Count) + " stored in long-term storage:";
+                s += putFiles.Count + " data file version" + G.S(putFiles.Count) + " added to long-term storage:";
                 foreach (string f in putFiles)
                 {
                     s += G.NL + f;
                 }
             }
+
+            s += G.NL + G.NL;
+            s += " ------------------------- HASH CACHE ------------------------------ ";
+            s += G.NL + G.NL;
+            s += "Queries = " + DlinkHashCache.countAsk + ", hits = " + DlinkHashCache.countHit + ", size = " + DlinkHashCache.Count();
 
             WindowMessageBox w = new WindowMessageBox(EMessageBox.Normal);
             w.Height = 300;
@@ -482,6 +693,17 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         {
 
             if (G.DlinkDebug()) MessageBox.Show("Getting hash from " + filePath);
+
+            // ---- NEW: LRU cache lookup ---------------------------------------------------------
+            FileInfo fiForCache = new FileInfo(filePath);
+            string cachedHash = DlinkHashCache.TryGet(filePath, fiForCache.Length, fiForCache.LastWriteTimeUtc);
+            if (cachedHash != null)
+            {
+                if (G.DlinkDebug()) MessageBox.Show("Getting hash from LRU cache");
+                return cachedHash;
+            }
+            // -------------------------------------------------------------------------------------
+
             string hash = null;            
             bool isGbk = G.Equal(Path.GetExtension(filePath), ".gbk");
 
@@ -523,9 +745,13 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 if (G.DlinkDebug()) MessageBox.Show("Getting hash from xml");
             }
 
+            // ---- NEW: remember this result for next time -----------------------------------------
+            DlinkHashCache.Set(filePath, fiForCache.Length, fiForCache.LastWriteTimeUtc, hash);
+            // ----------------------------------------------------------------------------------------
+
             return hash;
         }
-        
+
         public static void SyncBlobs(bool isGet, string fileName, string sha256, string blobsFolder, List<string> getFilesNew, List<string> getFilesOverwrite, List<string> putFiles)
         {
             // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
@@ -653,7 +879,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
     {
         public readonly string version = "1.0";
         public string hash { get; private set; }
-        public long? size { get; private set; }
+        public long? bytes { get; private set; }
         public DateTime? stamp { get; private set; }
         public long? variables { get; private set; }
         public string extra { get; private set; }
@@ -662,10 +888,10 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         {
         }
 
-        public DlinkFile(string hash, long? size, DateTime? stamp, long? nVariables, string extra)
+        public DlinkFile(string hash, long? bytes, DateTime? stamp, long? nVariables, string extra)
         {
             this.hash = hash;
-            this.size = size;
+            this.bytes = bytes;
             this.stamp = stamp;
             this.variables = nVariables;
             this.extra = extra;
@@ -676,17 +902,33 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
     {
         public readonly string name = null;
         public readonly string hash = null;
-        public readonly long? size = null;
+        public readonly long? bytes = null;
         public readonly DateTime? stamp = null;
         public readonly bool exists = false;
 
-        public RealFile(string name, string hash, long? size, DateTime? stamp, bool exists)
+        public RealFile(string name, string hash, long? bytes, DateTime? stamp, bool exists)
         {
             this.name = name;
             this.hash = hash;
-            this.size = size;
+            this.bytes = bytes;
             this.stamp = stamp;
             this.exists = exists;
         }
+    }
+
+    // NEW: plain data classes backing DlinkHashCache's on-disk file. Kept as simple public fields
+    // (rather than DlinkFile's private-setter-property style) since DlinkHashCache mutates entries
+    // in place on every cache hit/refresh.
+    public class HashCacheEntry
+    {
+        public string path;
+        public long bytes;
+        public long stamp; //ticks (100ns units) since DlinkHashCache's fixed epoch; compared with a ~2 second tolerance
+        public string hash;
+    }
+
+    public class HashCacheFile
+    {
+        public List<HashCacheEntry> entries = new List<HashCacheEntry>();
     }
 }

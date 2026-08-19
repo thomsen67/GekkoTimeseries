@@ -2979,18 +2979,23 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer)
             {
-                //if (true)
-                //{
-                //    //string hash = DlinkHooks.BlobsHash(@"k:\MAKROBK_KILDE\2025_10_01\tth\test\biver\_uddata\y.gbk", true); //TODO: WithWait or WaitFor...
-                //    List<string> args = new List<string>();
-                //    //args.Add("-dlink:'pre-commit'");
-                //    //args.Add("'makrobk_grunddata/biver/_uddata_dlink/x.csv.dlink'");
-                //    //args.Add("'makrobk_grunddata/biver/_uddata_dlink/y.gbk.dlink'");
-                //    //args.Add("-dlinkw:'C:/Tools/K/MAKROBK/tth/test'");
-                //    args.Add("-dlink:'pre-commit','makrobk_grunddata/biver/_uddata_dlink/x.csv.dlink','makrobk_grunddata/biver/_uddata_dlink/y.gbk.dlink'");
-                //    args.Add("-dlinkw:'C:/Tools/K/MAKROBK/tth/test'");
-                //    DlinkHooks.DLinkCalledFromGitHook(args.ToArray());
-                //}                               
+                if (true)
+                {
+                    //var xx = Stringlist.Path_FromStringToList("//nas2/fkontor/makrobk/tth/test");
+                }
+
+                if (true)
+                {
+                    //string hash = DlinkHooks.BlobsHash(@"k:\MAKROBK_KILDE\2025_10_01\tth\test\biver\_uddata\y.gbk", true); //TODO: WithWait or WaitFor...
+                    List<string> args = new List<string>();
+                    //args.Add("-dlink:'pre-commit'");
+                    //args.Add("'makrobk_grunddata/biver/_uddata_dlink/x.csv.dlink'");
+                    //args.Add("'makrobk_grunddata/biver/_uddata_dlink/y.gbk.dlink'");
+                    //args.Add("-dlinkw:'C:/Tools/K/MAKROBK/tth/test'");
+                    args.Add("-dlink:'pre-commit','makrobk_grunddata/biver/_uddata_dlink/x.csv.dlink'");
+                    args.Add("-dlinkw:'//nas2/fkontor/MAKROBK/tth/test'");
+                    DlinkHooks.DLinkCalledFromGitHook(args.ToArray());
+                }
 
                 // -----------------------------------------------------------
                 // Kør tell't1', tell't2', tell't3'.
@@ -2999,7 +3004,7 @@ namespace Gekko
                 //   traces1.parquet så filen fra DST, mens traces2.parquet var
                 //   fra TTH pc.
                 // -----------------------------------------------------------
-                                
+
 
                 if (Globals.runningOnTTComputer)
                 {

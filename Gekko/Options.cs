@@ -76,8 +76,8 @@ namespace Gekko
         public string databank_file_gbk_internal = "databank.data";
         public bool databank_file_gbk_underscore = false; //if set to true, when reading a Gekko 2.x gbk databank, a variable like x___a___b is understood as an array-series x[a,b].
         public bool databank_file_gbk_datahash = true; //calculate data hash code for .gbk files
-        public bool databank_file_gbk_datahash_trace = true; //includes a "flag" to distingusih if there are 0 traces or > 0 traces.
-        public bool databank_file_gbk_datahash_meta = false; //includes metadata for series, except stamps
+        public bool databank_file_gbk_datahash_trace = true; //includes a "flag" to distingusih if there are 0 traces or > 0 traces. TODO: what if someone manually deletes the trace file inside the zip?
+        public bool databank_file_gbk_datahash_meta = true; //includes metadata for series, except stamps. TODO: labels for matrices
         public bool databank_search = true;
 
         public bool databank_dlink = false;

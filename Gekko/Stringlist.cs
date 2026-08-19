@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Windows.Forms;
 
 namespace Gekko
 {
@@ -161,7 +162,12 @@ namespace Gekko
                 //Mostly for unc part, first element
                 m2 = m.Select(s => s?.Replace('\\', '/')).ToList();
             }
-            else new Error("Expected separator '\\' or '/'");
+            else if (separator == "<separator>")
+            {
+                //Only For testing purposes
+                m2 = m;
+            }
+            else new Error("Expected separator '\\' or '/' or '<separator>'");
             return string.Join(separator, m2.ToArray());
         }
 
@@ -176,7 +182,12 @@ namespace Gekko
             if (source == null || prefix == null) new Error("Null list");
             // Check if source has enough items and matches prefix case-insensitively
             bool startsWithPrefix = source.Count >= prefix.Count && source.Take(prefix.Count).SequenceEqual(prefix, StringComparer.OrdinalIgnoreCase);
-            if (!startsWithPrefix) new Error("The path '" + Path_FromListToString(source, "\\") + " does not start with " + Path_FromListToString(prefix, "\\"));
+            if (Globals.tthDebug) File.WriteAllText("c:\\b-tth\\gitbug111.txt", Path_FromListToString(source, "<separator>") + " === " + Path_FromListToString(prefix, "<separator>"));
+            if (!startsWithPrefix)
+            {
+                if (Globals.tthDebug) File.WriteAllText("c:\\b-tth\\gitbug.txt2222", "The path '" + Path_FromListToString(source, "<separator>") + " does not start with " + Path_FromListToString(prefix, "<separator>"));
+                new Error("The path '" + Path_FromListToString(source, "<separator>") + " does not start with " + Path_FromListToString(prefix, "<separator>"));
+            }
             return source.Skip(prefix.Count).ToList();
         }
 

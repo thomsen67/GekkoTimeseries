@@ -3336,6 +3336,7 @@ namespace Gekko
                 Hashing.HashDoubleArray(this.data.GetDataArray_ONLY_INTERNAL_USE(), helper.hash);
                 if (helper.includeMetadata)
                 {
+                    //TODO: What about labels on matrices???
                     Hashing.HashEnum1(Hashing.EHashType.SeriesMetadata, helper.hash);
                     Hashing.HashString(this.meta.label, helper.hash); //no .ToLower() here!
                     Hashing.HashString(this.meta.source, helper.hash); //no .ToLower() here!
