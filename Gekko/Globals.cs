@@ -53,9 +53,8 @@ namespace Gekko
 
         // -------------------------------------
 
-        public static bool tthDlink1 = true;
-        public static bool tthDlink2 = true;
-        public static bool tthDebug = true;
+        public static bool tthDlink1 = false; //On TTH computer        
+        public static bool tthDebug = false;
 
         // -------------------------------------
 

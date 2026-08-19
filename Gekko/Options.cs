@@ -91,6 +91,8 @@ namespace Gekko
         public string databank_dlink_folder_replace1b = "_inddata_dlink";
         public string databank_dlink_folder_replace2a = "_uddata";
         public string databank_dlink_folder_replace2b = "_uddata_dlink";
+        public string databank_dlink_folder_replace3a = "//nas2/fkontor/";
+        public string databank_dlink_folder_replace3b = "K:/";
 
         public bool databank_trace = true;
         public bool databank_trace_dublets = false; //
@@ -463,7 +465,9 @@ namespace Gekko
             Add("DATABANK DLINK FOLDER REPLACE1A", Globals.xnameOrString, "dlink");
             Add("DATABANK DLINK FOLDER REPLACE1B", Globals.xnameOrString, "dlink");
             Add("DATABANK DLINK FOLDER REPLACE2A", Globals.xnameOrString, "dlink");
-            Add("DATABANK DLINK FOLDER REPLACE2B", Globals.xnameOrString, "dlink");        
+            Add("DATABANK DLINK FOLDER REPLACE2B", Globals.xnameOrString, "dlink");
+            Add("DATABANK DLINK FOLDER REPLACE3A", Globals.xnameOrString, "dlink");
+            Add("DATABANK DLINK FOLDER REPLACE3B", Globals.xnameOrString, "dlink");
 
             Add("DATABANK TRACE", Globals.xbool);
             Add("DATABANK TRACE DUBLETS", Globals.xbool); 

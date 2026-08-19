@@ -464,12 +464,12 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             if (args.Length >= 2 && args[1].StartsWith("-dlinkw:"))
             {
                 gitFolder = G.StripQuotes(args[1].Substring("-dlinkw:".Length)); //The path to \.git is sent from the Git hook
-                if (Globals.tthDlink2)
+                if (Globals.tthDebug) File.WriteAllText("c:\\b-tth\\test1", gitFolder);
+                if (!G.NullOrBlanks(Program.options.databank_dlink_folder_replace3a))
                 {
-                    if (Globals.tthDebug) File.WriteAllText("c:\\b-tth\\test1", gitFolder);
-                    gitFolder = G.Replace(gitFolder, "//nas2/fkontor/", "K:/", StringComparison.OrdinalIgnoreCase, 1);
-                    if (Globals.tthDebug) File.WriteAllText("c:\\b-tth\\test2", gitFolder);
+                    gitFolder = G.Replace(gitFolder, Program.options.databank_dlink_folder_replace3a, Program.options.databank_dlink_folder_replace3b, StringComparison.OrdinalIgnoreCase, 1);
                 }
+                if (Globals.tthDebug) File.WriteAllText("c:\\b-tth\\test2", gitFolder);
                 if (!Directory.Exists(gitFolder))
                 {
                     MessageBox.Show("*** Error: The folder '" + gitFolder + "' could not be found (parent of \\.git folder)");

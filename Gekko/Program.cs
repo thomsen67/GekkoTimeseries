@@ -2984,7 +2984,7 @@ namespace Gekko
                     //var xx = Stringlist.Path_FromStringToList("//nas2/fkontor/makrobk/tth/test");
                 }
 
-                if (true)
+                if (false)
                 {
                     //string hash = DlinkHooks.BlobsHash(@"k:\MAKROBK_KILDE\2025_10_01\tth\test\biver\_uddata\y.gbk", true); //TODO: WithWait or WaitFor...
                     List<string> args = new List<string>();
