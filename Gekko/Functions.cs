@@ -6861,15 +6861,19 @@ namespace Gekko
             string s = O.ConvertToString(x);
             if (G.Equal(s, "activate"))
             {
-                DlinkSetup.DlinkFunction(O.ConvertToString(root(smpl, _t1, _t2, new ScalarString("git"))), true);
+                DlinkSetup.DlinkFunction(O.ConvertToString(root(smpl, _t1, _t2, new ScalarString("git"))), DlinkSetup.EDlinkSetup.Activate);
             }
             else if (G.Equal(s, "deactivate"))
             {
-                DlinkSetup.DlinkFunction(O.ConvertToString(root(smpl, _t1, _t2, new ScalarString("git"))), false);
+                DlinkSetup.DlinkFunction(O.ConvertToString(root(smpl, _t1, _t2, new ScalarString("git"))), DlinkSetup.EDlinkSetup.Deactivate);
+            }
+            else if (G.Equal(s, "sync"))
+            {
+                DlinkSetup.DlinkFunction(O.ConvertToString(root(smpl, _t1, _t2, new ScalarString("git"))), DlinkSetup.EDlinkSetup.Sync);
             }
             else
             {
-                new Error("Expected dlink() argument to be 'activate' or 'deactivate'");                
+                new Error("Expected dlink() argument to be 'activate', 'deactivate' or 'sync'");
             }
         }
 
