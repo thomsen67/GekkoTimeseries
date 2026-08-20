@@ -49,7 +49,7 @@ namespace Gekko
         /// <param name="parentOfGitFolder"></param>
         public static void DlinkFunction(string parentOfGitFolder, EDlinkSetup type)
         {
-            if (G.DlinkDebug()) MessageBox.Show("GitHooks() called with " + parentOfGitFolder + ", activate " + activate);
+            if (G.DlinkDebug()) MessageBox.Show("GitHooks() called with " + parentOfGitFolder + ", type " + type.ToString());
 
             string hooksPath = Path.Combine(parentOfGitFolder, ".git", "hooks");
             if (!Directory.Exists(hooksPath)) new Error("Could not find folder '" + hooksPath + "'");
@@ -180,7 +180,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     {
                         if (true)
                         {
-                            MessageBox.Show("The folder '" + Path.GetDirectoryName(dlinkFile) + "' is created");
+                            //MessageBox.Show("The folder '" + Path.GetDirectoryName(dlinkFile) + "' is created");
                             Directory.CreateDirectory(Path.GetDirectoryName(dlinkFile));
                         }
                         else
@@ -787,7 +787,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         public static int countHit = 0;
 
         private const int Capacity = 1000;
-        private static readonly long ToleranceTicks = TimeSpan.FromSeconds(2).Ticks; //Changed from TimeSpan.FromSeconds(2) to TimeSpan.FromSeconds(0).
+        private static readonly long ToleranceTicks = TimeSpan.FromSeconds(0).Ticks; //Changed from TimeSpan.FromSeconds(2) to TimeSpan.FromSeconds(0).
         private static readonly DateTime TicksEpoch = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         private static readonly object _lock = new object(); //cheap insurance if the foreach loops above are ever parallelized
