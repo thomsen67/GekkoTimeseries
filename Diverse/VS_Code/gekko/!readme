@@ -5,3 +5,13 @@ Go to marketplace.visualstudio.com --> publish extensions --> hit three dots (..
 Could use .yaml instead of .json, and convert with kqr_yaml.bat? Then the Sublime coloring could be used here. THen it would be
 npx yaml-js syntaxes/gekko.tmLanguage.json > syntaxes/gekko.tmLanguage.yaml.
 
+// ---
+
+Installer VS Code. Fra cmd window, kør "npm install -g yo generator-code". Derefter "npm install -g pnpm". For at kunne lave vsix-filer, brug "npm install -g @vscode/vsce". Derefter "yo code", og vælg language support (eller hvad det hedder). Hvis fejl, prøv evt. "npm upgrade" først, og hvis der mangler ts compiler: "npm install -g typescript". I \src skal der ligge en extension.js, og der skal være et link til denne under "main" i package.json. 
+Icon kan kun ligge i root, ellers failer det åbenbart.
+
+// ---
+
+Cursor: had to go to https://open-vsx.org and create account, and then also open an
+Eclipse Foundation account (linked both to GitHub account).
+Created a "Claiming namespace" here: https://github.com/EclipseFdn/open-vsx.org/issues.
