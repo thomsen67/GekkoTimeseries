@@ -56,7 +56,8 @@ namespace Gekko
             String = 13,
             Date = 14,
             SeriesMetadata = 15,
-            SeriesTraces = 16
+            SeriesTraces = 16,
+            DatabankLabel = 17,
 
         }
 

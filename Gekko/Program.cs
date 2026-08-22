@@ -24638,6 +24638,11 @@ namespace Gekko
                         int hasTraces = 0; if (tracesToWrite != null && tracesToWrite.Count > 0) hasTraces = 1;
                         Hashing.HashInteger(hasTraces, helper.hash);
                     }
+                    if (true) //Bank label
+                    {
+                        Hashing.HashEnum1(Hashing.EHashType.DatabankLabel, helper.hash);
+                        Hashing.HashString(databank.info1, helper.hash); //no .ToLower() here!                    
+                    }
                     helper.hash.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
                     dataHash = BitConverter.ToString(helper.hash.Hash!).Replace("-", "").ToLower();
                     G.WritelnGray("Datahash = " + dataHash + ", " + G.Seconds(t0));

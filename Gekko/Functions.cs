@@ -6887,7 +6887,7 @@ namespace Gekko
         {
             List<IVariable> m1 = O.ConvertToList(x);
             string[] m2 = Stringlist.GetListOfStringsFromListOfIvariables(m1.ToArray());
-            DlinkHooks.DLinkFilesCalledFromExe(m2, true);
+            DlinkHooks.CreateDlinkFilesManually(m2, true);
         }
 
         public static IVariable eval(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)

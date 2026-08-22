@@ -259,7 +259,7 @@ namespace Gekko
             if (args.Length >= 1 && args[0].StartsWith("-dlinkfiles:"))
             {                
                 Program.SetupGekkoForNonGuiUse(); //necessary because of temp folders and more
-                DlinkHooks.DLinkFilesCalledFromExe(args, false);
+                DlinkHooks.CreateDlinkFilesManually(args, false);
                 return;
             }
 

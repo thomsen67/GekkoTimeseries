@@ -132,8 +132,6 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 new Error();
             }
         }
-
-
     }
 
     public static class DlinkAutoDlinkFiles
@@ -145,7 +143,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         public static void Blob(string dataFile, long? nVariables, bool force)
         {
             string hash = null;
-            long? size = null;
+            long? bytes = null;
             DateTime? stamp = null;
             if (force || Program.options.databank_dlink)
             {
@@ -175,21 +173,13 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     // and forth for data that has not really changed also means the .dlink file's
                     // content changes for no real reason -- which shows up in Git as a commit on a
                     // file that, in reality, is unchanged. Leaving it null avoids both problems.
-                    size = DlinkHooks.IsDataHashFileType(dataFile) ? (long?)null : (new FileInfo(dataFile)).Length;
+                    bytes = DlinkHooks.IsDataHashFileType(dataFile) ? (long?)null : (new FileInfo(dataFile)).Length;
                     if (!Directory.Exists(Path.GetDirectoryName(dlinkFile)))
                     {
-                        if (true)
-                        {
-                            //MessageBox.Show("The folder '" + Path.GetDirectoryName(dlinkFile) + "' is created");
-                            Directory.CreateDirectory(Path.GetDirectoryName(dlinkFile));
-                        }
-                        else
-                        {
-                            MessageBox.Show("The folder '" + Path.GetDirectoryName(dlinkFile) + "' does not exist for ." + Program.options.databank_dlink_name + " file writing");
-                            new Error();
-                        }
+                        //MessageBox.Show("The folder '" + Path.GetDirectoryName(dlinkFile) + "' is created");
+                        Directory.CreateDirectory(Path.GetDirectoryName(dlinkFile));
                     }
-                    DlinkFile blobInfo = new DlinkFile(hash, size, stamp, nVariables, null);
+                    DlinkFile blobInfo = new DlinkFile(hash, bytes, stamp, nVariables, null);
                     G.YamlWriter<DlinkFile>(blobInfo, dlinkFile);
                 }
             }
@@ -225,10 +215,14 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         }
     }    
 
+    /// <summary>
+    /// For instance if Python creates a csv file. Or already existing .gbk files are to be put into Git as .dlink files.    
+    /// TODO: for Python etc. should it be possible to state number of variables?
+    /// 
+    /// </summary>
     public static class DlinkHooks
     {
-
-        public static void DLinkFilesCalledFromExe(string[] args, bool function)
+        public static void CreateDlinkFilesManually(string[] args, bool function)
         {
             List<string> dlinkFiles = new List<string>();
             if (function)
@@ -276,7 +270,6 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             string s3 = "Producing " + dlinkFiles.Count + " dlink file" + G.S(dlinkFiles.Count) + " succeeded";
             if (function) new Writeln(s3);
             else Console.WriteLine(s3); //This will probably not show in output, but never mind
-
         }
         
         /// <summary>
@@ -321,8 +314,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             List<string> getFilesNew = new List<string>();
             List<string> getFilesOverwrite = new List<string>();
             List<string> putFiles = new List<string>();            
-            
-            //GekkoDictionary<string, bool> datafiles = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+                        
             foreach (string dlinkFile2 in dlinkFiles) //Could probably be parallelized
             {                
                 string dLinkFileWithPath = Path.Combine(G.CleanupFolderName(gitFolder, false), G.CleanupFolderName(dlinkFile2, false));
@@ -332,8 +324,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     new Error();
                 }
                 DlinkFile dlinkFileData = G.YamlReader<DlinkFile>(dLinkFileWithPath);
-                string dataFile = Dlink_FromDlinkFileToDataFile(dLinkFileWithPath);
-                //datafiles.Add(dataFile, false); //for cleanup purposes
+                string dataFile = Dlink_FromDlinkFileToDataFile(dLinkFileWithPath);                
                 if (G.NullOrBlanks(dataFile))
                 {
                     MessageBox.Show("Datafile string is null"); new Error();
@@ -364,10 +355,10 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 // --------------------------------------------------------------------------------------------------                                
                 
                 //After this method call, realFile may change regarding .hash and .exists fields (and only those)
-                bool isDataFileOk = IsDLlinkHelperFileOk(realFile.name, dlinkFileData, ref realFile); //regarding last two args: either both non-null or both null
-                if (isDataFileOk)
+                bool doDlinkFileAndDataFileCorrespond = DoDlinkFileAndDataFileCorrespond(realFile.name, dlinkFileData, ref realFile); //regarding last two args: either both non-null or both null
+                if (doDlinkFileAndDataFileCorrespond)
                 {
-                    //Check that we have the file in blobs folder, else add it there
+                    //Check that we have the file in blobs folder, else add it there. This happens when making a brand new datafile
                     SyncBlobs(false, realFile.name, dlinkFileData.hash, G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), getFilesNew, getFilesOverwrite, putFiles);                    
                 }
                 else
@@ -434,7 +425,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// <param name="dlinkFileData"></param>
         /// <param name="fi"></param>
         /// <returns></returns>
-        public static bool IsDLlinkHelperFileOk(string dataFile, DlinkFile dlinkFileData, ref RealFile realFile)
+        public static bool DoDlinkFileAndDataFileCorrespond(string dataFile, DlinkFile dlinkFileData, ref RealFile realFile)
         {
             //When this method is called, dataFile does not have a hash code because it is costly to compute
             //We try to take the hash code from cache
@@ -518,9 +509,11 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             s += G.NL + G.NL;
             s += " ------------------------- HASH CACHE ------------------------------ ";
             s += G.NL + G.NL;
-            s += "Queries = " + DlinkHashCache.countAsk + ", hits = " + DlinkHashCache.countHit + ", size = " + DlinkHashCache.Count();
+            s += "Queries = " + DlinkHashCache.countAsk + ", hits = " + DlinkHashCache.countHit + ", size = " + DlinkHashCache.Count() + G.NL;
+            s += "This part of the message is for debugging and will be removed soon" + G.NL;
 
             WindowMessageBox w = new WindowMessageBox(EMessageBox.Normal);
+            w.Title = "Data versioning message";
             w.Height = 300;
             w.Width = 600;
             w.textBox1.VerticalScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility.Visible;
@@ -594,7 +587,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             return hash;
         }
 
-        public static void SyncBlobs(bool isGet, string fileName, string sha256, string blobsFolder, List<string> getFilesNew, List<string> getFilesOverwrite, List<string> putFiles)
+        public static void SyncBlobs(bool isGet, string fileNameAndPath, string sha256, string blobsFolder, List<string> getFilesNew, List<string> getFilesOverwrite, List<string> putFiles)
         {
             // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
             // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
@@ -625,14 +618,14 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 // ------------------------------------
                 if (!File.Exists(Path.Combine(blobsFolder, shapart1, shapart2)))
                 {
-                    MessageBox.Show("For '" + fileName + "', could not find blob file '" + Path.Combine(blobsFolder, shapart1, shapart2) + "'");
+                    MessageBox.Show("For '" + fileNameAndPath + "', could not find blob file '" + Path.Combine(blobsFolder, shapart1, shapart2) + "'");
                     new Error();
                 }
                 else
                 {
-                    if (File.Exists(fileName)) getFilesOverwrite.Add(fileName);
-                    else getFilesNew.Add(fileName);
-                    BlobsFileGet(fileName, Path.Combine(blobsFolder, shapart1, shapart2));
+                    if (File.Exists(fileNameAndPath)) getFilesOverwrite.Add(fileNameAndPath);
+                    else getFilesNew.Add(fileNameAndPath);
+                    BlobsFileGet(fileNameAndPath, Path.Combine(blobsFolder, shapart1, shapart2));
                 }
             }
             else
@@ -644,8 +637,8 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 if (!Directory.Exists(Path.Combine(blobsFolder, shapart1)))
                 {
                     Directory.CreateDirectory(Path.Combine(blobsFolder, shapart1));
-                    BlobsFilePut(fileName, blobsFile);
-                    putFiles.Add(fileName);
+                    BlobsFilePut(fileNameAndPath, blobsFile);
+                    putFiles.Add(fileNameAndPath);
                 }
                 else
                 {
@@ -660,23 +653,27 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     }
                     else
                     {
-                        BlobsFilePut(fileName, blobsFile);
-                        putFiles.Add(fileName);
+                        BlobsFilePut(fileNameAndPath, blobsFile);
+                        putFiles.Add(fileNameAndPath);
                     }
                 }
             }
         }
 
-        private static void BlobsFileGet(string fileName, string blobsFile)
+        private static void BlobsFileGet(string fileNameAndPath, string blobsFile)
         {
             //TODO
             //TODO
             //TODO Maybe check that the sha hash is correct after fetching the file.
             //TODO
             //TODO
-            if (Globals.alreadyZipped.Contains(Path.GetExtension(fileName), StringComparer.OrdinalIgnoreCase))
+
+            //We always create the folder in case it does not already exist. For cloning this is obviously important.
+            Directory.CreateDirectory(Path.GetDirectoryName(fileNameAndPath));
+
+            if (Globals.alreadyZipped.Contains(Path.GetExtension(fileNameAndPath), StringComparer.OrdinalIgnoreCase))
             {
-                File.Copy(blobsFile, fileName, true); //Allows overwrite, TODO UNZIPPING                    
+                File.Copy(blobsFile, fileNameAndPath, true); //Allows overwrite, TODO UNZIPPING                    
             }
             else
             {
@@ -685,11 +682,11 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     ZipArchiveEntry entry = archive.GetEntry("storage");
                     if (entry != null)
                     {
-                        entry.ExtractToFile(fileName, true);
+                        entry.ExtractToFile(fileNameAndPath, true);
                     }
                 }
             }
-            G.ReadOnlyRemove(fileName);
+            G.ReadOnlyRemove(fileNameAndPath);
         }
 
         private static void BlobsFilePut(string fileName, string blobsFile)
