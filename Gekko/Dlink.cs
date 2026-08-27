@@ -27,6 +27,7 @@ using System.Data;
 using ProtoBuf;
 using System.Linq;
 using System.IO.Compression;
+using System.Diagnostics;
 
 namespace Gekko
 {
@@ -38,8 +39,9 @@ namespace Gekko
         public enum EDlinkSetup
         {
             Activate,
-            Deactivate,
-            Sync
+            ActivateOnlyHooks,
+            ActivateOnlySync,
+            DeactivateHooks,
         }
         
         /// <summary>
@@ -59,11 +61,34 @@ namespace Gekko
                 // ----------------------------------------------------------------------------------------------------------                                            
                 string gekkoPath = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), "_utilities", "Gekko").Replace("\\", "/");
                 string gekkoExePath = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), "_utilities", "Gekko", "Gekko.exe").Replace("\\", "/");
+                // Note: -c core.quotepath=false --> without it, Git mangles זרו etc. With it, we get UTF8. Se #oowar7asdfj
+                // Pre-commit only needs to sync the .dlink files that are actually part of
+                //      this commit -- "git diff --cached --name-only --diff-filter=ACMR"
+                //      Note that "D" is not in "ACMR" because a deleted .dlink does not need to be synced.
+                //      Also note that using "git commit -a" might break this logic...!
+                // NOTE: It seems that if one uses raw Git commands and (1) creates a file with "117" inside, (2) adds it
+                //       changes the file to "118" inside, (3) commits it --> it is "117" that ends up in the repo.
+                //       Regarding TortoiseGit it seems like it re-stages the working-tree contents before committing, because
+                //       using TortoiseGit GUI instead makes "118" end up in the repo.
+                //       If users ever start using raw Git commands AND do an add and then changes the file before committing,
+                //       the logic may break.
                 string _common = @$"#!/bin/sh
 ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null)
-STAGED_FILES=$(git -C ""${{ROOT_DIR}}"" ls-files --cached -- ':(icase)*.dlink')
-FORMATTED_FILES=$(echo ""$STAGED_FILES"" | sed ""s/^/'/;s/$/'/"" | paste -sd, -)
-cmd.exe //c ""{gekkoExePath}"" ""-dlink:'$1',$FORMATTED_FILES"" ""-dlinkw:'$ROOT_DIR'""
+rm -f ""${{ROOT_DIR}}""/.git/dlink_filelist_*.txt
+if [ ""$1"" = ""pre-commit"" ]; then
+  STAGED_FILES=$(git -C ""${{ROOT_DIR}}"" -c core.quotepath=false diff --cached --name-only --diff-filter=ACMR -- ':(icase)*.dlink')
+else
+  STAGED_FILES=$(git -C ""${{ROOT_DIR}}"" -c core.quotepath=false ls-files --cached -- ':(icase)*.dlink')
+fi
+DLINK_TMP_NAME=""dlink_filelist_$$.txt""
+DLINK_TMP_PATH=""${{ROOT_DIR}}/.git/${{DLINK_TMP_NAME}}""
+echo ""$1"" > ""$DLINK_TMP_PATH""
+echo ""$STAGED_FILES"" >> ""$DLINK_TMP_PATH""
+cd /c/Windows
+echo ""==> Syncing data files start (please wait for popup window to show)""
+cmd.exe //c ""{gekkoExePath}"" ""-dlink:'$DLINK_TMP_NAME'"" ""-dlinkw:'$ROOT_DIR'""
+rm -f ""$DLINK_TMP_PATH""
+echo ""==> Syncing data files end""
 ";
                 // ----------------------------------------------------------------------------------------------------------
                 string post_checkout = $@"#!/bin/sh
@@ -86,24 +111,34 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
                 var hooks = new Dictionary<string, string> { { "_common", _common }, { "post-checkout", post_checkout }, { "post-merge", post_merge }, { "pre-commit", pre_commit }, { "pre-push", pre_push } };
 
-                if (type == EDlinkSetup.Activate)
+                if (type == EDlinkSetup.Activate || type == EDlinkSetup.ActivateOnlyHooks || type == EDlinkSetup.ActivateOnlySync)
                 {
-                    int counter = 0;
-                    Directory.CreateDirectory(gekkoPath);
-                    foreach (var hook in hooks)
+                    if (type == EDlinkSetup.Activate || type == EDlinkSetup.ActivateOnlyHooks)
                     {
-                        string filePath = Path.Combine(hooksPath, hook.Key);
-                        string contentToWrite = hook.Value;
-                        bool b = G.WriteIfChanged(filePath, contentToWrite);
-                        if (b) counter++;
+                        int counter = 0;
+                        Directory.CreateDirectory(gekkoPath);
+                        foreach (var hook in hooks)
+                        {
+                            string filePath = Path.Combine(hooksPath, hook.Key);
+                            string contentToWrite = hook.Value;
+                            bool b = G.WriteIfChanged(filePath, contentToWrite);
+                            if (b) counter++;
+                        }
+                        if (counter == 0) new Writeln("Git hook files in folder '" + hooksPath + "' are already up to date");
+                        else
+                        {
+                            new Writeln("Added or changed " + counter + " Git hook files in folder '" + hooksPath + "'");
+                        }
                     }
-                    if (counter == 0) new Writeln("Git hook files in folder '" + hooksPath + "' are already up to date");
-                    else
+
+                    if (type == EDlinkSetup.Activate || type == EDlinkSetup.ActivateOnlySync)
                     {
-                        new Writeln("Added or changed " + counter + " Git hook files in folder '" + hooksPath + "'");
+                        // Here we sync every tracked .dlink file, as if a Git hook had fired.
+                        List<string> trackedDlinkFiles = DlinkHooks.ListTrackedDlinkFiles(parentOfGitFolder);
+                        DlinkHooks.DlinkSyncFiles(parentOfGitFolder, "activate", trackedDlinkFiles);
                     }
                 }
-                else if (type == EDlinkSetup.Deactivate)
+                else if (type == EDlinkSetup.DeactivateHooks)
                 {
                     int c = 0;
                     foreach (var hook in hooks)
@@ -117,18 +152,15 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     }
                     if (c == 0) new Writeln("Did not find any Git hook files to delete in folder '" + hooksPath + "'");
                     else new Writeln("Deleted " + c + " Git hook files from folder '" + hooksPath + "'");
-                }
-                else if (type == EDlinkSetup.Sync)
-                {
-                    new Writeln("Syncing should be automatic when for instance cloning a repo. Therefore this function is not implemented at the moment");
-                }
+                }                
                 else new Error();
             }
             catch
             {
-                if (type == EDlinkSetup.Activate) new Error("Failed to write Git hooks files in folder '" + hooksPath + "'");
-                else if (type == EDlinkSetup.Deactivate) new Error("Failed to remove Git hooks files in folder '" + hooksPath + "'");
-                else if (type == EDlinkSetup.Sync) new Error("Failed to sync .dlink files (Git folder: '" + hooksPath + "')");
+                if (type == EDlinkSetup.Activate) new Error("Failed to write Git hooks files in folder '" + hooksPath + "', and sync afterwards.");
+                else if (type == EDlinkSetup.DeactivateHooks) new Error("Failed to remove Git hooks files in folder '" + hooksPath + "'");
+                else if (type == EDlinkSetup.ActivateOnlyHooks) new Error("Failed to write Git hooks files in folder '" + hooksPath + "'");
+                else if (type == EDlinkSetup.ActivateOnlySync) new Error("Failed to sync .dlink files (Git folder: '" + hooksPath + "')");
                 new Error();
             }
         }
@@ -166,17 +198,11 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     {
                         new Error("The file '" + dataFile + "' does not exist for .dlink file construction");
                     }
-                    // New: for "data hash" file types (see DlinkHooks.IsDataHashFileType), the byte
-                    // size is not a reliable proxy for "the data is the same" -- two files holding
-                    // the same data can have different byte sizes (e.g. embedded timestamps inside a
-                    // .gbk, or different zip/compression settings). Recording a size that flips back
-                    // and forth for data that has not really changed also means the .dlink file's
-                    // content changes for no real reason -- which shows up in Git as a commit on a
-                    // file that, in reality, is unchanged. Leaving it null avoids both problems.
-                    bytes = DlinkHooks.IsDataHashFileType(dataFile) ? (long?)null : (new FileInfo(dataFile)).Length;
+                    // For "data hash" file types (see DlinkHooks.IsDataHashFileType), the byte
+                    // size is not a reliable proxy for "same data". So bytes is == null for .gbk.
+                    bytes = DlinkHooks.IsDataHashFileType(dataFile) ? null : (new FileInfo(dataFile)).Length;
                     if (!Directory.Exists(Path.GetDirectoryName(dlinkFile)))
-                    {
-                        //MessageBox.Show("The folder '" + Path.GetDirectoryName(dlinkFile) + "' is created");
+                    {                        
                         Directory.CreateDirectory(Path.GetDirectoryName(dlinkFile));
                     }
                     DlinkFile blobInfo = new DlinkFile(hash, bytes, stamp, nVariables, null);
@@ -207,6 +233,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             if (!G.NullOrBlanks(Program.options.databank_dlink_folder_remove1)) m3.Insert(2, Program.options.databank_dlink_folder_remove1); //hacky, in middle                        
             List<string> m4 = Stringlist.Path_ReplaceString(m3, Program.options.databank_dlink_folder_replace1a, Program.options.databank_dlink_folder_replace1b, 1);
             m4 = Stringlist.Path_ReplaceString(m4, Program.options.databank_dlink_folder_replace2a, Program.options.databank_dlink_folder_replace2b, 1);
+            m4 = Stringlist.Path_ReplaceString(m4, Program.options.databank_dlink_folder_replace3a, Program.options.databank_dlink_folder_replace3b, 1);
             List<string> m5 = m4.ToList();
             m5[m5.Count - 1] += "." + Program.options.databank_dlink_name;
             List<string> m6 = m5.ToList();
@@ -285,9 +312,9 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             {
                 gitFolder = G.StripQuotes(args[1].Substring("-dlinkw:".Length)); //The path to \.git is sent from the Git hook
                 if (Globals.tthDebug) File.WriteAllText("c:\\b-tth\\test1", gitFolder);
-                if (!G.NullOrBlanks(Program.options.databank_dlink_folder_replace3a))
+                if (!G.NullOrBlanks(Program.options.databank_dlink_folder_replace4a))
                 {
-                    gitFolder = G.Replace(gitFolder, Program.options.databank_dlink_folder_replace3a, Program.options.databank_dlink_folder_replace3b, StringComparison.OrdinalIgnoreCase, 1);
+                    gitFolder = G.Replace(gitFolder, Program.options.databank_dlink_folder_replace4a, Program.options.databank_dlink_folder_replace4b, StringComparison.OrdinalIgnoreCase, 1);
                 }
                 if (Globals.tthDebug) File.WriteAllText("c:\\b-tth\\test2", gitFolder);
                 if (!Directory.Exists(gitFolder))
@@ -301,22 +328,108 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 MessageBox.Show("*** Error: Could not get the path to the \\.git folder)");
                 new Error();
             }
-            string s2 = args[0].Substring("dlink:".Length);
-            MatchCollection matches = Regex.Matches(s2, @"'([^']*)'");            
-            List<string> dlinkFiles = new List<string>();
-            string type = matches[0].Groups[1].Value;
-            for (int i = 1; i < matches.Count; i++)
+            
+            //Reads file names from the temporary file created by the _common bash script/hook            
+            string dlinkFileArg = args.FirstOrDefault(a => a.StartsWith("-dlink:"));
+            if (G.NullOrBlanks(dlinkFileArg))
             {
-                string s = matches[i].Groups[1].Value;
-                if (G.NullOrBlanks(s)) continue; //First time, it can have a '' as the first element
-                dlinkFiles.Add(s);
-            }            
+                MessageBox.Show("*** Error: Could not find the '-dlink:' argument");
+                new Error();
+            }
+            string dlinkListFileName = G.StripQuotes(dlinkFileArg.Substring("-dlink:".Length));
+            string dlinkListFilePath = Path.Combine(gitFolder, ".git", dlinkListFileName);
+            if (!File.Exists(dlinkListFilePath))
+            {
+                MessageBox.Show("*** Error: Could not find the .dlink file list '" + dlinkListFilePath + "'");
+                new Error();
+            }
+            string[] lines = File.ReadAllLines(dlinkListFilePath);
+            string type = lines.Length >= 1 ? lines[0] : null;
+            List<string> dlinkFiles = new List<string>();
+            for (int i = 1; i < lines.Length; i++)
+            {
+                if (G.NullOrBlanks(lines[i])) continue; //Happens when there are no staged .dlink files at all
+                dlinkFiles.Add(lines[i]);
+            }
+            DlinkSyncFiles(gitFolder, type, dlinkFiles);
+        }
+
+        /// <summary>
+        /// runs "git ls-files --cached -- :(icase)*.dlink", same as 
+        /// the "_common" hook script does. It is assumed that Git in on the PATH.
+        /// </summary>
+        public static List<string> ListTrackedDlinkFiles(string parentOfGitFolder)
+        {
+            List<string> result = new List<string>();
+            try
+            {
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = "git",                    
+                    // Note: -c core.quotepath=false --> without it, Git mangles זרו etc. With it, we get UTF8. Se #oowar7asdfj
+                    Arguments = "-c core.quotepath=false ls-files --cached -- :(icase)*.dlink",
+                    WorkingDirectory = parentOfGitFolder,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    //UTF8 because Git emits that
+                    StandardOutputEncoding = System.Text.Encoding.UTF8,
+                    StandardErrorEncoding = System.Text.Encoding.UTF8,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+                using (Process p = Process.Start(psi))
+                {
+                    string stdout = p.StandardOutput.ReadToEnd();
+                    string stderr = p.StandardError.ReadToEnd();
+                    p.WaitForExit();
+                    if (p.ExitCode != 0)
+                    {
+                        MessageBox.Show("*** Error: 'git ls-files' failed in '" + parentOfGitFolder + "':" + G.NL + stderr);
+                        new Error();
+                    }
+                    foreach (string line in stdout.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        result.Add(line);
+                    }
+                }
+            }
+            catch
+            {
+                MessageBox.Show("*** Error: could not run 'git' from '" + parentOfGitFolder + "' -- is Git installed and on PATH?");
+                new Error();
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Make data files correspond to .dlink files. type is just a label used in the reporting dialog (e.g. "post-checkout",
+        /// "pre-commit", or "activate").
+        /// </summary>  
+        public static void DlinkSyncFiles(string gitFolder, string type, List<string> dlinkFiles)
+        {
+            int gap = 10;
             List<string> getFilesNew = new List<string>();
             List<string> getFilesOverwrite = new List<string>();
-            List<string> putFiles = new List<string>();            
-                        
+            List<string> putFiles = new List<string>();
+            int currentFileIndex = 0; int lastReportedPercent = 0; //for progress
+            if (G.Equal(type, "activate")) new Writeln("Synchronizing .dlink and data files");
+
+            //Sanity check
+            string blobsFolder = G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false);
+            if (!Directory.Exists(blobsFolder))
+            {
+                MessageBox.Show("Folder '" + blobsFolder + "' does not exist for file blobs/storage");
+                new Error();
+            }
+            if (!File.Exists(Path.Combine(blobsFolder, "blobsroot.ini")))
+            {
+                MessageBox.Show("File '" + Path.Combine(blobsFolder, "blobsroot.ini") + "' does not exist. This is a safety precaution: you may add an empty file with that name.");
+                new Error();
+            }
+
             foreach (string dlinkFile2 in dlinkFiles) //Could probably be parallelized
-            {                
+            {
+                G.PrintProgress(dlinkFiles.Count, ref currentFileIndex, ref lastReportedPercent, G.Equal(type, "activate"), "data file" + G.S(dlinkFiles.Count) + " synchronized", gap);
                 string dLinkFileWithPath = Path.Combine(G.CleanupFolderName(gitFolder, false), G.CleanupFolderName(dlinkFile2, false));
                 if (!File.Exists(dLinkFileWithPath))
                 {
@@ -324,7 +437,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     new Error();
                 }
                 DlinkFile dlinkFileData = G.YamlReader<DlinkFile>(dLinkFileWithPath);
-                string dataFile = Dlink_FromDlinkFileToDataFile(dLinkFileWithPath);                
+                string dataFile = Dlink_FromDlinkFileToDataFile(dLinkFileWithPath);
                 if (G.NullOrBlanks(dataFile))
                 {
                     MessageBox.Show("Datafile string is null"); new Error();
@@ -338,7 +451,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     exists ? fi1.Length : 0,
                     exists ? fi1.LastWriteTimeUtc : DateTime.MinValue,
                     exists
-                );                
+                );
 
                 // --------------------------------------------------------------------------------------------------
                 //                              datafile exists
@@ -353,26 +466,29 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 //  D: Not relevant
                 //  Note: were are obvisously in A or B here, since we are handling a .dlink file.
                 // --------------------------------------------------------------------------------------------------                                
-                
+
                 //After this method call, realFile may change regarding .hash and .exists fields (and only those)
                 bool doDlinkFileAndDataFileCorrespond = DoDlinkFileAndDataFileCorrespond(realFile.name, dlinkFileData, ref realFile); //regarding last two args: either both non-null or both null
                 if (doDlinkFileAndDataFileCorrespond)
                 {
                     //Check that we have the file in blobs folder, else add it there. This happens when making a brand new datafile
-                    SyncBlobs(false, realFile.name, dlinkFileData.hash, G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), getFilesNew, getFilesOverwrite, putFiles);                    
+                    SyncBlobs(false, realFile.name, dlinkFileData.hash, blobsFolder, getFilesNew, getFilesOverwrite, putFiles);
                 }
                 else
                 {
                     //Get it from blobs (A or B)
-                    SyncBlobs(true, realFile.name, dlinkFileData.hash, G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), getFilesNew, getFilesOverwrite, putFiles);
+                    SyncBlobs(true, realFile.name, dlinkFileData.hash, blobsFolder, getFilesNew, getFilesOverwrite, putFiles);
                     FileInfo fi2 = new FileInfo(realFile.name);
                     //We update the realFile, because its contents have changed
-                    realFile = new RealFile(realFile.name, dlinkFileData.hash, fi2.Length, fi2.LastWriteTimeUtc, true);                    
+                    realFile = new RealFile(realFile.name, dlinkFileData.hash, fi2.Length, fi2.LastWriteTimeUtc, true);
+                    //Hash cache remembers this for later
+                    DlinkHashCache.Set(realFile.name, fi2.Length, fi2.LastWriteTimeUtc, dlinkFileData.hash);
+                    DlinkHashCache.SetBlobConfirmed(realFile.name, dlinkFileData.hash);
                 }
-            }            
+            }
             DlinkHashCache.Save(); //Persist any hashes computed while checking this batch of .dlink files
             DLinkCalledFromGitHookReporting(type, getFilesNew, getFilesOverwrite, putFiles);
-        }
+        }   
 
         private static string Dlink_FromDlinkFileToDataFile(string dlinkFile)
         {
@@ -396,7 +512,8 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             if (!G.NullOrBlanks(Program.options.databank_dlink_folder_remove1)) m3 = Stringlist.Path_RemoveString(m3, Program.options.databank_dlink_folder_remove1, 1);
             if (!G.NullOrBlanks(Program.options.databank_dlink_folder_remove2)) m3 = Stringlist.Path_RemoveString(m3, Program.options.databank_dlink_folder_remove2, 1);
             List<string> m4 = Stringlist.Path_ReplaceString(m3, Program.options.databank_dlink_folder_replace1b, Program.options.databank_dlink_folder_replace1a, 1);
-            m4 = Stringlist.Path_ReplaceString(m4, Program.options.databank_dlink_folder_replace2b, Program.options.databank_dlink_folder_replace2a, 1);            
+            m4 = Stringlist.Path_ReplaceString(m4, Program.options.databank_dlink_folder_replace2b, Program.options.databank_dlink_folder_replace2a, 1);
+            m4 = Stringlist.Path_ReplaceString(m4, Program.options.databank_dlink_folder_replace3b, Program.options.databank_dlink_folder_replace3a, 1);
             List<string> m5 = m4.ToList();
             m5[m5.Count - 1] = m5[m5.Count - 1].Replace("." + Program.options.databank_dlink_name, "");
             List<string> m6 = m5.ToList();
@@ -405,12 +522,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         }
 
         /// <summary>
-        /// New: true for file types whose .dlink hash is a "data hash" -- computed from the actual
-        /// values inside the file rather than from its raw bytes (see the isGbk branch in
-        /// GetFileHash below). For these types, two files with different byte sizes (different
-        /// embedded timestamps, different zip/compression settings, etc.) can legitimately produce
-        /// the same hash, so byte size must NOT be used as a proxy for "this is the same/different
-        /// data" -- see Blob() and IsDLlinkHelperFileOk(), which both consult this.
+        /// True for .gbk type. For these, the file size may not be used (if data hash is present).
         /// </summary>
         public static bool IsDataHashFileType(string filePath)
         {
@@ -418,7 +530,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         }
 
         /// <summary>
-        /// Returns true if file is ok, else it must be fetched from blobs
+        /// Returns true if .dlink and data files correspond: else data file must be fetched from blobs
         /// </summary>
         /// <param name="dataFile"></param>
         /// <param name="syncTimeUtc"></param>
@@ -433,20 +545,17 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             {                
                 return false; //In that case, realFile.stamp etc. are null too
             }
-            // New: dlinkFileData.bytes is null for "data hash" file types (see IsDataHashFileType /
-            // Blob()), where byte size is not a reliable proxy for "the data is the same". Only gate
-            // on it when we actually have a comparable value recorded.
+            // For most .gbk files, byte size is not stored because data hash is used instead.
             if (dlinkFileData.bytes != null && realFile.bytes != dlinkFileData.bytes)
             {                
                 return false;
-            }            
-            //HARD way
-            //We now need to calc the sha256 physically.                
-            string realHash = GetFileHash(dataFile);
+            }                        
+            //We now need to calc the sha256 physically (or for newer .gbk files: fetch data hash).
+            //The hash may be gotten from cache file though.
+            string realHash = GetFileHash(dataFile, realFile.bytes.Value, realFile.stamp.Value);
             realFile = new RealFile(realFile.name, realHash, realFile.bytes, realFile.stamp, true);
             if (dlinkFileData.hash != realHash)
-            {
-                //MessageBox.Show("FALSE --> hash, dlink=" + dlinkFileData.hash + " just gotten realhash=" + realHash);
+            {                
                 return false;
             }
             return true;
@@ -506,11 +615,13 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 }
             }
 
-            s += G.NL + G.NL;
-            s += " ------------------------- HASH CACHE ------------------------------ ";
-            s += G.NL + G.NL;
-            s += "Queries = " + DlinkHashCache.countAsk + ", hits = " + DlinkHashCache.countHit + ", size = " + DlinkHashCache.Count() + G.NL;
-            s += "This part of the message is for debugging and will be removed soon" + G.NL;
+            if (G.Equal(Environment.UserName, "tth"))
+            {
+                s += G.NL + G.NL;
+                s += " ------------------------- HASH CACHE ------------------------------ ";
+                s += G.NL + G.NL;
+                s += "TTH: Queries = " + DlinkHashCache.countAsk + ", hits = " + DlinkHashCache.countHit + ", size = " + DlinkHashCache.Count() + G.NL;                
+            }
 
             WindowMessageBox w = new WindowMessageBox(EMessageBox.Normal);
             w.Title = "Data versioning message";
@@ -527,12 +638,17 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
         public static string GetFileHash(string filePath)
         {
+            FileInfo fi = new FileInfo(filePath);
+            return GetFileHash(filePath, fi.Length, fi.LastWriteTimeUtc);
+        }
+        
+        public static string GetFileHash(string filePath, long knownSize, DateTime knownLastWriteUtc)
+        {
 
             if (G.DlinkDebug()) MessageBox.Show("Getting hash from " + filePath);
 
             // ---- LRU cache lookup ---------------------------------------------------------
-            FileInfo fiForCache = new FileInfo(filePath);
-            string cachedHash = DlinkHashCache.TryGet(filePath, fiForCache.Length, fiForCache.LastWriteTimeUtc);
+            string cachedHash = DlinkHashCache.TryGet(filePath, knownSize, knownLastWriteUtc);
             if (cachedHash != null)
             {
                 if (G.DlinkDebug()) MessageBox.Show("Getting hash from LRU cache");
@@ -540,7 +656,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             }            
 
             string hash = null;            
-            bool isGbk = IsDataHashFileType(filePath); // New: was "G.Equal(Path.GetExtension(filePath), ".gbk")" inline; now shared with Blob() / IsDLlinkHelperFileOk()
+            bool isGbk = IsDataHashFileType(filePath);
 
             if (isGbk)
             {
@@ -581,7 +697,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             }
 
             // ---- Remember this result for next time -----------------------------------------
-            DlinkHashCache.Set(filePath, fiForCache.Length, fiForCache.LastWriteTimeUtc, hash);
+            DlinkHashCache.Set(filePath, knownSize, knownLastWriteUtc, hash);
             // ----------------------------------------------------------------------------------------
 
             return hash;
@@ -589,26 +705,8 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
         public static void SyncBlobs(bool isGet, string fileNameAndPath, string sha256, string blobsFolder, List<string> getFilesNew, List<string> getFilesOverwrite, List<string> putFiles)
         {
-            // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
-            // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
-            // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO            
-            // -----------------------------------------------------------
-            // ==== Think about atomic writes and simultaneous threads
-            // -----------------------------------------------------------
-            // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
-            // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
-            // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
-
-            if (!Directory.Exists(blobsFolder))
-            {
-                MessageBox.Show("Folder '" + blobsFolder + "' does not exist for file blobs/storage");
-                new Error();
-            }
-            if (!File.Exists(Path.Combine(blobsFolder, "blobsroot.ini")))
-            {
-                MessageBox.Show("File '" + Path.Combine(blobsFolder, "blobsroot.ini") + "' does not exist. This is a safety precaution: you may add an empty file with that name.");
-                new Error();
-            }
+            // This uses atomic writes.
+            
             string shapart1 = sha256.Substring(0, 2);
             string shapart2 = sha256; //We do not want file "abcdefg" to become "\ab\cdefg", but prefer it to become "\ab\abcdefg". Easier to search for etc. even though Git does the former.
             if (isGet)
@@ -631,8 +729,14 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             else
             {
                 // ------------------------------------
-                // Putting
+                // Putting --> when a brand new file is there
                 // ------------------------------------
+                                
+                if (DlinkHashCache.IsBlobConfirmed(fileNameAndPath, sha256))
+                {
+                    return;
+                }
+
                 string blobsFile = Path.Combine(blobsFolder, shapart1, shapart2);
                 if (!Directory.Exists(Path.Combine(blobsFolder, shapart1)))
                 {
@@ -645,16 +749,100 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     if (File.Exists(Path.Combine(blobsFolder, shapart1, shapart2)))
                     {
                         //No need to copy it: same file is already there
-                        //TODO TODO TODO
-                        //TODO TODO TODO
-                        //TODO TODO TODO ---> if a gbk is newer but with same datahash, we could add the new one (may have better meta information)
-                        //TODO TODO TODO
-                        //TODO TODO TODO
+                        //TODO TODO TODO                        
+                        //TODO TODO TODO ---> if a gbk is newer but with same datahash, we could add the new one (may have better meta information --> but we have now added meta info to data hash, so...)
+                        //TODO TODO TODO                        
                     }
                     else
                     {
                         BlobsFilePut(fileNameAndPath, blobsFile);
                         putFiles.Add(fileNameAndPath);
+                    }
+                }                
+                DlinkHashCache.SetBlobConfirmed(fileNameAndPath, sha256);
+            }
+        }
+
+        /// <summary>
+        /// Writes to finalPath atomically and crash-safely, so a concurrent reader can never
+        /// observe a partially-written file. writeAction is given a path to a private temp file in
+        /// the SAME folder as finalPath (same-volume, so the final publish step is a true rename,
+        /// not a copy+delete across volumes) and must write the complete content there. finalPath
+        /// only ever appears under its real name once writeAction has fully finished -- a crash or
+        /// exception mid-write leaves only an orphaned temp file behind, never a corrupt finalPath.        
+        /// </summary>
+        private static void AtomicWrite(string finalPath, bool ifAbsentOnly, Action<string> writeAction)
+        {
+            string folder = Path.GetDirectoryName(finalPath);
+            Directory.CreateDirectory(folder);
+            //Unique temp name, same folder as finalPath, dot-prefixed so it doesn't look like a
+            //real data/blob file if something lists the folder mid-write.
+            string tempPath = Path.Combine(folder, "." + Path.GetFileName(finalPath) + "." + Guid.NewGuid().ToString("N") + ".tmp");
+            try
+            {
+                writeAction(tempPath);
+                if (!File.Exists(tempPath))
+                {
+                    //writeAction chose not to produce anything -- nothing to publish.
+                    return;
+                }
+
+                //tempPath may have inherited the ReadOnly attribute from whatever writeAction copied it
+                //from (e.g. a blob file, which BlobsFilePut always marks read-only). It's our own scratch
+                //file, so strip it -- otherwise the move/delete below, or the cleanup in "finally", can
+                //fail with UnauthorizedAccessException.
+                FileAttributes tempAttr = File.GetAttributes(tempPath);
+                if ((tempAttr & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
+                {
+                    File.SetAttributes(tempPath, tempAttr & ~FileAttributes.ReadOnly);
+                }
+
+                if (ifAbsentOnly)
+                {
+                    if (File.Exists(finalPath))
+                    {
+                        return; //someone else already produced this exact (hash-addressed) content
+                    }
+                    try
+                    {
+                        File.Move(tempPath, finalPath);
+                    }
+                    catch (IOException)
+                    {
+                        //Lost a race between the check above and the move -- finalPath now exists
+                        //with (by construction, same hash) the same content, so this is not an error.
+                        if (!File.Exists(finalPath)) new Writeln("Dlink data file storage issue: " + finalPath);
+                    }
+                }
+                else
+                {
+                    // File.Replace's underlying Win32 ReplaceFile call is not reliably supported on
+                    // network/mapped drives. File.Move (MoveFileEx under
+                    // the hood) is far more broadly supported. This trades
+                    // strict atomicity for reliability: there is a brief window, between the delete and the
+                    // move, where finalPath does not exist at all. A concurrent reader hitting that exact
+                    // instant sees "file not found" rather than old or new content -- never a torn/partial
+                    // read, and still a big improvement over reading a file mid-write.
+                    if (File.Exists(finalPath))
+                    {
+                        FileAttributes finalAttr = File.GetAttributes(finalPath);
+                        if ((finalAttr & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
+                        {
+                            File.SetAttributes(finalPath, finalAttr & ~FileAttributes.ReadOnly);
+                        }
+                        File.Delete(finalPath);
+                    }
+                    File.Move(tempPath, finalPath);
+                }
+            }
+            finally
+            {
+                if (File.Exists(tempPath))
+                {
+                    try { File.Delete(tempPath); }
+                    catch
+                    {
+                        //We live with the temp file
                     }
                 }
             }
@@ -670,46 +858,52 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
             //We always create the folder in case it does not already exist. For cloning this is obviously important.
             Directory.CreateDirectory(Path.GetDirectoryName(fileNameAndPath));
-
-            if (Globals.alreadyZipped.Contains(Path.GetExtension(fileNameAndPath), StringComparer.OrdinalIgnoreCase))
+            
+            AtomicWrite(fileNameAndPath, false, tempPath =>
             {
-                File.Copy(blobsFile, fileNameAndPath, true); //Allows overwrite, TODO UNZIPPING                    
-            }
-            else
-            {
-                using (ZipArchive archive = ZipFile.OpenRead(blobsFile))
+                if (Globals.alreadyZipped.Contains(Path.GetExtension(fileNameAndPath), StringComparer.OrdinalIgnoreCase))
                 {
-                    ZipArchiveEntry entry = archive.GetEntry("storage");
-                    if (entry != null)
+                    File.Copy(blobsFile, tempPath, true);
+                }
+                else
+                {
+                    using (ZipArchive archive = ZipFile.OpenRead(blobsFile))
                     {
-                        entry.ExtractToFile(fileNameAndPath, true);
+                        ZipArchiveEntry entry = archive.GetEntry("storage");
+                        if (entry != null)
+                        {
+                            entry.ExtractToFile(tempPath, true);
+                        }
                     }
                 }
-            }
+            });
             G.ReadOnlyRemove(fileNameAndPath);
         }
 
         private static void BlobsFilePut(string fileName, string blobsFile)
-        {
-            if (Globals.alreadyZipped.Contains(Path.GetExtension(fileName), StringComparer.OrdinalIgnoreCase))
+        {            
+            AtomicWrite(blobsFile, true, tempPath =>
             {
-                File.Copy(fileName, blobsFile);
-            }
-            else
-            {
-                using (FileStream zipToOpen = new FileStream(blobsFile, FileMode.Create, FileAccess.Write))
+                if (Globals.alreadyZipped.Contains(Path.GetExtension(fileName), StringComparer.OrdinalIgnoreCase))
                 {
-                    using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Create))
+                    File.Copy(fileName, tempPath);
+                }
+                else
+                {
+                    using (FileStream zipToOpen = new FileStream(tempPath, FileMode.Create, FileAccess.Write))
                     {
-                        ZipArchiveEntry readmeEntry = archive.CreateEntry(Path.GetFileName("storage"));
-                        using (Stream writer = readmeEntry.Open())
-                        using (FileStream fs = File.OpenRead(fileName))
+                        using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Create))
                         {
-                            fs.CopyTo(writer);
+                            ZipArchiveEntry readmeEntry = archive.CreateEntry(Path.GetFileName("storage"));
+                            using (Stream writer = readmeEntry.Open())
+                            using (FileStream fs = File.OpenRead(fileName))
+                            {
+                                fs.CopyTo(writer);
+                            }
                         }
                     }
                 }
-            }
+            });
             G.ReadOnlySet(blobsFile);
         }
     }    
@@ -757,10 +951,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
     // ================================================================================================
     // On-disk LRU hash cache.
-    //
-    // GetFileHash() (below, in DlinkHooks) is called once per .dlink file on every single git hook
-    // invocation (post-checkout, post-merge, pre-commit, pre-push all funnel through
-    // DLinkCalledFromGitHook -> IsDLlinkHelperFileOk -> GetFileHash), even for files nothing touched.
+    //    
     // This cache lets GetFileHash skip recomputing a SHA-256 (or, for .gbk files, re-extracting the
     // embedded metadata) when a file's size and last-write-time still match what was recorded the
     // last time it was hashed.
@@ -772,18 +963,11 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
     //
     // Callers should call Set() per file as usual, then call Save() ONCE after a batch of files, not
     // once per file -- otherwise every hashed file costs a disk write and most of the benefit is lost.
-    //
-    // Deliberately NOT given the same atomic-write treatment as the blob store (see the TODO in
-    // SyncBlobs below): this cache only ever holds derived data that can always be recomputed from
-    // the file itself, so worst case on a corrupt or half-written cache file is a cold cache next run
-    // (caught below and treated as empty), never a wrong or lost answer.
-    // ================================================================================================
     public static class DlinkHashCache
     {
         public static int countAsk = 0;
         public static int countHit = 0;
-
-        private const int Capacity = 1000;
+        
         private static readonly long ToleranceTicks = TimeSpan.FromSeconds(0).Ticks; //Changed from TimeSpan.FromSeconds(2) to TimeSpan.FromSeconds(0).
         private static readonly DateTime TicksEpoch = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
@@ -799,9 +983,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             {
                 string folder = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), "_utilities", "hashcache");
                 //Per-machine file name: this folder is shared/network storage (databank_dlink_folder_blobs),
-                //and giving each machine its own cache file avoids two machines racing on the same file.
-                //If you'd rather have one shared cache, replace this with a fixed file name -- just be
-                //aware Save() below is a plain overwrite, not an atomic one (see class comment above).
+                //and giving each machine its own cache file avoids two machines racing on the same file.                
                 return Path.Combine(folder, "hashcache_" + Environment.MachineName + ".yaml");
             }
         }
@@ -845,7 +1027,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
         /// <summary>
         /// Returns the cached hash for filePath if it is still fresh (same size, and last-write-time
-        /// within +/- 2 seconds of what was recorded last time). Returns null on a miss.
+        /// of what was recorded last time). Returns null on a miss.
         /// </summary>
         public static string TryGet(string filePath, long size, DateTime lastWriteUtc)
         {
@@ -871,7 +1053,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
         /// <summary>
         /// Records/refreshes the hash for filePath. Evicts the least-recently-used entry once the
-        /// cache is over capacity (1000 entries). Does not touch disk -- call Save() once after a
+        /// cache is over capacity (5000 entries). Does not touch disk -- call Save() once after a
         /// batch of files.
         /// </summary>
         public static void Set(string filePath, long bytes, DateTime lastWriteUtc, string hash)
@@ -883,7 +1065,11 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
                 LinkedListNode<HashCacheEntry> existing;
                 if (_map.TryGetValue(filePath, out existing))
-                {
+                {                    
+                    if (existing.Value.hash != hash)
+                    {
+                        existing.Value.blobConfirmed = false;
+                    }
                     existing.Value.bytes = bytes;
                     existing.Value.stamp = stamp;
                     existing.Value.hash = hash;
@@ -895,7 +1081,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     HashCacheEntry entry = new HashCacheEntry { path = filePath, bytes = bytes, stamp = stamp, hash = hash };
                     LinkedListNode<HashCacheEntry> node = _lru.AddFirst(entry);
                     _map[filePath] = node;
-                    if (_map.Count > Capacity)
+                    if (_map.Count > Program.options.databank_dlink_cache)
                     {
                         LinkedListNode<HashCacheEntry> lruNode = _lru.Last;
                         _lru.RemoveLast();
@@ -903,6 +1089,36 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     }
                 }
                 _dirty = true;
+            }
+        }
+
+        /// <summary>
+        /// This trusts that a blob, once written, is never deleted out from under it. Blob storage is expected to
+        /// be read-only (write once). But if files are ever removed from blob storage, the system will crash with
+        /// an error.
+        /// </summary>
+        public static bool IsBlobConfirmed(string filePath, string hash)
+        {
+            lock (_lock)
+            {
+                EnsureLoaded();
+                LinkedListNode<HashCacheEntry> node;
+                if (!_map.TryGetValue(filePath, out node)) return false;
+                return node.Value.hash == hash && node.Value.blobConfirmed;
+            }
+        }        
+        
+        public static void SetBlobConfirmed(string filePath, string hash)
+        {
+            lock (_lock)
+            {
+                EnsureLoaded();
+                LinkedListNode<HashCacheEntry> node;
+                if (_map.TryGetValue(filePath, out node) && node.Value.hash == hash && !node.Value.blobConfirmed)
+                {
+                    node.Value.blobConfirmed = true;
+                    _dirty = true;
+                }
             }
         }
 
@@ -931,8 +1147,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 }
                 catch
                 {
-                    //Best-effort: a failed cache save should not break the hook. Worst case, next
-                    //run recomputes a few more hashes than strictly necessary.
+                    //No catastrophe is this happens
                 }
             }
         }
@@ -957,8 +1172,11 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
     {
         public string path;
         public long bytes;
-        public long stamp; //ticks (100ns units) since DlinkHashCache's fixed epoch; compared with a ~2 second tolerance
+        public long stamp; //ticks (100ns units) since DlinkHashCache's fixed epoch
         public string hash;
+        //True once we've confirmed (via SyncBlobs) that the blob for "hash" is present in blob storage.
+        //Reset to false whenever hash changes.
+        public bool blobConfirmed;
     }
 
     public class HashCacheFile

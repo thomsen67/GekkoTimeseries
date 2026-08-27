@@ -1727,11 +1727,7 @@ namespace Gekko
         {
             toolStripStatusLabel3.Image = yellow;
             toolStripButton3.Enabled = true;
-            Globals.dateStamp = Program.GetDateStamp();  //takes a small amount of time to generate, so we put it in globally for later use in SERIES statements etc. Around midnight, this may be 1 day off.....!
-
-            //Globals.bugfixMissing1 = new List<string>();
-            //Globals.bugfixMissing2 = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            //Globals.bugfixLhsDollar = 0;
+            Globals.dateStamp = Program.GetDateStamp();  //takes a small amount of time to generate, so we put it in globally for later use in SERIES statements etc. Around midnight, this may be 1 day off.....!            
 
             //Blinking icon when running a statement
             //Not active/blinking when Gekko is idle
@@ -1827,6 +1823,7 @@ namespace Gekko
             catch (Exception e2)
             {
                 Program.PrintExceptionAndFinishThread(e2, p);
+                Elapsed(p.startingTime, false);
                 if (!Globals.applicationIsInProcessOfAborting)
                 {
                     try
@@ -2057,19 +2054,8 @@ namespace Gekko
             if (p.hasBeenCmdFile)
             {
                 if (!(G.Contains(p.lastFileSentToANTLR, Globals.autoExecCmdFileName)))
-                {
-                    double ms = (DateTime.Now - p.startingTime).TotalMilliseconds;
-                    if (ms > 1000 && !Globals.threadIsInProcessOfAborting)
-                    {
-                        //to avoid UFunctions being shown here. Fix better when #980324532985 is done
-                        string s1 = null;
-                        string s2 = null;
-                        //if (Globals.traceTime > 0d) s1 = ", of which data-tracing used " + Math.Round(100d * Globals.traceTime / ms) + "%";
-                        if (G.Equal(Program.options.global_dependency_tracking, "none")) s2 = ". To track file dependencies, see menu 'Options' --> 'Program dependency tracking'.";
-                        G.Writeln();
-                        G.Writeln("Total elapsed time: " + G.SecondsFormat(ms) + s1 + s2);
-                        G.Writeln();
-                    }
+                {                    
+                    Elapsed(p.startingTime, true);
                 }
             }
 
@@ -2144,6 +2130,21 @@ namespace Gekko
 
                 Globals.isAutoExec = false;  //must be last
             }            
+        }
+
+        private static void Elapsed(DateTime t0, bool message)
+        {
+            double ms = (DateTime.Now - t0).TotalMilliseconds;
+            if (ms > 1000 && !Globals.threadIsInProcessOfAborting)
+            {
+                //to avoid UFunctions being shown here. Fix better when #980324532985 is done
+                string s1 = null;
+                string s2 = null;
+                if (message && G.Equal(Program.options.global_dependency_tracking, "none")) s2 = ". To track file dependencies, see menu 'Options' --> 'Program dependency tracking'.";
+                G.Writeln();
+                G.Writeln("Total elapsed time: " + G.SecondsFormat(ms) + s1 + s2);
+                G.Writeln();
+            }
         }
 
         public void GuiBrowseArrowsStuff(string var, bool link, ETabs type)

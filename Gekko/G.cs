@@ -5907,6 +5907,38 @@ namespace Gekko
             return f1;
         }
 
+        /// <summary>
+        /// Helper for printing percentage progress on long jobs
+        /// </summary>
+        /// <param name="total"></param>
+        /// <param name="current"></param>
+        /// <param name="lastReportedPercent"></param>
+        /// <param name="show"></param>
+        /// <param name="message"></param>
+        /// <param name="gap"></param>
+        public static void PrintProgress(int total, ref int current, ref int lastReportedPercent, bool show, string message, int gap)
+        {
+            current++;
+            if (show && total > 0)
+            {
+                int currentPercent = (int)((double)current / total * 100);
+                if (currentPercent >= lastReportedPercent + gap || current == total)
+                {
+                    int displayPercent = (currentPercent / gap) * gap;
+                    if (displayPercent > lastReportedPercent)
+                    {
+                        using (Writeln txt = new Writeln())
+                        {
+                            txt.MainOmitVeryFirstNewLine();
+                            txt.color = System.Drawing.Color.Gray;
+                            txt.MainAdd(displayPercent + "% of " + total + " " + message);
+                        }
+                        lastReportedPercent = displayPercent;
+                    }
+                }
+            }
+        }
+
         public static void ReadOnlyRemove(string fileName)
         {
             //Remove read-only

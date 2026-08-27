@@ -15,3 +15,6 @@ Icon kan kun ligge i root, ellers failer det åbenbart.
 Cursor: had to go to https://open-vsx.org and create account, and then also open an
 Eclipse Foundation account (linked both to GitHub account).
 Created a "Claiming namespace" here: https://github.com/EclipseFdn/open-vsx.org/issues.
+Then had to install node.js get be able to use "npm ..." from cmd window
+Then: npm install -g ovsx
+Then: ovsx publish gekko-1.1.2.vsix -p ovsxat_........-....-....-....-............

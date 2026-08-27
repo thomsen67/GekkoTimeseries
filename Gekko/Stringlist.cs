@@ -186,7 +186,7 @@ namespace Gekko
             if (!startsWithPrefix)
             {
                 if (Globals.tthDebug) File.WriteAllText("c:\\b-tth\\gitbug.txt2222", "The path '" + Path_FromListToString(source, "<separator>") + " does not start with " + Path_FromListToString(prefix, "<separator>"));
-                new Error("The path '" + Path_FromListToString(source, "<separator>") + " does not start with " + Path_FromListToString(prefix, "<separator>"));
+                new Error("The path '" + Path_FromListToString(source, "\\") + " does not start with " + Path_FromListToString(prefix, "\\"));
             }
             return source.Skip(prefix.Count).ToList();
         }

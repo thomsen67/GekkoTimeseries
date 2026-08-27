@@ -6861,19 +6861,25 @@ namespace Gekko
             string s = O.ConvertToString(x);
             if (G.Equal(s, "activate"))
             {
+                //Same as 'hooks' followed by 'sync'
                 DlinkSetup.DlinkFunction(O.ConvertToString(root(smpl, _t1, _t2, new ScalarString("git"))), DlinkSetup.EDlinkSetup.Activate);
             }
             else if (G.Equal(s, "deactivate"))
             {
-                DlinkSetup.DlinkFunction(O.ConvertToString(root(smpl, _t1, _t2, new ScalarString("git"))), DlinkSetup.EDlinkSetup.Deactivate);
+                //Deactivates hooks only
+                DlinkSetup.DlinkFunction(O.ConvertToString(root(smpl, _t1, _t2, new ScalarString("git"))), DlinkSetup.EDlinkSetup.DeactivateHooks);
+            }
+            else if (G.Equal(s, "hooks"))
+            {
+                DlinkSetup.DlinkFunction(O.ConvertToString(root(smpl, _t1, _t2, new ScalarString("git"))), DlinkSetup.EDlinkSetup.ActivateOnlyHooks);
             }
             else if (G.Equal(s, "sync"))
             {
-                DlinkSetup.DlinkFunction(O.ConvertToString(root(smpl, _t1, _t2, new ScalarString("git"))), DlinkSetup.EDlinkSetup.Sync);
-            }
+                DlinkSetup.DlinkFunction(O.ConvertToString(root(smpl, _t1, _t2, new ScalarString("git"))), DlinkSetup.EDlinkSetup.ActivateOnlySync);
+            }            
             else
             {
-                new Error("Expected dlink() argument to be 'activate', 'deactivate' or 'sync'");
+                new Error("Expected dlink() argument to be 'activate', 'deactivate', 'hooks' or 'sync'");
             }
         }
 
