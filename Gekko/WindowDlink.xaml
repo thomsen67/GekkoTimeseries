@@ -1,0 +1,83 @@
+﻿<Window x:Class="Gekko.WindowDlink"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Create/update .dlink files manually"
+        Height="560" Width="880"
+        WindowStartupLocation="CenterScreen">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="8"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="8"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="8"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Drop zone: files or whole folders (folders are walked recursively, including every
+             level of subfolder -- see SearchOption.AllDirectories in the code-behind, unchanged).
+             New: dashed border via an overlaid Rectangle (Border itself has no dash support), and
+             the border turns "primary blue" while a file is being dragged over it. -->
+        <Grid Grid.Row="0" Name="DropZone" AllowDrop="True"
+              Drop="DropZone_Drop" DragEnter="DropZone_DragEnter" DragLeave="DropZone_DragLeave">
+            <Rectangle Name="DropZoneBorder" Fill="#FFF4F4F4" Stroke="#FF999999" StrokeThickness="2"
+                       StrokeDashArray="4 2" RadiusX="4" RadiusY="4"/>
+            <TextBlock Text="Drag data files or folders here (for data added/changed outside Gekko)"
+                       HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False"
+                       FontSize="14" Foreground="#FF555555" TextWrapping="Wrap" TextAlignment="Center" Margin="10"/>
+        </Grid>
+
+        <!-- File-explorer-style list: data file path (with its corresponding .dlink path shown
+             underneath, in gray), computed status, and per-row [Dlink]/[Remove] buttons. -->
+        <DataGrid Grid.Row="2" Name="FilesGrid" AutoGenerateColumns="False" CanUserAddRows="False"
+                  IsReadOnly="True" SelectionMode="Extended" GridLinesVisibility="Horizontal"
+                  AllowDrop="True" Drop="DropZone_Drop" DragEnter="DropZone_DragEnter" DragLeave="DropZone_DragLeave">
+            <DataGrid.Columns>
+                <!-- New: two-line cell -- data file path, then its .dlink path underneath in gray
+                     (same font otherwise). "<No correspondence>" for a row that errored or falls
+                     outside the recognized data folder structure. -->
+                <DataGridTemplateColumn Header="Path" Width="4*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical" Margin="2">
+                                <TextBlock Text="{Binding Path}"/>
+                                <TextBlock Text="{Binding DlinkPathDisplay}" Foreground="#FF888888"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="3*"/>
+                <!-- New: a per-row [Dlink] button next to [Remove], so a single file can be
+                     processed without touching the rest of the batch. -->
+                <DataGridTemplateColumn Header="" Width="135">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Dlink" Padding="4,1" Margin="0,0,4,0" Click="DlinkSingleRow_Click" Tag="{Binding}"/>
+                                <Button Content="Remove" Padding="4,1" Click="RemoveRow_Click" Tag="{Binding}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Shown after clicking Dlink / Dlink all, only if any pre-existing .dlink files were left unclaimed. -->
+        <TextBlock Grid.Row="4" Name="OrphanSummaryText" TextWrapping="Wrap" Foreground="#FF8A6D00"
+                   Visibility="Collapsed" MaxHeight="120"/>
+
+        <Grid Grid.Row="6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Name="StatusText" Grid.Column="0" VerticalAlignment="Center" Foreground="#FF444444"/>
+            <!-- New: renamed from "Dlink" to "Dlink all", now that individual rows have their own button. -->
+            <Button Name="DlinkAllButton" Grid.Column="1" Content="Dlink all" Width="90" Margin="0,0,10,0"
+                    Click="DlinkAllButton_Click" IsEnabled="False"/>
+            <Button Name="CancelButton" Grid.Column="2" Content="Cancel" Width="90" Click="CancelButton_Click"/>
+        </Grid>
+    </Grid>
+</Window>

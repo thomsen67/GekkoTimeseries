@@ -560,6 +560,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Translate_2_4_to_3_0.cs" />
     <Compile Include="WarningPool.cs" />
+    <Compile Include="WindowDlink.xaml.cs">
+      <DependentUpon>WindowDlink.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WindowFind.xaml.cs">
       <DependentUpon>WindowFind.xaml</DependentUpon>
     </Compile>
@@ -759,6 +762,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="WindowDecompSortEtc.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WindowDlink.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

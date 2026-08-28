@@ -30,12 +30,9 @@ using System.IO.Compression;
 using System.Diagnostics;
 
 namespace Gekko
-{
-    
-    
+{    
     public static class DlinkSetup
     {
-
         public enum EDlinkSetup
         {
             Activate,
@@ -63,15 +60,19 @@ namespace Gekko
                 string gekkoExePath = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), "_utilities", "Gekko", "Gekko.exe").Replace("\\", "/");
                 // Note: -c core.quotepath=false --> without it, Git mangles זרו etc. With it, we get UTF8. Se #oowar7asdfj
                 // Pre-commit only needs to sync the .dlink files that are actually part of
-                //      this commit -- "git diff --cached --name-only --diff-filter=ACMR"
-                //      Note that "D" is not in "ACMR" because a deleted .dlink does not need to be synced.
-                //      Also note that using "git commit -a" might break this logic...!
-                // NOTE: It seems that if one uses raw Git commands and (1) creates a file with "117" inside, (2) adds it
-                //       changes the file to "118" inside, (3) commits it --> it is "117" that ends up in the repo.
-                //       Regarding TortoiseGit it seems like it re-stages the working-tree contents before committing, because
-                //       using TortoiseGit GUI instead makes "118" end up in the repo.
-                //       If users ever start using raw Git commands AND do an add and then changes the file before committing,
-                //       the logic may break.
+                // this commit -- "git diff --cached --name-only --diff-filter=ACMR" lists just the
+                // Added/Copied/Modified/Renamed paths staged in the index (D=deleted is excluded on
+                // purpose: nothing to sync for a file being removed). The other hooks
+                // (post-checkout/post-merge/pre-push) are about "does the whole working copy match
+                // reality", not "what's in this one commit", so they keep the full
+                // "git ls-files --cached" scan below.
+                //NOTE: It seems that if one uses raw Git commands and(1) creates a file with "117" inside, (2) adds it
+                //      changes the file to "118" inside, (3) commits it --> it is "117" that ends up in the repo.
+                //      Regarding TortoiseGit it seems like it re-stages the working-tree contents before committing, because
+                //      using TortoiseGit GUI instead makes "118" end up in the repo.
+                //      If users ever start using raw Git commands AND do an add and then changes the file before committing,
+                //      the logic may break.
+
                 string _common = @$"#!/bin/sh
 ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null)
 rm -f ""${{ROOT_DIR}}""/.git/dlink_filelist_*.txt
@@ -84,11 +85,13 @@ DLINK_TMP_NAME=""dlink_filelist_$$.txt""
 DLINK_TMP_PATH=""${{ROOT_DIR}}/.git/${{DLINK_TMP_NAME}}""
 echo ""$1"" > ""$DLINK_TMP_PATH""
 echo ""$STAGED_FILES"" >> ""$DLINK_TMP_PATH""
+echo ""==> Syncing data files (please wait for popup window to show)""
 cd /c/Windows
-echo ""==> Syncing data files start (please wait for popup window to show)""
 cmd.exe //c ""{gekkoExePath}"" ""-dlink:'$DLINK_TMP_NAME'"" ""-dlinkw:'$ROOT_DIR'""
+GEKKO_EXIT_CODE=$?
 rm -f ""$DLINK_TMP_PATH""
-echo ""==> Syncing data files end""
+echo ""==> Syncing data files finished""
+exit $GEKKO_EXIT_CODE
 ";
                 // ----------------------------------------------------------------------------------------------------------
                 string post_checkout = $@"#!/bin/sh
@@ -211,7 +214,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             }
         }
 
-        private static string Dlink_FromDataFileToDlinkFile(string dataFile)
+        public static string Dlink_FromDataFileToDlinkFile(string dataFile)
         {
             // datastart1  k:\\MAKROBK_KILDE\\2025_10_01
             // datastart2  k:\\MAKROBK
@@ -427,70 +430,84 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 new Error();
             }
 
+            List<string> errors = new List<string>();
+
             foreach (string dlinkFile2 in dlinkFiles) //Could probably be parallelized
             {
                 G.PrintProgress(dlinkFiles.Count, ref currentFileIndex, ref lastReportedPercent, G.Equal(type, "activate"), "data file" + G.S(dlinkFiles.Count) + " synchronized", gap);
-                string dLinkFileWithPath = Path.Combine(G.CleanupFolderName(gitFolder, false), G.CleanupFolderName(dlinkFile2, false));
-                if (!File.Exists(dLinkFileWithPath))
+                try
                 {
-                    MessageBox.Show("This ." + Program.options.databank_dlink_name + " file does not exist: '" + dLinkFileWithPath + "'");
-                    new Error();
-                }
-                DlinkFile dlinkFileData = G.YamlReader<DlinkFile>(dLinkFileWithPath);
-                string dataFile = Dlink_FromDlinkFileToDataFile(dLinkFileWithPath);
-                if (G.NullOrBlanks(dataFile))
-                {
-                    MessageBox.Show("Datafile string is null"); new Error();
-                }
+                    string dLinkFileWithPath = Path.Combine(G.CleanupFolderName(gitFolder, false), G.CleanupFolderName(dlinkFile2, false));
+                    if (!File.Exists(dLinkFileWithPath))
+                    {
+                        MessageBox.Show("This ." + Program.options.databank_dlink_name + " file does not exist: '" + dLinkFileWithPath + "'");
+                        new Error();
+                    }
+                    DlinkFile dlinkFileData = G.YamlReader<DlinkFile>(dLinkFileWithPath);
+                    string dataFile = Dlink_FromDlinkFileToDataFile(dLinkFileWithPath);
+                    if (G.NullOrBlanks(dataFile))
+                    {
+                        MessageBox.Show("Datafile string is null"); new Error();
+                    }
 
-                FileInfo fi1 = new FileInfo(dataFile); //File may not exist                
-                bool exists = fi1.Exists;
-                RealFile realFile = new RealFile(
-                    fi1.FullName,
-                    null,
-                    exists ? fi1.Length : 0,
-                    exists ? fi1.LastWriteTimeUtc : DateTime.MinValue,
-                    exists
-                );
+                    FileInfo fi1 = new FileInfo(dataFile); //File may not exist                
+                    bool exists = fi1.Exists;
+                    RealFile realFile = new RealFile(
+                        fi1.FullName,
+                        null,
+                        exists ? fi1.Length : 0,
+                        exists ? fi1.LastWriteTimeUtc : DateTime.MinValue,
+                        exists
+                    );
 
-                // --------------------------------------------------------------------------------------------------
-                //                              datafile exists
-                //                             yes            no
-                //  ----------------------------------------------------------
-                //  .dlink exists    yes       A              B
-                //                   no        C              D
-                //  ----------------------------------------------------------
-                //  A: Check that they correspond etc. --> but only if .dlink file has been already added/committed.
-                //  B: Try to get file from blobs      --> but only if .dlink file has been already added/committed.
-                //  C: May just be a datafile copied into datafiles, not being read by Gekko yet
-                //  D: Not relevant
-                //  Note: were are obvisously in A or B here, since we are handling a .dlink file.
-                // --------------------------------------------------------------------------------------------------                                
+                    // --------------------------------------------------------------------------------------------------
+                    //                              datafile exists
+                    //                             yes            no
+                    //  ----------------------------------------------------------
+                    //  .dlink exists    yes       A              B
+                    //                   no        C              D
+                    //  ----------------------------------------------------------
+                    //  A: Check that they correspond etc. --> but only if .dlink file has been already added/committed.
+                    //  B: Try to get file from blobs      --> but only if .dlink file has been already added/committed.
+                    //  C: May just be a datafile copied into datafiles, not being read by Gekko yet
+                    //  D: Not relevant
+                    //  Note: were are obvisously in A or B here, since we are handling a .dlink file.
+                    // --------------------------------------------------------------------------------------------------                                
 
-                //After this method call, realFile may change regarding .hash and .exists fields (and only those)
-                bool doDlinkFileAndDataFileCorrespond = DoDlinkFileAndDataFileCorrespond(realFile.name, dlinkFileData, ref realFile); //regarding last two args: either both non-null or both null
-                if (doDlinkFileAndDataFileCorrespond)
-                {
-                    //Check that we have the file in blobs folder, else add it there. This happens when making a brand new datafile
-                    SyncBlobs(false, realFile.name, dlinkFileData.hash, blobsFolder, getFilesNew, getFilesOverwrite, putFiles);
+                    //After this method call, realFile may change regarding .hash and .exists fields (and only those)
+                    bool doDlinkFileAndDataFileCorrespond = DoDlinkFileAndDataFileCorrespond(realFile.name, dlinkFileData, ref realFile); //regarding last two args: either both non-null or both null
+                    if (doDlinkFileAndDataFileCorrespond)
+                    {
+                        //Check that we have the file in blobs folder, else add it there. This happens when making a brand new datafile
+                        SyncBlobs(false, realFile.name, dlinkFileData.hash, blobsFolder, getFilesNew, getFilesOverwrite, putFiles);
+                    }
+                    else
+                    {
+                        //Get it from blobs (A or B)
+                        SyncBlobs(true, realFile.name, dlinkFileData.hash, blobsFolder, getFilesNew, getFilesOverwrite, putFiles);
+                        FileInfo fi2 = new FileInfo(realFile.name);
+                        //We update the realFile, because its contents have changed
+                        realFile = new RealFile(realFile.name, dlinkFileData.hash, fi2.Length, fi2.LastWriteTimeUtc, true);
+                        //Hash cache remembers this for later
+                        DlinkHashCache.Set(realFile.name, fi2.Length, fi2.LastWriteTimeUtc, dlinkFileData.hash);
+                        DlinkHashCache.SetBlobConfirmed(realFile.name, dlinkFileData.hash);
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    //Get it from blobs (A or B)
-                    SyncBlobs(true, realFile.name, dlinkFileData.hash, blobsFolder, getFilesNew, getFilesOverwrite, putFiles);
-                    FileInfo fi2 = new FileInfo(realFile.name);
-                    //We update the realFile, because its contents have changed
-                    realFile = new RealFile(realFile.name, dlinkFileData.hash, fi2.Length, fi2.LastWriteTimeUtc, true);
-                    //Hash cache remembers this for later
-                    DlinkHashCache.Set(realFile.name, fi2.Length, fi2.LastWriteTimeUtc, dlinkFileData.hash);
-                    DlinkHashCache.SetBlobConfirmed(realFile.name, dlinkFileData.hash);
+                    errors.Add(dlinkFile2 + ": " + ex.Message);
                 }
             }
             DlinkHashCache.Save(); //Persist any hashes computed while checking this batch of .dlink files
             DLinkCalledFromGitHookReporting(type, getFilesNew, getFilesOverwrite, putFiles);
+                        
+            if (errors.Count > 0)
+            {
+                new Error("Dlink sync failed for " + errors.Count + " file" + G.S(errors.Count) + ":" + G.NL + string.Join(G.NL, errors));
+            }
         }   
-
-        private static string Dlink_FromDlinkFileToDataFile(string dlinkFile)
+                
+        public static string Dlink_FromDlinkFileToDataFile(string dlinkFile)
         {
             //m1                 K:\MAKROBK\tth\test\makrobk_grunddata\biver\_progs\_uddata_dlink\x.csv.dlink
             //m2                 tth\test\makrobk_grunddata\biver\_progs\_uddata_dlink\x.csv.dlink

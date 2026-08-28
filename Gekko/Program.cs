@@ -2981,7 +2981,8 @@ namespace Gekko
             {
                 if (true)
                 {
-                    //var xx = Stringlist.Path_FromStringToList("//nas2/fkontor/makrobk/tth/test");
+                    WindowDlink xx = new WindowDlink();
+                    xx.ShowDialog();
                 }
 
                 if (false)
