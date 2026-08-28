@@ -112,6 +112,7 @@ namespace Gekko
             this.tSPImportEqsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tSPImportDataToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.runStatusToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.dlinkToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showCurrentOptionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.restoreUserSettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -853,7 +854,7 @@ namespace Gekko
             this.comparecheckEquationsToolStripMenuItem,
             this.compareModeldatabankvarlistToolStripMenuItem,
             this.convertersToolStripMenuItem,
-            this.runStatusToolStripMenuItem});
+            this.dlinkToolStripMenuItem});
             this.utilitiesToolStripMenuItem.Name = "utilitiesToolStripMenuItem";
             this.utilitiesToolStripMenuItem.Size = new System.Drawing.Size(58, 20);
             this.utilitiesToolStripMenuItem.Text = "Utilities";
@@ -954,6 +955,13 @@ namespace Gekko
             this.runStatusToolStripMenuItem.Size = new System.Drawing.Size(331, 22);
             this.runStatusToolStripMenuItem.Text = "Run status...";
             this.runStatusToolStripMenuItem.Click += new System.EventHandler(this.runStatusToolStripMenuItem_Click_1);
+            // 
+            // dlinkToolStripMenuItem
+            // 
+            this.dlinkToolStripMenuItem.Name = "dlinkToolStripMenuItem";
+            this.dlinkToolStripMenuItem.Size = new System.Drawing.Size(331, 22);
+            this.dlinkToolStripMenuItem.Text = "Dlink files (data versioning)...";
+            this.dlinkToolStripMenuItem.Click += new System.EventHandler(this.dlinkToolStripMenuItem_Click_1);
             // 
             // optionsToolStripMenuItem
             // 
@@ -1956,6 +1964,7 @@ namespace Gekko
         private ToolStripMenuItem viewDatabanksToolStripMenuItem;
         public ToolStripMenuItem traceToolStripMenuItem;
         private ToolStripMenuItem runStatusToolStripMenuItem;
+        private ToolStripMenuItem dlinkToolStripMenuItem;
         private ToolStripMenuItem windowToolStripMenuItem;
         private ToolStripMenuItem closeToolStripMenuItem1;
         private ToolStripMenuItem allPPLOTUDVALGToolStripMenuItem;

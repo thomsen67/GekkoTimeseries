@@ -1,9 +1,10 @@
 ﻿<Window x:Class="Gekko.WindowDlink"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Create/update .dlink files manually"
+        Title="Dlink files manager (create/update)"
         Height="560" Width="880"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen">    
+
     <Window.Resources>
         <!-- New: compact, slightly rounded style for the per-row [Dlink]/[Remove] buttons. -->
         <Style x:Key="RoundedSmallButtonStyle" TargetType="Button">
@@ -60,7 +61,7 @@
               Drop="DropZone_Drop" DragEnter="DropZone_DragEnter" DragLeave="DropZone_DragLeave">
             <Rectangle Name="DropZoneBorder" Fill="#FFF4F4F4" Stroke="#FF999999" StrokeThickness="2"
                        StrokeDashArray="4 2" RadiusX="4" RadiusY="4"/>
-            <TextBlock Name="DropZoneHintText" Text="Drag data files or folders here"
+            <TextBlock Name="DropZoneHintText" Text="Drag data files or data folders here"
                        HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False"
                        FontSize="14" Foreground="#FF555555" TextWrapping="Wrap" TextAlignment="Center" Margin="10"/>
         </Grid>

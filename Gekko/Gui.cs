@@ -2962,6 +2962,12 @@ namespace Gekko
             OpenRunStatusWindow();
         }
 
+        private void dlinkToolStripMenuItem_Click_1(object sender, EventArgs e)
+        {
+            WindowDlink xx = new WindowDlink();
+            xx.Show();
+        }
+
         private void allPPLOTUDVALGToolStripMenuItem_Click(object sender, EventArgs e)
         {
             CloseAllDecompUdvalg(true);

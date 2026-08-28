@@ -61,30 +61,11 @@ namespace Gekko
     /// Drag-and-drop tool for producing/updating .dlink files for data files that were added or
     /// changed outside Gekko (e.g. a plain file copy). For each dropped file it works out one of:
     /// already in sync (nothing to do) or new/changed (needs Blob()). Each row can be processed
-    /// individually (its own [Dlink] button) or all at once ([Dlink all]).
-    ///
-    /// Renaming/moving a data file is handled entirely outside this tool: rename or move the data
-    /// file first (e.g. in Total Commander), then do the same to its .dlink -- either by
-    /// TortoiseGit-renaming/moving it alongside, or by Git-deleting the old .dlink and adding a
-    /// new one (this window can regenerate that new one). .dlink content depends only on the
-    /// data, never on its path, so a plain rename of the .dlink is always correct and needs no
-    /// rehashing; this window intentionally does not try to detect or automate that case, to keep
-    /// its own logic simple and to keep "remove this from Git" a deliberate action the user takes
-    /// themselves rather than something this tool infers and does as a side effect.
-    ///
-    /// Deliberately synchronous/single-threaded: hashing happens on the UI thread as files are
-    /// dropped, which is fine for the batch sizes this is meant for (a handful to a few dozen
-    /// files at a time), but would visibly block the UI for a very large drop. Not addressed here
-    /// to keep this first version simple; worth revisiting with a background worker if that
-    /// becomes a real usage pattern.
+    /// individually (its own [Dlink] button) or all at once ([Dlink all]).    
     /// </summary>
     public partial class WindowDlink : Window
     {
-        private readonly ObservableCollection<DlinkImportRow> _items = new ObservableCollection<DlinkImportRow>();
-
-        // Resting vs. drag-hover colors for the drop zone's fill (not the dashed border, which
-        // stays as-is). Both colors are light enough that the hint text's normal gray reads fine
-        // against either, so no text-color swap is needed on hover.
+        private readonly ObservableCollection<DlinkImportRow> _items = new ObservableCollection<DlinkImportRow>();        
         private static readonly Brush DropZoneRestFill = CreateFrozenBrush(0xF4, 0xF4, 0xF4);
         private static readonly Brush DropZoneHoverFill = CreateFrozenBrush(0xCC, 0xD5, 0xF0); //dusted blue
 
@@ -126,9 +107,7 @@ namespace Gekko
             foreach (string p in dropped)
             {
                 if (Directory.Exists(p))
-                {
-                    //SearchOption.AllDirectories recurses through every level of subfolder, not
-                    //just the immediate children -- dropping a folder picks up its whole subtree.
+                {                    
                     allFiles.AddRange(Directory.GetFiles(p, "*", SearchOption.AllDirectories));
                 }
                 else if (File.Exists(p))
@@ -160,7 +139,7 @@ namespace Gekko
             catch (Exception ex)
             {
                 row.Kind = DlinkImportRowKind.Unresolved;
-                row.Status = "Error while checking: " + ex.Message;
+                row.Status = "Error while checking";
                 row.DlinkPathDisplay = "<No correspondence>";
             }
         }
@@ -199,7 +178,7 @@ namespace Gekko
                     return;
                 }
                 row.Kind = DlinkImportRowKind.NewOrChanged;
-                row.Status = "Will be updated (existing .dlink has a different hash)";
+                row.Status = "Will be updated (existing .dlink differs)";
                 return;
             }
 
@@ -239,11 +218,7 @@ namespace Gekko
             }
             TryCopyToClipboard(row.TargetDlinkPath, ".dlink path");
         }
-
-        // A right-click menu attached via RowStyle is not part of the row's visual tree (it opens
-        // as a separate popup), so the clicked MenuItem's DataContext is not the row --
-        // PlacementTarget (set by WPF to whichever row was actually right-clicked) is how to get
-        // back to it.
+                
         private DlinkImportRow GetRowFromContextMenuSender(object sender)
         {
             MenuItem menuItem = sender as MenuItem;
@@ -263,7 +238,7 @@ namespace Gekko
             }
             catch (Exception ex)
             {
-                StatusText.Text = "Could not copy " + whatForStatusText + " to clipboard: " + ex.Message;
+                StatusText.Text = "Could not copy " + whatForStatusText + " to clipboard";
             }
         }
 
@@ -332,8 +307,8 @@ namespace Gekko
                 //One bad file (unreadable, corrupt, permissions, ...) should not abort a batch --
                 //or, for a single-row click, the row simply reports its own failure. Record the
                 //error against this row (and the caller's list) and move on.
-                row.Status = "Error: " + ex.Message;
-                errors.Add(row.Path + ": " + ex.Message);
+                row.Status = "Error";
+                errors.Add(row.Path);
             }
         }
 

@@ -2981,8 +2981,7 @@ namespace Gekko
             {
                 if (true)
                 {
-                    WindowDlink xx = new WindowDlink();
-                    xx.ShowDialog();
+                    
                 }
 
                 if (false)
