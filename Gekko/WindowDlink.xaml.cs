@@ -27,9 +27,7 @@ namespace Gekko
             get { return _status; }
             set { _status = value; OnPropertyChanged("Status"); }
         }
-
-        // New: the .dlink path shown underneath Path in the grid, in gray. "<No correspondence>"
-        // for a row that errored or falls outside the recognized data folder structure.
+        
         private string _dlinkPathDisplay;
         public string DlinkPathDisplay
         {
@@ -64,8 +62,8 @@ namespace Gekko
     /// Drag-and-drop tool for producing/updating .dlink files for data files that were added or
     /// changed outside Gekko (e.g. a plain file copy). For each dropped file it works out one of:
     /// already in sync (nothing to do), new/changed (needs Blob()), or a detected move/rename (an
-    /// existing, now-orphaned .dlink elsewhere in the tree has the exact same hash -- since .dlink
-    /// content depends only on the data, never on its path, that .dlink can just be relocated
+    /// existing, now-orphaned .dlink elsewhere in the tree has the exact same hash, since .dlink
+    /// content depends only on the data, never on its path, so that .dlink can just be relocated
     /// rather than regenerated). Orphaned .dlink files not claimed by whatever's been processed so
     /// far are reported, not silently left behind -- see ReportLeftoverOrphans. Each row can be
     /// processed individually (its own [Dlink] button) or all at once ([Dlink all]).
@@ -104,9 +102,7 @@ namespace Gekko
             InitializeComponent();
             FilesGrid.ItemsSource = _items;
         }
-
-        // New: highlights the drop zone in "primary blue" while a file/folder is being dragged
-        // over it (both the top zone and the grid below it route here).
+                
         private void DropZone_DragEnter(object sender, System.Windows.DragEventArgs e)
         {
             bool ok = e.Data.GetDataPresent(DataFormats.FileDrop);
@@ -114,8 +110,7 @@ namespace Gekko
             DropZoneBorder.Stroke = ok ? DropZoneHoverBrush : DropZoneRestBrush;
             e.Handled = true;
         }
-
-        // New: reverts the drop zone back to its resting color once the drag leaves it.
+                
         private void DropZone_DragLeave(object sender, System.Windows.DragEventArgs e)
         {
             DropZoneBorder.Stroke = DropZoneRestBrush;
@@ -124,7 +119,7 @@ namespace Gekko
 
         private void DropZone_Drop(object sender, System.Windows.DragEventArgs e)
         {
-            DropZoneBorder.Stroke = DropZoneRestBrush; // New: reset the hover color once the drag completes
+            DropZoneBorder.Stroke = DropZoneRestBrush;
 
             if (!e.Data.GetDataPresent(DataFormats.FileDrop)) return;
             string[] dropped = (string[])e.Data.GetData(DataFormats.FileDrop);
@@ -133,10 +128,7 @@ namespace Gekko
             foreach (string p in dropped)
             {
                 if (Directory.Exists(p))
-                {
-                    //SearchOption.AllDirectories already recurses through every level of
-                    //subfolder, not just the immediate children -- dropping a folder picks up its
-                    //whole subtree (unchanged from before, just calling this out explicitly).
+                {                    
                     allFiles.AddRange(Directory.GetFiles(p, "*", SearchOption.AllDirectories));
                 }
                 else if (File.Exists(p))
@@ -188,7 +180,7 @@ namespace Gekko
                 row.DlinkPathDisplay = "<No correspondence>"; // New
                 return;
             }
-            row.DlinkPathDisplay = targetDlink; // New: shown in gray underneath Path in the grid
+            row.DlinkPathDisplay = targetDlink; 
 
             FileInfo fi = new FileInfo(row.Path);
             row.ComputedSize = fi.Length;
@@ -292,9 +284,7 @@ namespace Gekko
             DialogResult = false;
             Close();
         }
-
-        // New: processes every row in the grid (renamed from DlinkButton_Click now that
-        // individual rows have their own [Dlink] button -- see DlinkSingleRow_Click below).
+                
         private void DlinkAllButton_Click(object sender, RoutedEventArgs e)
         {
             DlinkAllButton.IsEnabled = false;
@@ -318,9 +308,7 @@ namespace Gekko
             ReportLeftoverOrphans(claimedOrphans);
             ShowErrorsIfAny(errors);
         }
-
-        // New: processes just the one row this button lives on, via the same logic
-        // DlinkAllButton_Click uses for the whole batch -- see ProcessRow.
+                
         private void DlinkSingleRow_Click(object sender, RoutedEventArgs e)
         {
             DlinkImportRow row = (DlinkImportRow)((Button)sender).Tag;
@@ -381,9 +369,7 @@ namespace Gekko
                 errors.Add(row.Path + ": " + ex.Message);
             }
         }
-
-        // New: extracted so both DlinkAllButton_Click and DlinkSingleRow_Click report errors the
-        // same way.
+                
         private void ShowErrorsIfAny(List<string> errors)
         {
             if (errors.Count > 0)
