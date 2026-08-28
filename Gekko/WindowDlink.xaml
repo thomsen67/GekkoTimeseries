@@ -54,8 +54,6 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="8"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="8"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         
         <Grid Grid.Row="0" Name="DropZone" AllowDrop="True"
@@ -109,10 +107,7 @@
             </DataGrid.Columns>
         </DataGrid>
         
-        <TextBlock Grid.Row="4" Name="OrphanSummaryText" TextWrapping="Wrap" Foreground="#FF8A6D00"
-                   Visibility="Collapsed" MaxHeight="120"/>
-
-        <Grid Grid.Row="6">
+        <Grid Grid.Row="4">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
