@@ -37,6 +37,15 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <!-- New: moved out of DataGrid.RowStyle's inline Setter.Value. MenuItem Click handlers
+             declared on an object nested inside a Setter.Value for a plain object-valued property
+             (as opposed to inside a ControlTemplate/DataTemplate, which handle this fine) can trip
+             up the WPF XAML compiler's event wireup: defining the ContextMenu here as a normal
+             keyed resource and referencing it via StaticResource avoids that. -->
+        <ContextMenu x:Key="RowContextMenu">
+            <MenuItem Header="Copy data file path" Click="CopyDataFilePath_Click"/>
+            <MenuItem Header="Copy dlink file path" Click="CopyDlinkFilePath_Click"/>
+        </ContextMenu>
     </Window.Resources>
     <Grid Margin="10">
         <Grid.RowDefinitions>
@@ -67,14 +76,7 @@
                  whichever row was actually clicked each time it opens. -->
             <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow">
-                    <Setter Property="ContextMenu">
-                        <Setter.Value>
-                            <ContextMenu>
-                                <MenuItem Header="Copy data file path" Click="CopyDataFilePath_Click"/>
-                                <MenuItem Header="Copy dlink file path" Click="CopyDlinkFilePath_Click"/>
-                            </ContextMenu>
-                        </Setter.Value>
-                    </Setter>
+                    <Setter Property="ContextMenu" Value="{StaticResource RowContextMenu}"/>
                 </Style>
             </DataGrid.RowStyle>
             <DataGrid.Columns>                
