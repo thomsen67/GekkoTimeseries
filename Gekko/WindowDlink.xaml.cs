@@ -86,9 +86,13 @@ namespace Gekko
         private Dictionary<string, List<string>> _orphanIndex;
         private bool _orphanIndexBuilt;
 
-        // New: resting vs. drag-hover colors for the drop zone's border.
-        private static readonly Brush DropZoneRestBrush = CreateFrozenBrush(0x99, 0x99, 0x99);
-        private static readonly Brush DropZoneHoverBrush = CreateFrozenBrush(0x00, 0x78, 0xD4); //"primary blue"
+        // New: resting vs. drag-hover colors for the drop zone's fill (not the dashed border,
+        // which stays as-is), plus a matching text color swap so the hint text stays readable
+        // against the blue fill.
+        private static readonly Brush DropZoneRestFill = CreateFrozenBrush(0xF4, 0xF4, 0xF4);
+        private static readonly Brush DropZoneHoverFill = CreateFrozenBrush(0x00, 0x78, 0xD4); //"primary blue"
+        private static readonly Brush DropZoneRestText = CreateFrozenBrush(0x55, 0x55, 0x55);
+        private static readonly Brush DropZoneHoverText = CreateFrozenBrush(0xFF, 0xFF, 0xFF);
 
         private static Brush CreateFrozenBrush(byte r, byte g, byte b)
         {
@@ -107,19 +111,22 @@ namespace Gekko
         {
             bool ok = e.Data.GetDataPresent(DataFormats.FileDrop);
             e.Effects = ok ? DragDropEffects.Copy : DragDropEffects.None;
-            DropZoneBorder.Stroke = ok ? DropZoneHoverBrush : DropZoneRestBrush;
+            DropZoneBorder.Fill = ok ? DropZoneHoverFill : DropZoneRestFill;
+            DropZoneHintText.Foreground = ok ? DropZoneHoverText : DropZoneRestText;
             e.Handled = true;
         }
                 
         private void DropZone_DragLeave(object sender, System.Windows.DragEventArgs e)
         {
-            DropZoneBorder.Stroke = DropZoneRestBrush;
+            DropZoneBorder.Fill = DropZoneRestFill;
+            DropZoneHintText.Foreground = DropZoneRestText;
             e.Handled = true;
         }
 
         private void DropZone_Drop(object sender, System.Windows.DragEventArgs e)
         {
-            DropZoneBorder.Stroke = DropZoneRestBrush;
+            DropZoneBorder.Fill = DropZoneRestFill;
+            DropZoneHintText.Foreground = DropZoneRestText;
 
             if (!e.Data.GetDataPresent(DataFormats.FileDrop)) return;
             string[] dropped = (string[])e.Data.GetData(DataFormats.FileDrop);

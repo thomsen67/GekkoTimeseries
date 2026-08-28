@@ -4,6 +4,36 @@
         Title="Create/update .dlink files manually"
         Height="560" Width="880"
         WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <!-- New: compact, slightly rounded style for the per-row [Dlink]/[Remove] buttons. -->
+        <Style x:Key="RoundedSmallButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="18"/>
+            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="Background" Value="#FFF0F0F0"/>
+            <Setter Property="BorderBrush" Value="#FFACACAC"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="3">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FFE5E5E5"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#FFD0D0D0"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="100"/>
@@ -19,7 +49,7 @@
               Drop="DropZone_Drop" DragEnter="DropZone_DragEnter" DragLeave="DropZone_DragLeave">
             <Rectangle Name="DropZoneBorder" Fill="#FFF4F4F4" Stroke="#FF999999" StrokeThickness="2"
                        StrokeDashArray="4 2" RadiusX="4" RadiusY="4"/>
-            <TextBlock Text="Drag data files or folders here"
+            <TextBlock Name="DropZoneHintText" Text="Drag data files or folders here"
                        HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False"
                        FontSize="14" Foreground="#FF555555" TextWrapping="Wrap" TextAlignment="Center" Margin="10"/>
         </Grid>
@@ -28,11 +58,14 @@
                   IsReadOnly="True" SelectionMode="Extended" GridLinesVisibility="Horizontal"
                   AllowDrop="True" Drop="DropZone_Drop" DragEnter="DropZone_DragEnter" DragLeave="DropZone_DragLeave">
             <DataGrid.Columns>                
-                <DataGridTemplateColumn Header="Path" Width="4*">
+                <!-- New: SortMemberPath lets the user click this header to sort by data file path,
+                     since DataGrid cannot auto-detect a sort key for a template column. -->
+                <DataGridTemplateColumn Header="Path" Width="4*" SortMemberPath="Path" CanUserSort="True">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Vertical" Margin="2">
-                                <TextBlock Text="{Binding Path}"/>
+                                <!-- New: data file path in a dusted dark blue -->
+                                <TextBlock Text="{Binding Path}" Foreground="#FF1F4E79"/>
                                 <TextBlock Text="{Binding DlinkPathDisplay}" Foreground="#FF888888"/>
                             </StackPanel>
                         </DataTemplate>
@@ -43,8 +76,10 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
-                                <Button Content="Dlink" Padding="4,1" Margin="0,0,4,0" Click="DlinkSingleRow_Click" Tag="{Binding}"/>
-                                <Button Content="Remove" Padding="4,1" Click="RemoveRow_Click" Tag="{Binding}"/>
+                                <Button Content="Dlink" Style="{StaticResource RoundedSmallButtonStyle}"
+                                        Margin="0,0,4,0" Click="DlinkSingleRow_Click" Tag="{Binding}"/>
+                                <Button Content="Remove" Style="{StaticResource RoundedSmallButtonStyle}"
+                                        Click="RemoveRow_Click" Tag="{Binding}"/>
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
