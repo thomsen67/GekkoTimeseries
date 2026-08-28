@@ -291,6 +291,56 @@ namespace Gekko
             DialogResult = false;
             Close();
         }
+
+        // New: right-click "Copy data file path" -- copies the plain data file path shown on the
+        // top line of the row.
+        private void CopyDataFilePath_Click(object sender, RoutedEventArgs e)
+        {
+            DlinkImportRow row = GetRowFromContextMenuSender(sender);
+            if (row == null || G.NullOrBlanks(row.Path)) return;
+            TryCopyToClipboard(row.Path, "data file path");
+        }
+
+        // New: right-click "Copy dlink file path" -- copies the actual target .dlink path, not
+        // the "<No correspondence>" placeholder text shown in that case (there is nothing useful
+        // to copy for that row).
+        private void CopyDlinkFilePath_Click(object sender, RoutedEventArgs e)
+        {
+            DlinkImportRow row = GetRowFromContextMenuSender(sender);
+            if (row == null || G.NullOrBlanks(row.TargetDlinkPath))
+            {
+                StatusText.Text = "No .dlink path available to copy for this row.";
+                return;
+            }
+            TryCopyToClipboard(row.TargetDlinkPath, ".dlink path");
+        }
+
+        // New: a right-click menu attached via RowStyle is not part of the row's visual tree (it
+        // opens as a separate popup), so the clicked MenuItem's DataContext is not the row --
+        // PlacementTarget (set by WPF to whichever row was actually right-clicked) is how to get
+        // back to it.
+        private DlinkImportRow GetRowFromContextMenuSender(object sender)
+        {
+            MenuItem menuItem = sender as MenuItem;
+            ContextMenu contextMenu = menuItem != null ? menuItem.Parent as ContextMenu : null;
+            FrameworkElement placementTarget = contextMenu != null ? contextMenu.PlacementTarget as FrameworkElement : null;
+            return placementTarget != null ? placementTarget.DataContext as DlinkImportRow : null;
+        }
+
+        // New: Clipboard access can occasionally throw (e.g. another process briefly holds it) --
+        // worth a try/catch rather than letting a copy-to-clipboard action crash the window.
+        private void TryCopyToClipboard(string text, string whatForStatusText)
+        {
+            try
+            {
+                Clipboard.SetText(text);
+                StatusText.Text = "Copied " + whatForStatusText + " to clipboard.";
+            }
+            catch (Exception ex)
+            {
+                StatusText.Text = "Could not copy " + whatForStatusText + " to clipboard: " + ex.Message;
+            }
+        }
                 
         private void DlinkAllButton_Click(object sender, RoutedEventArgs e)
         {

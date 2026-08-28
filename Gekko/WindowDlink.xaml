@@ -8,7 +8,7 @@
         <!-- New: compact, slightly rounded style for the per-row [Dlink]/[Remove] buttons. -->
         <Style x:Key="RoundedSmallButtonStyle" TargetType="Button">
             <Setter Property="Height" Value="18"/>
-            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="Padding" Value="12,0"/>
             <Setter Property="Background" Value="#FFF0F0F0"/>
             <Setter Property="BorderBrush" Value="#FFACACAC"/>
             <Setter Property="BorderThickness" Value="1"/>
@@ -19,7 +19,11 @@
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
                                 CornerRadius="3">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <!-- New: without this Margin binding, the Padding setter above had no
+                                 visible effect at all; Padding was set on the Button but never
+                                 consumed anywhere in the template. -->
+                            <ContentPresenter Margin="{TemplateBinding Padding}"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
@@ -56,14 +60,30 @@
         
         <DataGrid Grid.Row="2" Name="FilesGrid" AutoGenerateColumns="False" CanUserAddRows="False"
                   IsReadOnly="True" SelectionMode="Extended" GridLinesVisibility="Horizontal"
+                  HorizontalGridLinesBrush="#FF999999"
                   AllowDrop="True" Drop="DropZone_Drop" DragEnter="DropZone_DragEnter" DragLeave="DropZone_DragLeave">
+            <!-- New: right-click anywhere on a row to copy either path to the clipboard. One
+                 shared ContextMenu instance is fine here; WPF reassigns PlacementTarget to
+                 whichever row was actually clicked each time it opens. -->
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Setter Property="ContextMenu">
+                        <Setter.Value>
+                            <ContextMenu>
+                                <MenuItem Header="Copy data file path" Click="CopyDataFilePath_Click"/>
+                                <MenuItem Header="Copy dlink file path" Click="CopyDlinkFilePath_Click"/>
+                            </ContextMenu>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </DataGrid.RowStyle>
             <DataGrid.Columns>                
                 <!-- New: SortMemberPath lets the user click this header to sort by data file path,
                      since DataGrid cannot auto-detect a sort key for a template column. -->
                 <DataGridTemplateColumn Header="Path" Width="4*" SortMemberPath="Path" CanUserSort="True">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Vertical" Margin="2">
+                            <StackPanel Orientation="Vertical" Margin="2,6,2,6">
                                 <!-- New: data file path in a dusted dark blue -->
                                 <TextBlock Text="{Binding Path}" Foreground="#FF1F4E79"/>
                                 <TextBlock Text="{Binding DlinkPathDisplay}" Foreground="#FF888888"/>
