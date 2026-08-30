@@ -26268,6 +26268,13 @@ namespace Gekko
 
         public static void MaybeWriteOpenDatabank(P p, Databank removed, bool noTrace)
         {
+            //We set this here, because even if the databank is not dirty (not changed), we still want to potentially generate
+            //a .dlink file.
+            if (File.Exists(removed.FileNameWithPath)) //probably always exists...
+            {
+                DlinkAutoDlinkFiles.Blob(removed.FileNameWithPath, removed.storage.Count(), false);
+            }
+
             if (Program.IsDatabankDirty(removed))
             {
                 //If it is a non-gbk, we are not going to alter the databank no matter what
@@ -26283,11 +26290,7 @@ namespace Gekko
                 }
                 else
                 {
-                    Program.WriteRemovedDatabank(p, removed, noTrace);
-                    if (File.Exists(removed.FileNameWithPath)) //probably always exists...
-                    {
-                        DlinkAutoDlinkFiles.Blob(removed.FileNameWithPath, removed.storage.Count(), false);
-                    }
+                    Program.WriteRemovedDatabank(p, removed, noTrace);                    
                 }
             }
         }

@@ -81,7 +81,7 @@
             <DataGrid.Columns>                
                 <!-- New: SortMemberPath lets the user click this header to sort by data file path,
                      since DataGrid cannot auto-detect a sort key for a template column. -->
-                <DataGridTemplateColumn Header="Path" Width="4*" SortMemberPath="Path" CanUserSort="True">
+                <DataGridTemplateColumn Header="Path" Width="*" SortMemberPath="Path" CanUserSort="True">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Vertical" Margin="2,6,2,6">
@@ -92,8 +92,8 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="3*"/>                
-                <DataGridTemplateColumn Header="" Width="135">
+                <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="150"/>                
+                <DataGridTemplateColumn Header="" Width="150">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
