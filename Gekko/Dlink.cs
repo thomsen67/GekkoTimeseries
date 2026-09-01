@@ -171,9 +171,20 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
     }
 
     public static class DlinkAutoDlinkFiles
-    {        
+    {
+
         /// <summary>
-        /// Handles blobs, for .dlink
+        /// Handles blobs, for .dlink. All non-gbk files go through this.
+        /// </summary>
+        /// <param name="dataFile"></param>
+        /// <param name="force"></param>
+        public static void Blob(string dataFile, bool force)
+        {
+            Blob(dataFile, null, null, force);
+        }
+
+        /// <summary>
+        /// Handles blobs, for .dlink. Only gbk files go through this.
         /// </summary>
         /// <param name="dataFile"></param>
         public static void Blob(string dataFile, long? nVariables, long? nSeries, bool force)
@@ -292,7 +303,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             {
                 foreach (string dlinkFile2 in dlinkFiles) //Could probably be parallelized
                 {
-                    DlinkAutoDlinkFiles.Blob(dlinkFile2, null, null, true); //We do not know the number of variables, so it is set to null
+                    DlinkAutoDlinkFiles.Blob(dlinkFile2, true); //We do not know the number of variables, so it is set to null
                 }
             }
             catch
@@ -718,6 +729,8 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             }            
 
             string hash = null;
+            int variables = 0; //default
+            int series = 0; //default
 
             if (G.Equal(Path.GetExtension(filePath), ".gbk"))
             {
@@ -735,6 +748,8 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                                 string tempFileNameWithPath = Program.WaitForZipExtractFileEntryToTempFile(entry, filePath);
                                 Program.GetDatabankInfo(readInfo, tempFileNameWithPath, out databankVersion, out traceVersion);
                                 hash = readInfo.dataHashFull;
+                                variables = readInfo.variables;
+                                series = readInfo.series;
                             }
                             catch
                             {

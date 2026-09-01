@@ -1870,6 +1870,7 @@ namespace Gekko
                 readInfo.startPerInFile = d1min;
                 readInfo.endPerInFile = d2max;
                 readInfo.variables = counter;
+                readInfo.series = readInfo.variables;
                 if (emptyWarnings > 0) G.Warning("w2.1", emptyWarnings + " variables with empty string as name in .tsd file (skipped)");
                 if (smallWarnings > 0) G.Warning("w2.2", smallWarnings + " numbers numerically smaller than 1.0e-37 were set to 0");
             }
@@ -1925,6 +1926,7 @@ namespace Gekko
                         DateTime dt3 = DateTime.Now;
                         databank = Serializer.Deserialize<Databank_1_1>(fs);
                         readInfo.variables = databank.storage.Count;
+                        readInfo.series = readInfo.variables;
                         G.WritelnGray("Protobuf deserialize took: " + G.Seconds(dt3));
                     }
                     catch (Exception e)

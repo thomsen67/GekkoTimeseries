@@ -7051,6 +7051,7 @@ namespace Gekko
                     readInfo.startPerInFile = year1;
                     readInfo.endPerInFile = year2;
                     readInfo.variables = databankTemp2.storage.Count;
+                    readInfo.series = databankTemp2.CountFlattenedArrayTimeseries();
                     if (databankTemp2.cacheParameters != null)  //will this ever be false?
                     {
                         readInfo.databankVersion = databankTemp2.cacheParameters.databankVersion;
@@ -7677,7 +7678,7 @@ namespace Gekko
                 O.AddIVariableWithOverwriteFromString(collectionName, output);
                 G.Writeln2("Imported " + type.ToString().ToLower() + " " + collectionName + " (" + rr + "x" + cc + " elements)");
             }
-            DlinkAutoDlinkFiles.Blob(blob, null, null, false);
+            DlinkAutoDlinkFiles.Blob(blob, false);
         }
 
         /// <summary>
@@ -7851,6 +7852,7 @@ namespace Gekko
                     Gekko.Trace2.HandleTraceRead1(deserializedDatabank);
 
                     readInfo.variables = deserializedDatabank.storage.Count;
+                    readInfo.series = deserializedDatabank.CountFlattenedArrayTimeseries();
                     readInfo.startPerInFile = yearMinMax.int1;
                     readInfo.endPerInFile = yearMinMax.int2;
                     G.WritelnGray("Protobuf deserialize took: " + G.Seconds(dt3));
@@ -7992,6 +7994,20 @@ namespace Gekko
                     if (!G.NullOrBlanks(readInfo.dataHash)) readInfo.dataHash = readInfo.dataHash.Length > 8 ? readInfo.dataHash.Substring(0, 8) : readInfo.dataHash;
                 }
 
+                XmlNodeList variables = doc.GetElementsByTagName("Variables");
+                foreach (XmlNode variable in variables) //should be only 1 in this loop
+                {
+                    int x = 0; int.TryParse(variable.InnerText.Trim(), out x);
+                    readInfo.variables = x;
+                }
+
+                XmlNodeList seriess = doc.GetElementsByTagName("Series");
+                foreach (XmlNode series in seriess) //should be only 1 in this loop
+                {
+                    int x = 0; int.TryParse(series.InnerText.Trim(), out x);
+                    readInfo.series = x;
+                }
+
                 XmlNodeList modelNames = doc.GetElementsByTagName("ModelName");
                 foreach (XmlNode modelName in modelNames) //should be only 1 in this loop
                 {
@@ -8087,6 +8103,7 @@ namespace Gekko
             readInfo.startPerInFile = readInfo_oldbank.startPerInFile;
             readInfo.endPerInFile = readInfo_oldbank.endPerInFile;
             readInfo.variables = readInfo_oldbank.variables;
+            readInfo.series = readInfo.variables;
 
             bool underscore = false;
 
@@ -8753,6 +8770,7 @@ namespace Gekko
                 readInfo.startPerInFile = d1min;
                 readInfo.endPerInFile = d2max;
                 readInfo.variables = counter;
+                readInfo.series = readInfo.variables;
                 if (emptyWarnings > 0)
                 {
                     G.Warning("w2.1", emptyWarnings + " variables with empty string as name in .tsd file (skipped)");
@@ -23050,7 +23068,7 @@ namespace Gekko
                 //}
             }
             G.Writeln2("Exported " + list2.Count + " series to file " + pathAndFilename);
-            DlinkAutoDlinkFiles.Blob(blob, list2.Count, null, false);
+            DlinkAutoDlinkFiles.Blob(blob, false);
         }
 
         public static string ProgramFolderRunning()
@@ -24075,7 +24093,7 @@ namespace Gekko
                     {
                         GamsData.WriteGdxSlow(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list1Sorted); //probably cannot handle list2
                     }
-                    DlinkAutoDlinkFiles.Blob(blob, list1Sorted?.Count ?? 0, null, false);
+                    DlinkAutoDlinkFiles.Blob(blob, false);
                     return 0;
                 }
                 else if (o.opt_arrow != null)
@@ -24103,7 +24121,7 @@ namespace Gekko
                         }
                         throw;
                     }
-                    DlinkAutoDlinkFiles.Blob(blob, list2Sorted?.Count ?? 0, null, false);
+                    DlinkAutoDlinkFiles.Blob(blob, false);
                     return 0;
                 }
                 else if (o.opt_parquet != null)
@@ -24131,7 +24149,7 @@ namespace Gekko
                         }
                         throw;
                     }
-                    DlinkAutoDlinkFiles.Blob(blob, list2Sorted?.Count ?? 0, null, false);
+                    DlinkAutoDlinkFiles.Blob(blob, false);
                     return 0;
                 }
                 else if (isRecordsFormat)
@@ -24306,7 +24324,7 @@ namespace Gekko
                 }
                 file.Flush();
             }
-            DlinkAutoDlinkFiles.Blob(blob, null, null, false);
+            DlinkAutoDlinkFiles.Blob(blob, false);
             G.Writeln2("R export of " + o.list1.Count() + " matrices, " + fullFileName);            
         }
 
@@ -24355,7 +24373,7 @@ namespace Gekko
                 }
                 file.Flush();
             }
-            DlinkAutoDlinkFiles.Blob(blob, null, null, false);
+            DlinkAutoDlinkFiles.Blob(blob, false);
             G.Writeln2("Python export of " + o.list1.Count() + " matrices, " + fullFileName);
         }
 
@@ -24727,7 +24745,7 @@ namespace Gekko
                 }
             }
 
-            DlinkAutoDlinkFiles.Blob(blob, count, databank.CountFlattenedArrayTimeseries(), false);
+            DlinkAutoDlinkFiles.Blob(blob, count, databank.CountFlattenedArrayTimeseries(), false); //see also #poakj34lkjafs3f
             return count;
         }
 
@@ -24809,7 +24827,7 @@ namespace Gekko
                     }
                 }
             }
-            DlinkAutoDlinkFiles.Blob(blob, count, null, false);
+            DlinkAutoDlinkFiles.Blob(blob, false);
             return count;
         }
 
@@ -24850,7 +24868,7 @@ namespace Gekko
                     }
                 }
             }
-            DlinkAutoDlinkFiles.Blob(blob, count, null, false);
+            DlinkAutoDlinkFiles.Blob(blob, false);
             return count;
         }
 
@@ -24951,6 +24969,7 @@ namespace Gekko
             doc.AppendChild(dec);// Create the root element
             //Using PascalCase for elements, and camelCase for attributes.
             XmlElement root = doc.CreateElement("DatabankInfo");
+            doc.AppendChild(root);
             root.SetAttribute("databankVersion", databankVersion);  //needs to be changed if Databank/Series change
             root.SetAttribute("traceVersion", traceVersion);  //needs to be changed if Databank/Series change
             root.SetAttribute("gekkoVersion", Globals.gekkoVersion);            
@@ -24987,8 +25006,7 @@ namespace Gekko
                     if (!G.NullOrBlanks(gcm.InnerText)) root.AppendChild(gcm);
                 } 
                 catch { }
-            }
-            doc.AppendChild(root);
+            }            
 
             XmlElement comment = doc.CreateElement("Info1");  //HDG
             comment.InnerText = databank.info1;
@@ -25001,7 +25019,15 @@ namespace Gekko
 
             XmlElement dataHash2 = doc.CreateElement("DataHash");
             dataHash2.InnerText = dataHash;
-            if (!G.NullOrBlanks(dataHash2.InnerText)) root.AppendChild(dataHash2);
+            if (!G.NullOrBlanks(dataHash2.InnerText)) root.AppendChild(dataHash2);                        
+
+            XmlElement variables = doc.CreateElement("Variables"); //Just a count of databank dictionary keys
+            variables.InnerText = databank.storage.Count().ToString();
+            if (!G.NullOrBlanks(variables.InnerText)) root.AppendChild(variables);
+
+            XmlElement series = doc.CreateElement("Series"); //normal series + array-subseries
+            series.InnerText = databank.CountFlattenedArrayTimeseries().ToString(); //See also #poakj34lkjafs3f
+            if (!G.NullOrBlanks(series.InnerText)) root.AppendChild(series);
 
             if (G.GetModelSourceType() == EModelType.Gekko && !isCloseCommand)
             {
@@ -25915,7 +25941,7 @@ namespace Gekko
             }
 
             G.Writeln("Wrote " + counter + " variables to " + pathAndFilename);
-            DlinkAutoDlinkFiles.Blob(blob, counter, null, false);
+            DlinkAutoDlinkFiles.Blob(blob, false);
             return counter;
         }        
 
@@ -26062,7 +26088,7 @@ namespace Gekko
             }
 
             G.Writeln("Wrote " + list2.Count + " variables to " + pathAndFilename);
-            DlinkAutoDlinkFiles.Blob(blob, list2.Count, null, false);
+            DlinkAutoDlinkFiles.Blob(blob, false);
             return list2.Count;
         }
 
@@ -26154,7 +26180,7 @@ namespace Gekko
             }
 
             if (true) G.Writeln("Wrote " + counter + " variables to " + pathAndFilename);
-            DlinkAutoDlinkFiles.Blob(blob, counter, null, false);
+            DlinkAutoDlinkFiles.Blob(blob, false);
             return counter;
         }
 
@@ -33300,7 +33326,7 @@ namespace Gekko
                                 if (File.Exists(fileNameWithPathOriginal)) WaitForFileDelete(fileNameWithPathOriginal);  //probably not necessary
                                 WaitForFileCopy(fileNameWithPath, fileNameWithPathOriginal);
                                 if (true) G.Writeln2("Wrote dataset with " + dataRows + " rows and " + dataCols + " cols to " + fileNameWithPathOriginal);
-                                DlinkAutoDlinkFiles.Blob(blob, null, null, false);
+                                DlinkAutoDlinkFiles.Blob(blob, false);
                             }
                             catch (Exception e)
                             {
@@ -33927,7 +33953,7 @@ namespace Gekko
 
                         ExcelCleanup(ref objBook, ref objBooks, ref objSheets, ref objSheet, ref range, ref newSheet, ref range0);
                         if (true) G.Writeln2("Wrote dataset with " + dataRows + " rows and " + dataCols + " cols to " + fileNameOriginalFile);
-                        DlinkAutoDlinkFiles.Blob(blob, null, null, false);
+                        DlinkAutoDlinkFiles.Blob(blob, false);
                     }
                     return null;
                 }
@@ -36051,6 +36077,7 @@ namespace Gekko
             public string fileNamePretty = null;
             public string dbName = null; //internal name for the RAM databank (key in hashtable of databanks)            
             public int variables;
+            public int series;
             public int startPerInFile = -12345;
             public int endPerInFile = -12345;
             public int startPerResultingBank = -12345;
