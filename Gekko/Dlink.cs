@@ -617,17 +617,19 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 string s2b = "are"; if (filesOverwritten.Count < 2) s2b = "is";
                 if (filesNew.Count > 0 && filesOverwritten.Count == 0)
                 {
-                    s += filesNew.Count + " new file" + G.S(filesNew.Count) + " " + s2a + " added ";
+                    s += filesNew.Count + " new file" + G.S(filesNew.Count) + " " + s2a + " added";
                 }
                 else if (filesNew.Count == 0 && filesOverwritten.Count > 0)
                 {
-                    s += filesOverwritten.Count + " file" + G.S(filesOverwritten.Count) + " " + s2b + " overwritten ";
+                    s += filesOverwritten.Count + " file" + G.S(filesOverwritten.Count) + " " + s2b + " overwritten";
                 }
                 else
                 {
-                    s += filesNew.Count + " new file" + G.S(filesNew.Count) + " " + s2a + " added, " + filesOverwritten.Count + " file" + G.S(filesOverwritten.Count) + " " + s2b + " overwritten ";
+                    s += filesNew.Count + " new file" + G.S(filesNew.Count) + " " + s2a + " added, " + filesOverwritten.Count + " file" + G.S(filesOverwritten.Count) + " " + s2b + " overwritten";
                 }
-                s += " (" + type + ")";
+                string typeTemp = type;
+                if (type == "activate") typeTemp = "dlink('activate')";
+                s += " (" + typeTemp + ")";
                 foreach (string f in filesNew)
                 {
                     s += G.NL + f + " (added)";

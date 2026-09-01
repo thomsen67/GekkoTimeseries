@@ -43,8 +43,7 @@ namespace Gekko
                 if (percent < 0) percent = 0;
                 if (percent > 100) percent = 100;
                 progressBar.Value = percent;
-                progressLabel.Text = "Processing " + current + " of " + total +
-                    (string.IsNullOrEmpty(currentItemLabel) ? "" : (": " + currentItemLabel));
+                progressLabel.Text = "Processing " + current + " of " + total + (string.IsNullOrEmpty(currentItemLabel) ? "" : (": " + currentItemLabel));
             });
         }
 
