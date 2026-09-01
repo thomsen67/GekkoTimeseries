@@ -198,6 +198,32 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// This will correspond to the count seen in COMPARE. Note: an empty array-superseries will not count
+        /// as anything.
+        /// </summary>
+        /// <returns></returns>
+        public int CountFlattenedArrayTimeseries()
+        {
+            int n = 0;
+            foreach (KeyValuePair<string, IVariable> kvp in this.storage)
+            {
+                if (kvp.Value.Type() == EVariableType.Series)
+                {
+                    Series ts = kvp.Value as Series;
+                    if (ts.type == ESeriesType.ArraySuper)
+                    {
+                        n += ts.dimensionsStorage.storage.Count;
+                    }
+                    else
+                    {
+                        n++; //normal
+                    }
+                }
+            }
+            return n;
+        }
+
         public void Clear()
         {
             if (!this.editable) Program.ProtectError("You cannot clear a non-editable databank, see OPEN<edit> or UNLOCK");

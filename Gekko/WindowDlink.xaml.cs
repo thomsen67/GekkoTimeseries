@@ -297,7 +297,8 @@ namespace Gekko
                 {
                     //New or changed: (re)generate the .dlink from the current file content,
                     //exactly like Gekko itself does when it reads/writes this file.
-                    DlinkAutoDlinkFiles.Blob(row.Path, null, true);
+                    //Note: done like this, for .gbk files the .dlink files will not get info on #vars and #series
+                    DlinkAutoDlinkFiles.Blob(row.Path, null, null, true);
                     row.Status = "Done";
                 }
             }

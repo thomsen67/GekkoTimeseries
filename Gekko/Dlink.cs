@@ -175,11 +175,10 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// Handles blobs, for .dlink
         /// </summary>
         /// <param name="dataFile"></param>
-        public static void Blob(string dataFile, long? nVariables, bool force)
+        public static void Blob(string dataFile, long? nVariables, long? nSeries, bool force)
         {
             string hash = null;
             long? bytes = null;
-            DateTime? stamp = null;
             if (force || Program.options.databank_dlink)
             {
                 //Note: just because a .dlink file is constructed, this it not the same
@@ -201,14 +200,23 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     {
                         new Error("The file '" + dataFile + "' does not exist for .dlink file construction");
                     }
-                    // For "data hash" file types (see DlinkHooks.IsDataHashFileType), the byte
-                    // size is not a reliable proxy for "same data". So bytes is == null for .gbk.
-                    bytes = DlinkHooks.IsDataHashFileType(dataFile) ? null : (new FileInfo(dataFile)).Length;
+
+                    bytes = (new FileInfo(dataFile)).Length;
                     if (!Directory.Exists(Path.GetDirectoryName(dlinkFile)))
                     {                        
                         Directory.CreateDirectory(Path.GetDirectoryName(dlinkFile));
                     }
-                    DlinkFile blobInfo = new DlinkFile(hash, bytes, stamp, nVariables, null);
+
+                    if (!G.Equal(Path.GetExtension(dataFile), ".gbk"))
+                    {
+                        nVariables = null; nSeries = null; //Even if present, we do not store these in .dlink file. We would like other software like Python be able to produce .dlink files that are compatible, without parsing/understanding the contents of the data file (for instance .csv file)
+                    }
+                    if (G.Equal(Path.GetExtension(dataFile), ".gbk") || G.Equal(Path.GetExtension(dataFile), ".px"))
+                    {
+                        bytes = null; //Bytes do not necessarily follow (data)hash for these types
+                    }
+
+                    DlinkFile blobInfo = new DlinkFile(hash, bytes, nVariables, nSeries, null);                    
                     G.YamlWriter<DlinkFile>(blobInfo, dlinkFile);
                 }
             }
@@ -283,7 +291,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             {
                 foreach (string dlinkFile2 in dlinkFiles) //Could probably be parallelized
                 {
-                    DlinkAutoDlinkFiles.Blob(dlinkFile2, null, true); //We do not know the number of variables, so it is set to null
+                    DlinkAutoDlinkFiles.Blob(dlinkFile2, null, null, true); //We do not know the number of variables, so it is set to null
                 }
             }
             catch
@@ -410,7 +418,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// </summary>  
         public static void DlinkSyncFiles(string gitFolder, string type, List<string> dlinkFiles)
         {
-            int gap = 10;
+            int gap = 5; //5%
             List<string> getFilesNew = new List<string>();
             List<string> getFilesOverwrite = new List<string>();
             List<string> putFiles = new List<string>();
@@ -539,14 +547,6 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         }
 
         /// <summary>
-        /// True for .gbk type. For these, the file size may not be used (if data hash is present).
-        /// </summary>
-        public static bool IsDataHashFileType(string filePath)
-        {
-            return G.Equal(Path.GetExtension(filePath), ".gbk");
-        }
-
-        /// <summary>
         /// Returns true if .dlink and data files correspond: else data file must be fetched from blobs
         /// </summary>
         /// <param name="dataFile"></param>
@@ -650,18 +650,32 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             w.textBox1.Text = s;
             w.textBox1.FontFamily = new System.Windows.Media.FontFamily("Courier New");
             w.textBox1.FontSize = 11;
+            w.button2.Visibility = System.Windows.Visibility.Hidden; //Do not show "Copy text" button
             w.ShowDialog();
         }
 
+        /// <summary>
+        /// Handles .gbk files to get datahash from metadata inside file, and handles .px
+        /// files to omit the line with time stamp.
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
         public static string GetFileHash(string filePath)
         {
             FileInfo fi = new FileInfo(filePath);
             return GetFileHash(filePath, fi.Length, fi.LastWriteTimeUtc);
         }
         
+        /// <summary>
+        /// Handles .gbk files to get datahash from metadata inside file, and handles .px
+        /// files to omit the line with time stamp.
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="knownSize"></param>
+        /// <param name="knownLastWriteUtc"></param>
+        /// <returns></returns>
         public static string GetFileHash(string filePath, long knownSize, DateTime knownLastWriteUtc)
         {
-
             if (G.DlinkDebug()) MessageBox.Show("Getting hash from " + filePath);
 
             // ---- LRU cache lookup ---------------------------------------------------------
@@ -672,10 +686,9 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 return cachedHash;
             }            
 
-            string hash = null;            
-            bool isGbk = IsDataHashFileType(filePath);
+            string hash = null;
 
-            if (isGbk)
+            if (G.Equal(Path.GetExtension(filePath), ".gbk"))
             {
                 using (ZipArchive archive = ZipFile.OpenRead(filePath))
                 {
@@ -706,7 +719,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             {
                 //if .gbk, this means that data hash is not implemented for that file
                 if (G.DlinkDebug()) MessageBox.Show("Getting hash from physical file");
-                hash = G.GetSha256FromFile(filePath);
+                hash =  G.FileHasher.GetSha256FromFile(filePath);
             }
             else
             {
@@ -929,21 +942,21 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
     {
         public readonly string version = "1.0";
         public string hash { get; private set; }
-        public long? bytes { get; private set; }
-        public DateTime? stamp { get; private set; }
-        public long? variables { get; private set; }
+        public long? bytes { get; private set; }        
+        public long? variables { get; private set; }        
+        public long? series { get; private set; } //normal series + array-subseries
         public string extra { get; private set; }
 
         public DlinkFile()
         {
         }
 
-        public DlinkFile(string hash, long? bytes, DateTime? stamp, long? nVariables, string extra)
+        public DlinkFile(string hash, long? bytes, long? nVariables, long? nSeries, string extra)
         {
             this.hash = hash;
             this.bytes = bytes;
-            this.stamp = stamp;
             this.variables = nVariables;
+            this.series = nSeries;
             this.extra = extra;
         }
     }
@@ -1070,7 +1083,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
         /// <summary>
         /// Records/refreshes the hash for filePath. Evicts the least-recently-used entry once the
-        /// cache is over capacity (5000 entries). Does not touch disk -- call Save() once after a
+        /// cache is over capacity (10000 entries). Does not touch disk -- call Save() once after a
         /// batch of files.
         /// </summary>
         public static void Set(string filePath, long bytes, DateTime lastWriteUtc, string hash)

@@ -4233,7 +4233,7 @@ namespace Gekko
                 catch { };  //fail silently               
 
 
-            }            
+            }
 
             sb.AppendLine(new string('=', Math.Max(60, wf.Length + 4))); //See #77afakjhf
 
@@ -4413,8 +4413,8 @@ namespace Gekko
                 return FindParent<T>(parentObject);
         }
 
-        public static bool DlinkDebug() 
-        {            
+        public static bool DlinkDebug()
+        {
             if (Directory.Exists("p:\\tth\\ny\\dlinkdebug.txt")) return true;
             else return false;
         }
@@ -5834,27 +5834,6 @@ namespace Gekko
             return hash;
         }
 
-        public static string GetSha256FromFile(string filePath)
-        {
-            string hash = null;
-            using (var stream = File.OpenRead(filePath))
-            {
-                using (var sha256 = SHA256.Create())
-                {
-                    byte[] hashBytes = sha256.ComputeHash(stream);
-                    // Convert bytes to a hex string
-                    StringBuilder sb = new StringBuilder();
-                    foreach (byte b in hashBytes)
-                    {
-                        sb.Append(b.ToString("x2"));
-                    }
-                    hash = sb.ToString();
-                }
-            }
-
-            return hash;
-        }
-
         /// <summary>
         /// Checks if a file is blocked by the filesystem/Windows. This method may exist somewhere else, something
         /// like it was possibly being used in Gekko 2.x.
@@ -5878,7 +5857,7 @@ namespace Gekko
                 }
             }
             return isBlocked;
-        }        
+        }
 
         /// <summary>
         /// Used in DECOMP. Not case sensitive.
@@ -6220,9 +6199,9 @@ namespace Gekko
         public static void WriteAbstract2(Object o)
         {
             Program.WorkerThreadHelper2 helper = (Program.WorkerThreadHelper2)o;
-            
+
             Color color = helper.color;
-            string s = helper.s;            
+            string s = helper.s;
             string linktype = helper.linktype;
             bool newline = helper.newline;
             bool link = helper.link;
@@ -6231,7 +6210,7 @@ namespace Gekko
 
             if (s.Contains(Globals.linkActionStart)) // Use GekkoAction class instead
             {
-                LinkAction action = FindAction(s); 
+                LinkAction action = FindAction(s);
                 if (action != null)
                 {
                     Program.WorkerThreadHelper2 helper1 = helper.Clone();
@@ -6248,7 +6227,7 @@ namespace Gekko
                     helper2.s = action.ss2[0];
                     helper2.mustScrollToEnd = false;
                     WriteAbstract2(helper2);
-                    
+
                     Program.WorkerThreadHelper2 helper3 = helper.Clone();
                     helper3.s = action.chop3;
                     WriteAbstract2(helper3);
@@ -6317,16 +6296,16 @@ namespace Gekko
                 //used in stack trace error message
                 if (newline)
                 {
-                    Globals.errorMemory.AppendLine(s);  
+                    Globals.errorMemory.AppendLine(s);
                 }
                 else
                 {
-                    Globals.errorMemory.Append(s);  
+                    Globals.errorMemory.Append(s);
                 }
             }
 
-            bool isPiping = false;            
-            
+            bool isPiping = false;
+
             //Not piping to normal pipe file if there is a pipe to pipe2-file (eg. for "p fy file=output.txt")
             if (!Globals.pipe2 && Globals.pipe.isPiping && Globals.pipeFileHelper.pipeFile != null)
             {
@@ -6354,7 +6333,7 @@ namespace Gekko
                 catch (Exception e)
                 {
                     //#80435243075235
-                    MessageBox.Show("*** ERROR: Could not PIPE to file: " + Globals.pipeFileHelper.pipeFileFileWithPath);                    
+                    MessageBox.Show("*** ERROR: Could not PIPE to file: " + Globals.pipeFileHelper.pipeFileFileWithPath);
                     throw new GekkoException();
                 }
             }
@@ -6376,10 +6355,10 @@ namespace Gekko
                     MessageBox.Show("*** ERROR: Could not PIPE to file: " + Globals.pipeFileHelper2.pipeFileFileWithPath);
                     throw new GekkoException();
                 }
-            }            
+            }
 
             if (!(isPiping || isMuting) || mustAlsoPrintOnScreen)
-            {                
+            {
                 if (G.IsUnitTestingOrNotShowingGUI())
                 {
                     if (newline)
@@ -6388,7 +6367,7 @@ namespace Gekko
                         {
                             if (Globals.pyGekkoStdout)
                             {
-                                Console.WriteLine(s);                                
+                                Console.WriteLine(s);
                             }
                             else
                             {
@@ -6411,7 +6390,7 @@ namespace Gekko
                         {
                             if (Globals.pyGekkoStdout)
                             {
-                                Console.Write(s);                                
+                                Console.Write(s);
                             }
                             else
                             {
@@ -6430,7 +6409,7 @@ namespace Gekko
                     }
                 }
                 else
-                {                    
+                {
                     if (tab == ETabs.Main) textBox = Gui.gui.textBoxMainTabUpper;
                     else if (tab == ETabs.Output) textBox = Gui.gui.textBoxOutputTab;
                     else throw new GekkoException();
@@ -6503,9 +6482,9 @@ namespace Gekko
                 extra += 1; // Globals.linkActionDelimiter
                 extra += action.ss2[1].Length;
                 extra += Globals.linkActionEnd.Length;
-                
+
                 extra += ExtraLinkLength(action.chop3);
-            }         
+            }
 
             return extra;
         }
@@ -6534,15 +6513,15 @@ namespace Gekko
                             action.chop1 = s.Substring(0, action.start - Globals.linkActionStart.Length);
                             action.chop2 = s.Substring(action.start, action.end - action.start);
                             action.chop3 = s.Substring(action.end + Globals.linkActionEnd.Length, s.Length - action.end - Globals.linkActionEnd.Length);
-                            action.ss2 = action.chop2.Split(Globals.linkActionDelimiter);                            
+                            action.ss2 = action.chop2.Split(Globals.linkActionDelimiter);
                             return action;
                         }
                     }
                 }
             }
             return action;  //will be null
-        }        
-        
+        }
+
         /// <summary>
         /// Low-level part of printing on screen.
         /// </summary>
@@ -6610,11 +6589,11 @@ namespace Gekko
                             //but it may be too long, like 400 chars rather than < 100.
                             //it will happen pretty seldom, probably only when a link is right at
                             //the right margin.
-                                                        
+
                             while (true)
                             {
                                 if (Program.options.print_width - start.Length - s.Length < 0)
-                                {                                    
+                                {
                                     string s1 = s.Substring(0, Program.options.print_width - start.Length);
                                     s = G.Substring(s, Program.options.print_width - start.Length + 1 - 1, s.Length - 1);
                                     s1 = s1.TrimStart();
@@ -6630,7 +6609,7 @@ namespace Gekko
                                 }
                                 break;
                             }
-                            
+
                             if (newline) Globals.guiMainLinePosition = 0;
                             else Globals.guiMainLinePosition = start.Length + s.Length;
                             s = null;
@@ -6650,7 +6629,7 @@ namespace Gekko
                     }
                 }
             }
-        }        
+        }
 
         /// <summary>
         /// Is it a full path like 'c:\xx\yy.zz'? With drive letter and colon (localhost ok too).
@@ -6672,7 +6651,7 @@ namespace Gekko
         {
             WriteAbstract(EWrapType.Writeln, "", null, true, Color.Empty, false, ETabs.Main);
         }
-        
+
         /// <summary>
         /// For writing output to screen
         /// </summary>
@@ -6680,7 +6659,7 @@ namespace Gekko
         {
             WriteAbstract(EWrapType.Writeln, "", null, true, Color.Empty, false, tab);
         }
-        
+
         /// <summary>
         /// For writing output to screen (with line feed)
         /// </summary>
@@ -6754,7 +6733,7 @@ namespace Gekko
         /// <param name="s">String to show</param>
         /// <param name="link">Link url, else null if no link</param>
         public static void PrintLowLevelAppendTextAbstract(RichTextBox textBox, string s, string link, EWrapType type, bool mustAlsoPrintOnScreen)
-        {            
+        {
             if (type == EWrapType.Error || type == EWrapType.Warning) mustAlsoPrintOnScreen = true;  //so that errors and warnings get seen. The argument can be true if set in Writeln(...)
 
             bool isMuting = false;
@@ -6765,14 +6744,14 @@ namespace Gekko
 
 
             if (!(isPiping || isMuting) || mustAlsoPrintOnScreen)
-            {                
+            {
                 if (G.IsUnitTestingOrNotShowingGUI())
                 {
                     if (Globals.batchType == EBatchType.PyGekko)
                     {
                         if (Globals.pyGekkoStdout)
                         {
-                            Console.Write(s);                            
+                            Console.Write(s);
                         }
                         else
                         {
@@ -6800,15 +6779,15 @@ namespace Gekko
                     {
                         RichTextBoxEx textBoxEx = textBox as RichTextBoxEx;
                         if (textBoxEx == null) MessageBox.Show("*** ERROR: Cannot use links in this RichTextBox");
-                        int position = textBoxEx.SelectionStart;                        
+                        int position = textBoxEx.SelectionStart;
                         //This is apparently a hack
-                        textBoxEx.SelectedRtf = @"{\rtf1\ansi " + s + @"\v #" + link + @"\v0}";                        
-                        textBoxEx.Select(position, s.Length + link.Length + 1);                        
+                        textBoxEx.SelectedRtf = @"{\rtf1\ansi " + s + @"\v #" + link + @"\v0}";
+                        textBoxEx.Select(position, s.Length + link.Length + 1);
                         textBoxEx.SetSelectionLink(true);
                         textBoxEx.Select(position + s.Length + link.Length + 1, 0);
                     }
                 }
-            }            
+            }
 
             if (Globals.errorMemory != null)
             {
@@ -7033,5 +7012,94 @@ namespace Gekko
             else return Math.Log(x1);
         }
 
-    }    
+        public static class FileHasher
+        {
+            private const string CreationDatePrefix = "CREATION-DATE="; //Note: will not work for lower-case or with blanks around "=".
+
+            /// <summary>
+            /// Handles .px files to omit time stamp
+            /// </summary>
+            /// <param name="filePath"></param>
+            /// <returns></returns>
+            public static string GetSha256FromFile(string filePath)
+            {
+                if (string.Equals(Path.GetExtension(filePath), ".px", StringComparison.OrdinalIgnoreCase))
+                {
+                    return GetSha256ExcludingLine(filePath, CreationDatePrefix);
+                }
+
+                string hash = null;
+                using (var stream = File.OpenRead(filePath))
+                {
+                    using (var sha256 = SHA256.Create())
+                    {
+                        byte[] hashBytes = sha256.ComputeHash(stream);
+                        hash = BytesToHex(hashBytes);
+                    }
+                }
+                return hash;
+            }
+
+            // Hashes filePath as if any line starting with linePrefix (including its line
+            // terminator) had been deleted first. Works on raw bytes, so it's unaffected by
+            // the file's text encoding.
+            public static string GetSha256ExcludingLine(string filePath, string linePrefix)
+            {
+                byte[] fileBytes = File.ReadAllBytes(filePath);
+                byte[] prefixBytes = Encoding.ASCII.GetBytes(linePrefix);
+
+                using (var sha256 = SHA256.Create())
+                {
+                    int lineStart = 0;
+                    for (int i = 0; i < fileBytes.Length; i++)
+                    {
+                        if (fileBytes[i] == (byte)'\n')
+                        {
+                            HashLineUnlessExcluded(sha256, fileBytes, lineStart, i - lineStart + 1, prefixBytes);
+                            lineStart = i + 1;
+                        }
+                    }
+                    if (lineStart < fileBytes.Length)
+                    {
+                        HashLineUnlessExcluded(sha256, fileBytes, lineStart, fileBytes.Length - lineStart, prefixBytes);
+                    }
+
+                    sha256.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
+                    return BytesToHex(sha256.Hash);
+                }
+            }
+
+            private static void HashLineUnlessExcluded(SHA256 sha256, byte[] fileBytes, int lineStart, int lineLength, byte[] prefixBytes)
+            {
+                if (StartsWith(fileBytes, lineStart, lineLength, prefixBytes)) return;                
+                sha256.TransformBlock(fileBytes, lineStart, lineLength, null, 0);
+            }
+
+            private static bool StartsWith(byte[] fileBytes, int lineStart, int lineLength, byte[] prefix)
+            {
+                if (lineLength < prefix.Length)
+                {
+                    return false;
+                }
+                for (int i = 0; i < prefix.Length; i++)
+                {
+                    if (fileBytes[lineStart + i] != prefix[i])
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            private static string BytesToHex(byte[] bytes)
+            {
+                var sb = new StringBuilder(bytes.Length * 2);
+                foreach (byte b in bytes)
+                {
+                    sb.Append(b.ToString("x2"));
+                }
+                return sb.ToString();
+            }
+        }
+    }
 }
