@@ -28,6 +28,7 @@ using ProtoBuf;
 using System.Linq;
 using System.IO.Compression;
 using System.Diagnostics;
+using System.Threading;
 
 namespace Gekko
 {    
@@ -419,13 +420,9 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         public static void DlinkSyncFiles(string gitFolder, string type, List<string> dlinkFiles)
         {
             int gap = 5; //5%
-            List<string> getFilesNew = new List<string>();
-            List<string> getFilesOverwrite = new List<string>();
-            List<string> putFiles = new List<string>();
-            int currentFileIndex = 0; int lastReportedPercent = 0; //for progress
             if (G.Equal(type, "activate")) new Writeln("Synchronizing .dlink and data files");
 
-            //Sanity check
+            //Sanity check -- fast, so it stays on the calling thread, before any window is shown
             string blobsFolder = G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false);
             if (!Directory.Exists(blobsFolder))
             {
@@ -438,77 +435,101 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 new Error();
             }
 
+            List<string> getFilesNew = new List<string>();
+            List<string> getFilesOverwrite = new List<string>();
+            List<string> putFiles = new List<string>();
             List<string> errors = new List<string>();
+            
+            WindowDlinkGitHook progressWindow = new WindowDlinkGitHook("Data file sync (" + type + ")");
 
-            foreach (string dlinkFile2 in dlinkFiles) //Could probably be parallelized
+            Thread worker = new Thread(delegate ()
             {
-                G.PrintProgress(dlinkFiles.Count, ref currentFileIndex, ref lastReportedPercent, G.Equal(type, "activate"), "data file" + G.S(dlinkFiles.Count) + " synchronized", gap);
-                try
+                int currentFileIndex = 0; int lastReportedPercent = 0; //for the console-style progress line
+
+                foreach (string dlinkFile2 in dlinkFiles) //Could probably be parallelized
                 {
-                    string dLinkFileWithPath = Path.Combine(G.CleanupFolderName(gitFolder, false), G.CleanupFolderName(dlinkFile2, false));
-                    if (!File.Exists(dLinkFileWithPath))
+                    G.PrintProgress(dlinkFiles.Count, ref currentFileIndex, ref lastReportedPercent, G.Equal(type, "activate"), "data file" + G.S(dlinkFiles.Count) + " synchronized", gap);
+                    progressWindow.ReportProgress(currentFileIndex + 1, dlinkFiles.Count, Path.GetFileName(dlinkFile2));
+                    try
                     {
-                        MessageBox.Show("This ." + Program.options.databank_dlink_name + " file does not exist: '" + dLinkFileWithPath + "'");
-                        new Error();
-                    }
-                    DlinkFile dlinkFileData = G.YamlReader<DlinkFile>(dLinkFileWithPath);
-                    string dataFile = Dlink_FromDlinkFileToDataFile(dLinkFileWithPath);
-                    if (G.NullOrBlanks(dataFile))
-                    {
-                        MessageBox.Show("Datafile string is null"); new Error();
-                    }
+                        string dLinkFileWithPath = Path.Combine(G.CleanupFolderName(gitFolder, false), G.CleanupFolderName(dlinkFile2, false));
+                        if (!File.Exists(dLinkFileWithPath))
+                        {
+                            MessageBox.Show("This ." + Program.options.databank_dlink_name + " file does not exist: '" + dLinkFileWithPath + "'");
+                            new Error();
+                        }
+                        DlinkFile dlinkFileData = G.YamlReader<DlinkFile>(dLinkFileWithPath);
+                        string dataFile = Dlink_FromDlinkFileToDataFile(dLinkFileWithPath);
+                        if (G.NullOrBlanks(dataFile))
+                        {
+                            MessageBox.Show("Datafile string is null"); new Error();
+                        }
 
-                    FileInfo fi1 = new FileInfo(dataFile); //File may not exist                
-                    bool exists = fi1.Exists;
-                    RealFile realFile = new RealFile(
-                        fi1.FullName,
-                        null,
-                        exists ? fi1.Length : 0,
-                        exists ? fi1.LastWriteTimeUtc : DateTime.MinValue,
-                        exists
-                    );
+                        FileInfo fi1 = new FileInfo(dataFile); //File may not exist                
+                        bool exists = fi1.Exists;
+                        RealFile realFile = new RealFile(
+                            fi1.FullName,
+                            null,
+                            exists ? fi1.Length : 0,
+                            exists ? fi1.LastWriteTimeUtc : DateTime.MinValue,
+                            exists
+                        );
 
-                    // --------------------------------------------------------------------------------------------------
-                    //                              datafile exists
-                    //                             yes            no
-                    //  ----------------------------------------------------------
-                    //  .dlink exists    yes       A              B
-                    //                   no        C              D
-                    //  ----------------------------------------------------------
-                    //  A: Check that they correspond etc. --> but only if .dlink file has been already added/committed.
-                    //  B: Try to get file from blobs      --> but only if .dlink file has been already added/committed.
-                    //  C: May just be a datafile copied into datafiles, not being read by Gekko yet
-                    //  D: Not relevant
-                    //  Note: were are obvisously in A or B here, since we are handling a .dlink file.
-                    // --------------------------------------------------------------------------------------------------                                
+                        // --------------------------------------------------------------------------------------------------
+                        //                              datafile exists
+                        //                             yes            no
+                        //  ----------------------------------------------------------
+                        //  .dlink exists    yes       A              B
+                        //                   no        C              D
+                        //  ----------------------------------------------------------
+                        //  A: Check that they correspond etc. --> but only if .dlink file has been already added/committed.
+                        //  B: Try to get file from blobs      --> but only if .dlink file has been already added/committed.
+                        //  C: May just be a datafile copied into datafiles, not being read by Gekko yet
+                        //  D: Not relevant
+                        //  Note: were are obvisously in A or B here, since we are handling a .dlink file.
+                        // --------------------------------------------------------------------------------------------------                                
 
-                    //After this method call, realFile may change regarding .hash and .exists fields (and only those)
-                    bool doDlinkFileAndDataFileCorrespond = DoDlinkFileAndDataFileCorrespond(realFile.name, dlinkFileData, ref realFile); //regarding last two args: either both non-null or both null
-                    if (doDlinkFileAndDataFileCorrespond)
-                    {
-                        //Check that we have the file in blobs folder, else add it there. This happens when making a brand new datafile
-                        SyncBlobs(false, realFile.name, dlinkFileData.hash, blobsFolder, getFilesNew, getFilesOverwrite, putFiles);
+                        //After this method call, realFile may change regarding .hash and .exists fields (and only those)
+                        bool doDlinkFileAndDataFileCorrespond = DoDlinkFileAndDataFileCorrespond(realFile.name, dlinkFileData, ref realFile); //regarding last two args: either both non-null or both null
+                        if (doDlinkFileAndDataFileCorrespond)
+                        {
+                            //Check that we have the file in blobs folder, else add it there. This happens when making a brand new datafile
+                            SyncBlobs(false, realFile.name, dlinkFileData.hash, blobsFolder, getFilesNew, getFilesOverwrite, putFiles);
+                        }
+                        else
+                        {
+                            //Get it from blobs (A or B)
+                            SyncBlobs(true, realFile.name, dlinkFileData.hash, blobsFolder, getFilesNew, getFilesOverwrite, putFiles);
+                            FileInfo fi2 = new FileInfo(realFile.name);
+                            //We update the realFile, because its contents have changed
+                            realFile = new RealFile(realFile.name, dlinkFileData.hash, fi2.Length, fi2.LastWriteTimeUtc, true);
+                            //Hash cache remembers this for later
+                            DlinkHashCache.Set(realFile.name, fi2.Length, fi2.LastWriteTimeUtc, dlinkFileData.hash);
+                            DlinkHashCache.SetBlobConfirmed(realFile.name, dlinkFileData.hash);
+                        }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        //Get it from blobs (A or B)
-                        SyncBlobs(true, realFile.name, dlinkFileData.hash, blobsFolder, getFilesNew, getFilesOverwrite, putFiles);
-                        FileInfo fi2 = new FileInfo(realFile.name);
-                        //We update the realFile, because its contents have changed
-                        realFile = new RealFile(realFile.name, dlinkFileData.hash, fi2.Length, fi2.LastWriteTimeUtc, true);
-                        //Hash cache remembers this for later
-                        DlinkHashCache.Set(realFile.name, fi2.Length, fi2.LastWriteTimeUtc, dlinkFileData.hash);
-                        DlinkHashCache.SetBlobConfirmed(realFile.name, dlinkFileData.hash);
+                        errors.Add(dlinkFile2 + ": " + ex.Message);
                     }
                 }
-                catch (Exception ex)
-                {
-                    errors.Add(dlinkFile2 + ": " + ex.Message);
-                }
-            }
-            DlinkHashCache.Save(); //Persist any hashes computed while checking this batch of .dlink files
-            DLinkCalledFromGitHookReporting(type, getFilesNew, getFilesOverwrite, putFiles);
-                        
+                DlinkHashCache.Save(); //Persist any hashes computed while checking this batch of .dlink files
+
+                string report = BuildSyncReportText(type, getFilesNew, getFilesOverwrite, putFiles);
+                progressWindow.Finish(report); //fills the report in, enables OK, and lets ShowDialog() below return once the user dismisses it
+            });
+            worker.IsBackground = true;
+            //MessageBox.Show(...) above, and Clipboard access inside WindowDlinkGitHook's "Copy
+            //text" button, are WinForms/COM and expect an STA thread, same as the app's main UI thread.
+            worker.SetApartmentState(ApartmentState.STA);
+            worker.Start();
+
+            //Blocks the calling thread here (same as the old ShowDialog() call did), but this
+            //window's own message pump keeps it responsive/repainting while "worker" does the
+            //actual sync work above. Returns once the user clicks OK (see WindowDlinkGitHook,
+            //which refuses to close early via its Closing handler).
+            progressWindow.ShowDialog();
+
             if (errors.Count > 0)
             {
                 new Error("Dlink sync failed for " + errors.Count + " file" + G.S(errors.Count) + ":" + G.NL + string.Join(G.NL, errors));
@@ -578,7 +599,14 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             return true;
         }
 
-        private static void DLinkCalledFromGitHookReporting(string type, List<string> filesNew, List<string> filesOverwritten, List<string> putFiles)
+        /// <summary>
+        /// Builds the final summary text shown in the progress window once a sync finishes (see
+        /// DlinkSyncFiles). Pure string building -- no window/UI code -- so it's safe to call from
+        /// a background thread. (Previously this method was also responsible for creating and
+        /// showing a WindowMessageBox itself, only once the whole sync was already done; that's
+        /// now WindowDlinkGitHook's job, opened up-front by DlinkSyncFiles.)
+        /// </summary>
+        private static string BuildSyncReportText(string type, List<string> filesNew, List<string> filesOverwritten, List<string> putFiles)
         {
             string s = null;
             s += " ---------------------- DATA FOLDER SYNC --------------------------- ";
@@ -640,18 +668,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 s += "TTH: Queries = " + DlinkHashCache.countAsk + ", hits = " + DlinkHashCache.countHit + ", size = " + DlinkHashCache.Count() + G.NL;                
             }
 
-            WindowMessageBox w = new WindowMessageBox(EMessageBox.Normal);
-            w.Title = "Data versioning message";
-            w.Height = 300;
-            w.Width = 600;
-            w.textBox1.VerticalScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility.Visible;
-            w.textBox1.HorizontalScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility.Visible;
-            w.textBox1.TextWrapping = System.Windows.TextWrapping.NoWrap;
-            w.textBox1.Text = s;
-            w.textBox1.FontFamily = new System.Windows.Media.FontFamily("Courier New");
-            w.textBox1.FontSize = 11;
-            w.button2.Visibility = System.Windows.Visibility.Hidden; //Do not show "Copy text" button
-            w.ShowDialog();
+            return s;
         }
 
         /// <summary>
