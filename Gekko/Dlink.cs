@@ -446,10 +446,17 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             {
                 int currentFileIndex = 0; int lastReportedPercent = 0; //for the console-style progress line
 
-                foreach (string dlinkFile2 in dlinkFiles) //Could probably be parallelized
+                System.Diagnostics.Stopwatch progressStopwatch = System.Diagnostics.Stopwatch.StartNew();
+                const int progressReportIntervalMs = 50; //don't push a window update more often than this
+
+                foreach (string dlinkFile2 in dlinkFiles) //Could probably be parallelized, but maybe it is IO bound anyway
                 {
                     G.PrintProgress(dlinkFiles.Count, ref currentFileIndex, ref lastReportedPercent, G.Equal(type, "activate"), "data file" + G.S(dlinkFiles.Count) + " synchronized", gap);
-                    progressWindow.ReportProgress(currentFileIndex + 1, dlinkFiles.Count, Path.GetFileName(dlinkFile2));
+                    if ((currentFileIndex == dlinkFiles.Count) || progressStopwatch.ElapsedMilliseconds >= progressReportIntervalMs)
+                    {
+                        progressWindow.ReportProgress(currentFileIndex, dlinkFiles.Count, Path.GetFileNameWithoutExtension(dlinkFile2));
+                        progressStopwatch.Restart();
+                    }
                     try
                     {
                         string dLinkFileWithPath = Path.Combine(G.CleanupFolderName(gitFolder, false), G.CleanupFolderName(dlinkFile2, false));
@@ -612,7 +619,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             s += " ---------------------- DATA FOLDER SYNC --------------------------- ";
             s += G.NL + G.NL;
             if (filesNew.Count + filesOverwritten.Count > 0)
-            {                         
+            {
                 string s2a = "are"; if (filesNew.Count < 2) s2a = "is";
                 string s2b = "are"; if (filesOverwritten.Count < 2) s2b = "is";
                 if (filesNew.Count > 0 && filesOverwritten.Count == 0)
@@ -626,10 +633,8 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 else
                 {
                     s += filesNew.Count + " new file" + G.S(filesNew.Count) + " " + s2a + " added, " + filesOverwritten.Count + " file" + G.S(filesOverwritten.Count) + " " + s2b + " overwritten";
-                }
-                string typeTemp = type;
-                if (type == "activate") typeTemp = "dlink('activate')";
-                s += " (" + typeTemp + ")";
+                }                
+                s += " (" + ActivateText(type) + ")";
                 foreach (string f in filesNew)
                 {
                     s += G.NL + f + " (added)";
@@ -637,7 +642,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 foreach (string f in filesOverwritten)
                 {
                     s += G.NL + f + " (overwritten)";
-                }                
+                }
             }
             else
             {
@@ -671,6 +676,13 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             }
 
             return s;
+        }
+
+        private static string ActivateText(string type)
+        {
+            string typeTemp = type;
+            if (G.Equal(type, "activate")) typeTemp = "dlink('activate')";
+            return typeTemp;
         }
 
         /// <summary>
@@ -1046,6 +1058,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         {
             //Caller must hold _lock
             if (_loaded) return;
+            var sw = System.Diagnostics.Stopwatch.StartNew();
             _map = new Dictionary<string, LinkedListNode<HashCacheEntry>>(StringComparer.OrdinalIgnoreCase);
             _lru = new LinkedList<HashCacheEntry>();
             try
@@ -1072,6 +1085,11 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 _lru = new LinkedList<HashCacheEntry>();
             }
             _loaded = true;
+
+            if (G.Equal(Environment.UserName, "tth"))
+            {
+                MessageBox.Show("TTH: Hash cache load took " + (double)sw.ElapsedMilliseconds / 1000d + " s for " + _map.Count + " entries");
+            }
         }
 
         /// <summary>
@@ -1177,6 +1195,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// </summary>
         public static void Save()
         {
+            var sw = System.Diagnostics.Stopwatch.StartNew();
             lock (_lock)
             {
                 if (!_dirty || _lru == null) return;
@@ -1198,6 +1217,10 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 {
                     //No catastrophe is this happens
                 }
+            }
+            if (G.Equal(Environment.UserName, "tth"))
+            {
+                MessageBox.Show("TTH: Hash cache save took " + (double)sw.ElapsedMilliseconds / 1000d + " s for " + _map.Count + " entries");
             }
         }
 

@@ -95,7 +95,7 @@ namespace Gekko
         public string databank_dlink_folder_replace3b = "_kilde_dlink";
         public string databank_dlink_folder_replace4a = "//nas2/fkontor/";
         public string databank_dlink_folder_replace4b = "K:/";
-        public int databank_dlink_cache = 10000;
+        public int databank_dlink_cache = 100000; //We have about 3000 datafiles, so this should be more than enough for smoothness
 
         public bool databank_trace = true;
         public bool databank_trace_dublets = false; //

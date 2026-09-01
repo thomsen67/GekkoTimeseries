@@ -36,8 +36,8 @@ namespace Gekko
         /// Safe to call from any thread.
         /// </summary>
         public void ReportProgress(int current, int total, string currentItemLabel)
-        {
-            RunOnUiThread(delegate
+        {            
+            Dispatcher.BeginInvoke((Action)delegate
             {
                 int percent = total > 0 ? (int)(100.0 * current / total) : 0;
                 if (percent < 0) percent = 0;
