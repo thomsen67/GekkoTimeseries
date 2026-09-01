@@ -1823,7 +1823,11 @@ namespace Gekko
             catch (Exception e2)
             {
                 Program.PrintExceptionAndFinishThread(e2, p);
-                Elapsed(p.startingTime, false);
+                if (false)
+                {
+                    //With the below, we often get the elapsed time two times. Therefore removed again.
+                    Elapsed(p.startingTime, false);
+                }
                 if (!Globals.applicationIsInProcessOfAborting)
                 {
                     try
