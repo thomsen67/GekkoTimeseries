@@ -250,7 +250,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 {
                     if (File.Exists(dataFile))
                     {
-                        //New: fileVariables/fileSeries come back populated for .gbk files, at no
+                        //fileVariables/fileSeries come back populated for .gbk files, at no
                         //extra cost over the hash computation Blob() already needed to do. An
                         //explicit nVariables/nSeries passed in by the caller (above) still wins --
                         //we only fill in from the file itself where the caller passed null.
@@ -575,7 +575,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                             //We update the realFile, because its contents have changed
                             realFile = new RealFile(realFile.name, dlinkFileData.hash, fi2.Length, fi2.LastWriteTimeUtc, true);
                             //Hash cache remembers this for later
-                            DlinkHashCache.Set(realFile.name, fi2.Length, fi2.LastWriteTimeUtc, dlinkFileData.hash, dlinkFileData.variables, dlinkFileData.series); //New: variables/series -- already sitting right there on dlinkFileData, no extra work to grab them
+                            DlinkHashCache.Set(realFile.name, fi2.Length, fi2.LastWriteTimeUtc, dlinkFileData.hash, dlinkFileData.variables, dlinkFileData.series); //Variables/series -- already sitting right there on dlinkFileData, no extra work to grab them
                             DlinkHashCache.SetBlobConfirmed(realFile.name, dlinkFileData.hash);
                         }
                     }
@@ -743,7 +743,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         
         public static string GetFileHash(string filePath, long knownSize, DateTime knownLastWriteUtc)
         {
-            long? variables, series; //New: discarded here -- see the out-param overload below
+            long? variables, series; // Discarded here -- see the out-param overload below
             return GetFileHash(filePath, knownSize, knownLastWriteUtc, out variables, out series);
         }
 
@@ -1080,16 +1080,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
     //
     // Callers should call Set() per file as usual, then call Save() ONCE after a batch of files, not
     // once per file -- otherwise every hashed file costs a disk write and most of the benefit is lost.
-    //
-    // New: the on-disk file is protobuf-net (binary), not YAML like the .dlink files -- unlike those,
-    // nobody ever reads this file by eye or diffs it in Git, so there's no reason to pay YAML's
-    // parsing cost here. At 10,000 entries (2.3MB as YAML) load+save was taking ~0.7s each; this
-    // cache is now sized for up to ~100,000 entries, where that cost would only have gotten worse.
-    // protobuf-net is binary and schema-based, avoiding both YAML's heavier grammar and its
-    // reflection-based object construction. The file extension changed from .yaml to .cache to
-    // match -- the first run after this change starts with a cold cache (the old .yaml file is
-    // simply orphaned, not migrated), which is fine: this cache has never been load-bearing, only a
-    // performance optimization (see Count()/countHit's own remarks elsewhere in this file).
+        
     public static class DlinkHashCache
     {
         public static int countAsk = 0;
@@ -1130,12 +1121,12 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             try
             {
                 if (File.Exists(CacheFilePath))
-                {
-                    //New: protobuf-net instead of G.YamlReader -- see the class-level note above.
+                {                    
                     HashCacheFile cf;
                     using (FileStream stream = File.OpenRead(CacheFilePath))
+                    using (GZipStream gzipStream = new GZipStream(stream, CompressionMode.Decompress))
                     {
-                        cf = ProtoBuf.Serializer.Deserialize<HashCacheFile>(stream);
+                        cf = ProtoBuf.Serializer.Deserialize<HashCacheFile>(gzipStream);
                     }
                     if (cf != null && cf.entries != null)
                     {
@@ -1158,14 +1149,15 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             _loaded = true;
 
             if (G.Equal(Environment.UserName, "tth"))
-            {
-                MessageBox.Show("TTH: Hash cache load took " + (double)sw.ElapsedMilliseconds / 1000d + " s for " + _map.Count + " entries");
+            {                
+                long fileSizeBytes = File.Exists(CacheFilePath) ? new FileInfo(CacheFilePath).Length : 0;
+                MessageBox.Show("TTH: Hash cache load took " + (double)sw.ElapsedMilliseconds / 1000d + " s for " + _map.Count + " entries (" + fileSizeBytes + " bytes on disk)");
             }
         }
 
         /// <summary>
         /// Returns the cached hash for filePath if it is still fresh (same size, and last-write-time
-        /// of what was recorded last time). Returns null on a miss -- and, new: variables/series are
+        /// of what was recorded last time). Returns null on a miss -- and, variables/series are
         /// also null on any miss, regardless of what an earlier (now-stale) entry for this path held.
         /// </summary>
         public static string TryGet(string filePath, long size, DateTime lastWriteUtc, out long? variables, out long? series)
@@ -1177,20 +1169,20 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 LinkedListNode<HashCacheEntry> node;
                 if (!_map.TryGetValue(filePath, out node))
                 {
-                    variables = null; series = null; //New
+                    variables = null; series = null; 
                     return null;
                 }
 
                 HashCacheEntry e = node.Value;
                 if (e.bytes != size)
                 {
-                    variables = null; series = null; //New
+                    variables = null; series = null; 
                     return null;
                 }
                 long ticksNow = ToTicksSinceEpoch(lastWriteUtc);
                 if (Math.Abs(ticksNow - e.stamp) > ToleranceTicks)
                 {
-                    variables = null; series = null; //New
+                    variables = null; series = null; 
                     return null;
                 }
 
@@ -1207,7 +1199,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// <summary>
         /// Records/refreshes the hash for filePath -- and, new: variables/series alongside it, so a
         /// later cache hit (see TryGet) can still report them. Evicts the least-recently-used entry
-        /// once the cache is over capacity (10000 entries). Does not touch disk -- call Save() once
+        /// once the cache is over capacity. Does not touch disk -- call Save() once
         /// after a batch of files.
         /// </summary>
         public static void Set(string filePath, long bytes, DateTime lastWriteUtc, string hash, long? variables, long? series)
@@ -1227,8 +1219,8 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     existing.Value.bytes = bytes;
                     existing.Value.stamp = stamp;
                     existing.Value.hash = hash;
-                    existing.Value.variables = variables; //New
-                    existing.Value.series = series; //New
+                    existing.Value.variables = variables;
+                    existing.Value.series = series;
                     _lru.Remove(existing);
                     _lru.AddFirst(existing);
                 }
@@ -1298,11 +1290,11 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     {
                         cf.entries.Add(node.Value);
                     }
-                    Directory.CreateDirectory(Path.GetDirectoryName(CacheFilePath));
-                    //New: protobuf-net instead of G.YamlWriter -- see the class-level note above.
+                    Directory.CreateDirectory(Path.GetDirectoryName(CacheFilePath));                    
                     using (FileStream stream = File.Create(CacheFilePath))
+                    using (GZipStream gzipStream = new GZipStream(stream, CompressionLevel.Fastest))
                     {
-                        ProtoBuf.Serializer.Serialize(stream, cf);
+                        ProtoBuf.Serializer.Serialize(gzipStream, cf);
                     }
                     _dirty = false;
                 }
@@ -1312,8 +1304,9 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 }
             }
             if (G.Equal(Environment.UserName, "tth"))
-            {
-                MessageBox.Show("TTH: Hash cache save took " + (double)sw.ElapsedMilliseconds / 1000d + " s for " + _map.Count + " entries");
+            {                
+                long fileSizeBytes = File.Exists(CacheFilePath) ? new FileInfo(CacheFilePath).Length : 0;
+                MessageBox.Show("TTH: Hash cache save took " + (double)sw.ElapsedMilliseconds / 1000d + " s for " + _map.Count + " entries (" + fileSizeBytes + " bytes on disk)");
             }
         }
 
@@ -1332,29 +1325,25 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
     // Plain data classes backing DlinkHashCache's on-disk file. Kept as simple public fields
     // (rather than DlinkFile's private-setter-property style) since DlinkHashCache mutates entries
-    // in place on every cache hit/refresh.
-    //
-    // New: [ProtoContract]/[ProtoMember] decorate these for protobuf-net (see the class-level note
-    // on DlinkHashCache above for why). Field numbers, once assigned, should never be reused or
-    // renumbered for a different field -- that's what lets old and new cache files stay readable
-    // across a schema change; a removed field's number should simply be retired, not reassigned.
+    // in place on every cache hit/refresh.    
+    
     [ProtoContract] //New
     public class HashCacheEntry
     {
-        [ProtoMember(1)] public string path; //New
-        [ProtoMember(2)] public long bytes; //New
-        [ProtoMember(3)] public long stamp; //ticks (100ns units) since DlinkHashCache's fixed epoch //New
-        [ProtoMember(4)] public string hash; //New
-        [ProtoMember(5)] public long? variables; //Null when unknown (non-.gbk file, or a .gbk predating this feature). //New
-        [ProtoMember(6)] public long? series; //Same convention as variables //New
+        [ProtoMember(1)] public string path;
+        [ProtoMember(2)] public long bytes; 
+        [ProtoMember(3)] public long stamp; //ticks (100ns units) since DlinkHashCache's fixed epoch 
+        [ProtoMember(4)] public string hash;
+        [ProtoMember(5)] public long? variables;
+        [ProtoMember(6)] public long? series;
         //True once we've confirmed (via SyncBlobs) that the blob for "hash" is present in blob storage.
         //Reset to false whenever hash changes.
         [ProtoMember(7)] public bool blobConfirmed; //New
     }
 
-    [ProtoContract] //New
+    [ProtoContract] 
     public class HashCacheFile
     {
-        [ProtoMember(1)] public List<HashCacheEntry> entries = new List<HashCacheEntry>(); //New
+        [ProtoMember(1)] public List<HashCacheEntry> entries = new List<HashCacheEntry>();
     }
 }
