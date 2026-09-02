@@ -1,7 +1,7 @@
 ﻿<Window x:Class="Gekko.WindowDlink"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Dlink files manager (create/update)"
+        Title="Dlink files (data versioning)"
         Height="560" Width="880"
         WindowStartupLocation="CenterScreen">    
 
@@ -70,11 +70,7 @@
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
                 <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FFEAEAEA"/>
                 <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="Black"/>
-            </DataGrid.Resources>
-            <!-- New: suppresses the per-cell black keyboard-focus rectangle that WPF draws by
-                 default (DataGrid always tracks a "current cell" for keyboard nav, even though
-                 SelectionUnit is FullRow here) -- the gray row-selection background above is
-                 already the only selection indicator we want. -->
+            </DataGrid.Resources>            
             <DataGrid.CellStyle>
                 <Style TargetType="DataGridCell">
                     <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
@@ -88,7 +84,7 @@
                 </Style>
             </DataGrid.RowStyle>
             <DataGrid.Columns>                
-                <!-- New: SortMemberPath lets the user click this header to sort by data file path,
+                <!-- SortMemberPath lets the user click this header to sort by data file path,
                      since DataGrid cannot auto-detect a sort key for a template column. -->
                 <DataGridTemplateColumn Header="Path" Width="*" SortMemberPath="Path" CanUserSort="True">
                     <DataGridTemplateColumn.CellTemplate>
@@ -100,11 +96,11 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <!-- New: MB column. Bound to the unrounded SizeMB (StringFormat only affects the
-                     displayed text), so sorting -- CanUserSort is on by default here, since this is
-                     a plain Binding, unlike the Path column above -- compares actual size, not the
+                <!-- MB column. Bound to the unrounded SizeMB (StringFormat only affects the
+                     displayed text), so sorting CanUserSort is on by default here, since this is
+                     a plain Binding, unlike the Path column above compares actual size, not the
                      rounded/formatted string. -->
-                <DataGridTextColumn Header="MB" Binding="{Binding SizeMB, StringFormat={}{0:F1}}" Width="70">
+                <DataGridTextColumn Header="MB" Binding="{Binding SizeMB, StringFormat={}{0:F1}}" Width="60">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="HorizontalAlignment" Value="Right"/>
@@ -112,14 +108,14 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
-                <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="150"/>                
-                <DataGridTemplateColumn Header="" Width="150">
+                <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="120"/>                
+                <DataGridTemplateColumn Header="" Width="130">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
                                 <Button Content="Dlink" Style="{StaticResource RoundedSmallButtonStyle}"
                                         Margin="0,0,4,0" Click="DlinkSingleRow_Click" Tag="{Binding}"/>
-                                <Button Content="Remove" Style="{StaticResource RoundedSmallButtonStyle}"
+                                <Button Content="Ignore" Style="{StaticResource RoundedSmallButtonStyle}"
                                         Click="RemoveRow_Click" Tag="{Binding}"/>
                             </StackPanel>
                         </DataTemplate>
@@ -127,10 +123,7 @@
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
-        
-        <!-- New: two "lines" -- StatusText (transient progress/status messages, including the full
-             data file path while processing) on top, and a permanent "Files = ..." count plus the
-             action buttons on the bottom. -->
+                
         <Grid Grid.Row="4">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -148,11 +141,11 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Name="FileCountText" Grid.Column="0" VerticalAlignment="Center" Foreground="#FF444444"/>
-                <Button Name="RemoveInSyncButton" Grid.Column="1" Content="Remove synced" Width="110" Margin="0,0,10,0"
+                <Button Name="RemoveInSyncButton" Grid.Column="1" Content="Ignore synced" Width="110" Margin="0,0,10,0"
                         Click="RemoveInSyncButton_Click" IsEnabled="False"/>
                 <Button Name="DlinkAllButton" Grid.Column="2" Content="Dlink all" Width="90" Margin="0,0,10,0"
                         Click="DlinkAllButton_Click" IsEnabled="False"/>
-                <Button Name="CancelButton" Grid.Column="3" Content="Cancel" Width="90" Click="CancelButton_Click"/>
+                <Button Name="CancelButton" Grid.Column="3" Content="Close" Width="90" Click="CancelButton_Click"/>
             </Grid>
         </Grid>
     </Grid>
