@@ -398,6 +398,7 @@ namespace Gekko
                 //New or changed: (re)generate the .dlink from the current file content,
                 //exactly like Gekko itself does when it reads/writes this file.
                 //Note: done like this, for .gbk files the .dlink files will not get info on #vars and #series
+                //To Claude: the above statement is wrong no, isn't it (since variables and series are part of the ReadInfo object now)
                 await Task.Run(() => DlinkAutoDlinkFiles.Blob(row.Path, true));
                 row.Status = "Done";
             }
