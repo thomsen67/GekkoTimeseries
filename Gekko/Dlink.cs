@@ -1080,6 +1080,16 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
     //
     // Callers should call Set() per file as usual, then call Save() ONCE after a batch of files, not
     // once per file -- otherwise every hashed file costs a disk write and most of the benefit is lost.
+    //
+    // New: the on-disk file is protobuf-net (binary), not YAML like the .dlink files -- unlike those,
+    // nobody ever reads this file by eye or diffs it in Git, so there's no reason to pay YAML's
+    // parsing cost here. At 10,000 entries (2.3MB as YAML) load+save was taking ~0.7s each; this
+    // cache is now sized for up to ~100,000 entries, where that cost would only have gotten worse.
+    // protobuf-net is binary and schema-based, avoiding both YAML's heavier grammar and its
+    // reflection-based object construction. The file extension changed from .yaml to .cache to
+    // match -- the first run after this change starts with a cold cache (the old .yaml file is
+    // simply orphaned, not migrated), which is fine: this cache has never been load-bearing, only a
+    // performance optimization (see Count()/countHit's own remarks elsewhere in this file).
     public static class DlinkHashCache
     {
         public static int countAsk = 0;
@@ -1101,7 +1111,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 string folder = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), "_utilities", "hashcache");
                 //Per-machine file name: this folder is shared/network storage (databank_dlink_folder_blobs),
                 //and giving each machine its own cache file avoids two machines racing on the same file.                
-                return Path.Combine(folder, "hashcache_" + Environment.MachineName + ".yaml");
+                return Path.Combine(folder, "hashcache_" + Environment.MachineName + ".cache"); //New: was ".yaml" -- now a protobuf-net binary file
             }
         }
 
@@ -1121,7 +1131,12 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             {
                 if (File.Exists(CacheFilePath))
                 {
-                    HashCacheFile cf = G.YamlReader<HashCacheFile>(CacheFilePath);
+                    //New: protobuf-net instead of G.YamlReader -- see the class-level note above.
+                    HashCacheFile cf;
+                    using (FileStream stream = File.OpenRead(CacheFilePath))
+                    {
+                        cf = ProtoBuf.Serializer.Deserialize<HashCacheFile>(stream);
+                    }
                     if (cf != null && cf.entries != null)
                     {
                         //File is written oldest-first (see Save() below); AddFirst()'ing in that order
@@ -1284,7 +1299,11 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                         cf.entries.Add(node.Value);
                     }
                     Directory.CreateDirectory(Path.GetDirectoryName(CacheFilePath));
-                    G.YamlWriter<HashCacheFile>(cf, CacheFilePath);
+                    //New: protobuf-net instead of G.YamlWriter -- see the class-level note above.
+                    using (FileStream stream = File.Create(CacheFilePath))
+                    {
+                        ProtoBuf.Serializer.Serialize(stream, cf);
+                    }
                     _dirty = false;
                 }
                 catch
@@ -1314,21 +1333,28 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
     // Plain data classes backing DlinkHashCache's on-disk file. Kept as simple public fields
     // (rather than DlinkFile's private-setter-property style) since DlinkHashCache mutates entries
     // in place on every cache hit/refresh.
+    //
+    // New: [ProtoContract]/[ProtoMember] decorate these for protobuf-net (see the class-level note
+    // on DlinkHashCache above for why). Field numbers, once assigned, should never be reused or
+    // renumbered for a different field -- that's what lets old and new cache files stay readable
+    // across a schema change; a removed field's number should simply be retired, not reassigned.
+    [ProtoContract] //New
     public class HashCacheEntry
     {
-        public string path;
-        public long bytes;
-        public long stamp; //ticks (100ns units) since DlinkHashCache's fixed epoch
-        public string hash;
-        public long? variables; //Null when unknown (non-.gbk file, or a .gbk predating this feature).
-        public long? series; //Same convention as variables
+        [ProtoMember(1)] public string path; //New
+        [ProtoMember(2)] public long bytes; //New
+        [ProtoMember(3)] public long stamp; //ticks (100ns units) since DlinkHashCache's fixed epoch //New
+        [ProtoMember(4)] public string hash; //New
+        [ProtoMember(5)] public long? variables; //Null when unknown (non-.gbk file, or a .gbk predating this feature). //New
+        [ProtoMember(6)] public long? series; //Same convention as variables //New
         //True once we've confirmed (via SyncBlobs) that the blob for "hash" is present in blob storage.
         //Reset to false whenever hash changes.
-        public bool blobConfirmed;
+        [ProtoMember(7)] public bool blobConfirmed; //New
     }
 
+    [ProtoContract] //New
     public class HashCacheFile
     {
-        public List<HashCacheEntry> entries = new List<HashCacheEntry>();
+        [ProtoMember(1)] public List<HashCacheEntry> entries = new List<HashCacheEntry>(); //New
     }
 }
