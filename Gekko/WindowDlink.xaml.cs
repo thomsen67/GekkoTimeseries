@@ -39,7 +39,24 @@ namespace Gekko
         public DlinkImportRowKind Kind;
         public string TargetDlinkPath;      //where this file's .dlink should live
         public string ComputedHash;
-        public long ComputedSize;
+
+        private long _computedSize;
+        public long ComputedSize
+        {
+            get { return _computedSize; }
+            //New: was a plain field -- needs to raise PropertyChanged now that SizeMB (bound in the
+            //grid's MB column) derives from it.
+            set { _computedSize = value; OnPropertyChanged("ComputedSize"); OnPropertyChanged("SizeMB"); }
+        }
+
+        // New: bound to the grid's MB column. Left unrounded here -- the column's StringFormat
+        // handles display rounding to 1 decimal, while sorting still compares this full-precision
+        // value, which is more correct/stable than sorting on a pre-rounded number.
+        public double SizeMB
+        {
+            get { return ComputedSize / (1024.0 * 1024.0); }
+        }
+
         public DateTime ComputedStampUtc;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -82,6 +99,7 @@ namespace Gekko
         {
             InitializeComponent();
             FilesGrid.ItemsSource = _items;
+            UpdateFooter(); //New: initializes "Files = 0"
         }
 
         private void DropZone_DragEnter(object sender, System.Windows.DragEventArgs e)
@@ -129,10 +147,12 @@ namespace Gekko
                 for (int i = 0; i < newFiles.Count; i++)
                 {
                     string filePath = newFiles[i];
-                    StatusText.Text = "Checking file " + (i + 1) + " of " + newFiles.Count + "...";
+                    //New: full path, matching DlinkSyncFiles() in Dlink.cs
+                    StatusText.Text = "Checking " + (i + 1) + " of " + newFiles.Count + ": " + filePath;
 
                     DlinkImportRow row = new DlinkImportRow { Path = filePath, Status = "Checking...", DlinkPathDisplay = "" };
                     _items.Add(row);
+                    UpdateFooter(); //New: keeps "Files = ..." live as rows stream in, not just once at the end
              
                     StatusResult result;
                     try
@@ -157,18 +177,19 @@ namespace Gekko
             {                
                 await Task.Run(() => DlinkHashCache.Save());
                 _isBusy = false;
-                UpdateButtonEnabledStates();
+                UpdateFooter();
                 CancelButton.IsEnabled = true;
             }
         }
 
-        // Keeps the two "acts on the whole grid" buttons in sync with whether there's
-        // anything in the grid to act on -- called everywhere _items' count can change.
-        private void UpdateButtonEnabledStates()
+        // New: renamed from UpdateButtonEnabledStates -- now also keeps the "Files = ..." counter
+        // current. Called everywhere _items' count can change (a drop, a remove, a delete).
+        private void UpdateFooter()
         {
             bool hasRows = _items.Count > 0;
             DlinkAllButton.IsEnabled = hasRows;
             RemoveInSyncButton.IsEnabled = hasRows;
+            FileCountText.Text = "Files = " + _items.Count;
         }
 
         // Runs entirely off the UI thread.
@@ -274,7 +295,7 @@ namespace Gekko
             if (_isBusy) return;
             DlinkImportRow row = (DlinkImportRow)((Button)sender).Tag;
             _items.Remove(row);
-            UpdateButtonEnabledStates();
+            UpdateFooter();
         }
         
         private void RemoveInSyncButton_Click(object sender, RoutedEventArgs e)
@@ -285,7 +306,7 @@ namespace Gekko
             {
                 _items.Remove(row);
             }
-            UpdateButtonEnabledStates();
+            UpdateFooter();
             StatusText.Text = toRemove.Count == 0
                 ? "No rows already in sync to remove."
                 : "Removed " + toRemove.Count + " row" + G.S(toRemove.Count) + " already in sync.";
@@ -303,7 +324,7 @@ namespace Gekko
             {
                 _items.Remove(row);
             }
-            UpdateButtonEnabledStates();
+            UpdateFooter();
         }
 
         // Right-clicking a row that isn't part of the current multi-selection selects just
@@ -318,6 +339,34 @@ namespace Gekko
                 FilesGrid.SelectedItems.Clear();
                 row.IsSelected = true;
             }
+        }
+
+        // New: explicit Up/Down handling for row navigation. Handled at the DataGrid level via
+        // PreviewKeyDown (tunneling), so it fires before -- and takes priority over -- whatever a
+        // focused child control (e.g. one of the Dlink/Remove buttons) would otherwise do with the
+        // key, and regardless of why the grid's own built-in arrow-key navigation wasn't doing this.
+        // Moves/replaces the selection by one row in the CURRENTLY DISPLAYED order, so this still
+        // makes sense after the user has sorted the grid (e.g. by clicking the MB column header).
+        private void FilesGrid_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key != System.Windows.Input.Key.Up && e.Key != System.Windows.Input.Key.Down) return;
+            if (FilesGrid.Items.Count == 0) return;
+
+            int currentIndex = FilesGrid.SelectedIndex;
+            int newIndex;
+            if (e.Key == System.Windows.Input.Key.Up)
+            {
+                newIndex = currentIndex <= 0 ? 0 : currentIndex - 1;
+            }
+            else
+            {
+                newIndex = currentIndex < 0 ? 0 : Math.Min(currentIndex + 1, FilesGrid.Items.Count - 1);
+            }
+
+            FilesGrid.SelectedItems.Clear();
+            FilesGrid.SelectedIndex = newIndex;
+            FilesGrid.ScrollIntoView(FilesGrid.Items[newIndex]);
+            e.Handled = true;
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -378,10 +427,21 @@ namespace Gekko
 
             List<string> errors = new List<string>();
 
+            //New: full path + throttled to at most one status update per 100ms, matching
+            //DlinkSyncFiles() in Dlink.cs -- otherwise a big batch of small/fast rows pays a UI
+            //update cost on every single one.
+            System.Diagnostics.Stopwatch progressStopwatch = System.Diagnostics.Stopwatch.StartNew();
+            const int progressReportIntervalMs = 100;
+
             for (int i = 0; i < _items.Count; i++)
             {
                 DlinkImportRow row = _items[i];
-                StatusText.Text = "Processing " + (i + 1) + " of " + _items.Count + "...";
+                bool isLastRow = (i == _items.Count - 1);
+                if (isLastRow || progressStopwatch.ElapsedMilliseconds >= progressReportIntervalMs)
+                {
+                    StatusText.Text = "Processing " + (i + 1) + " of " + _items.Count + ": " + row.Path;
+                    progressStopwatch.Restart();
+                }
                 await ProcessRowAsync(row, errors);
             }
             
@@ -389,7 +449,7 @@ namespace Gekko
 
             StatusText.Text = "Done.";
             _isBusy = false;
-            UpdateButtonEnabledStates();
+            UpdateFooter();
             CancelButton.IsEnabled = true;
 
             ShowErrorsIfAny(errors);
@@ -403,7 +463,7 @@ namespace Gekko
 
             List<string> errors = new List<string>();
 
-            StatusText.Text = "Processing " + System.IO.Path.GetFileName(row.Path) + "...";
+            StatusText.Text = "Processing " + row.Path + "..."; //New: full path, was Path.GetFileName(row.Path)
 
             await ProcessRowAsync(row, errors);
 

@@ -63,14 +63,24 @@
         
         <DataGrid Grid.Row="2" Name="FilesGrid" AutoGenerateColumns="False" CanUserAddRows="False"
                   IsReadOnly="True" SelectionMode="Extended" GridLinesVisibility="Horizontal"
-                  HorizontalGridLinesBrush="#FF999999"
+                  HorizontalGridLinesBrush="#FF999999" PreviewKeyDown="FilesGrid_PreviewKeyDown"
                   AllowDrop="True" Drop="DropZone_Drop" DragEnter="DropZone_DragEnter" DragLeave="DropZone_DragLeave">            
             <DataGrid.Resources>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFE3E3E3"/>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
                 <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FFEAEAEA"/>
                 <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="Black"/>
-            </DataGrid.Resources>            
+            </DataGrid.Resources>
+            <!-- New: suppresses the per-cell black keyboard-focus rectangle that WPF draws by
+                 default (DataGrid always tracks a "current cell" for keyboard nav, even though
+                 SelectionUnit is FullRow here) -- the gray row-selection background above is
+                 already the only selection indicator we want. -->
+            <DataGrid.CellStyle>
+                <Style TargetType="DataGridCell">
+                    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                    <Setter Property="BorderThickness" Value="0"/>
+                </Style>
+            </DataGrid.CellStyle>
             <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow">
                     <Setter Property="ContextMenu" Value="{StaticResource RowContextMenu}"/>
@@ -90,6 +100,18 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+                <!-- New: MB column. Bound to the unrounded SizeMB (StringFormat only affects the
+                     displayed text), so sorting -- CanUserSort is on by default here, since this is
+                     a plain Binding, unlike the Path column above -- compares actual size, not the
+                     rounded/formatted string. -->
+                <DataGridTextColumn Header="MB" Binding="{Binding SizeMB, StringFormat={}{0:F1}}" Width="70">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Right"/>
+                            <Setter Property="Margin" Value="0,0,8,0"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
                 <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="150"/>                
                 <DataGridTemplateColumn Header="" Width="150">
                     <DataGridTemplateColumn.CellTemplate>
@@ -106,19 +128,32 @@
             </DataGrid.Columns>
         </DataGrid>
         
+        <!-- New: two "lines" -- StatusText (transient progress/status messages, including the full
+             data file path while processing) on top, and a permanent "Files = ..." count plus the
+             action buttons on the bottom. -->
         <Grid Grid.Row="4">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock Name="StatusText" Grid.Column="0" VerticalAlignment="Center" Foreground="#FF444444"/>                        
-            <Button Name="RemoveInSyncButton" Grid.Column="1" Content="Remove synced" Width="110" Margin="0,0,10,0"
-                    Click="RemoveInSyncButton_Click" IsEnabled="False"/>
-            <Button Name="DlinkAllButton" Grid.Column="2" Content="Dlink all" Width="90" Margin="0,0,10,0"
-                    Click="DlinkAllButton_Click" IsEnabled="False"/>
-            <Button Name="CancelButton" Grid.Column="3" Content="Cancel" Width="90" Click="CancelButton_Click"/>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="4"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Name="StatusText" Grid.Row="0" Foreground="#FF444444" TextTrimming="CharacterEllipsis"/>
+
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Name="FileCountText" Grid.Column="0" VerticalAlignment="Center" Foreground="#FF444444"/>
+                <Button Name="RemoveInSyncButton" Grid.Column="1" Content="Remove synced" Width="110" Margin="0,0,10,0"
+                        Click="RemoveInSyncButton_Click" IsEnabled="False"/>
+                <Button Name="DlinkAllButton" Grid.Column="2" Content="Dlink all" Width="90" Margin="0,0,10,0"
+                        Click="DlinkAllButton_Click" IsEnabled="False"/>
+                <Button Name="CancelButton" Grid.Column="3" Content="Cancel" Width="90" Click="CancelButton_Click"/>
+            </Grid>
         </Grid>
     </Grid>
 </Window>
