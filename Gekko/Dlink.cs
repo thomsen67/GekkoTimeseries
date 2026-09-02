@@ -511,16 +511,11 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 int currentFileIndex = 0; int lastReportedPercent = 0; //for the console-style progress line
 
                 System.Diagnostics.Stopwatch progressStopwatch = System.Diagnostics.Stopwatch.StartNew();
-                const int progressReportIntervalMs = 50; //don't push a window update more often than this
+                const int progressReportIntervalMs = 100; //don't push a window update more often than this
 
                 foreach (string dlinkFile2 in dlinkFiles) //Could probably be parallelized, but maybe it is IO bound anyway
                 {
                     G.PrintProgress(dlinkFiles.Count, ref currentFileIndex, ref lastReportedPercent, G.Equal(type, "activate"), "data file" + G.S(dlinkFiles.Count) + " synchronized", gap);
-                    if ((currentFileIndex == dlinkFiles.Count) || progressStopwatch.ElapsedMilliseconds >= progressReportIntervalMs)
-                    {
-                        progressWindow.ReportProgress(currentFileIndex, dlinkFiles.Count, Path.GetFileNameWithoutExtension(dlinkFile2));
-                        progressStopwatch.Restart();
-                    }
                     try
                     {
                         string dLinkFileWithPath = Path.Combine(G.CleanupFolderName(gitFolder, false), G.CleanupFolderName(dlinkFile2, false));
@@ -578,11 +573,16 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                             DlinkHashCache.Set(realFile.name, fi2.Length, fi2.LastWriteTimeUtc, dlinkFileData.hash, dlinkFileData.variables, dlinkFileData.series); //Variables/series -- already sitting right there on dlinkFileData, no extra work to grab them
                             DlinkHashCache.SetBlobConfirmed(realFile.name, dlinkFileData.hash);
                         }
+                        if ((currentFileIndex == dlinkFiles.Count) || progressStopwatch.ElapsedMilliseconds >= progressReportIntervalMs)
+                        {
+                            progressWindow.ReportProgress(currentFileIndex, dlinkFiles.Count, dataFile);
+                            progressStopwatch.Restart();
+                        }
                     }
                     catch (Exception ex)
                     {
                         errors.Add(dlinkFile2 + ": " + ex.Message);
-                    }
+                    }                    
                 }
                 DlinkHashCache.Save(); //Persist any hashes computed while checking this batch of .dlink files
 
