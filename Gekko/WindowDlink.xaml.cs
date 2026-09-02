@@ -59,15 +59,7 @@ namespace Gekko
 
     /// <summary>
     /// Drag-and-drop tool for producing/updating .dlink files for data files that were added or
-    /// changed outside Gekko (e.g. a plain file copy). For each dropped file it works out one of:
-    /// already in sync (nothing to do) or new/changed (needs Blob()). Each row can be processed
-    /// individually (its own [Dlink] button) or all at once ([Dlink all]).
-    ///
-    /// Everything that can be slow -- walking a dropped folder's contents, hashing a file to
-    /// compute its status, or (re)writing a .dlink file via Blob() -- runs on a background thread
-    /// (via Task.Run), so a large dropped folder or a big batch of files never freezes the window.
-    /// Only the ObservableCollection<> and the DlinkImportRow property setters (which raise
-    /// PropertyChanged, consumed by WPF data binding) are touched on the UI thread.
+    /// changed outside Gekko (e.g. a plain file copy).    
     /// </summary>
     public partial class WindowDlink : Window
     {
@@ -125,9 +117,7 @@ namespace Gekko
             StatusText.Text = "Scanning dropped item(s)...";
 
             try
-            {
-                //Walking a big folder tree (Directory.EnumerateFiles over "AllDirectories") is the
-                //part that used to freeze the window on a large drop -- now off the UI thread.
+            {            
                 List<string> newFiles = await Task.Run(() => EnumerateDroppedFiles(dropped, dlinkExtension, alreadyPresent));
 
                 if (newFiles.Count == 0)
@@ -143,10 +133,7 @@ namespace Gekko
 
                     DlinkImportRow row = new DlinkImportRow { Path = filePath, Status = "Checking...", DlinkPathDisplay = "" };
                     _items.Add(row);
-
-                    //Computing the status involves hashing the file's contents -- also potentially
-                    //slow, so it's done off the UI thread. The row's own properties are only ever
-                    //written back on the UI thread, via ApplyStatusResult below.
+             
                     StatusResult result;
                     try
                     {
@@ -167,15 +154,24 @@ namespace Gekko
                 StatusText.Text = "Ready.";
             }
             finally
-            {
+            {                
+                await Task.Run(() => DlinkHashCache.Save());
                 _isBusy = false;
-                DlinkAllButton.IsEnabled = _items.Count > 0;
+                UpdateButtonEnabledStates();
                 CancelButton.IsEnabled = true;
             }
         }
 
-        // Runs entirely off the UI thread: expands dropped folders recursively, drops any .dlink
-        // files themselves (never treated as data files) and anything already in the grid.
+        // Keeps the two "acts on the whole grid" buttons in sync with whether there's
+        // anything in the grid to act on -- called everywhere _items' count can change.
+        private void UpdateButtonEnabledStates()
+        {
+            bool hasRows = _items.Count > 0;
+            DlinkAllButton.IsEnabled = hasRows;
+            RemoveInSyncButton.IsEnabled = hasRows;
+        }
+
+        // Runs entirely off the UI thread.
         private static List<string> EnumerateDroppedFiles(string[] dropped, string dlinkExtension, HashSet<string> alreadyPresent)
         {
             List<string> result = new List<string>();
@@ -204,10 +200,7 @@ namespace Gekko
             }
             return result;
         }
-
-        // Plain data carrier for what ComputeStatus works out for one file. Kept separate from
-        // DlinkImportRow so that background-thread code never sets a bound property directly --
-        // only the UI thread does that, in ApplyStatusResult.
+        
         private class StatusResult
         {
             public DlinkImportRowKind Kind;
@@ -220,9 +213,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Works out what, if anything, needs to happen for one dropped file: already correct, or
-        /// new/changed (regenerate via Blob()). Safe to call from a background thread -- it only
-        /// reads/hashes the file on disk and returns a plain result, touching no UI-bound state.
+        /// Works out what, if anything, needs to happen for one dropped file.
         /// </summary>
         private static StatusResult ComputeStatus(string filePath)
         {
@@ -256,7 +247,7 @@ namespace Gekko
                     return result;
                 }
                 result.Kind = DlinkImportRowKind.NewOrChanged;
-                result.Status = "Will be updated (existing .dlink differs)";
+                result.Status = "Not in sync";
                 return result;
             }
 
@@ -283,7 +274,50 @@ namespace Gekko
             if (_isBusy) return;
             DlinkImportRow row = (DlinkImportRow)((Button)sender).Tag;
             _items.Remove(row);
-            DlinkAllButton.IsEnabled = _items.Count > 0;
+            UpdateButtonEnabledStates();
+        }
+        
+        private void RemoveInSyncButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_isBusy) return;
+            List<DlinkImportRow> toRemove = _items.Where(r => r.Kind == DlinkImportRowKind.AlreadyInSync || r.Status == "Done").ToList();
+            foreach (DlinkImportRow row in toRemove)
+            {
+                _items.Remove(row);
+            }
+            UpdateButtonEnabledStates();
+            StatusText.Text = toRemove.Count == 0
+                ? "No rows already in sync to remove."
+                : "Removed " + toRemove.Count + " row" + G.S(toRemove.Count) + " already in sync.";
+        }
+
+        // Removes every currently-selected row -- not just the one that was right-clicked, so
+        // Shift/Ctrl-click a range first, then right-click anywhere within it (see
+        // Row_PreviewMouseRightButtonDown, which makes sure right-clicking doesn't collapse an
+        // existing multi-selection down to just the clicked row).
+        private void DeleteSelectedRows_Click(object sender, RoutedEventArgs e)
+        {
+            if (_isBusy) return;
+            List<DlinkImportRow> toRemove = FilesGrid.SelectedItems.Cast<DlinkImportRow>().ToList();
+            foreach (DlinkImportRow row in toRemove)
+            {
+                _items.Remove(row);
+            }
+            UpdateButtonEnabledStates();
+        }
+
+        // Right-clicking a row that isn't part of the current multi-selection selects just
+        // that row (replacing whatever was selected before) -- e.g. Windows Explorer does the same.
+        // Right-clicking WITHIN an existing multi-selection leaves it untouched, which is what makes
+        // "Shift/Ctrl-click a range, then right-click it" work for Delete selected row(s).
+        private void Row_PreviewMouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            DataGridRow row = sender as DataGridRow;
+            if (row != null && !row.IsSelected)
+            {
+                FilesGrid.SelectedItems.Clear();
+                row.IsSelected = true;
+            }
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -339,6 +373,7 @@ namespace Gekko
             if (_isBusy) return;
             _isBusy = true;
             DlinkAllButton.IsEnabled = false;
+            RemoveInSyncButton.IsEnabled = false;
             CancelButton.IsEnabled = false;
 
             List<string> errors = new List<string>();
@@ -349,10 +384,12 @@ namespace Gekko
                 StatusText.Text = "Processing " + (i + 1) + " of " + _items.Count + "...";
                 await ProcessRowAsync(row, errors);
             }
+            
+            await Task.Run(() => DlinkHashCache.Save());
 
             StatusText.Text = "Done.";
             _isBusy = false;
-            DlinkAllButton.IsEnabled = _items.Count > 0;
+            UpdateButtonEnabledStates();
             CancelButton.IsEnabled = true;
 
             ShowErrorsIfAny(errors);
@@ -370,6 +407,8 @@ namespace Gekko
 
             await ProcessRowAsync(row, errors);
 
+            await Task.Run(() => DlinkHashCache.Save()); //New: see the note in DlinkAllButton_Click above
+
             StatusText.Text = "Done.";
             _isBusy = false;
 
@@ -377,9 +416,7 @@ namespace Gekko
         }
 
         // The actual per-row work, shared between DlinkAllButton_Click (looped over every row)
-        // and DlinkSingleRow_Click (just the one row clicked). Blob() does file I/O and hashing,
-        // so it runs via Task.Run -- everything before/after that stays on the UI thread and is
-        // free to touch the bound row/StatusText directly.
+        // and DlinkSingleRow_Click (just the one row clicked).
         private async Task ProcessRowAsync(DlinkImportRow row, List<string> errors)
         {
             if (row.Kind == DlinkImportRowKind.OutsideRecognizedFolder || row.Kind == DlinkImportRowKind.Unresolved)
@@ -394,19 +431,13 @@ namespace Gekko
             }
 
             try
-            {
-                //New or changed: (re)generate the .dlink from the current file content,
-                //exactly like Gekko itself does when it reads/writes this file.
-                //Note: done like this, for .gbk files the .dlink files will not get info on #vars and #series
-                //To Claude: the above statement is wrong no, isn't it (since variables and series are part of the ReadInfo object now)
+            {                
                 await Task.Run(() => DlinkAutoDlinkFiles.Blob(row.Path, true));
                 row.Status = "Done";
             }
             catch (Exception)
             {
-                //One bad file (unreadable, corrupt, permissions, ...) should not abort a batch --
-                //or, for a single-row click, the row simply reports its own failure. Record the
-                //error against this row (and the caller's list) and move on.
+                //One bad file (unreadable, corrupt, permissions, ...) should not abort a batch.
                 row.Status = "Error";
                 errors.Add(row.Path);
             }

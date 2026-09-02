@@ -5,8 +5,7 @@
         Height="560" Width="880"
         WindowStartupLocation="CenterScreen">    
 
-    <Window.Resources>
-        <!-- New: compact, slightly rounded style for the per-row [Dlink]/[Remove] buttons. -->
+    <Window.Resources>        
         <Style x:Key="RoundedSmallButtonStyle" TargetType="Button">
             <Setter Property="Height" Value="18"/>
             <Setter Property="Padding" Value="12,0"/>
@@ -19,10 +18,7 @@
                         <Border Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="3">
-                            <!-- New: without this Margin binding, the Padding setter above had no
-                                 visible effect at all; Padding was set on the Button but never
-                                 consumed anywhere in the template. -->
+                                CornerRadius="3">                      
                             <ContentPresenter Margin="{TemplateBinding Padding}"
                                                HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
@@ -38,14 +34,13 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <!-- New: moved out of DataGrid.RowStyle's inline Setter.Value. MenuItem Click handlers
-             declared on an object nested inside a Setter.Value for a plain object-valued property
-             (as opposed to inside a ControlTemplate/DataTemplate, which handle this fine) can trip
-             up the WPF XAML compiler's event wireup: defining the ContextMenu here as a normal
-             keyed resource and referencing it via StaticResource avoids that. -->
+        
         <ContextMenu x:Key="RowContextMenu">
             <MenuItem Header="Copy data file path" Click="CopyDataFilePath_Click"/>
             <MenuItem Header="Copy dlink file path" Click="CopyDlinkFilePath_Click"/>
+            <Separator/>
+            <!-- Acts on every currently-selected row, not just the one right-clicked -->
+            <MenuItem Header="Delete selected row(s)" Click="DeleteSelectedRows_Click"/>
         </ContextMenu>
     </Window.Resources>
     <Grid Margin="10">
@@ -69,13 +64,17 @@
         <DataGrid Grid.Row="2" Name="FilesGrid" AutoGenerateColumns="False" CanUserAddRows="False"
                   IsReadOnly="True" SelectionMode="Extended" GridLinesVisibility="Horizontal"
                   HorizontalGridLinesBrush="#FF999999"
-                  AllowDrop="True" Drop="DropZone_Drop" DragEnter="DropZone_DragEnter" DragLeave="DropZone_DragLeave">
-            <!-- New: right-click anywhere on a row to copy either path to the clipboard. One
-                 shared ContextMenu instance is fine here; WPF reassigns PlacementTarget to
-                 whichever row was actually clicked each time it opens. -->
+                  AllowDrop="True" Drop="DropZone_Drop" DragEnter="DropZone_DragEnter" DragLeave="DropZone_DragLeave">            
+            <DataGrid.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFE3E3E3"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FFEAEAEA"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="Black"/>
+            </DataGrid.Resources>            
             <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow">
                     <Setter Property="ContextMenu" Value="{StaticResource RowContextMenu}"/>
+                    <EventSetter Event="PreviewMouseRightButtonDown" Handler="Row_PreviewMouseRightButtonDown"/>
                 </Style>
             </DataGrid.RowStyle>
             <DataGrid.Columns>                
@@ -84,8 +83,7 @@
                 <DataGridTemplateColumn Header="Path" Width="*" SortMemberPath="Path" CanUserSort="True">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Vertical" Margin="2,6,2,6">
-                                <!-- New: data file path in a dusted dark blue -->
+                            <StackPanel Orientation="Vertical" Margin="2,6,2,6">                
                                 <TextBlock Text="{Binding Path}" Foreground="#FF1F4E79"/>
                                 <TextBlock Text="{Binding DlinkPathDisplay}" Foreground="#FF888888"/>
                             </StackPanel>
@@ -113,11 +111,14 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Name="StatusText" Grid.Column="0" VerticalAlignment="Center" Foreground="#FF444444"/>            
-            <Button Name="DlinkAllButton" Grid.Column="1" Content="Dlink all" Width="90" Margin="0,0,10,0"
+            <TextBlock Name="StatusText" Grid.Column="0" VerticalAlignment="Center" Foreground="#FF444444"/>                        
+            <Button Name="RemoveInSyncButton" Grid.Column="1" Content="Remove synced" Width="110" Margin="0,0,10,0"
+                    Click="RemoveInSyncButton_Click" IsEnabled="False"/>
+            <Button Name="DlinkAllButton" Grid.Column="2" Content="Dlink all" Width="90" Margin="0,0,10,0"
                     Click="DlinkAllButton_Click" IsEnabled="False"/>
-            <Button Name="CancelButton" Grid.Column="2" Content="Cancel" Width="90" Click="CancelButton_Click"/>
+            <Button Name="CancelButton" Grid.Column="3" Content="Cancel" Width="90" Click="CancelButton_Click"/>
         </Grid>
     </Grid>
 </Window>
