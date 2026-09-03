@@ -63,7 +63,7 @@
         
         <DataGrid Grid.Row="2" Name="FilesGrid" AutoGenerateColumns="False" CanUserAddRows="False"
                   IsReadOnly="True" SelectionMode="Extended" GridLinesVisibility="Horizontal"
-                  HorizontalGridLinesBrush="#FF999999" PreviewKeyDown="FilesGrid_PreviewKeyDown"
+                  HorizontalGridLinesBrush="#FF999999" 
                   AllowDrop="True" Drop="DropZone_Drop" DragEnter="DropZone_DragEnter" DragLeave="DropZone_DragLeave">            
             <DataGrid.Resources>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFE3E3E3"/>

@@ -240,7 +240,7 @@ namespace Gekko
         {
             StatusResult result = new StatusResult();
 
-            string targetDlink = DlinkAutoDlinkFiles.Dlink_FromDataFileToDlinkFile(filePath);
+            string targetDlink = DlinkCommon.Dlink_FromDataFileToDlinkFile(filePath);
             result.TargetDlinkPath = targetDlink;
             if (targetDlink == null)
             {
@@ -339,35 +339,7 @@ namespace Gekko
                 FilesGrid.SelectedItems.Clear();
                 row.IsSelected = true;
             }
-        }
-
-        // New: explicit Up/Down handling for row navigation. Handled at the DataGrid level via
-        // PreviewKeyDown (tunneling), so it fires before -- and takes priority over -- whatever a
-        // focused child control (e.g. one of the Dlink/Remove buttons) would otherwise do with the
-        // key, and regardless of why the grid's own built-in arrow-key navigation wasn't doing this.
-        // Moves/replaces the selection by one row in the CURRENTLY DISPLAYED order, so this still
-        // makes sense after the user has sorted the grid (e.g. by clicking the MB column header).
-        private void FilesGrid_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            if (e.Key != System.Windows.Input.Key.Up && e.Key != System.Windows.Input.Key.Down) return;
-            if (FilesGrid.Items.Count == 0) return;
-
-            int currentIndex = FilesGrid.SelectedIndex;
-            int newIndex;
-            if (e.Key == System.Windows.Input.Key.Up)
-            {
-                newIndex = currentIndex <= 0 ? 0 : currentIndex - 1;
-            }
-            else
-            {
-                newIndex = currentIndex < 0 ? 0 : Math.Min(currentIndex + 1, FilesGrid.Items.Count - 1);
-            }
-
-            FilesGrid.SelectedItems.Clear();
-            FilesGrid.SelectedIndex = newIndex;
-            FilesGrid.ScrollIntoView(FilesGrid.Items[newIndex]);
-            e.Handled = true;
-        }
+        }        
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
