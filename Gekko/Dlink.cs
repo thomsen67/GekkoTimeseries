@@ -240,7 +240,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 //Note: just because a .dlink file is constructed, this it not the same
                 //      as that it has to go into blobs storage.
 
-                string dlinkFile = DlinkCommon.Dlink_FromDataFileToDlinkFile(dataFile);
+                string dlinkFile = DlinkCommon.Dlink_FromDataFileToDlinkFile(dataFile, false);
 
                 if (dlinkFile == null)
                 {
@@ -495,12 +495,11 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                             new Error();
                         }
                         DlinkFile dlinkFileData = G.YamlReader<DlinkFile>(dLinkFileWithPath);
-                        string dataFile = DlinkCommon.Dlink_FromDlinkFileToDataFile(dLinkFileWithPath);
+                        string dataFile = DlinkCommon.Dlink_FromDlinkFileToDataFile(dLinkFileWithPath, true);
                         if (G.NullOrBlanks(dataFile))
                         {
-                            MessageBox.Show("Datafile string is null"); new Error();
+                            MessageBox.Show("Failed getting from .dlink file '" + dLinkFileWithPath + "' to data file name"); new Error();
                         }
-
                         FileInfo fi1 = new FileInfo(dataFile); //File may not exist                
                         bool exists = fi1.Exists;
                         RealFile realFile = new RealFile(
@@ -1288,7 +1287,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
     public static class DlinkCommon
     {
-        public static string Dlink_FromDlinkFileToDataFile(string dlinkFile)
+        public static string Dlink_FromDlinkFileToDataFile(string dlinkFile, bool reportError)
         {
             //m1                 K:\MAKROBK\tth\test\makrobk_grunddata\biver\_progs\_uddata_dlink\x.csv.dlink
             //m2                 tth\test\makrobk_grunddata\biver\_progs\_uddata_dlink\x.csv.dlink
@@ -1299,17 +1298,30 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
             if (Globals.tthDlink1) dlinkFile = G.Replace(dlinkFile, "c:\\tools\\k", "K:", StringComparison.OrdinalIgnoreCase, 1);
 
-            if (!Path.IsPathRooted(Program.options.databank_dlink_folder_progs)) new Error("Expected path '" + Program.options.databank_dlink_folder_progs + "' to be absolute");
+            if (!Path.IsPathRooted(Program.options.databank_dlink_folder_progs))
+            {
+                if (reportError) new Error("Expected path '" + Program.options.databank_dlink_folder_progs + "' to be absolute (option databank dlink folder progs)");
+                else return null;
+            }
             List<string> dataStart1 = Stringlist.Path_FromStringToList(Program.options.databank_dlink_folder_progs);
-            if (!Path.IsPathRooted(Program.options.databank_dlink_folder_data)) new Error("Expected path '" + Program.options.databank_dlink_folder_data + "' to be absolute");
+            if (!Path.IsPathRooted(Program.options.databank_dlink_folder_data))
+            {
+                if (reportError) new Error("Expected path '" + Program.options.databank_dlink_folder_data + "' to be absolute (option databank dlink folder data)");
+                else return null;
+            }
             List<string> dataStart2 = Stringlist.Path_FromStringToList(Program.options.databank_dlink_folder_data);
-            if (!Path.IsPathRooted(dlinkFile)) new Error("Expected path '" + dlinkFile + "' to be absolute");
+            if (!Path.IsPathRooted(dlinkFile))
+            {
+                if (reportError) new Error("Expected path '" + dlinkFile + "' to be absolute (.dlink file)");
+                else return null;
+            }
             List<string> m1 = Stringlist.Path_FromStringToList(dlinkFile);
-            List<string> m2 = Stringlist.Path_RemoveStart(m1, dataStart1);
+            List<string> m2 = Stringlist.Path_RemoveStart(m1, dataStart1, reportError);
+            if (m2 == null) return null; //Can only be == null from the above if reportError is false
             DlinkCommon.StagingOrMainError(m2);
             List<string> m3 = m2.ToList(); //copy
             if (!G.NullOrBlanks(Program.options.databank_dlink_folder_remove1)) m3 = Stringlist.Path_RemoveString(m3, Program.options.databank_dlink_folder_remove1, 1);
-            if (!G.NullOrBlanks(Program.options.databank_dlink_folder_remove2)) m3 = Stringlist.Path_RemoveString(m3, Program.options.databank_dlink_folder_remove2, 1);
+            //if (!G.NullOrBlanks(Program.options.databank_dlink_folder_remove2)) m3 = Stringlist.Path_RemoveString(m3, Program.options.databank_dlink_folder_remove2, 1);
             List<string> m4 = Stringlist.Path_ReplaceString(m3, Program.options.databank_dlink_folder_replace1b, Program.options.databank_dlink_folder_replace1a, 1);
             m4 = Stringlist.Path_ReplaceString(m4, Program.options.databank_dlink_folder_replace2b, Program.options.databank_dlink_folder_replace2a, 1);
             m4 = Stringlist.Path_ReplaceString(m4, Program.options.databank_dlink_folder_replace3b, Program.options.databank_dlink_folder_replace3a, 1);
@@ -1320,7 +1332,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             return Stringlist.Path_FromListToString(m6, "\\");
         }
 
-        public static string Dlink_FromDataFileToDlinkFile(string dataFile)
+        public static string Dlink_FromDataFileToDlinkFile(string dataFile, bool reportError)
         {
             // datastart1  k:\\MAKROBK_KILDE\\2025_10_01
             // datastart2  k:\\MAKROBK
@@ -1331,13 +1343,26 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             // m5          tth\test\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink
             // m6          k:\\MAKROBK\tth\test\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink   (output)            
 
-            if (!Path.IsPathRooted(Program.options.databank_dlink_folder_data)) new Error("Expected path '" + Program.options.databank_dlink_folder_data + "' to be absolute");
+            if (!Path.IsPathRooted(Program.options.databank_dlink_folder_data))
+            {
+                if (reportError) new Error("Expected path '" + Program.options.databank_dlink_folder_data + "' to be absolute (options databank dlink folder data)");
+                else return null;
+            }
             List<string> dataStart1 = Stringlist.Path_FromStringToList(Program.options.databank_dlink_folder_data);
-            if (!Path.IsPathRooted(Program.options.databank_dlink_folder_progs)) new Error("Expected path '" + Program.options.databank_dlink_folder_progs + "' to be absolute");
+            if (!Path.IsPathRooted(Program.options.databank_dlink_folder_progs))
+            {
+                if (reportError) new Error("Expected path '" + Program.options.databank_dlink_folder_progs + "' to be absolute (option databank dlink folder progs)");
+                else return null;
+            }
             List<string> dataStart2 = Stringlist.Path_FromStringToList(Program.options.databank_dlink_folder_progs);
-            if (!Path.IsPathRooted(dataFile)) new Error("Expected path '" + dataFile + "' to be absolute");
+            if (!Path.IsPathRooted(dataFile))
+            {
+                if (reportError) new Error("Expected path '" + dataFile + "' to be absolute (datafile)");
+                else return null;
+            }
             List<string> m1 = Stringlist.Path_FromStringToList(dataFile);
-            List<string> m2 = Stringlist.Path_RemoveStart(m1, dataStart1);
+            List<string> m2 = Stringlist.Path_RemoveStart(m1, dataStart1, reportError);
+            if (m2 == null) return null; //Can only be == null from the above if reportError is false. We allow this for .dlink construction, so that an opened file in a "foreign" folder is ok to read in (no .dlink constucted in that case)
             DlinkCommon.StagingOrMainError(m2);
             List<string> m3 = m2.ToList(); //copy
             if (!G.NullOrBlanks(Program.options.databank_dlink_folder_remove1)) m3.Insert(2, Program.options.databank_dlink_folder_remove1); //hacky, in middle                        
@@ -1353,9 +1378,12 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
         public static void StagingOrMainError(List<string> m2)
         {
-            //Sanity check
-            if (G.Equal(m2[0], "staging")) new Error("Cannot sync 'staging' files");
-            if (G.Equal(m2[0], "main")) new Error("Cannot sync 'main' files");
+            //Sanity check, hacky for now
+            List<string> m = new List<string>() { "staging", "main", "prod", "production", "test", "staging2" };
+            foreach (string s in m)
+            {
+                if (G.Equal(m2[0], s)) new Error("Cannot sync files in a sub-folder that starts with a non-username (here: '" + s + "'). Foldername: '" + Stringlist.Path_FromListToString(m2, "\\") + "'");
+            }            
         }
     }
 }

@@ -177,7 +177,15 @@ namespace Gekko
             return isRooted;
         }
 
-        public static List<string> Path_RemoveStart(List<string> source, List<string> prefix)
+        /// <summary>
+        /// If the file does not start with the prefix, the method either fails with error (reportError==true)
+        /// or returns null.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="prefix"></param>
+        /// <param name="reportError"></param>
+        /// <returns></returns>
+        public static List<string> Path_RemoveStart(List<string> source, List<string> prefix, bool reportError)
         {
             if (source == null || prefix == null) new Error("Null list");
             // Check if source has enough items and matches prefix case-insensitively
@@ -186,7 +194,8 @@ namespace Gekko
             if (!startsWithPrefix)
             {
                 if (Globals.tthDebug) File.WriteAllText("c:\\b-tth\\gitbug.txt2222", "The path '" + Path_FromListToString(source, "<separator>") + " does not start with " + Path_FromListToString(prefix, "<separator>"));
-                new Error("The path '" + Path_FromListToString(source, "\\") + " does not start with " + Path_FromListToString(prefix, "\\"));
+                if (reportError) new Error("The path '" + Path_FromListToString(source, "\\") + " does not start with " + Path_FromListToString(prefix, "\\"));
+                else return null;
             }
             return source.Skip(prefix.Count).ToList();
         }

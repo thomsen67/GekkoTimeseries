@@ -4414,8 +4414,8 @@ namespace Gekko
         }
 
         public static bool DlinkDebug()
-        {
-            if (Directory.Exists("p:\\tth\\ny\\dlinkdebug.txt")) return true;
+        {            
+            if (Directory.Exists("c:\\thomas\\Gekko\\GekkoCS\\dlinkdebug.txt")) return true;
             else return false;
         }
 

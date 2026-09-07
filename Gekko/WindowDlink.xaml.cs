@@ -240,7 +240,7 @@ namespace Gekko
         {
             StatusResult result = new StatusResult();
 
-            string targetDlink = DlinkCommon.Dlink_FromDataFileToDlinkFile(filePath);
+            string targetDlink = DlinkCommon.Dlink_FromDataFileToDlinkFile(filePath, true);
             result.TargetDlinkPath = targetDlink;
             if (targetDlink == null)
             {

@@ -4369,6 +4369,63 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_DlinkPaths()
+        {
+            Assert.AreEqual(@"k:\MAKROBK\tth\test\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink",
+            DlinkCommon.Dlink_FromDataFileToDlinkFile(@"K:\MAKROBK_KILDE\2025_10_01\tth\test\biver\_uddata\x.csv", false));
+
+            Assert.AreEqual(@"k:\MAKROBK_KILDE\2025_10_01\tth\test\biver\_uddata\x.csv",
+            DlinkCommon.Dlink_FromDlinkFileToDataFile(@"K:\MAKROBK\tth\test\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink", false));
+
+            // --- FAILS, special names like 'staging' -------------------------------------------------------------
+
+            try
+            {
+                //Will not allow \staging here
+                string xx1 = DlinkCommon.Dlink_FromDataFileToDlinkFile(@"K:\MAKROBK_KILDE\2025_10_01\staging\biver\_uddata\x.csv", false);
+                Assert.Fail();
+            }
+            catch
+            {
+
+            }
+            
+            try
+            {
+                //Will not allow \staging here
+                string xx2 = DlinkCommon.Dlink_FromDlinkFileToDataFile(@"K:\MAKROBK\staging\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink", false);
+                Assert.Fail();
+            }
+            catch
+            {                
+            }
+
+            // --- FAILS, out-of-folder ---------------------------------------------------------------------------
+
+            try
+            {
+                //Will not allow g: here
+                string xx1 = DlinkCommon.Dlink_FromDataFileToDlinkFile(@"g:\MAKROBK_KILDE\2025_10_01\tth\test\biver\_uddata\x.csv", false);
+                Assert.AreEqual(null, xx1);
+            }
+            catch
+            {
+                Assert.Fail();
+            }
+
+            try
+            {
+                //Will not allow g: here
+                string xx2 = DlinkCommon.Dlink_FromDlinkFileToDataFile(@"g:\MAKROBK\tth\test\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink", false);
+                Assert.AreEqual(null, xx2);
+            }
+            catch
+            {
+                Assert.Fail();
+            }
+        }
+
+        [TestMethod]
         public void _Test_Print()
         {
             Gekko.Table table = null;
