@@ -57,8 +57,8 @@ namespace Gekko
             try
             {
                 // ----------------------------------------------------------------------------------------------------------                                            
-                string gekkoPath = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), "_utilities", "Gekko").Replace("\\", "/");
-                string gekkoExePath = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), "_utilities", "Gekko", "Gekko.exe").Replace("\\", "/");
+                string gekkoPath = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_storage, false), "_utilities", "Gekko").Replace("\\", "/");
+                string gekkoExePath = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_storage, false), "_utilities", "Gekko", "Gekko.exe").Replace("\\", "/");
                 // Note: -c core.quotepath=false --> without it, Git mangles זרו etc. With it, we get UTF8. Se #oowar7asdfj
                 // Pre-commit only needs to sync the .dlink files that are actually part of
                 // this commit -- "git diff --cached --name-only --diff-filter=ACMR" lists just the
@@ -457,7 +457,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             if (G.Equal(type, "activate")) new Writeln("Synchronizing .dlink and data files");
 
             //Sanity check -- fast, so it stays on the calling thread, before any window is shown
-            string blobsFolder = G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false);
+            string blobsFolder = G.CleanupFolderName(Program.options.databank_dlink_folder_storage, false);
             if (!Directory.Exists(blobsFolder))
             {
                 MessageBox.Show("Folder '" + blobsFolder + "' does not exist for file blobs/storage");
@@ -1037,7 +1037,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         {
             get
             {
-                string folder = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_blobs, false), "_utilities", "hashcache");
+                string folder = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_storage, false), "_utilities", "hashcache");
                 //Per-machine file name: this folder is shared/network storage (databank_dlink_folder_blobs),
                 //and giving each machine its own cache file avoids two machines racing on the same file.                
                 return Path.Combine(folder, "hashcache_" + Environment.MachineName + ".cache"); //New: was ".yaml" -- now a protobuf-net binary file
