@@ -317,9 +317,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             if (dlinkFiles.Count == 0)
             {
                 string s2 = "Producing 0 dlink files";
-                if (function) new Error(s2);
-                MessageBox.Show("*** ERROR: " + s2); //We want this to show
-                return;
+                new Error(s2);
             }
 
             try
@@ -332,9 +330,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             catch
             {
                 string s2 = "Producing " + dlinkFiles.Count + " dlink file" + G.S(dlinkFiles.Count) + " failed";
-                if (function) new Error(s2);
-                else MessageBox.Show("*** ERROR: " + s2); //We want this to show
-                return;
+                new Error(s2);
             }
             finally
             {
@@ -352,52 +348,55 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// <param name="args"></param>
         public static void DLinkCalledFromGitHook(string[] args)
         {
-            //MessageBox.Show("!?!");
-            string gitFolder = null;
-            if (args.Length >= 2 && args[1].StartsWith("-dlinkw:"))
+            try
             {
-                gitFolder = G.StripQuotes(args[1].Substring("-dlinkw:".Length)); //The path to \.git is sent from the Git hook
-                if (Globals.tthDebug) File.WriteAllText("c:\\b-tth\\test1", gitFolder);
-                if (!G.NullOrBlanks(Program.options.databank_dlink_folder_replace4a))
+                Globals.showErrorsAsMessageBox = true;
+                string gitFolder = null;
+                if (args.Length >= 2 && args[1].StartsWith("-dlinkw:"))
                 {
-                    gitFolder = G.Replace(gitFolder, Program.options.databank_dlink_folder_replace4a, Program.options.databank_dlink_folder_replace4b, StringComparison.OrdinalIgnoreCase, 1);
+                    gitFolder = G.StripQuotes(args[1].Substring("-dlinkw:".Length)); //The path to \.git is sent from the Git hook
+                    if (Globals.tthDebug) File.WriteAllText("c:\\b-tth\\test1", gitFolder);
+                    if (!G.NullOrBlanks(Program.options.databank_dlink_folder_replace4a))
+                    {
+                        gitFolder = G.Replace(gitFolder, Program.options.databank_dlink_folder_replace4a, Program.options.databank_dlink_folder_replace4b, StringComparison.OrdinalIgnoreCase, 1);
+                    }
+                    if (Globals.tthDebug) File.WriteAllText("c:\\b-tth\\test2", gitFolder);
+                    if (!Directory.Exists(gitFolder))
+                    {
+                        new Error("The folder '" + gitFolder + "' could not be found (parent of \\.git folder)");                        
+                    }
                 }
-                if (Globals.tthDebug) File.WriteAllText("c:\\b-tth\\test2", gitFolder);
-                if (!Directory.Exists(gitFolder))
+                if (G.NullOrBlanks(gitFolder))
                 {
-                    MessageBox.Show("*** Error: The folder '" + gitFolder + "' could not be found (parent of \\.git folder)");
-                    new Error();
+                    new Error("Could not get the path to the \\.git folder)");
                 }
+
+                //Reads file names from the temporary file created by the _common bash script/hook            
+                string dlinkFileArg = args.FirstOrDefault(a => a.StartsWith("-dlink:"));
+                if (G.NullOrBlanks(dlinkFileArg))
+                {
+                    new Error("Could not find the '-dlink:' argument");                    
+                }
+                string dlinkListFileName = G.StripQuotes(dlinkFileArg.Substring("-dlink:".Length));
+                string dlinkListFilePath = Path.Combine(gitFolder, ".git", dlinkListFileName);
+                if (!File.Exists(dlinkListFilePath))
+                {
+                    new Error("Could not find the .dlink file list '" + dlinkListFilePath + "'");
+                }
+                string[] lines = File.ReadAllLines(dlinkListFilePath);
+                string type = lines.Length >= 1 ? lines[0] : null;
+                List<string> dlinkFiles = new List<string>();
+                for (int i = 1; i < lines.Length; i++)
+                {
+                    if (G.NullOrBlanks(lines[i])) continue; //Happens when there are no staged .dlink files at all
+                    dlinkFiles.Add(lines[i]);
+                }
+                DlinkSyncFiles(gitFolder, type, dlinkFiles);
             }
-            if (G.NullOrBlanks(gitFolder))
+            finally
             {
-                MessageBox.Show("*** Error: Could not get the path to the \\.git folder)");
-                new Error();
+                Globals.showErrorsAsMessageBox = false;
             }
-            
-            //Reads file names from the temporary file created by the _common bash script/hook            
-            string dlinkFileArg = args.FirstOrDefault(a => a.StartsWith("-dlink:"));
-            if (G.NullOrBlanks(dlinkFileArg))
-            {
-                MessageBox.Show("*** Error: Could not find the '-dlink:' argument");
-                new Error();
-            }
-            string dlinkListFileName = G.StripQuotes(dlinkFileArg.Substring("-dlink:".Length));
-            string dlinkListFilePath = Path.Combine(gitFolder, ".git", dlinkListFileName);
-            if (!File.Exists(dlinkListFilePath))
-            {
-                MessageBox.Show("*** Error: Could not find the .dlink file list '" + dlinkListFilePath + "'");
-                new Error();
-            }
-            string[] lines = File.ReadAllLines(dlinkListFilePath);
-            string type = lines.Length >= 1 ? lines[0] : null;
-            List<string> dlinkFiles = new List<string>();
-            for (int i = 1; i < lines.Length; i++)
-            {
-                if (G.NullOrBlanks(lines[i])) continue; //Happens when there are no staged .dlink files at all
-                dlinkFiles.Add(lines[i]);
-            }
-            DlinkSyncFiles(gitFolder, type, dlinkFiles);
         }
 
         /// <summary>
@@ -430,8 +429,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     p.WaitForExit();
                     if (p.ExitCode != 0)
                     {
-                        MessageBox.Show("*** Error: 'git ls-files' failed in '" + parentOfGitFolder + "':" + G.NL + stderr);
-                        new Error();
+                        new Error("'git ls-files' failed in '" + parentOfGitFolder + "':" + G.NL + stderr);
                     }
                     foreach (string line in stdout.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
                     {
@@ -441,8 +439,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             }
             catch
             {
-                MessageBox.Show("*** Error: could not run 'git' from '" + parentOfGitFolder + "' -- is Git installed and on PATH?");
-                new Error();
+                new Error("Could not run 'git' from '" + parentOfGitFolder + "' -- is Git installed and on PATH?");
             }
             return result;
         }
@@ -460,13 +457,11 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             string blobsFolder = G.CleanupFolderName(Program.options.databank_dlink_folder_storage, false);
             if (!Directory.Exists(blobsFolder))
             {
-                MessageBox.Show("Folder '" + blobsFolder + "' does not exist for file blobs/storage");
-                new Error();
+                new Error("Folder '" + blobsFolder + "' does not exist for file blobs/storage");
             }
             if (!File.Exists(Path.Combine(blobsFolder, "blobsroot.ini")))
             {
-                MessageBox.Show("File '" + Path.Combine(blobsFolder, "blobsroot.ini") + "' does not exist. This is a safety precaution: you may add an empty file with that name.");
-                new Error();
+                new Error("File '" + Path.Combine(blobsFolder, "blobsroot.ini") + "' does not exist. This is a safety precaution: you may add an empty file with that name.");
             }
 
             List<string> getFilesNew = new List<string>();
@@ -491,14 +486,13 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                         string dLinkFileWithPath = Path.Combine(G.CleanupFolderName(gitFolder, false), G.CleanupFolderName(dlinkFile2, false));
                         if (!File.Exists(dLinkFileWithPath))
                         {
-                            MessageBox.Show("This ." + Program.options.databank_dlink_name + " file does not exist: '" + dLinkFileWithPath + "'");
-                            new Error();
+                            new Error("This ." + Program.options.databank_dlink_name + " file does not exist: '" + dLinkFileWithPath + "'");                            
                         }
                         DlinkFile dlinkFileData = G.YamlReader<DlinkFile>(dLinkFileWithPath);
                         string dataFile = DlinkCommon.Dlink_FromDlinkFileToDataFile(dLinkFileWithPath, true);
                         if (G.NullOrBlanks(dataFile))
                         {
-                            MessageBox.Show("Failed getting from .dlink file '" + dLinkFileWithPath + "' to data file name"); new Error();
+                            new Error("Failed getting from .dlink file '" + dLinkFileWithPath + "' to data file name");
                         }
                         FileInfo fi1 = new FileInfo(dataFile); //File may not exist                
                         bool exists = fi1.Exists;
@@ -722,8 +716,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                             }
                             catch
                             {
-                                MessageBox.Show("Could not extract data hash from inside .gbk file (" + Globals.databankInfoName + ").\nFile: " + filePath);
-                                throw;
+                                new Error("Could not extract data hash from inside .gbk file (" + Globals.databankInfoName + ").\nFile: " + filePath);
                             }
                         }
                     }
@@ -753,27 +746,82 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             return value > 0 ? (long?)value : null;
         }
 
+        /// <summary>
+        /// Note: Globals.alreadyZipped may change in some future Gekko version (and even change back)
+        /// </summary>
+        /// <param name="dataFile"></param>
+        /// <returns></returns>
+        public static bool ShouldZipBlobByCurrentPolicy(string dataFile)
+        {
+            return !Globals.alreadyZipped.Contains(Path.GetExtension(dataFile), StringComparer.OrdinalIgnoreCase);
+        }
+
+        private class BlobLocation
+        {
+            public readonly string path;
+            public readonly bool zipped; //how to interpret the file AT path -- from ITS suffix, a settled fact, never a fresh policy guess
+            public BlobLocation(string path, bool zipped)
+            {
+                this.path = path;
+                this.zipped = zipped;
+            }
+        }
+
+        /// <summary>
+        /// Locates sha256's blob on disk, trying, in order:
+        ///   1. The two-level path (\xx\yy\hash_z or \xx\yy\\hash_r) with the suffix TODAY's policy
+        ///      (ShouldZipBlobByCurrentPolicy) says fileNameAndPath's extension should have. Right
+        ///      for the overwhelming majority of blobs, since whatever wrote this one presumably
+        ///      used the same policy that's in effect now.
+        ///   2. The SAME two-level path with the OTHER suffix -- in case Globals.alreadyZipped's
+        ///      membership changed since this specific blob was written. A blob's own suffix is a
+        ///      permanent, self-describing fact about that exact file; the policy check above is
+        ///      only ever used to decide which suffix to try FIRST, never to decide how to actually
+        ///      read a file once found -- that always comes from the suffix that's actually there.
+        /// Returns null if the blob exists nowhere.
+        /// </summary>
+        private static BlobLocation ResolveExistingBlob(string blobsFolder, string sha256, string fileNameAndPath)
+        {
+            string level1 = sha256.Substring(0, 2);
+            string level2 = sha256.Substring(2, 2);
+            bool policyZipped = ShouldZipBlobByCurrentPolicy(fileNameAndPath);
+
+            string primarySuffix = policyZipped ? "_z" : "_r";
+            string primaryPath = Path.Combine(blobsFolder, level1, level2, sha256 + primarySuffix);
+            if (File.Exists(primaryPath))
+            {
+                return new BlobLocation(primaryPath, policyZipped);
+            }
+
+            string otherSuffix = policyZipped ? "_r" : "_z";
+            string otherPath = Path.Combine(blobsFolder, level1, level2, sha256 + otherSuffix);
+            if (File.Exists(otherPath))
+            {
+                return new BlobLocation(otherPath, !policyZipped);
+            }
+
+            return null;
+        }
+
         public static void SyncBlobs(bool isGet, string fileNameAndPath, string sha256, string blobsFolder, List<string> getFilesNew, List<string> getFilesOverwrite, List<string> putFiles)
         {
             // This uses atomic writes.
-            
-            string shapart1 = sha256.Substring(0, 2);
-            string shapart2 = sha256; //We do not want file "abcdefg" to become "\ab\cdefg", but prefer it to become "\ab\abcdefg". Easier to search for etc. even though Git does the former.
+
             if (isGet)
             {
                 // ------------------------------------
                 // Getting
                 // ------------------------------------
-                if (!File.Exists(Path.Combine(blobsFolder, shapart1, shapart2)))
+                BlobLocation location = ResolveExistingBlob(blobsFolder, sha256, fileNameAndPath);
+                if (location == null)
                 {
-                    MessageBox.Show("For '" + fileNameAndPath + "', could not find blob file '" + Path.Combine(blobsFolder, shapart1, shapart2) + "'");
-                    new Error();
+                    new Error("For '" + fileNameAndPath + "', could not find a blob file for hash '" + sha256 + "' under '" + blobsFolder + "'");                    
                 }
                 else
                 {
                     if (File.Exists(fileNameAndPath)) getFilesOverwrite.Add(fileNameAndPath);
                     else getFilesNew.Add(fileNameAndPath);
-                    BlobsFileGet(fileNameAndPath, Path.Combine(blobsFolder, shapart1, shapart2));
+                    BlobsFileGet(fileNameAndPath, location.path, location.zipped);
                 }
             }
             else
@@ -787,28 +835,21 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     return;
                 }
 
-                string blobsFile = Path.Combine(blobsFolder, shapart1, shapart2);
-                if (!Directory.Exists(Path.Combine(blobsFolder, shapart1)))
+                BlobLocation existingLocation = ResolveExistingBlob(blobsFolder, sha256, fileNameAndPath);
+                if (existingLocation == null)
                 {
-                    Directory.CreateDirectory(Path.Combine(blobsFolder, shapart1));
-                    BlobsFilePut(fileNameAndPath, blobsFile);
+                    //No need to copy it if we already have it anywhere (new two-level layout,
+                    //either suffix) -- this is only reached when it's genuinely nowhere yet, so
+                    //write it fresh, at the new two-level, suffixed location, using today's policy
+                    //(the only sensible choice for content that's never been stored).                               
+                    bool blobZipped = ShouldZipBlobByCurrentPolicy(fileNameAndPath);
+                    string level1 = sha256.Substring(0, 2);
+                    string level2 = sha256.Substring(2, 2);
+                    string blobsFile = Path.Combine(blobsFolder, level1, level2, sha256 + (blobZipped ? "_z" : "_r"));
+                    Directory.CreateDirectory(Path.Combine(blobsFolder, level1, level2));
+                    BlobsFilePut(fileNameAndPath, blobsFile, blobZipped);
                     putFiles.Add(fileNameAndPath);
                 }
-                else
-                {
-                    if (File.Exists(Path.Combine(blobsFolder, shapart1, shapart2)))
-                    {
-                        //No need to copy it: same file is already there
-                        //TODO TODO TODO                        
-                        //TODO TODO TODO ---> if a gbk is newer but with same datahash, we could add the new one (may have better meta information --> but we have now added meta info to data hash, so...)
-                        //TODO TODO TODO                        
-                    }
-                    else
-                    {
-                        BlobsFilePut(fileNameAndPath, blobsFile);
-                        putFiles.Add(fileNameAndPath);
-                    }
-                }                
                 DlinkHashCache.SetBlobConfirmed(fileNameAndPath, sha256);
             }
         }
@@ -838,9 +879,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 }
 
                 //tempPath may have inherited the ReadOnly attribute from whatever writeAction copied it
-                //from (e.g. a blob file, which BlobsFilePut always marks read-only). It's our own scratch
-                //file, so strip it -- otherwise the move/delete below, or the cleanup in "finally", can
-                //fail with UnauthorizedAccessException.
+                //from (e.g. a blob file, which BlobsFilePut always marks read-only).
                 FileAttributes tempAttr = File.GetAttributes(tempPath);
                 if ((tempAttr & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
                 {
@@ -857,11 +896,12 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     {
                         File.Move(tempPath, finalPath);
                     }
-                    catch (IOException)
-                    {
-                        //Lost a race between the check above and the move -- finalPath now exists
-                        //with (by construction, same hash) the same content, so this is not an error.
-                        if (!File.Exists(finalPath)) new Writeln("Dlink data file storage issue: " + finalPath);
+                    catch (Exception ex)
+                    {                        
+                        if (!File.Exists(finalPath))
+                        {
+                            new Error("Filed to write '" + finalPath + "' from temp file '" + tempPath + "': " + ex.Message);                            
+                        }
                     }
                 }
                 else
@@ -898,7 +938,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             }
         }
 
-        private static void BlobsFileGet(string fileNameAndPath, string blobsFile)
+        private static void BlobsFileGet(string fileNameAndPath, string blobsFile, bool blobZipped)
         {
             //TODO
             //TODO
@@ -911,7 +951,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             
             AtomicWrite(fileNameAndPath, false, tempPath =>
             {
-                if (Globals.alreadyZipped.Contains(Path.GetExtension(fileNameAndPath), StringComparer.OrdinalIgnoreCase))
+                if (!blobZipped) //New: was Globals.alreadyZipped.Contains(Path.GetExtension(fileNameAndPath), ...) -- now decided by ResolveExistingBlob, from the blob's OWN suffix, and passed in
                 {
                     File.Copy(blobsFile, tempPath, true);
                 }
@@ -920,21 +960,23 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     using (ZipArchive archive = ZipFile.OpenRead(blobsFile))
                     {
                         ZipArchiveEntry entry = archive.GetEntry("storage");
-                        if (entry != null)
-                        {
-                            entry.ExtractToFile(tempPath, true);
+                        if (entry == null)
+                        {                            
+                            new Error("File '" + blobsFile + "' is a zip archive but has no 'storage' entry which was expected -- the file may be corrupt.");
+                            new Error();
                         }
+                        entry.ExtractToFile(tempPath, true);
                     }
                 }
             });
             G.ReadOnlyRemove(fileNameAndPath);
         }
 
-        private static void BlobsFilePut(string fileName, string blobsFile)
+        private static void BlobsFilePut(string fileName, string blobsFile, bool blobZipped)
         {            
             AtomicWrite(blobsFile, true, tempPath =>
             {
-                if (Globals.alreadyZipped.Contains(Path.GetExtension(fileName), StringComparer.OrdinalIgnoreCase))
+                if (!blobZipped) //New: was Globals.alreadyZipped.Contains(Path.GetExtension(fileName), ...) -- now decided once by SyncBlobs (ShouldZipBlobByCurrentPolicy) and passed in
                 {
                     File.Copy(fileName, tempPath);
                 }
@@ -1379,7 +1421,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         public static void StagingOrMainError(List<string> m2)
         {
             //Sanity check, hacky for now
-            List<string> m = new List<string>() { "staging", "main", "prod", "production", "test", "staging2" };
+            List<string> m = new List<string>() { "staging", "main", "prod", "production", "test", "datatest" };
             foreach (string s in m)
             {
                 if (G.Equal(m2[0], s)) new Error("Cannot sync files in a sub-folder that starts with a non-username (here: '" + s + "'). Foldername: '" + Stringlist.Path_FromListToString(m2, "\\") + "'");

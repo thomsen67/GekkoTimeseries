@@ -2347,9 +2347,11 @@ namespace Gekko
         /// True if the current thread is a DECOMP or FIND thread (these threads are used for DECOMP or FIND windows).
         /// </summary>
         /// <returns></returns>
-        public static bool IsDecompOrFindThread()
+        public static bool ShowErrorsAsMessageBox()
         {
-            return Thread.CurrentThread.Name == "Find" || Thread.CurrentThread.Name == "Decomp" || Thread.CurrentThread.Name == "Flow" || Thread.CurrentThread.Name == "Plot";
+            return Thread.CurrentThread.Name == "Find" || Thread.CurrentThread.Name == "Decomp" 
+                || Thread.CurrentThread.Name == "Flow" || Thread.CurrentThread.Name == "Plot"
+                || Globals.showErrorsAsMessageBox;
         }
 
         /// <summary>

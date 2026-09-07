@@ -142,7 +142,7 @@ namespace Gekko
         /// </summary>
         public void Exe1(Exception e)
         {
-            if (type == EWrapType.Error && this.throwExceptionForError && !G.IsDecompOrFindThread())
+            if (type == EWrapType.Error && this.throwExceptionForError && !G.ShowErrorsAsMessageBox())
             {
                 //if throwExceptionForError == false, an exception is not thrown, and CrossThreadStuff.Wrap() will print the error below.
                 //if decomp or find thread, the error is thrown later on.
@@ -180,7 +180,7 @@ namespace Gekko
                 Globals.numberOfWarnings++;
             }
 
-            if (G.IsDecompOrFindThread()) this.Exe2();  //keep it on its own thread
+            if (G.ShowErrorsAsMessageBox()) this.Exe2();  //keep it on its own thread
             else CrossThreadStuff.Wrap(this);  //calls .Exe2() on the GUI thread.
         }
 
@@ -267,7 +267,7 @@ namespace Gekko
                 O.Cls("output");
             }
 
-            if (G.IsDecompOrFindThread())
+            if (G.ShowErrorsAsMessageBox())
             {
                 if (Globals.decompIsCalculatingButtonColors)
                 {
