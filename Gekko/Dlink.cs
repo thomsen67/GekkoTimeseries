@@ -1361,10 +1361,8 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             List<string> m1 = Stringlist.Path_FromStringToList(dlinkFile);
             List<string> m2 = Stringlist.Path_RemoveStart(m1, dataStart1, reportError);
             if (m2 == null) return null; //Can only be == null from the above if reportError is false
-            DlinkCommon.StagingOrMainError(m2);
             List<string> m3 = m2.ToList(); //copy
             if (!G.NullOrBlanks(Program.options.databank_dlink_folder_remove1)) m3 = Stringlist.Path_RemoveString(m3, Program.options.databank_dlink_folder_remove1, 1);
-            //if (!G.NullOrBlanks(Program.options.databank_dlink_folder_remove2)) m3 = Stringlist.Path_RemoveString(m3, Program.options.databank_dlink_folder_remove2, 1);
             List<string> m4 = Stringlist.Path_ReplaceString(m3, Program.options.databank_dlink_folder_replace1b, Program.options.databank_dlink_folder_replace1a, 1);
             m4 = Stringlist.Path_ReplaceString(m4, Program.options.databank_dlink_folder_replace2b, Program.options.databank_dlink_folder_replace2a, 1);
             m4 = Stringlist.Path_ReplaceString(m4, Program.options.databank_dlink_folder_replace3b, Program.options.databank_dlink_folder_replace3a, 1);
@@ -1405,10 +1403,10 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             }
             List<string> m1 = Stringlist.Path_FromStringToList(dataFile);
             List<string> m2 = Stringlist.Path_RemoveStart(m1, dataStart1, reportError);
-            if (m2 == null) return null; //Can only be == null from the above if reportError is false. We allow this for .dlink construction, so that an opened file in a "foreign" folder is ok to read in (no .dlink constucted in that case)
-            DlinkCommon.StagingOrMainError(m2);
+            if (m2 == null) return null; //Can only be == null from the above if reportError is false. We allow this for .dlink construction, so that an opened file in a "foreign" folder is ok to read in (no .dlink constucted in that case)            
+            int i = 2; if (DlinkCommon.StagingOrMainError(m2)) i = 1;
             List<string> m3 = m2.ToList(); //copy
-            if (!G.NullOrBlanks(Program.options.databank_dlink_folder_remove1)) m3.Insert(2, Program.options.databank_dlink_folder_remove1); //hacky, in middle                        
+            if (!G.NullOrBlanks(Program.options.databank_dlink_folder_remove1)) m3.Insert(i, Program.options.databank_dlink_folder_remove1); //hacky, in middle
             List<string> m4 = Stringlist.Path_ReplaceString(m3, Program.options.databank_dlink_folder_replace1a, Program.options.databank_dlink_folder_replace1b, 1);
             m4 = Stringlist.Path_ReplaceString(m4, Program.options.databank_dlink_folder_replace2a, Program.options.databank_dlink_folder_replace2b, 1);
             m4 = Stringlist.Path_ReplaceString(m4, Program.options.databank_dlink_folder_replace3a, Program.options.databank_dlink_folder_replace3b, 1);
@@ -1419,14 +1417,15 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             return Stringlist.Path_FromListToString(m6, "\\");
         }
 
-        public static void StagingOrMainError(List<string> m2)
+        public static bool StagingOrMainError(List<string> m2)
         {
             //Sanity check, hacky for now
             List<string> m = new List<string>() { "staging", "main", "prod", "production", "test", "datatest" };
             foreach (string s in m)
             {
-                if (G.Equal(m2[0], s)) new Error("Cannot sync files in a sub-folder that starts with a non-username (here: '" + s + "'). Foldername: '" + Stringlist.Path_FromListToString(m2, "\\") + "'");
-            }            
+                if (G.Equal(m2[0], s)) return true;
+            }
+            return false;
         }
     }
 }

@@ -6896,6 +6896,13 @@ namespace Gekko
             DlinkHooks.CreateDlinkFilesManually(m2, true);
         }
 
+        public static IVariable makrobk_kilde(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {
+            string s1 = O.ConvertToString(x);
+            string s2 = DlinkCommon.Dlink_FromDlinkFileToDataFile(s1, true);
+            return new ScalarString(s2);
+        }
+
         public static IVariable eval(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
             //GekkoTime t1, t2; helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);

@@ -4370,37 +4370,57 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_DlinkPaths()
-        {
+        {            
+            Assert.AreEqual(@"k:\MAKROBK_KILDE\2025_10_01\tth\test",
+            DlinkCommon.Dlink_FromDlinkFileToDataFile(@"K:\MAKROBK\tth\test\makrobk_grunddata", false));
+
+            Assert.AreEqual(@"k:\MAKROBK_KILDE\2025_10_01\staging",
+            DlinkCommon.Dlink_FromDlinkFileToDataFile(@"K:\MAKROBK\staging\makrobk_grunddata", false));
+
+            // AA    tth test XX biver _uddata_dlink
+            // AA YY tth test    biver _uddata
+            //
+            // AA    staging XX biver _uddata_dlink
+            // AA YY staging    biver _uddata
+            //
+
             Assert.AreEqual(@"k:\MAKROBK\tth\test\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink",
             DlinkCommon.Dlink_FromDataFileToDlinkFile(@"K:\MAKROBK_KILDE\2025_10_01\tth\test\biver\_uddata\x.csv", false));
 
             Assert.AreEqual(@"k:\MAKROBK_KILDE\2025_10_01\tth\test\biver\_uddata\x.csv",
             DlinkCommon.Dlink_FromDlinkFileToDataFile(@"K:\MAKROBK\tth\test\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink", false));
 
-            // --- FAILS, special names like 'staging' -------------------------------------------------------------
+            // -----------------------------------------------------------------------------------------------------
+            // --- Special names like 'staging' -------------------------------------------------------------
+            // -----------------------------------------------------------------------------------------------------
 
-            try
-            {
-                //Will not allow \staging here
-                string xx1 = DlinkCommon.Dlink_FromDataFileToDlinkFile(@"K:\MAKROBK_KILDE\2025_10_01\staging\biver\_uddata\x.csv", false);
-                Assert.Fail();
-            }
-            catch
-            {
+            Assert.AreEqual(@"k:\MAKROBK\staging\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink",
+            DlinkCommon.Dlink_FromDataFileToDlinkFile(@"K:\MAKROBK_KILDE\2025_10_01\staging\biver\_uddata\x.csv", false));
 
-            }
-            
-            try
-            {
-                //Will not allow \staging here
-                string xx2 = DlinkCommon.Dlink_FromDlinkFileToDataFile(@"K:\MAKROBK\staging\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink", false);
-                Assert.Fail();
-            }
-            catch
-            {                
-            }
+            Assert.AreEqual(@"k:\MAKROBK_KILDE\2025_10_01\staging\biver\_uddata\x.csv",
+            DlinkCommon.Dlink_FromDlinkFileToDataFile(@"K:\MAKROBK\staging\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink", false));
 
+            Assert.AreEqual(@"k:\MAKROBK\main\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink",
+            DlinkCommon.Dlink_FromDataFileToDlinkFile(@"K:\MAKROBK_KILDE\2025_10_01\main\biver\_uddata\x.csv", false));
+
+            Assert.AreEqual(@"k:\MAKROBK_KILDE\2025_10_01\main\biver\_uddata\x.csv",
+            DlinkCommon.Dlink_FromDlinkFileToDataFile(@"K:\MAKROBK\main\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink", false));
+
+
+            // ------- the following is bad, but it is what it is
+
+            //Wrong but true
+            Assert.AreEqual(@"k:\MAKROBK\xxx\biver\makrobk_grunddata\_uddata_dlink\x.csv.dlink",
+            DlinkCommon.Dlink_FromDataFileToDlinkFile(@"K:\MAKROBK_KILDE\2025_10_01\xxx\biver\_uddata\x.csv", false));
+
+            //Wrong but true
+            Assert.AreEqual(@"k:\MAKROBK_KILDE\2025_10_01\xxx\biver\_uddata\x.csv",
+            DlinkCommon.Dlink_FromDlinkFileToDataFile(@"K:\MAKROBK\xxx\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink", false));
+
+
+            // ----------------------------------------------------------------------------------------------------
             // --- FAILS, out-of-folder ---------------------------------------------------------------------------
+            // ----------------------------------------------------------------------------------------------------
 
             try
             {
