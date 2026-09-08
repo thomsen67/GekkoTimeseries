@@ -489,6 +489,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                             new Error("This ." + Program.options.databank_dlink_name + " file does not exist: '" + dLinkFileWithPath + "'");                            
                         }
                         DlinkFile dlinkFileData = G.YamlReader<DlinkFile>(dLinkFileWithPath);
+                        if (dlinkFileData.version != "1.0") new Error("Dlink file '" + dlinkFile2 + "' has dlink version " + dlinkFileData.version + ", which is unsupported in this Gekko version");
                         string dataFile = DlinkCommon.Dlink_FromDlinkFileToDataFile(dLinkFileWithPath, true);
                         if (G.NullOrBlanks(dataFile))
                         {
