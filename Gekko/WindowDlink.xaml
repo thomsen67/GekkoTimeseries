@@ -40,7 +40,7 @@
             <MenuItem Header="Copy dlink file path" Click="CopyDlinkFilePath_Click"/>
             <Separator/>
             <!-- Acts on every currently-selected row, not just the one right-clicked -->
-            <MenuItem Header="Delete selected row(s)" Click="DeleteSelectedRows_Click"/>
+            <MenuItem Header="Ignore selected row(s)" Click="DeleteSelectedRows_Click"/>
         </ContextMenu>
     </Window.Resources>
     <Grid Margin="10">

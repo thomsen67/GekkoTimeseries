@@ -215,23 +215,12 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
     public static class DlinkAutoDlinkFiles
     {
-
+        
         /// <summary>
-        /// Handles blobs, for .dlink. Use this when the caller doesn't already know the file's
-        /// variables/series counts.
+        /// Handles blobs, for .dlink.       
         /// </summary>
         /// <param name="dataFile"></param>
-        /// <param name="force"></param>
         public static void Blob(string dataFile, bool force)
-        {
-            Blob(dataFile, null, null, force);
-        }
-
-        /// <summary>
-        /// Handles blobs, for .dlink. nVariables/nSeries only ever end up persisted for .gbk files        
-        /// </summary>
-        /// <param name="dataFile"></param>
-        public static void Blob(string dataFile, long? nVariables, long? nSeries, bool force)
         {
             string hash = null;
             long? bytes = null;
@@ -249,15 +238,8 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 else
                 {
                     if (File.Exists(dataFile))
-                    {
-                        //fileVariables/fileSeries come back populated for .gbk files, at no
-                        //extra cost over the hash computation Blob() already needed to do. An
-                        //explicit nVariables/nSeries passed in by the caller (above) still wins --
-                        //we only fill in from the file itself where the caller passed null.
-                        long? fileVariables, fileSeries;
-                        hash = DlinkHooks.GetFileHash(dataFile, out fileVariables, out fileSeries); //TODO: WithWait or WaitFor...
-                        if (nVariables == null) nVariables = fileVariables;
-                        if (nSeries == null) nSeries = fileSeries;
+                    {                        
+                        hash = DlinkHooks.GetFileHash(dataFile); //TODO: WithWait or WaitFor...                        
                     }
                     else
                     {
@@ -271,17 +253,13 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     }
 
                     DlinkHashKind hashKind = DlinkHashKinds.Classify(dataFile);
-
-                    if (hashKind != DlinkHashKind.GbkDataHash)
-                    {
-                        nVariables = null; nSeries = null; //Even if present, we do not store these in .dlink file. We would like other software like Python be able to produce .dlink files that are compatible, without parsing/understanding the contents of the data file (for instance .csv file)
-                    }
+                                        
                     if (!DlinkHashKinds.IsByteCountMeaningful(hashKind))
                     {
                         bytes = null;
                     }
 
-                    DlinkFile blobInfo = new DlinkFile(hash, bytes, nVariables, nSeries, null);                    
+                    DlinkFile blobInfo = new DlinkFile(hash, bytes);
                     G.YamlWriter<DlinkFile>(blobInfo, dlinkFile);
                 }
             }
@@ -489,7 +467,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                             new Error("This ." + Program.options.databank_dlink_name + " file does not exist: '" + dLinkFileWithPath + "'");                            
                         }
                         DlinkFile dlinkFileData = G.YamlReader<DlinkFile>(dLinkFileWithPath);
-                        if (dlinkFileData.version != "1.0") new Error("Dlink file '" + dlinkFile2 + "' has dlink version " + dlinkFileData.version + ", which is unsupported in this Gekko version");
+                        if (dlinkFileData.version != "1.1") new Error("Dlink file '" + dlinkFile2 + "' has dlink version " + dlinkFileData.version + ", which is unsupported in this Gekko version");
                         string dataFile = DlinkCommon.Dlink_FromDlinkFileToDataFile(dLinkFileWithPath, true);
                         if (G.NullOrBlanks(dataFile))
                         {
@@ -534,7 +512,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                             //We update the realFile, because its contents have changed
                             realFile = new RealFile(realFile.name, dlinkFileData.hash, fi2.Length, fi2.LastWriteTimeUtc, true);
                             //Hash cache remembers this for later
-                            DlinkHashCache.Set(realFile.name, fi2.Length, fi2.LastWriteTimeUtc, dlinkFileData.hash, dlinkFileData.variables, dlinkFileData.series); //Variables/series -- already sitting right there on dlinkFileData, no extra work to grab them
+                            DlinkHashCache.Set(realFile.name, fi2.Length, fi2.LastWriteTimeUtc, dlinkFileData.hash);
                             DlinkHashCache.SetBlobConfirmed(realFile.name, dlinkFileData.hash);
                         }
                         if ((currentFileIndex == dlinkFiles.Count) || progressStopwatch.ElapsedMilliseconds >= progressReportIntervalMs)
@@ -668,33 +646,25 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             return typeTemp;
         }        
                 
-        public static string GetFileHash(string filePath, out long? variables, out long? series)
+        public static string GetFileHash(string filePath)
         {
             FileInfo fi = new FileInfo(filePath);
-            return GetFileHash(filePath, fi.Length, fi.LastWriteTimeUtc, out variables, out series);
-        }        
+            return GetFileHash(filePath, fi.Length, fi.LastWriteTimeUtc);
+        }                
         
         public static string GetFileHash(string filePath, long knownSize, DateTime knownLastWriteUtc)
-        {
-            long? variables, series; // Discarded here -- see the out-param overload below
-            return GetFileHash(filePath, knownSize, knownLastWriteUtc, out variables, out series);
-        }
-
-        public static string GetFileHash(string filePath, long knownSize, DateTime knownLastWriteUtc, out long? variables, out long? series)
         {
             if (G.DlinkDebug()) MessageBox.Show("Getting hash from " + filePath);
 
             // ---- LRU cache lookup ---------------------------------------------------------
-            string cachedHash = DlinkHashCache.TryGet(filePath, knownSize, knownLastWriteUtc, out variables, out series);
+            string cachedHash = DlinkHashCache.TryGet(filePath, knownSize, knownLastWriteUtc);
             if (cachedHash != null)
             {
                 if (G.DlinkDebug()) MessageBox.Show("Getting hash from LRU cache");
                 return cachedHash;
             }            
 
-            string hash = null;
-            variables = null; //stays null unless the .gbk branch below finds real counts
-            series = null;
+            string hash = null;            
 
             if (DlinkHashKinds.Classify(filePath) == DlinkHashKind.GbkDataHash)
             {
@@ -711,9 +681,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                                 string traceVersion = null;
                                 string tempFileNameWithPath = Program.WaitForZipExtractFileEntryToTempFile(entry, filePath);
                                 Program.GetDatabankInfo(readInfo, tempFileNameWithPath, out databankVersion, out traceVersion);
-                                hash = readInfo.dataHashFull;
-                                variables = NullIfZero(readInfo.variables); //New
-                                series = NullIfZero(readInfo.series); //New
+                                hash = readInfo.dataHashFull;                                
                             }
                             catch
                             {
@@ -735,17 +703,12 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 if (G.DlinkDebug()) MessageBox.Show("Getting hash from xml");
             }
 
-            // ---- Remember this result for next time -----------------------------------------
-            DlinkHashCache.Set(filePath, knownSize, knownLastWriteUtc, hash, variables, series); //variables, series -- so a later cache hit can still return them
+            // ---- Remember this result for next time -----------------------------------------            
+            DlinkHashCache.Set(filePath, knownSize, knownLastWriteUtc, hash);
             // ----------------------------------------------------------------------------------------
 
             return hash;
-        }
-                
-        private static long? NullIfZero(int value)
-        {
-            return value > 0 ? (long?)value : null;
-        }
+        }        
 
         /// <summary>
         /// Note: Globals.alreadyZipped may change in some future Gekko version (and even change back)
@@ -1003,24 +966,18 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
     public class DlinkFile
     {
-        public readonly string version = "1.0";
+        public readonly string version = "1.1";
         public string hash { get; private set; }
-        public long? bytes { get; private set; }        
-        public long? variables { get; private set; }        
-        public long? series { get; private set; } //normal series + array-subseries
-        public string extra { get; private set; }
+        public long? bytes { get; private set; }                
 
         public DlinkFile()
         {
         }
 
-        public DlinkFile(string hash, long? bytes, long? nVariables, long? nSeries, string extra)
+        public DlinkFile(string hash, long? bytes)
         {
             this.hash = hash;
-            this.bytes = bytes;
-            this.variables = nVariables;
-            this.series = nSeries;
-            this.extra = extra;
+            this.bytes = bytes;            
         }
     }
 
@@ -1047,12 +1004,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
     //    
     // This cache lets GetFileHash skip recomputing a SHA-256 (or, for .gbk files, re-extracting the
     // embedded metadata) when a file's size and last-write-time still match what was recorded the
-    // last time it was hashed.
-    //
-    // New: entries also remember a .gbk file's variables/series counts alongside its hash, so a
-    // cache HIT can still report them -- without this, GetFileHash's .gbk-metadata read (the only
-    // place these are discovered) would simply never run on a hit, and Blob() would silently regress
-    // to "unknown" for a file it had already seen before.
+    // last time it was hashed.    
     //
     // It is a plain static cache: one instance per Gekko.exe run, loaded from disk on first use.
     // Because each hook invocation is its own process (see the "_common" hook script in DlinkSetup,
@@ -1129,7 +1081,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             }
             _loaded = true;
 
-            if (G.Equal(Environment.UserName, "tth"))
+            if (false && G.Equal(Environment.UserName, "tth"))
             {                
                 long fileSizeBytes = File.Exists(CacheFilePath) ? new FileInfo(CacheFilePath).Length : 0;
                 MessageBox.Show("TTH: Hash cache load took " + (double)sw.ElapsedMilliseconds / 1000d + " s for " + _map.Count + " entries (" + fileSizeBytes + " bytes on disk)");
@@ -1141,7 +1093,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// of what was recorded last time). Returns null on a miss -- and, variables/series are
         /// also null on any miss, regardless of what an earlier (now-stale) entry for this path held.
         /// </summary>
-        public static string TryGet(string filePath, long size, DateTime lastWriteUtc, out long? variables, out long? series)
+        public static string TryGet(string filePath, long size, DateTime lastWriteUtc)
         {
             lock (_lock)
             {
@@ -1149,30 +1101,25 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 EnsureLoaded();
                 LinkedListNode<HashCacheEntry> node;
                 if (!_map.TryGetValue(filePath, out node))
-                {
-                    variables = null; series = null; 
+                {                    
                     return null;
                 }
 
                 HashCacheEntry e = node.Value;
                 if (e.bytes != size)
-                {
-                    variables = null; series = null; 
+                {                    
                     return null;
                 }
                 long ticksNow = ToTicksSinceEpoch(lastWriteUtc);
                 if (Math.Abs(ticksNow - e.stamp) > ToleranceTicks)
-                {
-                    variables = null; series = null; 
+                {                    
                     return null;
                 }
 
                 //Hit: touch it so it counts as recently used
                 countHit++;
                 _lru.Remove(node);
-                _lru.AddFirst(node);
-                variables = e.variables; //New
-                series = e.series; //New
+                _lru.AddFirst(node);                
                 return e.hash;
             }
         }
@@ -1183,7 +1130,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// once the cache is over capacity. Does not touch disk -- call Save() once
         /// after a batch of files.
         /// </summary>
-        public static void Set(string filePath, long bytes, DateTime lastWriteUtc, string hash, long? variables, long? series)
+        public static void Set(string filePath, long bytes, DateTime lastWriteUtc, string hash)
         {
             lock (_lock)
             {
@@ -1199,15 +1146,13 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     }
                     existing.Value.bytes = bytes;
                     existing.Value.stamp = stamp;
-                    existing.Value.hash = hash;
-                    existing.Value.variables = variables;
-                    existing.Value.series = series;
+                    existing.Value.hash = hash;                    
                     _lru.Remove(existing);
                     _lru.AddFirst(existing);
                 }
                 else
                 {
-                    HashCacheEntry entry = new HashCacheEntry { path = filePath, bytes = bytes, stamp = stamp, hash = hash, variables = variables, series = series }; //New: variables, series
+                    HashCacheEntry entry = new HashCacheEntry { path = filePath, bytes = bytes, stamp = stamp, hash = hash }; //New: variables, series
                     LinkedListNode<HashCacheEntry> node = _lru.AddFirst(entry);
                     _map[filePath] = node;
                     if (_map.Count > Program.options.databank_dlink_cache)
@@ -1284,7 +1229,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     //No catastrophe is this happens
                 }
             }
-            if (G.Equal(Environment.UserName, "tth"))
+            if (false && G.Equal(Environment.UserName, "tth"))
             {                
                 long fileSizeBytes = File.Exists(CacheFilePath) ? new FileInfo(CacheFilePath).Length : 0;
                 MessageBox.Show("TTH: Hash cache save took " + (double)sw.ElapsedMilliseconds / 1000d + " s for " + _map.Count + " entries (" + fileSizeBytes + " bytes on disk)");
@@ -1314,9 +1259,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         [ProtoMember(1)] public string path;
         [ProtoMember(2)] public long bytes; 
         [ProtoMember(3)] public long stamp; //ticks (100ns units) since DlinkHashCache's fixed epoch 
-        [ProtoMember(4)] public string hash;
-        [ProtoMember(5)] public long? variables;
-        [ProtoMember(6)] public long? series;
+        [ProtoMember(4)] public string hash;        
         //True once we've confirmed (via SyncBlobs) that the blob for "hash" is present in blob storage.
         //Reset to false whenever hash changes.
         [ProtoMember(7)] public bool blobConfirmed; //New

@@ -51,9 +51,109 @@ using AngouriMath;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
+using System.Buffers;
 
 namespace Gekko
 {
+
+    public class Pool
+    {
+        const int N = 100_000_000;
+
+        public static void Test()
+        {
+            G.Writeln("Warming up...");
+            TestNew(10000);
+            TestPool(10000);
+
+            G.Writeln();
+            G.Writeln("Benchmarking " + N.ToString("N0") + " iterations...");
+            G.Writeln();
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+
+            long gc0Before = GC.CollectionCount(0);
+            long gc1Before = GC.CollectionCount(1);
+            long gc2Before = GC.CollectionCount(2);
+
+            Stopwatch sw = Stopwatch.StartNew();
+            double result1 = TestNew(N);
+            sw.Stop();
+
+            G.Writeln("new double[5]:");
+            G.Writeln("  Time:        ms" + sw.Elapsed.TotalMilliseconds);
+            G.Writeln("  GC Gen 0:   "+  (GC.CollectionCount(0) - gc0Before));
+            G.Writeln("  GC Gen 1:   "+ (GC.CollectionCount(1) - gc1Before));
+            G.Writeln("  GC Gen 2:   "+ (GC.CollectionCount(2) - gc2Before));
+            G.Writeln("  Result:     " + result1);
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+
+            gc0Before = GC.CollectionCount(0);
+            gc1Before = GC.CollectionCount(1);
+            gc2Before = GC.CollectionCount(2);
+
+            sw.Restart();
+            double result2 = TestPool(N);
+            sw.Stop();
+
+            G.Writeln();
+            G.Writeln("ArrayPool<double>:");
+            G.Writeln("  Time:       ms"+ sw.Elapsed.TotalMilliseconds);
+            G.Writeln("  GC Gen 0:   "+ (GC.CollectionCount(0) - gc0Before));
+            G.Writeln("  GC Gen 1:   "+ (GC.CollectionCount(1) - gc1Before));
+            G.Writeln("  GC Gen 2:   "+ (GC.CollectionCount(2) - gc2Before));
+            G.Writeln("  Result:     " + result2);
+        }
+
+        static double TestNew(int count)
+        {
+            double result = 0;
+
+            for (int i = 0; i < count; i++)
+            {
+                double[] a = new double[5];
+
+                a[0] = 1.0;
+                //a[1] = 2.0;
+                //a[2] = 3.0;
+                //a[3] = 4.0;
+                a[4] = 5.0;
+
+                result += a[4];
+            }
+
+            return result;
+        }
+
+        static double TestPool(int count)
+        {
+            double result = 0;
+
+            ArrayPool<double> pool = ArrayPool<double>.Shared;
+
+            for (int i = 0; i < count; i++)
+            {
+                double[] a = pool.Rent(5);
+
+                a[0] = 1.0;
+                //a[1] = 2.0;
+                //a[2] = 3.0;
+                //a[3] = 4.0;
+                a[4] = 5.0;
+
+                result += a[4];
+
+                pool.Return(a);
+            }
+
+            return result;
+        }
+    }
 
     public enum EMessageBox
     {
@@ -2980,7 +3080,8 @@ namespace Gekko
             if (Globals.runningOnTTComputer)
             {
                 if (true)
-                {                    
+                {
+                    Pool.Test();
                 }
 
                 if (false)
@@ -6828,7 +6929,7 @@ namespace Gekko
                 {
                     //READ. We cannot handle OPEN here, because an OPENed databank may be edited before CLOSE.
                     //      So CLOSE handles this.
-                    DlinkAutoDlinkFiles.Blob(blob, databank.storage.Count(), databank.CountFlattenedArrayTimeseries(), false);                    
+                    DlinkAutoDlinkFiles.Blob(blob, false);                    
                 }
             }  //for each bank in list
 
@@ -7990,6 +8091,7 @@ namespace Gekko
                 foreach (XmlNode dataHash in dataHashes) //should be only 1 in this loop
                 {
                     readInfo.dataHashFull = dataHash.InnerText.Trim();
+                    if (G.NullOrBlanks(readInfo.dataHash)) readInfo.dataHash = null; //Used in Dlink.cs, should be null rather than "".
                     readInfo.dataHash = readInfo.dataHashFull;                    
                     if (!G.NullOrBlanks(readInfo.dataHash)) readInfo.dataHash = readInfo.dataHash.Length > 8 ? readInfo.dataHash.Substring(0, 8) : readInfo.dataHash;
                 }
@@ -24745,7 +24847,7 @@ namespace Gekko
                 }
             }
 
-            DlinkAutoDlinkFiles.Blob(blob, count, databank.CountFlattenedArrayTimeseries(), false); //see also #poakj34lkjafs3f
+            DlinkAutoDlinkFiles.Blob(blob, false); //see also #poakj34lkjafs3f
             return count;
         }
 
@@ -26297,7 +26399,7 @@ namespace Gekko
             //a .dlink file.
             if (File.Exists(removed.FileNameWithPath)) //probably always exists...
             {
-                DlinkAutoDlinkFiles.Blob(removed.FileNameWithPath, removed.storage.Count(), removed.CountFlattenedArrayTimeseries(), false);
+                DlinkAutoDlinkFiles.Blob(removed.FileNameWithPath, false);
             }
 
             if (Program.IsDatabankDirty(removed))
