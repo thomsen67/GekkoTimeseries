@@ -96,11 +96,12 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Extension" Binding="{Binding Extension}" Width="60"/>
                 <!-- MB column. Bound to the unrounded SizeMB (StringFormat only affects the
                      displayed text), so sorting CanUserSort is on by default here, since this is
                      a plain Binding, unlike the Path column above compares actual size, not the
                      rounded/formatted string. -->
-                <DataGridTextColumn Header="MB" Binding="{Binding SizeMB, StringFormat={}{0:F1}}" Width="60">
+                <DataGridTextColumn Header="MB" Binding="{Binding SizeMB, StringFormat={}{0:F1}}" Width="50">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="HorizontalAlignment" Value="Right"/>

@@ -40,7 +40,7 @@ namespace Gekko
             ActivateOnlyHooks,
             ActivateOnlySync,
             DeactivateHooks,
-        }
+        }        
         
         /// <summary>
         /// When called, parentPath will be the folder wherein the folder \.git resides, and
@@ -168,26 +168,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 new Error();
             }
         }
-    }
-    
-    public enum DlinkHashKind
-    {
-        /// <summary>
-        /// Default: SHA-256 of the file's raw bytes. Byte count IS meaningful here: same byte count + same hash implies an identical
-        /// file, so DoDlinkFileAndDataFileCorrespond() can reject a mismatch on byte count alone, without hashing at all.
-        /// </summary>
-        PhysicalFileHash,
-        /// <summary>
-        /// .px only: SHA-256 with the "CREATION-DATE=..." line omitted (see G.FileHasher.GetSha256FromFile). Byte count is NOT meaningful.
-        /// </summary>
-        PxContentHash,
-        /// <summary>
-        /// .gbk only: a data hash Gekko already wrote into the file's own metadata, and also
-        /// counts of variables and series. Byte count is NOT meaningful.
-        /// For .gbk's without data hash inside, the system falls back on .PhysicalFileHash.
-        /// </summary>
-        GbkDataHash,
-    }
+    }    
 
     public static class DlinkHashKinds
     {
@@ -196,20 +177,25 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// place Blob() and GetFileHash() both ask this question -- change what counts as a .px/.gbk
         /// file here, and both follow automatically.
         /// </summary>
-        public static DlinkHashKind Classify(string filePath)
+        public static DlinkCommon.EDlinkHashKind Classify(string filePath)
         {
-            if (G.Equal(Path.GetExtension(filePath), ".px")) return DlinkHashKind.PxContentHash;
-            if (G.Equal(Path.GetExtension(filePath), ".gbk")) return DlinkHashKind.GbkDataHash;
-            return DlinkHashKind.PhysicalFileHash;
+            return ClassifyByExtension(Path.GetExtension(filePath));
+        }
+        
+        public static DlinkCommon.EDlinkHashKind ClassifyByExtension(string extension)
+        {
+            if (G.Equal(extension, ".px")) return DlinkCommon.EDlinkHashKind.PxContentHash;
+            if (G.Equal(extension, ".gbk")) return DlinkCommon.EDlinkHashKind.GbkDataHash;
+            return DlinkCommon.EDlinkHashKind.PhysicalFileHash;
         }
 
         /// <summary>
         /// True only for the one kind where persisting this file's byte count alongside its hash is
         /// safe.
         /// </summary>
-        public static bool IsByteCountMeaningful(DlinkHashKind kind)
+        public static bool IsByteCountMeaningful(DlinkCommon.EDlinkHashKind kind)
         {
-            return kind == DlinkHashKind.PhysicalFileHash;
+            return kind == DlinkCommon.EDlinkHashKind.PhysicalFileHash;
         }
     }
 
@@ -252,7 +238,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                         Directory.CreateDirectory(Path.GetDirectoryName(dlinkFile));
                     }
 
-                    DlinkHashKind hashKind = DlinkHashKinds.Classify(dataFile);
+                    DlinkCommon.EDlinkHashKind hashKind = DlinkHashKinds.Classify(dataFile);
                                         
                     if (!DlinkHashKinds.IsByteCountMeaningful(hashKind))
                     {
@@ -664,9 +650,27 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 return cachedHash;
             }            
 
+            string hash = ComputeHashUncached(filePath);
+
+            // ---- Remember this result for next time -----------------------------------------            
+            DlinkHashCache.Set(filePath, knownSize, knownLastWriteUtc, hash);
+            // ----------------------------------------------------------------------------------------
+
+            return hash;
+        }        
+
+        private static string ComputeHashUncached(string filePath, string forceFileType = null)
+        {
+            if (forceFileType != null && !G.Equal(forceFileType, ".px") && !G.Equal(forceFileType, ".gbk"))
+            {
+                throw new ArgumentException("forceFileType must be null, \".px\", or \".gbk\" -- got '" + forceFileType + "'.");
+            }
+
+            DlinkCommon.EDlinkHashKind hashKind = forceFileType != null ? DlinkHashKinds.ClassifyByExtension(forceFileType) : DlinkHashKinds.Classify(filePath);
+
             string hash = null;            
 
-            if (DlinkHashKinds.Classify(filePath) == DlinkHashKind.GbkDataHash)
+            if (hashKind == DlinkCommon.EDlinkHashKind.GbkDataHash)
             {
                 using (ZipArchive archive = ZipFile.OpenRead(filePath))
                 {
@@ -696,19 +700,15 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             {
                 //if .gbk, this means that data hash is not implemented for that file
                 if (G.DlinkDebug()) MessageBox.Show("Getting hash from physical file");
-                hash =  G.FileHasher.GetSha256FromFile(filePath);
+                hash =  DlinkCommon.GetSha256FromFileWithDlink(filePath, DlinkCommon.EDlinkVersion.v1_1, forceFileType); //New: forceFileType passed through
             }
             else
             {
                 if (G.DlinkDebug()) MessageBox.Show("Getting hash from xml");
             }
 
-            // ---- Remember this result for next time -----------------------------------------            
-            DlinkHashCache.Set(filePath, knownSize, knownLastWriteUtc, hash);
-            // ----------------------------------------------------------------------------------------
-
             return hash;
-        }        
+        }
 
         /// <summary>
         /// Note: Globals.alreadyZipped may change in some future Gekko version (and even change back)
@@ -785,7 +785,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 {
                     if (File.Exists(fileNameAndPath)) getFilesOverwrite.Add(fileNameAndPath);
                     else getFilesNew.Add(fileNameAndPath);
-                    BlobsFileGet(fileNameAndPath, location.path, location.zipped);
+                    BlobsFileGet(fileNameAndPath, location.path, location.zipped, sha256); //New: sha256 passed through so BlobsFileGet can verify the fetched content
                 }
             }
             else
@@ -902,13 +902,10 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             }
         }
 
-        private static void BlobsFileGet(string fileNameAndPath, string blobsFile, bool blobZipped)
+        private static void BlobsFileGet(string fileNameAndPath, string blobsFile, bool blobZipped, string expectedHash)
         {
-            //TODO
-            //TODO
+            //New: the hash check below resolves this TODO.
             //TODO Maybe check that the sha hash is correct after fetching the file.
-            //TODO
-            //TODO
 
             //We always create the folder in case it does not already exist. For cloning this is obviously important.
             Directory.CreateDirectory(Path.GetDirectoryName(fileNameAndPath));
@@ -932,8 +929,45 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                         entry.ExtractToFile(tempPath, true);
                     }
                 }
+
+                //New: verify the just-fetched content actually hashes to what the .dlink file
+                //expects, BEFORE AtomicWrite (running next, once this lambda returns) moves
+                //anything into fileNameAndPath -- so a missing, corrupted, or replaced blob can
+                //never overwrite a good local file. Throws on mismatch; nothing here catches it,
+                //so it propagates out through AtomicWrite exactly like any other failure (see
+                //AtomicWrite's own remarks on how it treats an exception from writeAction).
+                VerifyFetchedBlobHash(tempPath, fileNameAndPath, expectedHash);
             });
             G.ReadOnlyRemove(fileNameAndPath);
+        }
+
+        /// <summary>
+        /// New: verifies that the just-fetched content at tempPath actually hashes to
+        /// expectedHash -- the mechanism behind "error if a blob is missing or its content
+        /// doesn't match the .dlink hash" (the "missing" half is handled earlier, in SyncBlobs,
+        /// by ResolveExistingBlob returning null; this handles "present but wrong").
+        ///
+        /// Passes originalFileNameAndPath's real extension as forceFileType, since tempPath
+        /// itself has a mangled, GUID-suffixed name (see AtomicWrite's temp-file naming) that
+        /// would otherwise make ComputeHashUncached (and G.FileHasher.GetSha256FromFile) silently
+        /// apply the wrong strategy for .px/.gbk content. No rename or copy needed -- forceFileType
+        /// decouples "which hashing strategy applies" from "what the file happens to be named", so
+        /// tempPath is read exactly as AtomicWrite left it.
+        ///
+        /// Throws on a mismatch. This runs BEFORE AtomicWrite ever moves anything into
+        /// fileNameAndPath, so a missing, corrupted, or replaced blob can never overwrite a good
+        /// local file with bad content.
+        /// </summary>
+        private static void VerifyFetchedBlobHash(string tempPath, string originalFileNameAndPath, string expectedHash)
+        {
+            string extension = Path.GetExtension(originalFileNameAndPath);
+            string forceFileType = (G.Equal(extension, ".px") || G.Equal(extension, ".gbk")) ? extension : null;
+
+            string actualHash = ComputeHashUncached(tempPath, forceFileType);
+            if (!G.Equal(actualHash, expectedHash))
+            {
+                throw new IOException("Fetched blob for '" + originalFileNameAndPath + "' does not match its expected hash (expected '" + expectedHash + "', got '" + actualHash + "') -- the stored blob may be missing, corrupted, or have been replaced.");
+            }
         }
 
         private static void BlobsFilePut(string fileName, string blobsFile, bool blobZipped)
@@ -1273,6 +1307,20 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
     public static class DlinkCommon
     {
+        public enum EDlinkHashKind
+        {
+            PhysicalFileHash,
+            PxContentHash,
+            GbkDataHash,
+        }
+
+        public enum EDlinkVersion
+        {
+            None,
+            v1_0,
+            v1_1
+        }
+
         public static string Dlink_FromDlinkFileToDataFile(string dlinkFile, bool reportError)
         {
             //m1                 K:\MAKROBK\tth\test\makrobk_grunddata\biver\_progs\_uddata_dlink\x.csv.dlink
@@ -1369,6 +1417,39 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 if (G.Equal(m2[0], s)) return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Hashes a file. If dlinkVersion == "1.1", it handles .px files to omit some lines.
+        /// If dlinkVersion == null, it is just simple file hasher.
+        /// forceFileType may be == null, but for ".px" or ".gbk" it is used for Dlink blobs with particular name.
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="forceFileType">null (default) to use filePath's own extension; otherwise ".px" or ".gbk".</param>
+        /// <returns></returns>
+        public static string GetSha256FromFileWithDlink(string filePath, DlinkCommon.EDlinkVersion dlinkVersion, string forceFileType = null)
+        {
+            if (dlinkVersion == DlinkCommon.EDlinkVersion.v1_0)
+            {
+                new Error("Dlink version 1.0 is unsupported");
+            }
+            else if (dlinkVersion == DlinkCommon.EDlinkVersion.v1_1)
+            {
+                //Special rule for 1.1 (.gbk is handled in some other place)
+                string CreationDatePrefix = "CREATION-DATE="; //Note: will not work for lower-case or with blanks around "=".
+                if (forceFileType != null && !G.Equal(forceFileType, ".px") && !G.Equal(forceFileType, ".gbk"))
+                {
+                    new Error("forceFileType must be null, \".px\", or \".gbk\" -- got '" + forceFileType + "'.");
+                }
+                string effectiveExtension = Path.GetExtension(filePath);
+                effectiveExtension = forceFileType ?? Path.GetExtension(filePath);
+                if (G.Equal(effectiveExtension, ".px"))
+                {
+                    return G.FileHasher.GetSha256ExcludingLine(filePath, CreationDatePrefix);
+                }
+            }
+            string hash = G.FileHasher.GetSha256FromFile(filePath);
+            return hash;
         }
     }
 }

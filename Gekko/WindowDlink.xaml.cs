@@ -18,7 +18,23 @@ namespace Gekko
     /// </summary>
     public class DlinkImportRow : INotifyPropertyChanged
     {
-        public string Path { get; set; }
+        private string _path;
+        public string Path
+        {
+            get { return _path; }
+            set
+            {
+                _path = value;
+                OnPropertyChanged("Path");
+                OnPropertyChanged("Extension");
+            }
+        }
+
+        // Retrieves the extension (including the dot) from the path
+        public string Extension
+        {
+            get { return string.IsNullOrEmpty(Path) ? "" : System.IO.Path.GetExtension(Path); }
+        }
 
         private string _status;
         public string Status

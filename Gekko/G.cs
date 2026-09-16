@@ -7015,21 +7015,10 @@ namespace Gekko
         }
 
         public static class FileHasher
-        {
-            private const string CreationDatePrefix = "CREATION-DATE="; //Note: will not work for lower-case or with blanks around "=".
+        {   
 
-            /// <summary>
-            /// Handles .px files to omit time stamp
-            /// </summary>
-            /// <param name="filePath"></param>
-            /// <returns></returns>
             public static string GetSha256FromFile(string filePath)
             {
-                if (string.Equals(Path.GetExtension(filePath), ".px", StringComparison.OrdinalIgnoreCase))
-                {
-                    return GetSha256ExcludingLine(filePath, CreationDatePrefix);
-                }
-
                 string hash = null;
                 using (var stream = File.OpenRead(filePath))
                 {
