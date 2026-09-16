@@ -6862,20 +6862,20 @@ namespace Gekko
             if (G.Equal(s, "activate"))
             {
                 //Same as 'hooks' followed by 'sync'
-                DlinkSetup.DlinkFunction(O.ConvertToString(root(smpl, _t1, _t2, new ScalarString("git"))), DlinkSetup.EDlinkSetup.Activate);
+                DlinkSetup.DlinkFunction(O.ConvertToString(root(smpl, _t1, _t2, new ScalarString("git"))), EDlinkSetup.Activate);
             }
             else if (G.Equal(s, "deactivate"))
             {
                 //Deactivates hooks only
-                DlinkSetup.DlinkFunction(O.ConvertToString(root(smpl, _t1, _t2, new ScalarString("git"))), DlinkSetup.EDlinkSetup.DeactivateHooks);
+                DlinkSetup.DlinkFunction(O.ConvertToString(root(smpl, _t1, _t2, new ScalarString("git"))), EDlinkSetup.DeactivateHooks);
             }
             else if (G.Equal(s, "hooks"))
             {
-                DlinkSetup.DlinkFunction(O.ConvertToString(root(smpl, _t1, _t2, new ScalarString("git"))), DlinkSetup.EDlinkSetup.ActivateOnlyHooks);
+                DlinkSetup.DlinkFunction(O.ConvertToString(root(smpl, _t1, _t2, new ScalarString("git"))), EDlinkSetup.ActivateOnlyHooks);
             }
             else if (G.Equal(s, "sync"))
             {
-                DlinkSetup.DlinkFunction(O.ConvertToString(root(smpl, _t1, _t2, new ScalarString("git"))), DlinkSetup.EDlinkSetup.ActivateOnlySync);
+                DlinkSetup.DlinkFunction(O.ConvertToString(root(smpl, _t1, _t2, new ScalarString("git"))), EDlinkSetup.ActivateOnlySync);
             }            
             else
             {

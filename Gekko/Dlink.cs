@@ -31,16 +31,31 @@ using System.Diagnostics;
 using System.Threading;
 
 namespace Gekko
-{    
-    public static class DlinkSetup
+{
+    public enum EDlinkSetup
     {
-        public enum EDlinkSetup
-        {
-            Activate,
-            ActivateOnlyHooks,
-            ActivateOnlySync,
-            DeactivateHooks,
-        }        
+        Activate,
+        ActivateOnlyHooks,
+        ActivateOnlySync,
+        DeactivateHooks,
+    }
+
+    public enum EDlinkHashKind
+    {
+        PhysicalFileHash,
+        PxContentHash,
+        GbkDataHash,
+    }
+
+    public enum EDlinkVersion
+    {
+        None,
+        v1_0,
+        v1_1
+    }
+
+    public static class DlinkSetup
+    {        
         
         /// <summary>
         /// When called, parentPath will be the folder wherein the folder \.git resides, and
@@ -171,31 +186,24 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
     }    
 
     public static class DlinkHashKinds
-    {
-        /// <summary>
-        /// The hash strategy that applies to filePath, decided purely by extension. This is the one
-        /// place Blob() and GetFileHash() both ask this question -- change what counts as a .px/.gbk
-        /// file here, and both follow automatically.
-        /// </summary>
-        public static DlinkCommon.EDlinkHashKind Classify(string filePath)
+    {        
+        public static EDlinkHashKind Classify(string filePath)
         {
             return ClassifyByExtension(Path.GetExtension(filePath));
         }
         
-        public static DlinkCommon.EDlinkHashKind ClassifyByExtension(string extension)
+        public static EDlinkHashKind ClassifyByExtension(string extension)
         {
-            if (G.Equal(extension, ".px")) return DlinkCommon.EDlinkHashKind.PxContentHash;
-            if (G.Equal(extension, ".gbk")) return DlinkCommon.EDlinkHashKind.GbkDataHash;
-            return DlinkCommon.EDlinkHashKind.PhysicalFileHash;
+            return DlinkCommon.ClassifyByExtension(EDlinkVersion.v1_1, extension);
         }
 
         /// <summary>
         /// True only for the one kind where persisting this file's byte count alongside its hash is
         /// safe.
         /// </summary>
-        public static bool IsByteCountMeaningful(DlinkCommon.EDlinkHashKind kind)
+        public static bool IsByteCountMeaningful(EDlinkHashKind kind)
         {
-            return kind == DlinkCommon.EDlinkHashKind.PhysicalFileHash;
+            return kind == EDlinkHashKind.PhysicalFileHash;
         }
     }
 
@@ -238,7 +246,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                         Directory.CreateDirectory(Path.GetDirectoryName(dlinkFile));
                     }
 
-                    DlinkCommon.EDlinkHashKind hashKind = DlinkHashKinds.Classify(dataFile);
+                    EDlinkHashKind hashKind = DlinkHashKinds.Classify(dataFile);
                                         
                     if (!DlinkHashKinds.IsByteCountMeaningful(hashKind))
                     {
@@ -253,8 +261,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
     }    
 
     /// <summary>
-    /// For instance if Python creates a csv file. Or already existing .gbk files are to be put into Git as .dlink files.    
-    /// TODO: for Python etc. should it be possible to state number of variables?
+    /// For instance if Python creates a csv file. Or already existing .gbk files are to be put into Git as .dlink files.        
     /// 
     /// </summary>
     public static class DlinkHooks
@@ -480,7 +487,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                         //  B: Try to get file from blobs      --> but only if .dlink file has been already added/committed.
                         //  C: May just be a datafile copied into datafiles, not being read by Gekko yet
                         //  D: Not relevant
-                        //  Note: were are obvisously in A or B here, since we are handling a .dlink file.
+                        //  Note: we are obviously in A or B here, since we are handling a .dlink file.
                         // --------------------------------------------------------------------------------------------------                                
 
                         //After this method call, realFile may change regarding .hash and .exists fields (and only those)
@@ -661,53 +668,11 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
         private static string ComputeHashUncached(string filePath, string forceFileType = null)
         {
-            if (forceFileType != null && !G.Equal(forceFileType, ".px") && !G.Equal(forceFileType, ".gbk"))
-            {
-                throw new ArgumentException("forceFileType must be null, \".px\", or \".gbk\" -- got '" + forceFileType + "'.");
-            }
-
-            DlinkCommon.EDlinkHashKind hashKind = forceFileType != null ? DlinkHashKinds.ClassifyByExtension(forceFileType) : DlinkHashKinds.Classify(filePath);
-
-            string hash = null;            
-
-            if (hashKind == DlinkCommon.EDlinkHashKind.GbkDataHash)
-            {
-                using (ZipArchive archive = ZipFile.OpenRead(filePath))
-                {
-                    foreach (ZipArchiveEntry entry in archive.Entries)
-                    {
-                        if (G.Equal(entry.Name, Globals.databankInfoName))
-                        {
-                            try //So that hasTraces has a chance to become == true
-                            {
-                                Program.ReadInfo readInfo = new Program.ReadInfo();
-                                string databankVersion = null;
-                                string traceVersion = null;
-                                string tempFileNameWithPath = Program.WaitForZipExtractFileEntryToTempFile(entry, filePath);
-                                Program.GetDatabankInfo(readInfo, tempFileNameWithPath, out databankVersion, out traceVersion);
-                                hash = readInfo.dataHashFull;                                
-                            }
-                            catch
-                            {
-                                new Error("Could not extract data hash from inside .gbk file (" + Globals.databankInfoName + ").\nFile: " + filePath);
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (hash == null)
-            {
-                //if .gbk, this means that data hash is not implemented for that file
-                if (G.DlinkDebug()) MessageBox.Show("Getting hash from physical file");
-                hash =  DlinkCommon.GetSha256FromFileWithDlink(filePath, DlinkCommon.EDlinkVersion.v1_1, forceFileType);
-            }
-            else
-            {
-                if (G.DlinkDebug()) MessageBox.Show("Getting hash from xml");
-            }
-
-            return hash;
+            // Every ".px"/".gbk" special case -- including .gbk's data-hash-from-zip extraction, and
+            // the "which extension is even valid as a forceFileType" check -- now lives in exactly one
+            // place: DlinkCommon.GetSha256FromFileWithDlink's v1_1 table. This method doesn't need to
+            // know either extension string, or branch on EDlinkHashKind, itself anymore.
+            return DlinkCommon.GetSha256FromFileWithDlink(filePath, EDlinkVersion.v1_1, forceFileType);
         }
 
         /// <summary>
@@ -936,8 +901,8 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         
         private static void VerifyFetchedBlobHash(string tempPath, string originalFileNameAndPath, string expectedHash)
         {
-            string extension = Path.GetExtension(originalFileNameAndPath);
-            string forceFileType = (G.Equal(extension, ".px") || G.Equal(extension, ".gbk")) ? extension : null;
+            string extension = Path.GetExtension(originalFileNameAndPath);            
+            string forceFileType = DlinkCommon.IsRecognizedForceFileType(EDlinkVersion.v1_1, extension) ? extension : null;
             string actualHash = ComputeHashUncached(tempPath, forceFileType);
             if (!G.Equal(actualHash, expectedHash))
             {
@@ -1089,12 +1054,6 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 _lru = new LinkedList<HashCacheEntry>();
             }
             _loaded = true;
-
-            if (false && G.Equal(Environment.UserName, "tth"))
-            {                
-                long fileSizeBytes = File.Exists(CacheFilePath) ? new FileInfo(CacheFilePath).Length : 0;
-                MessageBox.Show("TTH: Hash cache load took " + (double)sw.ElapsedMilliseconds / 1000d + " s for " + _map.Count + " entries (" + fileSizeBytes + " bytes on disk)");
-            }
         }
 
         /// <summary>
@@ -1234,12 +1193,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 {
                     //No catastrophe is this happens
                 }
-            }
-            if (false && G.Equal(Environment.UserName, "tth"))
-            {                
-                long fileSizeBytes = File.Exists(CacheFilePath) ? new FileInfo(CacheFilePath).Length : 0;
-                MessageBox.Show("TTH: Hash cache save took " + (double)sw.ElapsedMilliseconds / 1000d + " s for " + _map.Count + " entries (" + fileSizeBytes + " bytes on disk)");
-            }
+            }            
         }
 
         /// <summary>
@@ -1279,23 +1233,102 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
     public static class DlinkCommon
     {
-        // New: a List<string> rather than a single constant, so more lines can be added to skip
-        // later (e.g. another kind of timestamp/generated line) without touching the hashing logic
-        // itself -- GetSha256ExcludingLine excludes a line as soon as it matches ANY entry here.
+        
+        // ============================================================================================
+        // SINGLE SOURCE OF TRUTH for ".px" / ".gbk" / EDlinkHashKind / EDlinkVersion.        
+        // ============================================================================================
+
+        /// <summary>One special-extension rule, for one .dlink version.</summary>
+        private class ExtensionRule
+        {
+            public readonly string Extension;
+            public readonly EDlinkHashKind HashKind;            
+            public readonly Func<string, string> Hasher;
+
+            public ExtensionRule(string extension, EDlinkHashKind hashKind, Func<string, string> hasher)
+            {
+                Extension = extension;
+                HashKind = hashKind;
+                Hasher = hasher;
+            }
+        }
+        
         private static readonly List<string> CreationDatePrefix = new List<string> { "CREATION-DATE=", "TIMEVAL(\"tid\")=" }; //Note: entries here won't match lower-case or with blanks around "=".
 
-        public enum EDlinkHashKind
+        /// <summary>
+        /// Extracts the data hash embedded inside a .gbk file's databank-info entry, rather than
+        /// hashing the .gbk's raw bytes. Returns null if that fails or isn't present, in which case
+        /// the caller falls back to a plain physical-file hash of the .gbk itself.
+        /// </summary>
+        private static string ExtractGbkDataHash(string filePath)
         {
-            PhysicalFileHash,
-            PxContentHash,
-            GbkDataHash,
+            string hash = null;
+            using (ZipArchive archive = ZipFile.OpenRead(filePath))
+            {
+                foreach (ZipArchiveEntry entry in archive.Entries)
+                {
+                    if (G.Equal(entry.Name, Globals.databankInfoName))
+                    {
+                        try //So that hasTraces has a chance to become == true
+                        {
+                            Program.ReadInfo readInfo = new Program.ReadInfo();
+                            string databankVersion = null;
+                            string traceVersion = null;
+                            string tempFileNameWithPath = Program.WaitForZipExtractFileEntryToTempFile(entry, filePath);
+                            Program.GetDatabankInfo(readInfo, tempFileNameWithPath, out databankVersion, out traceVersion);
+                            hash = readInfo.dataHashFull;
+                        }
+                        catch
+                        {
+                            new Error("Could not extract data hash from inside .gbk file (" + Globals.databankInfoName + ").\nFile: " + filePath);
+                        }
+                    }
+                }
+            }
+            return hash;
         }
 
-        public enum EDlinkVersion
+        // Per-.dlink-version tables of special extensions. Only v1_1 currently defines any; v1_0 is
+        // unsupported outright (see GetSha256FromFileWithDlink below) and EDlinkVersion.None or any
+        // future value deliberately gets no rules either, so it falls through to the "unrecognized
+        // version" error there rather than silently guessing whether .px/.gbk handling should apply.
+        private static readonly Dictionary<EDlinkVersion, ExtensionRule[]> VersionExtensionRules = new Dictionary<EDlinkVersion, ExtensionRule[]>
         {
-            None,
-            v1_0,
-            v1_1
+            [EDlinkVersion.v1_1] = new[]
+            {
+                new ExtensionRule(".px", EDlinkHashKind.PxContentHash,
+                    hasher: filePath => G.FileHasher.GetSha256ExcludingLine(filePath, CreationDatePrefix)),
+                new ExtensionRule(".gbk", EDlinkHashKind.GbkDataHash,
+                    hasher: ExtractGbkDataHash),
+            },
+        };
+
+        private static ExtensionRule FindRule(EDlinkVersion dlinkVersion, string extension)
+        {
+            if (extension != null && VersionExtensionRules.TryGetValue(dlinkVersion, out ExtensionRule[] rules))
+            {
+                foreach (ExtensionRule rule in rules)
+                {
+                    if (G.Equal(extension, rule.Extension)) return rule;
+                }
+            }
+            return null;
+        }
+        
+        public static bool IsRecognizedForceFileType(EDlinkVersion dlinkVersion, string extension)
+        {
+            return FindRule(dlinkVersion, extension) != null;
+        }
+
+        /// <summary>
+        /// The hash strategy that applies to a file with this extension, under this .dlink version --
+        /// decided purely by VersionExtensionRules above. This is the one place Blob() and
+        /// GetFileHash() (via DlinkHashKinds) both ask this question -- change what counts as a
+        /// .px/.gbk file for a version here, and both follow automatically.
+        /// </summary>
+        public static EDlinkHashKind ClassifyByExtension(EDlinkVersion dlinkVersion, string extension)
+        {
+            return FindRule(dlinkVersion, extension)?.HashKind ?? EDlinkHashKind.PhysicalFileHash;
         }
 
         public static string Dlink_FromDlinkFileToDataFile(string dlinkFile, bool reportError)
@@ -1397,41 +1430,45 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         }
 
         /// <summary>
-        /// Hashes a file. If dlinkVersion == v1_1, it handles .px files to omit some lines.
+        /// Hashes a file. If dlinkVersion == v1_1, EVERYTHING about ".px"/".gbk" handling for that
+        /// version -- which extensions are special, what EDlinkHashKind they map to, and how each is
+        /// actually hashed (line-excluded content hash for .px, data-hash-from-zip for .gbk) -- comes
+        /// from VersionExtensionRules above. Nothing about either extension is repeated here.
         /// forceFileType may be == null, but for ".px" or ".gbk" it is used for Dlink blobs with particular name.
         /// </summary>
         /// <param name="filePath"></param>
-        /// <param name="forceFileType">null (default) to use filePath's own extension; otherwise ".px" or ".gbk".</param>
+        /// <param name="forceFileType">null (default) to use filePath's own extension; otherwise an extension dlinkVersion treats specially (".px"/".gbk" for v1_1).</param>
         /// <returns></returns>
-        public static string GetSha256FromFileWithDlink(string filePath, DlinkCommon.EDlinkVersion dlinkVersion, string forceFileType = null)
+        public static string GetSha256FromFileWithDlink(string filePath, EDlinkVersion dlinkVersion, string forceFileType = null)
         {
-            if (forceFileType != null && !G.Equal(forceFileType, ".px") && !G.Equal(forceFileType, ".gbk"))
+            if (forceFileType != null && !IsRecognizedForceFileType(dlinkVersion, forceFileType))
             {
-                throw new ArgumentException("forceFileType must be null, \".px\", or \".gbk\" -- got '" + forceFileType + "'.");
+                new Error("forceFileType must be null, or an extension '" + dlinkVersion + "' treats specially -- got '" + forceFileType + "'.");
             }
 
-            if (dlinkVersion == DlinkCommon.EDlinkVersion.v1_0)
+            if (dlinkVersion == EDlinkVersion.v1_0)
             {
                 new Error("Dlink version 1.0 is unsupported");
             }
-            else if (dlinkVersion == DlinkCommon.EDlinkVersion.v1_1)
+            else if (dlinkVersion == EDlinkVersion.v1_1)
             {
-                //Special rule for 1.1 (.gbk is handled in some other place)
                 string effectiveExtension = forceFileType ?? Path.GetExtension(filePath);
-                if (G.Equal(effectiveExtension, ".px"))
+                ExtensionRule rule = FindRule(dlinkVersion, effectiveExtension);
+                if (rule != null)
                 {
-                    return G.FileHasher.GetSha256ExcludingLine(filePath, CreationDatePrefix);
+                    string specialHash = rule.Hasher(filePath);
+                    if (specialHash != null)
+                    {
+                        if (G.DlinkDebug()) MessageBox.Show(rule.HashKind == EDlinkHashKind.GbkDataHash ? "Getting hash from xml" : "Getting hash from content hash");
+                        return specialHash;
+                    }                    
                 }
             }
             else
-            {
-                //New: EDlinkVersion.None (or any future value) is no longer a silent fall-through
-                //to a plain hash -- an unrecognized/unspecified version is treated as a caller
-                //error, exactly like v1_0 above, rather than a guess about whether .px handling
-                //should apply. Without this, a .px file hashed under this branch would have
-                //silently gotten the WRONG (non-line-stripped) hash, with no error at all.
+            {                
                 new Error("Dlink version '" + dlinkVersion + "' is not recognized here -- expected v1_1.");
             }
+            if (G.DlinkDebug()) MessageBox.Show("Getting hash from physical file");
             string hash = G.FileHasher.GetSha256FromFile(filePath);
             return hash;
         }
