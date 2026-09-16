@@ -288,7 +288,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             {
                 foreach (string dlinkFile2 in dlinkFiles) //Could probably be parallelized
                 {
-                    DlinkAutoDlinkFiles.Blob(dlinkFile2, true); //For .gbk files, Blob() now recovers variables/series itself (via GetFileHash) -- nothing extra needed here
+                    DlinkAutoDlinkFiles.Blob(dlinkFile2, true);
                 }
             }
             catch
@@ -864,7 +864,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     {                        
                         if (!File.Exists(finalPath))
                         {
-                            new Error("Filed to write '" + finalPath + "' from temp file '" + tempPath + "': " + ex.Message);                            
+                            new Error("Failed to write '" + finalPath + "' from temp file '" + tempPath + "': " + ex.Message);                            
                         }
                     }
                 }
@@ -949,10 +949,11 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         ///
         /// Passes originalFileNameAndPath's real extension as forceFileType, since tempPath
         /// itself has a mangled, GUID-suffixed name (see AtomicWrite's temp-file naming) that
-        /// would otherwise make ComputeHashUncached (and G.FileHasher.GetSha256FromFile) silently
-        /// apply the wrong strategy for .px/.gbk content. No rename or copy needed -- forceFileType
-        /// decouples "which hashing strategy applies" from "what the file happens to be named", so
-        /// tempPath is read exactly as AtomicWrite left it.
+        /// would otherwise make ComputeHashUncached (via DlinkCommon.GetSha256FromFileWithDlink,
+        /// which decides .px handling from the extension it's given) silently apply the wrong
+        /// strategy for .px content. No rename or copy needed -- forceFileType decouples "which
+        /// hashing strategy applies" from "what the file happens to be named", so tempPath is
+        /// read exactly as AtomicWrite left it.
         ///
         /// Throws on a mismatch. This runs BEFORE AtomicWrite ever moves anything into
         /// fileNameAndPath, so a missing, corrupted, or replaced blob can never overwrite a good
@@ -1067,7 +1068,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             get
             {
                 string folder = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_storage, false), "_utilities", "hashcache");
-                //Per-machine file name: this folder is shared/network storage (databank_dlink_folder_blobs),
+                //Per-machine file name: this folder is shared/network storage (databank_dlink_folder_storage),
                 //and giving each machine its own cache file avoids two machines racing on the same file.                
                 return Path.Combine(folder, "hashcache_" + Environment.MachineName + ".cache"); //New: was ".yaml" -- now a protobuf-net binary file
             }
@@ -1124,8 +1125,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
         /// <summary>
         /// Returns the cached hash for filePath if it is still fresh (same size, and last-write-time
-        /// of what was recorded last time). Returns null on a miss -- and, variables/series are
-        /// also null on any miss, regardless of what an earlier (now-stale) entry for this path held.
+        /// of what was recorded last time). Returns null on a miss.
         /// </summary>
         public static string TryGet(string filePath, long size, DateTime lastWriteUtc)
         {
@@ -1159,10 +1159,8 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         }
 
         /// <summary>
-        /// Records/refreshes the hash for filePath -- and, new: variables/series alongside it, so a
-        /// later cache hit (see TryGet) can still report them. Evicts the least-recently-used entry
-        /// once the cache is over capacity. Does not touch disk -- call Save() once
-        /// after a batch of files.
+        /// Records/refreshes the hash for filePath. Evicts the least-recently-used entry once the
+        /// cache is over capacity. Does not touch disk -- call Save() once after a batch of files.
         /// </summary>
         public static void Set(string filePath, long bytes, DateTime lastWriteUtc, string hash)
         {
@@ -1186,7 +1184,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 }
                 else
                 {
-                    HashCacheEntry entry = new HashCacheEntry { path = filePath, bytes = bytes, stamp = stamp, hash = hash }; //New: variables, series
+                    HashCacheEntry entry = new HashCacheEntry { path = filePath, bytes = bytes, stamp = stamp, hash = hash };
                     LinkedListNode<HashCacheEntry> node = _lru.AddFirst(entry);
                     _map[filePath] = node;
                     if (_map.Count > Program.options.databank_dlink_cache)
@@ -1307,6 +1305,11 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
     public static class DlinkCommon
     {
+        // New: promoted from a local re-declared inside GetSha256FromFileWithDlink every call, to
+        // one named constant for the whole class -- a magic string worth finding in one place if
+        // it's ever needed elsewhere too.
+        private const string CreationDatePrefix = "CREATION-DATE="; //Note: will not work for lower-case or with blanks around "=".
+
         public enum EDlinkHashKind
         {
             PhysicalFileHash,
@@ -1420,8 +1423,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         }
 
         /// <summary>
-        /// Hashes a file. If dlinkVersion == "1.1", it handles .px files to omit some lines.
-        /// If dlinkVersion == null, it is just simple file hasher.
+        /// Hashes a file. If dlinkVersion == v1_1, it handles .px files to omit some lines.
         /// forceFileType may be == null, but for ".px" or ".gbk" it is used for Dlink blobs with particular name.
         /// </summary>
         /// <param name="filePath"></param>
@@ -1429,6 +1431,11 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// <returns></returns>
         public static string GetSha256FromFileWithDlink(string filePath, DlinkCommon.EDlinkVersion dlinkVersion, string forceFileType = null)
         {
+            if (forceFileType != null && !G.Equal(forceFileType, ".px") && !G.Equal(forceFileType, ".gbk"))
+            {
+                throw new ArgumentException("forceFileType must be null, \".px\", or \".gbk\" -- got '" + forceFileType + "'.");
+            }
+
             if (dlinkVersion == DlinkCommon.EDlinkVersion.v1_0)
             {
                 new Error("Dlink version 1.0 is unsupported");
@@ -1436,17 +1443,20 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             else if (dlinkVersion == DlinkCommon.EDlinkVersion.v1_1)
             {
                 //Special rule for 1.1 (.gbk is handled in some other place)
-                string CreationDatePrefix = "CREATION-DATE="; //Note: will not work for lower-case or with blanks around "=".
-                if (forceFileType != null && !G.Equal(forceFileType, ".px") && !G.Equal(forceFileType, ".gbk"))
-                {
-                    new Error("forceFileType must be null, \".px\", or \".gbk\" -- got '" + forceFileType + "'.");
-                }
-                string effectiveExtension = Path.GetExtension(filePath);
-                effectiveExtension = forceFileType ?? Path.GetExtension(filePath);
+                string effectiveExtension = forceFileType ?? Path.GetExtension(filePath);
                 if (G.Equal(effectiveExtension, ".px"))
                 {
                     return G.FileHasher.GetSha256ExcludingLine(filePath, CreationDatePrefix);
                 }
+            }
+            else
+            {
+                //New: EDlinkVersion.None (or any future value) is no longer a silent fall-through
+                //to a plain hash -- an unrecognized/unspecified version is treated as a caller
+                //error, exactly like v1_0 above, rather than a guess about whether .px handling
+                //should apply. Without this, a .px file hashed under this branch would have
+                //silently gotten the WRONG (non-line-stripped) hash, with no error at all.
+                new Error("Dlink version '" + dlinkVersion + "' is not recognized here -- expected v1_1.");
             }
             string hash = G.FileHasher.GetSha256FromFile(filePath);
             return hash;
