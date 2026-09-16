@@ -7031,13 +7031,18 @@ namespace Gekko
                 return hash;
             }
 
-            // Hashes filePath as if any line starting with linePrefix (including its line
-            // terminator) had been deleted first. Works on raw bytes, so it's unaffected by
-            // the file's text encoding.
-            public static string GetSha256ExcludingLine(string filePath, string linePrefix)
+            // Hashes filePath as if any line starting with ANY of linePrefixes (including its line
+            // terminator) had been deleted first. A line is excluded as soon as it matches one
+            // prefix -- there's no need for it to match all of them. Works on raw bytes, so it's
+            // unaffected by the file's text encoding.
+            public static string GetSha256ExcludingLine(string filePath, List<string> linePrefixes)
             {
                 byte[] fileBytes = File.ReadAllBytes(filePath);
-                byte[] prefixBytes = Encoding.ASCII.GetBytes(linePrefix);
+                List<byte[]> prefixBytesList = new List<byte[]>();
+                foreach (string linePrefix in linePrefixes)
+                {
+                    prefixBytesList.Add(Encoding.ASCII.GetBytes(linePrefix));
+                }
 
                 using (var sha256 = SHA256.Create())
                 {
@@ -7046,13 +7051,13 @@ namespace Gekko
                     {
                         if (fileBytes[i] == (byte)'\n')
                         {
-                            HashLineUnlessExcluded(sha256, fileBytes, lineStart, i - lineStart + 1, prefixBytes);
+                            HashLineUnlessExcluded(sha256, fileBytes, lineStart, i - lineStart + 1, prefixBytesList);
                             lineStart = i + 1;
                         }
                     }
                     if (lineStart < fileBytes.Length)
                     {
-                        HashLineUnlessExcluded(sha256, fileBytes, lineStart, fileBytes.Length - lineStart, prefixBytes);
+                        HashLineUnlessExcluded(sha256, fileBytes, lineStart, fileBytes.Length - lineStart, prefixBytesList);
                     }
 
                     sha256.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
@@ -7060,9 +7065,14 @@ namespace Gekko
                 }
             }
 
-            private static void HashLineUnlessExcluded(SHA256 sha256, byte[] fileBytes, int lineStart, int lineLength, byte[] prefixBytes)
+            // New: prefixBytesList holds one entry per prefix the caller passed in -- the line is
+            // excluded (not hashed) if it starts with ANY one of them.
+            private static void HashLineUnlessExcluded(SHA256 sha256, byte[] fileBytes, int lineStart, int lineLength, List<byte[]> prefixBytesList)
             {
-                if (StartsWith(fileBytes, lineStart, lineLength, prefixBytes)) return;                
+                foreach (byte[] prefixBytes in prefixBytesList)
+                {
+                    if (StartsWith(fileBytes, lineStart, lineLength, prefixBytes)) return;
+                }
                 sha256.TransformBlock(fileBytes, lineStart, lineLength, null, 0);
             }
 

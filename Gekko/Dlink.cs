@@ -700,7 +700,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             {
                 //if .gbk, this means that data hash is not implemented for that file
                 if (G.DlinkDebug()) MessageBox.Show("Getting hash from physical file");
-                hash =  DlinkCommon.GetSha256FromFileWithDlink(filePath, DlinkCommon.EDlinkVersion.v1_1, forceFileType); //New: forceFileType passed through
+                hash =  DlinkCommon.GetSha256FromFileWithDlink(filePath, DlinkCommon.EDlinkVersion.v1_1, forceFileType);
             }
             else
             {
@@ -904,15 +904,12 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
         private static void BlobsFileGet(string fileNameAndPath, string blobsFile, bool blobZipped, string expectedHash)
         {
-            //New: the hash check below resolves this TODO.
-            //TODO Maybe check that the sha hash is correct after fetching the file.
-
             //We always create the folder in case it does not already exist. For cloning this is obviously important.
             Directory.CreateDirectory(Path.GetDirectoryName(fileNameAndPath));
             
             AtomicWrite(fileNameAndPath, false, tempPath =>
             {
-                if (!blobZipped) //New: was Globals.alreadyZipped.Contains(Path.GetExtension(fileNameAndPath), ...) -- now decided by ResolveExistingBlob, from the blob's OWN suffix, and passed in
+                if (!blobZipped)
                 {
                     File.Copy(blobsFile, tempPath, true);
                 }
@@ -930,40 +927,17 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     }
                 }
 
-                //New: verify the just-fetched content actually hashes to what the .dlink file
-                //expects, BEFORE AtomicWrite (running next, once this lambda returns) moves
-                //anything into fileNameAndPath -- so a missing, corrupted, or replaced blob can
-                //never overwrite a good local file. Throws on mismatch; nothing here catches it,
-                //so it propagates out through AtomicWrite exactly like any other failure (see
-                //AtomicWrite's own remarks on how it treats an exception from writeAction).
+                //Verify the just-fetched content actually hashes to what the .dlink file
+                //expects, BEFORE AtomicWrite (running next). 
                 VerifyFetchedBlobHash(tempPath, fileNameAndPath, expectedHash);
             });
             G.ReadOnlyRemove(fileNameAndPath);
         }
-
-        /// <summary>
-        /// New: verifies that the just-fetched content at tempPath actually hashes to
-        /// expectedHash -- the mechanism behind "error if a blob is missing or its content
-        /// doesn't match the .dlink hash" (the "missing" half is handled earlier, in SyncBlobs,
-        /// by ResolveExistingBlob returning null; this handles "present but wrong").
-        ///
-        /// Passes originalFileNameAndPath's real extension as forceFileType, since tempPath
-        /// itself has a mangled, GUID-suffixed name (see AtomicWrite's temp-file naming) that
-        /// would otherwise make ComputeHashUncached (via DlinkCommon.GetSha256FromFileWithDlink,
-        /// which decides .px handling from the extension it's given) silently apply the wrong
-        /// strategy for .px content. No rename or copy needed -- forceFileType decouples "which
-        /// hashing strategy applies" from "what the file happens to be named", so tempPath is
-        /// read exactly as AtomicWrite left it.
-        ///
-        /// Throws on a mismatch. This runs BEFORE AtomicWrite ever moves anything into
-        /// fileNameAndPath, so a missing, corrupted, or replaced blob can never overwrite a good
-        /// local file with bad content.
-        /// </summary>
+        
         private static void VerifyFetchedBlobHash(string tempPath, string originalFileNameAndPath, string expectedHash)
         {
             string extension = Path.GetExtension(originalFileNameAndPath);
             string forceFileType = (G.Equal(extension, ".px") || G.Equal(extension, ".gbk")) ? extension : null;
-
             string actualHash = ComputeHashUncached(tempPath, forceFileType);
             if (!G.Equal(actualHash, expectedHash))
             {
@@ -1305,10 +1279,10 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
     public static class DlinkCommon
     {
-        // New: promoted from a local re-declared inside GetSha256FromFileWithDlink every call, to
-        // one named constant for the whole class -- a magic string worth finding in one place if
-        // it's ever needed elsewhere too.
-        private const string CreationDatePrefix = "CREATION-DATE="; //Note: will not work for lower-case or with blanks around "=".
+        // New: a List<string> rather than a single constant, so more lines can be added to skip
+        // later (e.g. another kind of timestamp/generated line) without touching the hashing logic
+        // itself -- GetSha256ExcludingLine excludes a line as soon as it matches ANY entry here.
+        private static readonly List<string> CreationDatePrefix = new List<string> { "CREATION-DATE=", "TIMEVAL(\"tid\")=" }; //Note: entries here won't match lower-case or with blanks around "=".
 
         public enum EDlinkHashKind
         {
