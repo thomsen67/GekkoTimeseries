@@ -194,7 +194,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         
         public static EDlinkHashKind ClassifyByExtension(string extension)
         {
-            return DlinkCommon.ClassifyByExtension(EDlinkVersion.v1_1, extension);
+            return DlinkCommon.ClassifyByExtension(DlinkCommon.CurrentVersion, extension);
         }
 
         /// <summary>
@@ -460,7 +460,8 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                             new Error("This ." + Program.options.databank_dlink_name + " file does not exist: '" + dLinkFileWithPath + "'");                            
                         }
                         DlinkFile dlinkFileData = G.YamlReader<DlinkFile>(dLinkFileWithPath);
-                        if (dlinkFileData.version != "1.1") new Error("Dlink file '" + dlinkFile2 + "' has dlink version " + dlinkFileData.version + ", which is unsupported in this Gekko version");
+                        EDlinkVersion dlinkVersion = DlinkCommon.ParseDiskVersion(dlinkFileData.version);
+                        if (!DlinkCommon.IsVersionSupported(dlinkVersion)) new Error("Dlink file '" + dlinkFile2 + "' has dlink version " + dlinkFileData.version + ", which is unsupported in this Gekko version");
                         string dataFile = DlinkCommon.Dlink_FromDlinkFileToDataFile(dLinkFileWithPath, true);
                         if (G.NullOrBlanks(dataFile))
                         {
@@ -495,18 +496,18 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                         if (doDlinkFileAndDataFileCorrespond)
                         {
                             //Check that we have the file in blobs folder, else add it there. This happens when making a brand new datafile
-                            SyncBlobs(false, realFile.name, dlinkFileData.hash, blobsFolder, getFilesNew, getFilesOverwrite, putFiles);
+                            SyncBlobs(false, realFile.name, dlinkFileData.hash, blobsFolder, getFilesNew, getFilesOverwrite, putFiles, dlinkVersion);
                         }
                         else
                         {
                             //Get it from blobs (A or B)
-                            SyncBlobs(true, realFile.name, dlinkFileData.hash, blobsFolder, getFilesNew, getFilesOverwrite, putFiles);
+                            SyncBlobs(true, realFile.name, dlinkFileData.hash, blobsFolder, getFilesNew, getFilesOverwrite, putFiles, dlinkVersion);
                             FileInfo fi2 = new FileInfo(realFile.name);
                             //We update the realFile, because its contents have changed
                             realFile = new RealFile(realFile.name, dlinkFileData.hash, fi2.Length, fi2.LastWriteTimeUtc, true);
                             //Hash cache remembers this for later
-                            DlinkHashCache.Set(realFile.name, fi2.Length, fi2.LastWriteTimeUtc, dlinkFileData.hash);
-                            DlinkHashCache.SetBlobConfirmed(realFile.name, dlinkFileData.hash);
+                            DlinkHashCache.Set(HashCacheKey(realFile.name, dlinkVersion), fi2.Length, fi2.LastWriteTimeUtc, dlinkFileData.hash);
+                            DlinkHashCache.SetBlobConfirmed(HashCacheKey(realFile.name, dlinkVersion), dlinkFileData.hash);
                         }
                         if ((currentFileIndex == dlinkFiles.Count) || progressStopwatch.ElapsedMilliseconds >= progressReportIntervalMs)
                         {
@@ -555,10 +556,14 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             if (dlinkFileData.bytes != null && realFile.bytes != dlinkFileData.bytes)
             {                
                 return false;
-            }                        
+            }
+            //Hash the live file under THIS .dlink record's OWN version, not whatever is current --
+            //an old v1.1 file must keep being checked by v1.1's rules even once a newer Gekko build's
+            //CurrentVersion has moved on to v1.2/v1.3/etc.
+            EDlinkVersion dlinkVersion = DlinkCommon.ParseDiskVersion(dlinkFileData.version);
             //We now need to calc the sha256 physically (or for newer .gbk files: fetch data hash).
             //The hash may be gotten from cache file though.
-            string realHash = GetFileHash(dataFile, realFile.bytes.Value, realFile.stamp.Value);
+            string realHash = GetFileHash(dataFile, realFile.bytes.Value, realFile.stamp.Value, dlinkVersion);
             realFile = new RealFile(realFile.name, realHash, realFile.bytes, realFile.stamp, true);
             if (dlinkFileData.hash != realHash)
             {                
@@ -639,40 +644,74 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             return typeTemp;
         }        
                 
+        /// <summary>
+        /// Hashes filePath under DlinkCommon.CurrentVersion. Right for a BRAND NEW .dlink record --
+        /// there's no existing version to respect yet. To re-verify a file against an EXISTING .dlink
+        /// record, use the EDlinkVersion overload below with THAT record's own version instead (see
+        /// DoDlinkFileAndDataFileCorrespond), so a build whose CurrentVersion has moved on to v1.2
+        /// still hashes an untouched v1.1 file the v1.1 way.
+        /// </summary>
         public static string GetFileHash(string filePath)
         {
+            return GetFileHash(filePath, DlinkCommon.CurrentVersion);
+        }
+
+        public static string GetFileHash(string filePath, EDlinkVersion dlinkVersion)
+        {
             FileInfo fi = new FileInfo(filePath);
-            return GetFileHash(filePath, fi.Length, fi.LastWriteTimeUtc);
-        }                
-        
+            return GetFileHash(filePath, fi.Length, fi.LastWriteTimeUtc, dlinkVersion);
+        }
+
         public static string GetFileHash(string filePath, long knownSize, DateTime knownLastWriteUtc)
+        {
+            return GetFileHash(filePath, knownSize, knownLastWriteUtc, DlinkCommon.CurrentVersion);
+        }
+
+        /// <summary>
+        /// DlinkHashCache's entries are keyed by this rather than a bare filePath, everywhere in
+        /// DlinkHooks that touches it (GetFileHash below, and SyncBlobs/DlinkSyncFiles's
+        /// IsBlobConfirmed/SetBlobConfirmed/Set calls) -- so hashing, or confirming a blob for, the
+        /// same untouched file under two different .dlink versions (e.g. right after bumping
+        /// CurrentVersion from v1.1 to v1.2) can never read or write the wrong version's row. "|" is
+        /// illegal in a real file path, so it can't collide with one. This only affects the cache's
+        /// lookup key -- the real filePath is still what actually gets opened, hashed, or fetched.
+        /// </summary>
+        private static string HashCacheKey(string filePath, EDlinkVersion dlinkVersion)
+        {
+            return filePath + "|dlinkVersion=" + dlinkVersion;
+        }
+
+        public static string GetFileHash(string filePath, long knownSize, DateTime knownLastWriteUtc, EDlinkVersion dlinkVersion)
         {
             if (G.DlinkDebug()) MessageBox.Show("Getting hash from " + filePath);
 
+            string cacheKey = HashCacheKey(filePath, dlinkVersion);
+
             // ---- LRU cache lookup ---------------------------------------------------------
-            string cachedHash = DlinkHashCache.TryGet(filePath, knownSize, knownLastWriteUtc);
+            string cachedHash = DlinkHashCache.TryGet(cacheKey, knownSize, knownLastWriteUtc);
             if (cachedHash != null)
             {
                 if (G.DlinkDebug()) MessageBox.Show("Getting hash from LRU cache");
                 return cachedHash;
             }            
 
-            string hash = ComputeHashUncached(filePath);
+            string hash = ComputeHashUncached(filePath, dlinkVersion);
 
             // ---- Remember this result for next time -----------------------------------------            
-            DlinkHashCache.Set(filePath, knownSize, knownLastWriteUtc, hash);
+            DlinkHashCache.Set(cacheKey, knownSize, knownLastWriteUtc, hash);
             // ----------------------------------------------------------------------------------------
 
             return hash;
         }        
 
-        private static string ComputeHashUncached(string filePath, string forceFileType = null)
+        private static string ComputeHashUncached(string filePath, EDlinkVersion dlinkVersion, string forceFileType = null)
         {
             // Every ".px"/".gbk" special case -- including .gbk's data-hash-from-zip extraction, and
-            // the "which extension is even valid as a forceFileType" check -- now lives in exactly one
-            // place: DlinkCommon.GetSha256FromFileWithDlink's v1_1 table. This method doesn't need to
-            // know either extension string, or branch on EDlinkHashKind, itself anymore.
-            return DlinkCommon.GetSha256FromFileWithDlink(filePath, EDlinkVersion.v1_1, forceFileType);
+            // the "which extension is even valid as a forceFileType" check -- lives in exactly one
+            // place: DlinkCommon.GetSha256FromFileWithDlink's VersionRegistry. This method doesn't need
+            // to know either extension string, branch on EDlinkHashKind, or decide which version is
+            // "current" itself -- the caller (GetFileHash / VerifyFetchedBlobHash) decides that.
+            return DlinkCommon.GetSha256FromFileWithDlink(filePath, dlinkVersion, forceFileType);
         }
 
         /// <summary>
@@ -732,7 +771,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             return null;
         }
 
-        public static void SyncBlobs(bool isGet, string fileNameAndPath, string sha256, string blobsFolder, List<string> getFilesNew, List<string> getFilesOverwrite, List<string> putFiles)
+        public static void SyncBlobs(bool isGet, string fileNameAndPath, string sha256, string blobsFolder, List<string> getFilesNew, List<string> getFilesOverwrite, List<string> putFiles, EDlinkVersion dlinkVersion = DlinkCommon.CurrentVersion)
         {
             // This uses atomic writes.
 
@@ -750,7 +789,10 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 {
                     if (File.Exists(fileNameAndPath)) getFilesOverwrite.Add(fileNameAndPath);
                     else getFilesNew.Add(fileNameAndPath);
-                    BlobsFileGet(fileNameAndPath, location.path, location.zipped, sha256); //New: sha256 passed through so BlobsFileGet can verify the fetched content
+                    //dlinkVersion passed through so the re-fetched content is verified under the SAME
+                    //version's hash rules this .dlink record was written with (defaults to
+                    //DlinkCommon.CurrentVersion for any caller that doesn't know a specific version).
+                    BlobsFileGet(fileNameAndPath, location.path, location.zipped, sha256, dlinkVersion); //New: sha256 passed through so BlobsFileGet can verify the fetched content
                 }
             }
             else
@@ -759,7 +801,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 // Putting --> when a brand new file is there
                 // ------------------------------------
                                 
-                if (DlinkHashCache.IsBlobConfirmed(fileNameAndPath, sha256))
+                if (DlinkHashCache.IsBlobConfirmed(HashCacheKey(fileNameAndPath, dlinkVersion), sha256))
                 {
                     return;
                 }
@@ -779,7 +821,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     BlobsFilePut(fileNameAndPath, blobsFile, blobZipped);
                     putFiles.Add(fileNameAndPath);
                 }
-                DlinkHashCache.SetBlobConfirmed(fileNameAndPath, sha256);
+                DlinkHashCache.SetBlobConfirmed(HashCacheKey(fileNameAndPath, dlinkVersion), sha256);
             }
         }
 
@@ -867,7 +909,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             }
         }
 
-        private static void BlobsFileGet(string fileNameAndPath, string blobsFile, bool blobZipped, string expectedHash)
+        private static void BlobsFileGet(string fileNameAndPath, string blobsFile, bool blobZipped, string expectedHash, EDlinkVersion dlinkVersion)
         {
             //We always create the folder in case it does not already exist. For cloning this is obviously important.
             Directory.CreateDirectory(Path.GetDirectoryName(fileNameAndPath));
@@ -894,16 +936,16 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
                 //Verify the just-fetched content actually hashes to what the .dlink file
                 //expects, BEFORE AtomicWrite (running next). 
-                VerifyFetchedBlobHash(tempPath, fileNameAndPath, expectedHash);
+                VerifyFetchedBlobHash(tempPath, fileNameAndPath, expectedHash, dlinkVersion);
             });
             G.ReadOnlyRemove(fileNameAndPath);
         }
         
-        private static void VerifyFetchedBlobHash(string tempPath, string originalFileNameAndPath, string expectedHash)
+        private static void VerifyFetchedBlobHash(string tempPath, string originalFileNameAndPath, string expectedHash, EDlinkVersion dlinkVersion)
         {
             string extension = Path.GetExtension(originalFileNameAndPath);            
-            string forceFileType = DlinkCommon.IsRecognizedForceFileType(EDlinkVersion.v1_1, extension) ? extension : null;
-            string actualHash = ComputeHashUncached(tempPath, forceFileType);
+            string forceFileType = DlinkCommon.IsRecognizedForceFileType(dlinkVersion, extension) ? extension : null;
+            string actualHash = ComputeHashUncached(tempPath, dlinkVersion, forceFileType);
             if (!G.Equal(actualHash, expectedHash))
             {
                 throw new IOException("Fetched blob for '" + originalFileNameAndPath + "' does not match its expected hash (expected '" + expectedHash + "', got '" + actualHash + "') -- the stored blob may be missing, corrupted, or have been replaced.");
@@ -940,7 +982,10 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
     public class DlinkFile
     {
-        public readonly string version = "1.1";
+        //Always DlinkCommon.CurrentVersion's disk string as of construction -- bumping CurrentVersion
+        //is the ONE place that changes what NEW .dlink files get written as. Files already on disk
+        //keep whatever version string they were written with (read back via DlinkCommon.ParseDiskVersion).
+        public readonly string version = DlinkCommon.DiskVersionString(DlinkCommon.CurrentVersion);
         public string hash { get; private set; }
         public long? bytes { get; private set; }                
 
@@ -1235,7 +1280,21 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
     {
         
         // ============================================================================================
-        // SINGLE SOURCE OF TRUTH for ".px" / ".gbk" / EDlinkHashKind / EDlinkVersion.        
+        // SINGLE SOURCE OF TRUTH for ".px" / ".gbk" / EDlinkHashKind / EDlinkVersion -- and now for
+        // "which .dlink versions exist at all", "what does each one do", and "which one is current".
+        //
+        // TO ADD v1_2 (or v1_3, etc.), once its behavior is decided:
+        //   1. Add the member to the EDlinkVersion enum (top of file).
+        //   2. Add a VersionRegistry entry below for it -- DiskVersionString, IsSupported, and its
+        //      ExtensionRules (reuse v1_1's rules/lambdas for anything that hasn't changed).
+        //   3. If it's replacing v1_1 as the version NEW .dlink files get written as, change
+        //      CurrentVersion below to point at it. That is the ONLY place that decides "current" --
+        //      every existing v1_1 file keeps being read and re-hashed under v1_1's own rules forever,
+        //      because DoDlinkFileAndDataFileCorrespond/VerifyFetchedBlobHash always look up the
+        //      version recorded IN that file, not CurrentVersion.
+        // Skip step 2, or mistype the DiskVersionString, and DlinkCommon's static constructor throws
+        // immediately (see the bottom of this table) -- it is not possible to run Gekko with an
+        // EDlinkVersion member that has no registered VersionSpec.
         // ============================================================================================
 
         /// <summary>One special-extension rule, for one .dlink version.</summary>
@@ -1252,15 +1311,35 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 Hasher = hasher;
             }
         }
-        
-        private static readonly List<string> CreationDatePrefix = new List<string> { "CREATION-DATE=", "TIMEVAL(\"tid\")=" }; //Note: entries here won't match lower-case or with blanks around "=".
+
+        /// <summary>Everything DlinkCommon needs to know about one .dlink version.</summary>
+        private class VersionSpec
+        {
+            // The exact string stored in / read from a .dlink file's "version" field for this version.
+            public readonly string DiskVersionString;
+            // False for a version that's recognized (so old files naming it can still be identified
+            // and given a clear error) but that this Gekko build refuses to read/hash/write -- e.g.
+            // v1_0. True for every version this build can actually operate on.
+            public readonly bool IsSupported;
+            // This version's .px/.gbk (etc.) rules. Empty for an unsupported version.
+            public readonly ExtensionRule[] ExtensionRules;
+
+            public VersionSpec(string diskVersionString, bool isSupported, ExtensionRule[] extensionRules)
+            {
+                DiskVersionString = diskVersionString;
+                IsSupported = isSupported;
+                ExtensionRules = extensionRules ?? new ExtensionRule[0];
+            }
+        }
+
+        private static readonly List<string> CreationDatePrefixV1_1 = new List<string> { "CREATION-DATE=", "TIMEVAL(\"tid\")=" }; //Note: entries here won't match lower-case or with blanks around "=".
 
         /// <summary>
         /// Extracts the data hash embedded inside a .gbk file's databank-info entry, rather than
         /// hashing the .gbk's raw bytes. Returns null if that fails or isn't present, in which case
         /// the caller falls back to a plain physical-file hash of the .gbk itself.
         /// </summary>
-        private static string ExtractGbkDataHash(string filePath)
+        private static string ExtractGbkDataHashV1_1(string filePath)
         {
             string hash = null;
             using (ZipArchive archive = ZipFile.OpenRead(filePath))
@@ -1288,26 +1367,61 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             return hash;
         }
 
-        // Per-.dlink-version tables of special extensions. Only v1_1 currently defines any; v1_0 is
-        // unsupported outright (see GetSha256FromFileWithDlink below) and EDlinkVersion.None or any
-        // future value deliberately gets no rules either, so it falls through to the "unrecognized
-        // version" error there rather than silently guessing whether .px/.gbk handling should apply.
-        private static readonly Dictionary<EDlinkVersion, ExtensionRule[]> VersionExtensionRules = new Dictionary<EDlinkVersion, ExtensionRule[]>
+        /// <summary>
+        /// The version newly-created .dlink files are written as, and what "no specific version"
+        /// callers (e.g. constructing a brand-new .dlink file from scratch) mean by "the current
+        /// rules". Bumping this is the ONLY change needed to make a new version "the" version --
+        /// reading/verifying old files of earlier versions keeps working unchanged, since they carry
+        /// their own version string and are always looked up by THAT, never by CurrentVersion.
+        /// Must be a version registered below with IsSupported == true (the static constructor below
+        /// checks this too).
+        /// </summary>
+        public const EDlinkVersion CurrentVersion = EDlinkVersion.v1_1;
+
+        // One entry per EDlinkVersion member (except None -- see the static constructor below).
+        private static readonly Dictionary<EDlinkVersion, VersionSpec> VersionRegistry = new Dictionary<EDlinkVersion, VersionSpec>
         {
-            [EDlinkVersion.v1_1] = new[]
+            [EDlinkVersion.v1_0] = new VersionSpec("1.0", isSupported: false, extensionRules: null),
+
+            [EDlinkVersion.v1_1] = new VersionSpec("1.1", isSupported: true, extensionRules: new[]
             {
                 new ExtensionRule(".px", EDlinkHashKind.PxContentHash,
-                    hasher: filePath => G.FileHasher.GetSha256ExcludingLine(filePath, CreationDatePrefix)),
+                    hasher: filePath => G.FileHasher.GetSha256ExcludingLine(filePath, CreationDatePrefixV1_1)),
                 new ExtensionRule(".gbk", EDlinkHashKind.GbkDataHash,
-                    hasher: ExtractGbkDataHash),
-            },
+                    hasher: ExtractGbkDataHashV1_1),
+            }),
+
+            // Add v1_2, v1_3, etc. here as their own VersionSpec entry when the time comes -- see the
+            // "TO ADD v1_2" comment at the top of this table.
         };
+
+        /// <summary>
+        /// Fails fast, at type-load time, if EDlinkVersion ever gains a member with no matching
+        /// VersionSpec above -- so "add the enum member, forget the registry row" cannot silently
+        /// compile-and-ship; it cannot even run. None is deliberately exempt: it is the "no/unspecified
+        /// version" sentinel and is never meant to have a VersionSpec.
+        /// </summary>
+        static DlinkCommon()
+        {
+            foreach (EDlinkVersion v in Enum.GetValues(typeof(EDlinkVersion)))
+            {
+                if (v == EDlinkVersion.None) continue;
+                if (!VersionRegistry.ContainsKey(v))
+                {
+                    throw new InvalidOperationException("EDlinkVersion." + v + " has no VersionSpec registered in DlinkCommon.VersionRegistry -- add one before this build can be used (see the comment above VersionRegistry).");
+                }
+            }
+            if (!VersionRegistry.TryGetValue(CurrentVersion, out VersionSpec currentSpec) || !currentSpec.IsSupported)
+            {
+                throw new InvalidOperationException("DlinkCommon.CurrentVersion is set to '" + CurrentVersion + "', which is not a supported VersionSpec -- CurrentVersion must point at a version with IsSupported == true.");
+            }
+        }
 
         private static ExtensionRule FindRule(EDlinkVersion dlinkVersion, string extension)
         {
-            if (extension != null && VersionExtensionRules.TryGetValue(dlinkVersion, out ExtensionRule[] rules))
+            if (extension != null && VersionRegistry.TryGetValue(dlinkVersion, out VersionSpec spec))
             {
-                foreach (ExtensionRule rule in rules)
+                foreach (ExtensionRule rule in spec.ExtensionRules)
                 {
                     if (G.Equal(extension, rule.Extension)) return rule;
                 }
@@ -1321,10 +1435,46 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         }
 
         /// <summary>
+        /// True iff dlinkVersion is a version this build can actually read/hash/write (false for a
+        /// recognized-but-retired version like v1_0).
+        /// </summary>
+        public static bool IsVersionSupported(EDlinkVersion dlinkVersion)
+        {
+            return VersionRegistry.TryGetValue(dlinkVersion, out VersionSpec spec) && spec.IsSupported;
+        }
+
+        /// <summary>
+        /// The exact string this version is stored as in a .dlink file's "version" field.
+        /// </summary>
+        public static string DiskVersionString(EDlinkVersion dlinkVersion)
+        {
+            return VersionRegistry.TryGetValue(dlinkVersion, out VersionSpec spec) ? spec.DiskVersionString : dlinkVersion.ToString();
+        }
+
+        /// <summary>
+        /// Reverse lookup: the EDlinkVersion whose DiskVersionString matches the "version" string
+        /// found inside an existing .dlink file on disk. This is how an old v1.1 file keeps being
+        /// hashed/verified under v1.1's own rules forever, even once CurrentVersion has moved on to
+        /// v1.2/v1.3/etc. -- callers pass THIS result, not CurrentVersion, when working with a
+        /// specific already-existing .dlink record. Reports a clear error (and returns
+        /// EDlinkVersion.None) for a version string this build has never heard of -- e.g. a file
+        /// written by a newer Gekko than the one reading it.
+        /// </summary>
+        public static EDlinkVersion ParseDiskVersion(string diskVersion)
+        {
+            foreach (KeyValuePair<EDlinkVersion, VersionSpec> kv in VersionRegistry)
+            {
+                if (G.Equal(diskVersion, kv.Value.DiskVersionString)) return kv.Key;
+            }
+            new Error("Dlink file has version '" + diskVersion + "', which is not recognized in this Gekko version.");
+            return EDlinkVersion.None;
+        }
+
+        /// <summary>
         /// The hash strategy that applies to a file with this extension, under this .dlink version --
-        /// decided purely by VersionExtensionRules above. This is the one place Blob() and
-        /// GetFileHash() (via DlinkHashKinds) both ask this question -- change what counts as a
-        /// .px/.gbk file for a version here, and both follow automatically.
+        /// decided purely by VersionRegistry above. This is the one place Blob() and GetFileHash()
+        /// (via DlinkHashKinds) both ask this question -- change what counts as a .px/.gbk file for a
+        /// version here, and both follow automatically.
         /// </summary>
         public static EDlinkHashKind ClassifyByExtension(EDlinkVersion dlinkVersion, string extension)
         {
@@ -1430,13 +1580,17 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         }
 
         /// <summary>
-        /// Hashes a file. If dlinkVersion == v1_1, EVERYTHING about ".px"/".gbk" handling for that
-        /// version -- which extensions are special, what EDlinkHashKind they map to, and how each is
-        /// actually hashed (line-excluded content hash for .px, data-hash-from-zip for .gbk) -- comes
-        /// from VersionExtensionRules above. Nothing about either extension is repeated here.
+        /// Hashes a file under dlinkVersion's own rules. EVERYTHING about which extensions are special
+        /// for that version, what EDlinkHashKind they map to, and how each is actually hashed
+        /// (line-excluded content hash for .px, data-hash-from-zip for .gbk, under v1_1) comes from
+        /// VersionRegistry above -- nothing version-specific is repeated here, so adding v1_2/v1_3/etc.
+        /// needs ZERO changes to this method, only a new VersionRegistry entry.
         /// forceFileType may be == null, but for ".px" or ".gbk" it is used for Dlink blobs with particular name.
         /// </summary>
         /// <param name="filePath"></param>
+        /// <param name="dlinkVersion">Which version's rules to hash under -- the version recorded in the
+        /// specific .dlink file being worked with, NOT necessarily DlinkCommon.CurrentVersion (that's
+        /// only right for a brand-new file that has no existing version to respect).</param>
         /// <param name="forceFileType">null (default) to use filePath's own extension; otherwise an extension dlinkVersion treats specially (".px"/".gbk" for v1_1).</param>
         /// <returns></returns>
         public static string GetSha256FromFileWithDlink(string filePath, EDlinkVersion dlinkVersion, string forceFileType = null)
@@ -1446,11 +1600,15 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 new Error("forceFileType must be null, or an extension '" + dlinkVersion + "' treats specially -- got '" + forceFileType + "'.");
             }
 
-            if (dlinkVersion == EDlinkVersion.v1_0)
+            if (!IsVersionSupported(dlinkVersion))
             {
-                new Error("Dlink version 1.0 is unsupported");
+                // Covers v1_0 (registered but retired), EDlinkVersion.None, and anything else not
+                // marked IsSupported == true -- a genuinely unregistered enum member can't reach this
+                // line at all, since DlinkCommon's static constructor already refused to let the
+                // program start in that case.
+                new Error("Dlink version '" + dlinkVersion + "' is not supported for hashing.");
             }
-            else if (dlinkVersion == EDlinkVersion.v1_1)
+            else
             {
                 string effectiveExtension = forceFileType ?? Path.GetExtension(filePath);
                 ExtensionRule rule = FindRule(dlinkVersion, effectiveExtension);
@@ -1461,12 +1619,10 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     {
                         if (G.DlinkDebug()) MessageBox.Show(rule.HashKind == EDlinkHashKind.GbkDataHash ? "Getting hash from xml" : "Getting hash from content hash");
                         return specialHash;
-                    }                    
+                    }
+                    //else: e.g. a .gbk with no extractable data hash inside it -- fall through below,
+                    //exactly as if this extension had no rule at all (a plain physical-file hash).
                 }
-            }
-            else
-            {                
-                new Error("Dlink version '" + dlinkVersion + "' is not recognized here -- expected v1_1.");
             }
             if (G.DlinkDebug()) MessageBox.Show("Getting hash from physical file");
             string hash = G.FileHasher.GetSha256FromFile(filePath);
