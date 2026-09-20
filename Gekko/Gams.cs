@@ -5354,6 +5354,9 @@ namespace Gekko
         private static void GetGAMSWorkspace(ref string gamsDir, ref GAMSWorkspace ws)
         {
             gamsDir = Program.options.gams_exe_folder.Trim();
+
+            if (Globals.runningOnTTComputer) gamsDir = @"c:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\gdx";
+
             if (gamsDir.EndsWith("\\")) gamsDir = gamsDir.Substring(0, gamsDir.Length - "\\".Length);
             if (gamsDir.Trim() == "") gamsDir = null;  //must be so and not an empty string in the GAMSWorkspace call later on
             if (Program.options.gams_fast && gamsDir != null)
