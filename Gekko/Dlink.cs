@@ -434,7 +434,6 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             List<string> getFilesOverwrite = new List<string>();
             List<string> putFiles = new List<string>();
             List<string> errors = new List<string>();
-            List<string> notes = new List<string>(); //local data files that differed from their .dlink (saved, or left untouched)
             
             WindowDlinkGitHook progressWindow = new WindowDlinkGitHook("Data file sync (" + type + ")");
 
@@ -503,7 +502,6 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                             {
                                 new Error("For '" + realFile.name + "', could not find a blob file for hash '" + dlinkFileData.hash + "' under '" + blobsFolder + "'");
                             }
-                            notes.Add(realFile.name + " -- differs from its .dlink file, left untouched");
                         }
                         else
                         {
@@ -512,7 +510,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                             //blob storage first. (Only if the blob we restore from exists: else SyncBlobs(true) fails below and nothing is overwritten.)
                             if (realFile.exists && ResolveExistingBlob(blobsFolder, dlinkFileData.hash, realFile.name) != null)
                             {
-                                ParkLocalVersion(realFile, dlinkVersion, blobsFolder, notes);
+                                ParkLocalVersion(realFile, dlinkVersion, blobsFolder);
                             }
                             SyncBlobs(true, realFile.name, dlinkFileData.hash, blobsFolder, getFilesNew, getFilesOverwrite, putFiles, dlinkVersion);
                             FileInfo fi2 = new FileInfo(realFile.name);
@@ -535,7 +533,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 }
                 DlinkHashCache.Save(); //Persist any hashes computed while checking this batch of .dlink files
 
-                string report = BuildSyncReportText(type, getFilesNew, getFilesOverwrite, putFiles, notes);
+                string report = BuildSyncReportText(type, getFilesNew, getFilesOverwrite, putFiles);
                 progressWindow.Finish(report); //fills the report in, enables OK, and lets ShowDialog() below return once the user dismisses it
             });
             worker.IsBackground = true;            
@@ -586,35 +584,60 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         }
         
         /// <summary>
-        /// Called right before a data file that differs from its .dlink file is overwritten with the blob version.
-        /// Makes sure the version currently on disk is safe in blob storage first, so that a locally changed file whose .dlink
-        /// was never regenerated (for instance a csv written by Python) cannot be lost by a checkout/merge/commit sync.
-        /// Blobs are content-addressed, so if the current version is already in storage (the normal case after switching branch)
-        /// nothing is copied. If it cannot be saved this throws, and the caller must NOT overwrite the file.
+        /// Called right before a data file that differs from its .dlink file is about to be overwritten with the
+        /// blob version. If the file's CURRENT content is not already recoverable some other way (i.e. no blob
+        /// with its hash exists -- this is the case for a locally changed file whose .dlink was never regenerated,
+        /// e.g. a csv written by Python), copies it to a sibling ".bakN" file next to it before it's lost, N being
+        /// the next unused number (".bak1", ".bak2", ...) so earlier backups are never overwritten. If the current
+        /// content's hash IS already a blob somewhere (e.g. this is an older, already-committed version reached by
+        /// checking out an earlier commit -- recoverable through that commit's own .dlink file), nothing is written;
+        /// a local backup would just duplicate what Git/blob storage already has. If a needed backup cannot be
+        /// written this throws, and the caller must NOT overwrite the file.
         /// </summary>
-        private static void ParkLocalVersion(RealFile realFile, EDlinkVersion dlinkVersion, string blobsFolder, List<string> notes)
+        private static void ParkLocalVersion(RealFile realFile, EDlinkVersion dlinkVersion, string blobsFolder)
         {
-            string localHash = null;
-            List<string> newlyStored = new List<string>();
+            //realFile.hash is null if the byte-count check in DoDlinkFileAndDataFileCorrespond returned before hashing.
+            string currentHash = realFile.hash ?? GetFileHash(realFile.name, realFile.bytes.Value, realFile.stamp.Value, dlinkVersion);
+            if (ResolveExistingBlob(blobsFolder, currentHash, realFile.name) != null)
+            {
+                return; //Already safely stored under its own hash -- no local backup needed.
+            }
+
+            string backupPath = NextBackupPath(realFile.name);
             try
             {
-                //realFile.hash is null if the byte-count check in DoDlinkFileAndDataFileCorrespond returned before hashing.
-                localHash = realFile.hash ?? GetFileHash(realFile.name, realFile.bytes.Value, realFile.stamp.Value, dlinkVersion);
-                SyncBlobs(false, realFile.name, localHash, blobsFolder, new List<string>(), new List<string>(), newlyStored, dlinkVersion);
+                File.Copy(realFile.name, backupPath, true);
+                //Never leave the backup read-only -- it would make a LATER backup copy at this same path fail.
+                FileAttributes attr = File.GetAttributes(backupPath);
+                if ((attr & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
+                {
+                    File.SetAttributes(backupPath, attr & ~FileAttributes.ReadOnly);
+                }
             }
             catch (Exception ex)
             {
-                new Error("'" + realFile.name + "' differs from its .dlink file and would be overwritten, but its current version could not be saved to blob storage first (" + ex.Message + "). The file was NOT overwritten. Move or delete it manually, and sync again.");
-            }
-            if (newlyStored.Count > 0)
-            {
-                //It was not in storage before, i.e. this is a version that existed nowhere else. Tell the user where it went.
-                BlobLocation location = ResolveExistingBlob(blobsFolder, localHash, realFile.name);
-                notes.Add(realFile.name + " -- previous local version saved as " + (location != null ? location.path : "blob " + localHash));
+                new Error("'" + realFile.name + "' differs from its .dlink file and would be overwritten, but a backup copy '" + backupPath + "' could not be written first (" + ex.Message + "). The file was NOT overwritten. Move or delete it manually, and sync again.");
             }
         }
 
-        private static string BuildSyncReportText(string type, List<string> filesNew, List<string> filesOverwritten, List<string> putFiles, List<string> notes = null)
+        /// <summary>
+        /// Next unused "fileName.bakN" path (.bak1, .bak2, ...) -- so ParkLocalVersion never overwrites an earlier
+        /// backup that hasn't been dealt with yet. No upper bound: if these are never cleaned up they accumulate
+        /// indefinitely, one per overwritten local edit.
+        /// </summary>
+        private static string NextBackupPath(string fileName)
+        {
+            int n = 1;
+            string path;
+            do
+            {
+                path = fileName + ".bak" + n;
+                n++;
+            } while (File.Exists(path));
+            return path;
+        }
+
+        private static string BuildSyncReportText(string type, List<string> filesNew, List<string> filesOverwritten, List<string> putFiles)
         {
             string s = null;
             s += " ---------------------- DATA FOLDER SYNC --------------------------- ";
@@ -666,19 +689,6 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 {
                     s += G.NL + f;
                 }
-            }
-
-            if (notes != null && notes.Count > 0)
-            {
-                s += G.NL + G.NL;
-                s += " ---------------------- LOCAL CHANGES ------------------------------ ";
-                s += G.NL + G.NL;
-                s += notes.Count + " data file" + G.S(notes.Count) + " differed from the .dlink file:";
-                foreach (string note in notes)
-                {
-                    s += G.NL + note;
-                }
-                s += G.NL + G.NL + "(A blob file ending in _z is a zip file with one entry called 'storage'. One ending in _r is the file itself.)";
             }
 
             if (G.Equal(Environment.UserName, "tth"))
