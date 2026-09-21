@@ -23,7 +23,6 @@ using System;
 using System.Windows.Forms;
 using System.IO;
 using System.Collections.Generic;
-using System.Data;
 using ProtoBuf;
 using System.Linq;
 using System.IO.Compression;
@@ -233,7 +232,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 {
                     if (File.Exists(dataFile))
                     {                        
-                        hash = DlinkHooks.GetFileHash(dataFile); //TODO: WithWait or WaitFor...                        
+                        hash = DlinkHooks.GetFileHash(dataFile);
                     }
                     else
                     {
@@ -247,12 +246,8 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     }
 
                     EDlinkHashKind hashKind = DlinkHashKinds.Classify(dataFile);
-                                        
-                    if (!DlinkHashKinds.IsByteCountMeaningful(hashKind))
-                    {
-                        bytes = null;
-                    }
 
+                    if (!DlinkHashKinds.IsByteCountMeaningful(hashKind)) bytes = null; //Not meaningful for px or gbk
                     DlinkFile blobInfo = new DlinkFile(hash, bytes);
                     G.YamlWriter<DlinkFile>(blobInfo, dlinkFile);
                 }
@@ -439,6 +434,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             List<string> getFilesOverwrite = new List<string>();
             List<string> putFiles = new List<string>();
             List<string> errors = new List<string>();
+            List<string> notes = new List<string>(); //local data files that differed from their .dlink (saved, or left untouched)
             
             WindowDlinkGitHook progressWindow = new WindowDlinkGitHook("Data file sync (" + type + ")");
 
@@ -498,9 +494,26 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                             //Check that we have the file in blobs folder, else add it there. This happens when making a brand new datafile
                             SyncBlobs(false, realFile.name, dlinkFileData.hash, blobsFolder, getFilesNew, getFilesOverwrite, putFiles, dlinkVersion);
                         }
+                        else if (realFile.exists && G.Equal(type, "pre-push"))
+                        {
+                            //A push must never change the working copy. The data file differs from its .dlink file
+                            //(probably an uncommitted local change), so leave it alone. All the push needs is that the
+                            //blob the .dlink points to exists in storage.
+                            if (ResolveExistingBlob(blobsFolder, dlinkFileData.hash, realFile.name) == null)
+                            {
+                                new Error("For '" + realFile.name + "', could not find a blob file for hash '" + dlinkFileData.hash + "' under '" + blobsFolder + "'");
+                            }
+                            notes.Add(realFile.name + " -- differs from its .dlink file, left untouched");
+                        }
                         else
                         {
                             //Get it from blobs (A or B)
+                            //If a different version of the file is already there, it is about to be overwritten. Make sure that version is safe in
+                            //blob storage first. (Only if the blob we restore from exists: else SyncBlobs(true) fails below and nothing is overwritten.)
+                            if (realFile.exists && ResolveExistingBlob(blobsFolder, dlinkFileData.hash, realFile.name) != null)
+                            {
+                                ParkLocalVersion(realFile, dlinkVersion, blobsFolder, notes);
+                            }
                             SyncBlobs(true, realFile.name, dlinkFileData.hash, blobsFolder, getFilesNew, getFilesOverwrite, putFiles, dlinkVersion);
                             FileInfo fi2 = new FileInfo(realFile.name);
                             //We update the realFile, because its contents have changed
@@ -522,7 +535,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 }
                 DlinkHashCache.Save(); //Persist any hashes computed while checking this batch of .dlink files
 
-                string report = BuildSyncReportText(type, getFilesNew, getFilesOverwrite, putFiles);
+                string report = BuildSyncReportText(type, getFilesNew, getFilesOverwrite, putFiles, notes);
                 progressWindow.Finish(report); //fills the report in, enables OK, and lets ShowDialog() below return once the user dismisses it
             });
             worker.IsBackground = true;            
@@ -572,7 +585,36 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             return true;
         }
         
-        private static string BuildSyncReportText(string type, List<string> filesNew, List<string> filesOverwritten, List<string> putFiles)
+        /// <summary>
+        /// Called right before a data file that differs from its .dlink file is overwritten with the blob version.
+        /// Makes sure the version currently on disk is safe in blob storage first, so that a locally changed file whose .dlink
+        /// was never regenerated (for instance a csv written by Python) cannot be lost by a checkout/merge/commit sync.
+        /// Blobs are content-addressed, so if the current version is already in storage (the normal case after switching branch)
+        /// nothing is copied. If it cannot be saved this throws, and the caller must NOT overwrite the file.
+        /// </summary>
+        private static void ParkLocalVersion(RealFile realFile, EDlinkVersion dlinkVersion, string blobsFolder, List<string> notes)
+        {
+            string localHash = null;
+            List<string> newlyStored = new List<string>();
+            try
+            {
+                //realFile.hash is null if the byte-count check in DoDlinkFileAndDataFileCorrespond returned before hashing.
+                localHash = realFile.hash ?? GetFileHash(realFile.name, realFile.bytes.Value, realFile.stamp.Value, dlinkVersion);
+                SyncBlobs(false, realFile.name, localHash, blobsFolder, new List<string>(), new List<string>(), newlyStored, dlinkVersion);
+            }
+            catch (Exception ex)
+            {
+                new Error("'" + realFile.name + "' differs from its .dlink file and would be overwritten, but its current version could not be saved to blob storage first (" + ex.Message + "). The file was NOT overwritten. Move or delete it manually, and sync again.");
+            }
+            if (newlyStored.Count > 0)
+            {
+                //It was not in storage before, i.e. this is a version that existed nowhere else. Tell the user where it went.
+                BlobLocation location = ResolveExistingBlob(blobsFolder, localHash, realFile.name);
+                notes.Add(realFile.name + " -- previous local version saved as " + (location != null ? location.path : "blob " + localHash));
+            }
+        }
+
+        private static string BuildSyncReportText(string type, List<string> filesNew, List<string> filesOverwritten, List<string> putFiles, List<string> notes = null)
         {
             string s = null;
             s += " ---------------------- DATA FOLDER SYNC --------------------------- ";
@@ -624,6 +666,19 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 {
                     s += G.NL + f;
                 }
+            }
+
+            if (notes != null && notes.Count > 0)
+            {
+                s += G.NL + G.NL;
+                s += " ---------------------- LOCAL CHANGES ------------------------------ ";
+                s += G.NL + G.NL;
+                s += notes.Count + " data file" + G.S(notes.Count) + " differed from the .dlink file:";
+                foreach (string note in notes)
+                {
+                    s += G.NL + note;
+                }
+                s += G.NL + G.NL + "(A blob file ending in _z is a zip file with one entry called 'storage'. One ending in _r is the file itself.)";
             }
 
             if (G.Equal(Environment.UserName, "tth"))
@@ -948,7 +1003,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             string actualHash = ComputeHashUncached(tempPath, dlinkVersion, forceFileType);
             if (!G.Equal(actualHash, expectedHash))
             {
-                throw new IOException("Fetched blob for '" + originalFileNameAndPath + "' does not match its expected hash (expected '" + expectedHash + "', got '" + actualHash + "') -- the stored blob may be missing, corrupted, or have been replaced.");
+                new Error("Fetched blob for '" + originalFileNameAndPath + "' does not match its expected hash (expected '" + expectedHash + "', got '" + actualHash + "') -- the stored blob may be missing, corrupted, or have been replaced.");
             }
         }
 
@@ -1408,12 +1463,12 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 if (v == EDlinkVersion.None) continue;
                 if (!VersionRegistry.ContainsKey(v))
                 {
-                    throw new InvalidOperationException("EDlinkVersion." + v + " has no VersionSpec registered in DlinkCommon.VersionRegistry -- add one before this build can be used (see the comment above VersionRegistry).");
+                    new Error("EDlinkVersion." + v + " has no VersionSpec registered in DlinkCommon.VersionRegistry -- add one before this build can be used (see the comment above VersionRegistry).");
                 }
             }
             if (!VersionRegistry.TryGetValue(CurrentVersion, out VersionSpec currentSpec) || !currentSpec.IsSupported)
             {
-                throw new InvalidOperationException("DlinkCommon.CurrentVersion is set to '" + CurrentVersion + "', which is not a supported VersionSpec -- CurrentVersion must point at a version with IsSupported == true.");
+                new Error("DlinkCommon.CurrentVersion is set to '" + CurrentVersion + "', which is not a supported VersionSpec -- CurrentVersion must point at a version with IsSupported == true.");
             }
         }
 

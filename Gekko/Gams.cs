@@ -3497,7 +3497,6 @@ namespace Gekko
                 if (lhsList_list == null)
                 {
                     new Error("Variable #dependents should be of list type");
-                    //throw new GekkoException();
                 }
                 int c = 0;
                 foreach (IVariable x in lhsList_list.list)
