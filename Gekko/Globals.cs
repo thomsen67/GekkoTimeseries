@@ -561,8 +561,7 @@ namespace Gekko
 
         public const int timeStringsStart = 1900;
         public const int timeStringsEnd = 2500;
-        public static string[] timeStrings = null;  //stores "1900" to "2500" for easy access and reuse
-        public static List<string> alreadyZipped = new List<string>() { ".gbk", ".xlsx", ".parquet" };
+        public static string[] timeStrings = null;  //stores "1900" to "2500" for easy access and reuse        
         public static bool showErrorsAsMessageBox = false;
 
         public static ConcurrentDictionary<int, bool> browserCompleted = new ConcurrentDictionary<int, bool>();

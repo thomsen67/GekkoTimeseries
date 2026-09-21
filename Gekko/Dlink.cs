@@ -776,7 +776,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// <returns></returns>
         public static bool ShouldZipBlobByCurrentPolicy(string dataFile)
         {
-            return !Globals.alreadyZipped.Contains(Path.GetExtension(dataFile), StringComparer.OrdinalIgnoreCase);
+            return !DlinkCommon.alreadyZipped.Contains(Path.GetExtension(dataFile), StringComparer.OrdinalIgnoreCase);
         }
 
         private class BlobLocation
@@ -1333,7 +1333,8 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
     public static class DlinkCommon
     {
-        
+        public static List<string> alreadyZipped = new List<string>() { ".docx", ".gbk", ".parquet", ".pdf", ".pptx", ".rds", ".xlsx" };
+
         // ============================================================================================
         // SINGLE SOURCE OF TRUTH for ".px" / ".gbk" / EDlinkHashKind / EDlinkVersion -- and now for
         // "which .dlink versions exist at all", "what does each one do", and "which one is current".
