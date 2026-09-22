@@ -68,6 +68,7 @@ namespace Gekko
             string hooksPath = Path.Combine(parentOfGitFolder, ".git", "hooks");
             if (!Directory.Exists(hooksPath)) new Error("Could not find folder '" + hooksPath + "'");
 
+            bool hooksWritten = false; //so the catch block below can tell which phase of Activate actually failed
             try
             {
                 // ----------------------------------------------------------------------------------------------------------                                            
@@ -147,6 +148,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                         {
                             new Writeln("Added or changed " + counter + " Git hook files in folder '" + hooksPath + "'");
                         }
+                        hooksWritten = true;
                     }
 
                     if (type == EDlinkSetup.Activate || type == EDlinkSetup.ActivateOnlySync)
@@ -173,13 +175,17 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 }                
                 else new Error();
             }
-            catch
+            catch (Exception ex)
             {
-                if (type == EDlinkSetup.Activate) new Error("Failed to write Git hooks files in folder '" + hooksPath + "', and sync afterwards.");
-                else if (type == EDlinkSetup.DeactivateHooks) new Error("Failed to remove Git hooks files in folder '" + hooksPath + "'");
-                else if (type == EDlinkSetup.ActivateOnlyHooks) new Error("Failed to write Git hooks files in folder '" + hooksPath + "'");
-                else if (type == EDlinkSetup.ActivateOnlySync) new Error("Failed to sync .dlink files (Git folder: '" + hooksPath + "')");
-                new Error();
+                //Include the real underlying message (ex.Message) instead of replacing it -- e.g. DlinkSyncFiles
+                //already reports exactly which/how many blob files could not be found; don't discard that detail
+                //behind a generic guess. For Activate, hooksWritten tells us which of its two phases actually failed.
+                if (type == EDlinkSetup.Activate && !hooksWritten) new Error("Failed to write Git hooks files in folder '" + hooksPath + "': " + ex.Message);
+                else if (type == EDlinkSetup.Activate && hooksWritten) new Error("Git hooks were written OK, but syncing .dlink files afterwards failed: " + ex.Message);
+                else if (type == EDlinkSetup.DeactivateHooks) new Error("Failed to remove Git hooks files in folder '" + hooksPath + "': " + ex.Message);
+                else if (type == EDlinkSetup.ActivateOnlyHooks) new Error("Failed to write Git hooks files in folder '" + hooksPath + "': " + ex.Message);
+                else if (type == EDlinkSetup.ActivateOnlySync) new Error("Failed to sync .dlink files (Git folder: '" + hooksPath + "'): " + ex.Message);
+                else new Error(ex.Message);
             }
         }
     }    
@@ -698,12 +704,17 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 }
             }
 
-            if (backupFiles.Count > 0)
+            s += G.NL + G.NL;
+            s += " ----------------------- LOCAL BACKUPS ----------------------------- ";
+            s += G.NL + G.NL;
+
+            if (backupFiles.Count == 0)
             {
-                s += G.NL + G.NL;
-                s += " ----------------------- LOCAL BACKUPS ----------------------------- ";
-                s += G.NL + G.NL;
-                s += backupFiles.Count + " local file version" + G.S(backupFiles.Count) + " copied to *.bak{n} before being overwritten:";
+                s += "No local file versions needed backing up.";
+            }
+            else
+            {
+                s += backupFiles.Count + " local file version" + G.S(backupFiles.Count) + " renamed to a .bak file before being overwritten:";
                 foreach (string f in backupFiles)
                 {
                     s += G.NL + f;
@@ -1362,7 +1373,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
     public static class DlinkCommon
     {
-        public static List<string> alreadyZipped = new List<string>() { ".7z", ".docm", ".docx", ".gbk", ".gz", ".ods", ".odt", ".odp", ".parquet", ".pdf", ".pptm", ".pptx", ".rar", ".rds", ".xlsm", ".xlsx", ".zip" };
+        public static List<string> alreadyZipped = new List<string>() { ".docx", ".gbk", ".parquet", ".pdf", ".pptx", ".rds", ".xlsx" };
 
         // ============================================================================================
         // SINGLE SOURCE OF TRUTH for ".px" / ".gbk" / EDlinkHashKind / EDlinkVersion -- and now for
