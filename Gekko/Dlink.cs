@@ -691,7 +691,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 }
             }
 
-            if (G.Equal(Environment.UserName, "tth"))
+            if (false && G.Equal(Environment.UserName, "tth"))
             {
                 s += G.NL + G.NL;
                 s += " ------------------------- HASH CACHE ------------------------------ ";
