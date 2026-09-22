@@ -702,19 +702,14 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 {
                     s += G.NL + f;
                 }
-            }
+            }            
 
-            s += G.NL + G.NL;
-            s += " ----------------------- LOCAL BACKUPS ----------------------------- ";
-            s += G.NL + G.NL;
-
-            if (backupFiles.Count == 0)
+            if (backupFiles.Count > 0)
             {
-                s += "No local file versions needed backing up.";
-            }
-            else
-            {
-                s += backupFiles.Count + " local file version" + G.S(backupFiles.Count) + " renamed to a .bak file before being overwritten:";
+                s += G.NL + G.NL;
+                s += " ----------------------- LOCAL BACKUPS ----------------------------- ";
+                s += G.NL + G.NL;
+                s += backupFiles.Count + " local file version" + G.S(backupFiles.Count) + " saved to *.bak{n} file" + G.S(backupFiles.Count) + " before being overwritten:";
                 foreach (string f in backupFiles)
                 {
                     s += G.NL + f;
@@ -1373,7 +1368,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
     public static class DlinkCommon
     {
-        public static List<string> alreadyZipped = new List<string>() { ".docx", ".gbk", ".parquet", ".pdf", ".pptx", ".rds", ".xlsx" };
+        public static List<string> alreadyZipped = new List<string>() { ".7z", ".docm", ".docx", ".gbk", ".gz", ".ods", ".odt", ".odp", ".parquet", ".pdf", ".pptm", ".pptx", ".rar", ".rds", ".xlsm", ".xlsx", ".zip" };
 
         // ============================================================================================
         // SINGLE SOURCE OF TRUTH for ".px" / ".gbk" / EDlinkHashKind / EDlinkVersion -- and now for
