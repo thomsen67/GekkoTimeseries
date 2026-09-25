@@ -427,6 +427,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Arrow.cs" />
+    <Compile Include="BankCompareData.cs" />
+    <Compile Include="BankCompareEngine.cs" />
     <Compile Include="Decomp_OLD.cs" />
     <Compile Include="Dlink.cs" />
     <Compile Include="EquationBrowser.cs" />
@@ -484,6 +486,7 @@
       <DependentUpon>GuiDialogMakeBatfile.cs</DependentUpon>
     </Compile>
     <Compile Include="Hashing.cs" />
+    <Compile Include="HistogramView.cs" />
     <Compile Include="IBank.cs" />
     <Compile Include="GuiInputBox.cs" />
     <Compile Include="IVariable.cs" />
@@ -559,7 +562,11 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Translate_2_4_to_3_0.cs" />
+    <Compile Include="VennView.cs" />
     <Compile Include="WarningPool.cs" />
+    <Compile Include="WindowBankCompare.xaml.cs">
+      <DependentUpon>WindowBankCompare.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WindowDlink.xaml.cs">
       <DependentUpon>WindowDlink.xaml</DependentUpon>
     </Compile>
@@ -754,6 +761,10 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="WindowBankCompare.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="WindowDecomp.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

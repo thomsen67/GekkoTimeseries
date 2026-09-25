@@ -3079,9 +3079,15 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer)
             {
-                if (true)
+                if (false)
                 {
                     Pool.Test();
+                }
+
+                if (true)
+                {
+                    WindowBankCompare xx = new WindowBankCompare();                    
+                    xx.ShowDialog();
                 }
 
                 if (false)
@@ -36250,7 +36256,7 @@ namespace Gekko
                 string strange = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
                 
                 string ext = "";
-                if (fileNameExtensionPretty.ToLower() == "bnk") ext = ".bnk";
+                if (fileNameExtensionPretty != null && fileNameExtensionPretty.ToLower() == "bnk") ext = ".bnk";
                 tab.CurRow.SetText(1, "DATABANK " + fileNameWithoutPathPretty);
                 tab.CurRow.SetBottomBorder(1, 1);
                 tab.CurRow.Next();
@@ -36354,7 +36360,11 @@ namespace Gekko
                     if (m.Count > 0)
                     {
                         string s5 = string.Join(", ", m);
-                        string s6 = G.FirstCharToUpper(s5);
+                        string s6 = "";
+                        if (s5 != null)
+                        {
+                            s6 = G.FirstCharToUpper(s5);
+                        }
                         if (git && user) tab.CurRow.SetText(1, "Git/user : " + s6);
                         else if (git && !user) tab.CurRow.SetText(1, "Git      : " + s6);
                         else if (!git && user) tab.CurRow.SetText(1, "User     : " + s6.Replace("User: ", ""));
