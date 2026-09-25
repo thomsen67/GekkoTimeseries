@@ -15,9 +15,9 @@ namespace Gekko
     {
         static readonly Color[] Palette =
         {
-            Color.FromRgb(0x2E, 0x6D, 0xB4),  // bank 1: blue
-            Color.FromRgb(0xC9, 0x7A, 0x1E),  // bank 2: amber
-            Color.FromRgb(0x3D, 0x8C, 0x4E)   // bank 3: green
+            Color.FromRgb(0x3D, 0x8C, 0x4E),  // bank 1 (top): green
+            Color.FromRgb(0x2E, 0x6D, 0xB4),  // bank 2 (left): blue
+            Color.FromRgb(0xC9, 0x7A, 0x1E)   // bank 3 (right): amber
         };
         static readonly Color Grey = Color.FromRgb(0xA6, 0xA6, 0xA6);
 
@@ -55,8 +55,8 @@ namespace Gekko
     }
 
     /// <summary>
-    /// Venn diagram for 2 or 3 banks. Bank 1 is bottom-left, bank 2 bottom-right, bank 3 on top,
-    /// so the 2-bank diagram is the 3-bank diagram without the top circle.
+    /// Venn diagram for 2 or 3 banks. Bank 1 is on top, bank 2 bottom-left, bank 3 bottom-right.
+    /// The 2-bank diagram is the 3-bank diagram without the right circle: same positions, same size.
     /// Raises AreaClicked(mask, deviationsClicked) and BankClicked(slot).
     /// </summary>
     public sealed class VennView : Canvas
@@ -74,10 +74,11 @@ namespace Gekko
         static readonly Brush HiddenFill = BankColors.FromArgb(0x14, 0x80, 0x80, 0x80);
         static readonly Brush HiddenStroke = BankColors.FromRgb(0xB4, 0xB4, 0xB4);
         static readonly Brush TotalBrush = BankColors.FromRgb(0x1F, 0x4E, 0x79);
+        static readonly Brush NumberBrush = Brushes.Black;
         static readonly Brush DeviationBrush = BankColors.FromRgb(0xB0, 0x30, 0x30);
         static readonly Brush MutedBrush = BankColors.FromRgb(0x88, 0x88, 0x88);
         static readonly Brush TextBrush = BankColors.FromRgb(0x44, 0x44, 0x44);
-        static readonly Brush SelectedTextBack = BankColors.FromRgb(0xFF, 0xF0, 0xB0);
+        static readonly Brush SelectedTextBack = Brushes.White;
 
         VennResult result;
         string emptyMessage = "";
@@ -123,24 +124,24 @@ namespace Gekko
             }
 
             bool three = result.SlotCount == 3;
-            Point[] unit = three
-                ? new[] { new Point(-0.5, H3), new Point(0.5, H3), new Point(0, -T3) }
-                : new[] { new Point(-0.5, 0), new Point(0.5, 0) };
-            double yMin = three ? -(T3 + 1) : -1;
-            double yMax = three ? H3 + 1 : 1;
+            // The layout is always the 3-circle layout, so circles keep their size and place in 2-bank mode.
+            Point[] unit3 = { new Point(0, -T3), new Point(-0.5, H3), new Point(0.5, H3) };
+            Point[] unit = unit3.Take(result.SlotCount).ToArray();
+            const double yMin = -(T3 + 1), yMax = H3 + 1;
 
-            // Room for bank labels left/right (banks 1 and 2) and on top (bank 3).
-            const double side = 230, bottom = 30;
-            double top = three ? 62 : 30;
+            // Room for bank labels on the left and right, a text line on top and the caption below.
+            const double side = 225, top = 22, bottom = 26;
             double r = Math.Min((width - 2 * side) / 3.0, (height - top - bottom) / (yMax - yMin));
-            r = Math.Max(45, Math.Min(r, 200));
+            r = Math.Max(40, Math.Min(r, 200));
             double ox = width / 2;
             double oy = top + ((height - top - bottom) - (yMax - yMin) * r) / 2 - yMin * r;
             Func<Point, Point> toPixel = p => new Point(ox + p.X * r, oy + p.Y * r);
             Point[] centers = unit.Select(toPixel).ToArray();
 
             string freqName = result.Freq.ToString();
-            Add(new TextBlock { Text = freqName + " series, universal period " + result.SpanText, FontSize = 12.5, Foreground = TextBrush }, 2, 0);
+            string spanLine = freqName + " series, universal period " + result.SpanText;
+            if (result.IsRestricted) spanLine += ", compared " + result.WindowText;
+            Add(new TextBlock { Text = spanLine, FontSize = 12.5, Foreground = TextBrush }, 2, 0);
 
             // Circles
             for (int s = 0; s < result.SlotCount; s++)
@@ -216,26 +217,29 @@ namespace Gekko
             return g;
         }
 
-        /// <summary>Label position of each area, in radius units relative to the centroid.</summary>
+        /// <summary>
+        /// Label position of each area, in radius units relative to the centroid.
+        /// Mask bits: 1 = bank 1 (top), 2 = bank 2 (left), 4 = bank 3 (right).
+        /// </summary>
         static Point LabelPoint(bool three, int mask)
         {
             if (!three)
             {
                 switch (mask)
                 {
-                    case 1: return new Point(-1.0, 0);
-                    case 2: return new Point(1.0, 0);
-                    default: return new Point(0, 0);
+                    case 1: return new Point(0.25, -0.8);
+                    case 2: return new Point(-0.75, 0.55);
+                    default: return new Point(-0.25, -0.144);
                 }
             }
             switch (mask)
             {
-                case 1: return new Point(-0.935, 0.54);
-                case 2: return new Point(0.935, 0.54);
-                case 4: return new Point(0, -1.08);
-                case 3: return new Point(0, 0.78);
-                case 5: return new Point(-0.675, -0.39);
-                case 6: return new Point(0.675, -0.39);
+                case 1: return new Point(0, -1.08);
+                case 2: return new Point(-0.935, 0.54);
+                case 4: return new Point(0.935, 0.54);
+                case 3: return new Point(-0.675, -0.39);
+                case 5: return new Point(0.675, -0.39);
+                case 6: return new Point(0, 0.78);
                 default: return new Point(0, 0.02);
             }
         }
@@ -250,9 +254,7 @@ namespace Gekko
             var totalText = new TextBlock
             {
                 Text = total.ToString(CultureInfo.InvariantCulture),
-                FontSize = 17,
-                FontWeight = FontWeights.SemiBold,
-                Foreground = TotalBrush,
+                Foreground = NumberBrush,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 Padding = new Thickness(4, 0, 4, 0),
                 ToolTip = total + " series. Click to list their names."
@@ -266,8 +268,7 @@ namespace Gekko
                 int dev = area.Deviations.Count;
                 var devText = new TextBlock
                 {
-                    Text = dev + " dev.",
-                    FontSize = 12,
+                    Text = "(" + dev.ToString(CultureInfo.InvariantCulture) + ")",
                     Foreground = dev > 0 ? DeviationBrush : MutedBrush,
                     HorizontalAlignment = HorizontalAlignment.Center,
                     Padding = new Thickness(4, 0, 4, 1)
@@ -369,18 +370,21 @@ namespace Gekko
             double left, topPos;
             if (s == 0)
             {
-                left = center.X - r - 14 - size.Width;
+                // Left of the top circle, clear of the left circle below it
+                left = center.X - 1.3 * r - size.Width;
                 topPos = center.Y - size.Height / 2;
             }
             else if (s == 1)
             {
-                left = center.X + r + 14;
-                topPos = center.Y - size.Height / 2;
+                // Left of the left circle, somewhat below its center
+                left = center.X - r - 10 - size.Width;
+                topPos = center.Y + 0.45 * r - size.Height / 2;
             }
             else
             {
-                left = center.X - size.Width / 2;
-                topPos = center.Y - r - 8 - size.Height;
+                // Right of the right circle, somewhat below its center
+                left = center.X + r + 10;
+                topPos = center.Y + 0.45 * r - size.Height / 2;
             }
             Add(tag, Math.Max(2, left), Math.Max(2, topPos));
         }
@@ -401,11 +405,7 @@ namespace Gekko
 
         string Caption(int mask)
         {
-            VennArea area = result.Areas[mask];
-            string text = CompareEngine.DescribeArea(result, mask) + ": " + area.Names.Count + " series";
-            if (area.IsComparison)
-                text += ", " + area.Deviations.Count + (area.Slots.Length == 3 ? " not equal in all three" : " deviating");
-            return text;
+            return CompareEngine.SummarizeArea(result, mask);
         }
 
         void AddCenteredMessage(string text, double width, double height)

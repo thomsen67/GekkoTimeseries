@@ -489,6 +489,7 @@
     <Compile Include="HistogramView.cs" />
     <Compile Include="IBank.cs" />
     <Compile Include="GuiInputBox.cs" />
+    <Compile Include="InsertionLineAdorner.cs" />
     <Compile Include="IVariable.cs" />
     <Compile Include="Libraries.cs" />
     <Compile Include="List.cs" />

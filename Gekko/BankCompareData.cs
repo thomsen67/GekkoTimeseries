@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Gekko
 {
@@ -40,6 +41,50 @@ namespace Gekko
         public static int SubPeriod(CompareFreq freq, int index)
         {
             return index % PeriodsPerYear(freq) + 1;
+        }
+
+        static readonly Regex PeriodPattern = new Regex(@"^\s*(\d{4})\s*(?:([aAqQmM])\s*(\d{1,2}))?\s*$");
+
+        /// <summary>
+        /// Parses 2010, 2010q3 or 2010m7 (case-insensitive). A plain year means the first subperiod,
+        /// or the last one when isEnd is true, so "2010" as last quarterly period means 2010q4.
+        /// </summary>
+        public static bool TryParse(string text, CompareFreq freq, bool isEnd, out int index)
+        {
+            index = 0;
+            var m = PeriodPattern.Match(text ?? "");  // var: avoids a clash if Gekko has its own Match type
+            if (!m.Success) return false;
+            int year = int.Parse(m.Groups[1].Value, CultureInfo.InvariantCulture);
+            int periodsPerYear = PeriodsPerYear(freq);
+            int sub;
+            if (!m.Groups[2].Success)
+            {
+                sub = isEnd ? periodsPerYear : 1;
+            }
+            else
+            {
+                char letter = char.ToLowerInvariant(m.Groups[2].Value[0]);
+                char expected = freq == CompareFreq.Quarterly ? 'q' : freq == CompareFreq.Monthly ? 'm' : 'a';
+                if (letter != expected) return false;
+                sub = int.Parse(m.Groups[3].Value, CultureInfo.InvariantCulture);
+                if (sub < 1 || sub > periodsPerYear) return false;
+            }
+            index = ToIndex(freq, year, sub);
+            return true;
+        }
+
+        /// <summary>
+        /// The same point in time in another frequency. A start period maps to the period containing its
+        /// start (2010q3 -> 2010m7), an end period to the period containing its end (2010q3 -> 2010m9).
+        /// </summary>
+        public static int ChangeFrequency(int index, CompareFreq from, CompareFreq to, bool isEnd)
+        {
+            int fromPpy = PeriodsPerYear(from), toPpy = PeriodsPerYear(to);
+            int year = Year(from, index), sub = SubPeriod(from, index);
+            int newSub = isEnd
+                ? (int)Math.Ceiling(sub * (double)toPpy / fromPpy)
+                : (int)Math.Floor((sub - 1) * (double)toPpy / fromPpy) + 1;
+            return ToIndex(to, year, newSub);
         }
 
         public static string Format(CompareFreq freq, int index)

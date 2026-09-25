@@ -15,8 +15,11 @@ namespace Gekko
     /// <summary>One row in the numbered bank list.</summary>
     public sealed class BankItem : INotifyPropertyChanged
     {
+        static readonly Brush GreyNumber = BankColors.FromRgb(0x88, 0x88, 0x88);
+
         int position;
         bool inComparison;
+        bool isDragging;
 
         public BankItem(CompareBank bank)
         {
@@ -25,15 +28,12 @@ namespace Gekko
 
         public CompareBank Bank { get; }
         public string Name => Bank.Name;
+        public string PathText => Bank.FilePath ?? "(artificial data)";
 
-        public string Info
+        /// <summary>E.g. "A 380, Q 200, M 70".</summary>
+        public string SeriesText
         {
-            get
-            {
-                string where = Bank.FilePath ?? "artificial data";
-                IEnumerable<string> parts = Bank.Frequencies.Select(f => Bank.Count(f) + " " + f.ToString().ToLowerInvariant());
-                return where + "   (" + string.Join(", ", parts) + ")";
-            }
+            get { return string.Join(", ", Bank.Frequencies.Select(f => f.ToString().Substring(0, 1) + " " + Bank.Count(f))); }
         }
 
         public int Position
@@ -44,7 +44,7 @@ namespace Gekko
                 if (position == value) return;
                 position = value;
                 Raise(nameof(Position));
-                Raise(nameof(BadgeBrush));
+                Raise(nameof(NumberBrush));
             }
         }
 
@@ -57,13 +57,28 @@ namespace Gekko
                 if (inComparison == value) return;
                 inComparison = value;
                 Raise(nameof(InComparison));
-                Raise(nameof(BadgeBrush));
+                Raise(nameof(NumberBrush));
+                Raise(nameof(NumberWeight));
                 Raise(nameof(ItemOpacity));
             }
         }
 
-        public Brush BadgeBrush => BankColors.Solid(InComparison ? Position - 1 : -1);
-        public double ItemOpacity => InComparison ? 1.0 : 0.55;
+        /// <summary>True while the row is being dragged (shown in bold).</summary>
+        public bool IsDragging
+        {
+            get { return isDragging; }
+            set
+            {
+                if (isDragging == value) return;
+                isDragging = value;
+                Raise(nameof(IsDragging));
+            }
+        }
+
+        /// <summary>The number has the circle's color for compared banks.</summary>
+        public Brush NumberBrush => InComparison ? BankColors.Solid(Position - 1) : GreyNumber;
+        public FontWeight NumberWeight => InComparison ? FontWeights.Bold : FontWeights.Normal;
+        public double ItemOpacity => InComparison ? 1.0 : 0.6;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -78,12 +93,13 @@ namespace Gekko
         const string DragFormat = "GekkoBankCompareItem";
         static readonly Brush DropHighlight = BankColors.FromRgb(0x2E, 0x6D, 0xB4);
         static readonly Brush DropNormal = BankColors.FromRgb(0x99, 0x99, 0x99);
-        static readonly Brush InvalidFilterBack = BankColors.FromRgb(0xFB, 0xE3, 0xE3);
+        static readonly Brush InvalidBack = BankColors.FromRgb(0xFB, 0xE3, 0xE3);
+        static readonly Brush AutoPeriodBrush = BankColors.FromRgb(0x88, 0x88, 0x88);
 
         readonly ObservableCollection<BankItem> banks = new ObservableCollection<BankItem>();
         readonly IEqualityCriterion criterion = new SimpleEqualityCriterion();
         readonly bool[] active = { true, true, true };
-        readonly DispatcherTimer filterTimer;
+        readonly DispatcherTimer recomputeTimer;
         bool ready;
         bool busy;
 
@@ -96,16 +112,25 @@ namespace Gekko
         int lastBarPeriod = int.MinValue;
         DeviationListing listing;
 
+        // Chosen first/last period in the selected frequency. Null means: follow the universal period.
+        int? userFrom;
+        int? userTo;
+        CompareFreq? periodFreq;
+
+        bool diagramHidden;
+        GridLength savedVennHeight = new GridLength(1.25, GridUnitType.Star);
+
         Point dragStart;
         BankItem dragCandidate;
+        InsertionLineAdorner insertionLine;
 
         public WindowBankCompare()
         {
             InitializeComponent();
             BankList.ItemsSource = banks;
 
-            filterTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(300) };
-            filterTimer.Tick += (s, e) => Recompute();
+            recomputeTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(300) };
+            recomputeTimer.Tick += (s, e) => Recompute();
 
             Venn.AreaClicked += Venn_AreaClicked;
             Venn.BankClicked += Venn_BankClicked;
@@ -118,8 +143,7 @@ namespace Gekko
 
             ready = true;
             BanksChanged();
-            ClearDetails();
-            SetStatus("Three databanks with artificial data are loaded. Drop files to add banks, drag list items to reorder.");
+            SetStatus("Three databanks with artificial data are loaded. Drop files to add banks, drag rows to reorder.");
         }
 
         int SlotCount => Compare3Radio.IsChecked == true && banks.Count >= 3 ? 3 : 2;
@@ -171,39 +195,52 @@ namespace Gekko
             FreqCombo.SelectedIndex = index >= 0 ? index : (freqs.Count > 0 ? 0 : -1);
         }
 
+        void ScheduleRecompute()
+        {
+            recomputeTimer.Stop();
+            recomputeTimer.Start();
+        }
+
         void Recompute()
         {
             if (!ready) return;
-            filterTimer.Stop();
+            recomputeTimer.Stop();
 
-            if (banks.Count < 2)
-            {
-                current = null;
-                Venn.SetResult(null, banks.Count == 0 ? "Drag databank files into the drop field to begin." : "Add one more databank to compare.");
-                ClearDetails();
-                return;
-            }
             CompareFreq? freq = SelectedFreq;
-            if (!freq.HasValue)
+            if (banks.Count < 2 || !freq.HasValue)
             {
                 current = null;
-                Venn.SetResult(null, "The compared databanks contain no series.");
+                Venn.SetResult(null, banks.Count == 0 ? "Drag databank files into the drop field to begin."
+                                   : banks.Count == 1 ? "Add one more databank to compare."
+                                   : "The compared databanks contain no series.");
+                selectedMask = 0;
                 ClearDetails();
+                UpdatePeriodBoxes();
+                UpdateSelectionText();
                 return;
             }
+
+            // Keep the chosen periods when switching frequency (2010q3 becomes 2010m7 or 2010, and so on).
+            if (periodFreq.HasValue && periodFreq.Value != freq.Value)
+            {
+                if (userFrom.HasValue) userFrom = PeriodText.ChangeFrequency(userFrom.Value, periodFreq.Value, freq.Value, false);
+                if (userTo.HasValue) userTo = PeriodText.ChangeFrequency(userTo.Value, periodFreq.Value, freq.Value, true);
+            }
+            periodFreq = freq;
 
             string error;
             Func<string, bool> filter = CompareEngine.BuildFilter(FilterBox.Text, RegexCheck.IsChecked == true, out error);
             if (error == null) FilterBox.ClearValue(Control.BackgroundProperty);
             else
             {
-                FilterBox.Background = InvalidFilterBack;
+                FilterBox.Background = InvalidBack;
                 SetStatus(error);
             }
             FilterBox.ToolTip = error;
 
-            int n = SlotCount;
-            current = CompareEngine.Compute(banks.Take(n).Select(b => b.Bank).ToList(), active, freq.Value, filter, criterion);
+            List<CompareBank> compared = banks.Take(SlotCount).Select(b => b.Bank).ToList();
+            current = CompareEngine.Compute(compared, active, freq.Value, filter, criterion,
+                                            userFrom ?? int.MinValue, userTo ?? int.MaxValue);
             Venn.SetResult(current, null);
 
             VennArea area;
@@ -218,6 +255,8 @@ namespace Gekko
                 Venn.SetSelection(0, false);
                 ClearDetails();
             }
+            UpdatePeriodBoxes();
+            UpdateSelectionText();
         }
 
         // ---------------------------------------------------------------- diagram clicks
@@ -231,6 +270,7 @@ namespace Gekko
             selectedDeviations = deviations;
             Venn.SetSelection(mask, deviations);
             ShowArea(area, sameArea, true);
+            UpdateSelectionText();
         }
 
         /// <summary>
@@ -279,8 +319,8 @@ namespace Gekko
                 string what = area.Slots.Length == 3
                     ? "number of series not equal in all three banks, per period"
                     : "number of deviating series, per period";
-                Histogram.SetData(description + ": " + what, current.Freq, current.SpanStart,
-                                  CompareEngine.Histogram(area, current.SpanStart, current.SpanEnd));
+                Histogram.SetData(description + ": " + what, current.Freq, current.WindowStart,
+                                  CompareEngine.Histogram(area, current.WindowStart, current.WindowEnd));
                 navList = area.Deviations;
                 navIndex = 0;
                 if (keepName != null)
@@ -311,6 +351,195 @@ namespace Gekko
             navList = new List<SeriesComparison>();
             navIndex = -1;
             ShowCurrentSeries(null);
+        }
+
+        /// <summary>When the diagram is hidden, the selected area is summarized next to the toggle button.</summary>
+        void UpdateSelectionText()
+        {
+            VennArea area = null;
+            if (current != null && selectedMask != 0) current.Areas.TryGetValue(selectedMask, out area);
+            if (!diagramHidden || area == null)
+            {
+                SelectionText.Visibility = Visibility.Collapsed;
+                return;
+            }
+            SelectionText.Text = "Selected: " + CompareEngine.SummarizeArea(current, selectedMask);
+            SelectionText.ToolTip = SelectionText.Text;
+            SelectionText.Visibility = Visibility.Visible;
+        }
+
+        void DiagramToggle_Click(object sender, RoutedEventArgs e)
+        {
+            ToggleDiagram();
+        }
+
+        void ToggleDiagram()
+        {
+            diagramHidden = !diagramHidden;
+            if (diagramHidden)
+            {
+                savedVennHeight = VennRow.Height;
+                VennRow.MinHeight = 0;
+                VennRow.Height = new GridLength(0);
+                VennSplitterRow.Height = new GridLength(0);
+                VennBorder.Visibility = Visibility.Collapsed;
+                VennSplitter.Visibility = Visibility.Collapsed;
+                DiagramToggle.Content = "\u25BE Show diagram";
+            }
+            else
+            {
+                VennBorder.Visibility = Visibility.Visible;
+                VennSplitter.Visibility = Visibility.Visible;
+                VennRow.Height = savedVennHeight;
+                VennRow.MinHeight = 200;
+                VennSplitterRow.Height = new GridLength(6);
+                DiagramToggle.Content = "\u25B4 Hide diagram";
+            }
+            UpdateSelectionText();
+        }
+
+        // ---------------------------------------------------------------- period from/to
+
+        void UpdatePeriodBoxes()
+        {
+            bool has = current != null && current.HasSpan;
+            FromSpinner.IsEnabled = has;
+            ToSpinner.IsEnabled = has;
+            WholePeriodButton.IsEnabled = has && (userFrom.HasValue || userTo.HasValue);
+            if (!has)
+            {
+                FromBox.Text = "";
+                ToBox.Text = "";
+                return;
+            }
+            ShowPeriod(FromBox, userFrom, current.SpanStart);
+            ShowPeriod(ToBox, userTo, current.SpanEnd);
+        }
+
+        /// <summary>Grey text: follows the universal period. Black text: chosen by the user.</summary>
+        void ShowPeriod(TextBox box, int? chosen, int automatic)
+        {
+            box.Text = PeriodText.Format(current.Freq, chosen ?? automatic);
+            if (chosen.HasValue) box.ClearValue(Control.ForegroundProperty);
+            else box.Foreground = AutoPeriodBrush;
+            box.ClearValue(Control.BackgroundProperty);
+        }
+
+        /// <summary>Reads the typed period. Returns false (and marks the box) if it is not valid.</summary>
+        bool TryCommitPeriod(bool isFrom)
+        {
+            if (current == null || !current.HasSpan) return false;
+            TextBox box = isFrom ? FromBox : ToBox;
+            string text = box.Text.Trim();
+
+            int? value = null;
+            if (text.Length > 0)
+            {
+                int p;
+                if (!PeriodText.TryParse(text, current.Freq, !isFrom, out p))
+                {
+                    box.Background = InvalidBack;
+                    SetStatus("\"" + text + "\" is not a " + current.Freq.ToString().ToLowerInvariant()
+                              + " period. Type for example " + PeriodText.Format(current.Freq, current.SpanStart) + ".");
+                    return false;
+                }
+                value = p;
+            }
+
+            int from = isFrom ? (value ?? current.SpanStart) : (userFrom ?? current.SpanStart);
+            int to = isFrom ? (userTo ?? current.SpanEnd) : (value ?? current.SpanEnd);
+            if (from > to)
+            {
+                box.Background = InvalidBack;
+                SetStatus("The first period must not be after the last period.");
+                return false;
+            }
+
+            box.ClearValue(Control.BackgroundProperty);
+            if (isFrom) userFrom = value.HasValue && value.Value > current.SpanStart ? value : null;
+            else userTo = value.HasValue && value.Value < current.SpanEnd ? value : null;
+            return true;
+        }
+
+        void CommitPeriod(bool isFrom)
+        {
+            int? oldFrom = userFrom, oldTo = userTo;
+            if (!TryCommitPeriod(isFrom)) return;
+            if (oldFrom != userFrom || oldTo != userTo) Recompute();
+            else UpdatePeriodBoxes();
+        }
+
+        void StepPeriod(bool isFrom, int delta)
+        {
+            if (!TryCommitPeriod(isFrom)) return;
+            int from = userFrom ?? current.SpanStart;
+            int to = userTo ?? current.SpanEnd;
+            if (isFrom)
+            {
+                from = Math.Max(current.SpanStart, Math.Min(from + delta, to));
+                userFrom = from > current.SpanStart ? (int?)from : null;
+            }
+            else
+            {
+                to = Math.Min(current.SpanEnd, Math.Max(to + delta, from));
+                userTo = to < current.SpanEnd ? (int?)to : null;
+            }
+            UpdatePeriodBoxes();
+            ScheduleRecompute();  // holding an arrow down steps quickly, so recompute once it settles
+        }
+
+        void SpinButton_Click(object sender, RoutedEventArgs e)
+        {
+            switch ((sender as FrameworkElement)?.Tag as string)
+            {
+                case "FromUp": StepPeriod(true, 1); break;
+                case "FromDown": StepPeriod(true, -1); break;
+                case "ToUp": StepPeriod(false, 1); break;
+                case "ToDown": StepPeriod(false, -1); break;
+            }
+        }
+
+        void PeriodBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (Keyboard.Modifiers != ModifierKeys.None) return;
+            bool isFrom = ReferenceEquals(sender, FromBox);
+            switch (e.Key)
+            {
+                case Key.Enter:
+                    CommitPeriod(isFrom);
+                    e.Handled = true;
+                    break;
+                case Key.Escape:
+                    UpdatePeriodBoxes();
+                    e.Handled = true;
+                    break;
+                case Key.Up:
+                    StepPeriod(isFrom, 1);
+                    e.Handled = true;
+                    break;
+                case Key.Down:
+                    StepPeriod(isFrom, -1);
+                    e.Handled = true;
+                    break;
+            }
+        }
+
+        void PeriodBox_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            if (ready) CommitPeriod(ReferenceEquals(sender, FromBox));
+        }
+
+        void PeriodBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            StepPeriod(ReferenceEquals(sender, FromBox), e.Delta > 0 ? 1 : -1);
+            e.Handled = true;
+        }
+
+        void WholePeriod_Click(object sender, RoutedEventArgs e)
+        {
+            userFrom = null;
+            userTo = null;
+            Recompute();
         }
 
         // ---------------------------------------------------------------- names tab
@@ -420,10 +649,16 @@ namespace Gekko
             if (ready) ShowCurrentSeries(null);
         }
 
-        /// <summary>Ctrl+Up / Ctrl+Down step through the deviating series from anywhere in the window.</summary>
+        /// <summary>Ctrl+Up / Ctrl+Down step through the deviating series; Ctrl+D hides or shows the diagram.</summary>
         void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (Keyboard.Modifiers != ModifierKeys.Control) return;
+            if (e.Key == Key.D)
+            {
+                ToggleDiagram();
+                e.Handled = true;
+                return;
+            }
             if (e.Key != Key.Up && e.Key != Key.Down) return;
             if (navList.Count == 0) return;
             if (!Equals(Tabs.SelectedItem, DeviationsTab)) Tabs.SelectedItem = DeviationsTab;
@@ -473,9 +708,7 @@ namespace Gekko
 
         void FilterBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (!ready) return;
-            filterTimer.Stop();
-            filterTimer.Start();
+            if (ready) ScheduleRecompute();
         }
 
         void RegexCheck_Changed(object sender, RoutedEventArgs e)
@@ -501,6 +734,7 @@ namespace Gekko
 
         void DropZone_DragEnter(object sender, DragEventArgs e)
         {
+            RemoveInsertionLine();
             if (e.Data.GetDataPresent(DataFormats.FileDrop)) DropZoneBorder.Stroke = DropHighlight;
         }
 
@@ -518,12 +752,14 @@ namespace Gekko
         void DropZone_Drop(object sender, DragEventArgs e)
         {
             DropZoneBorder.Stroke = DropNormal;
-            AddFiles(e.Data.GetData(DataFormats.FileDrop) as string[]);
+            AddFiles(e.Data.GetData(DataFormats.FileDrop) as string[], banks.Count);
         }
 
-        void AddFiles(string[] paths)
+        /// <summary>Loads the files and inserts them in the list at position insertAt (0-based).</summary>
+        void AddFiles(string[] paths, int insertAt)
         {
             if (paths == null || paths.Length == 0) return;
+            int at = Math.Max(0, Math.Min(insertAt, banks.Count));
             int added = 0;
             var skipped = new List<string>();
             string failure = null;
@@ -536,7 +772,7 @@ namespace Gekko
                 }
                 try
                 {
-                    banks.Add(new BankItem(DatabankLoader.Load(path)));
+                    banks.Insert(at++, new BankItem(DatabankLoader.Load(path)));
                     added++;
                 }
                 catch (Exception ex)
@@ -555,7 +791,20 @@ namespace Gekko
         void RemoveBank_Click(object sender, RoutedEventArgs e)
         {
             var item = (sender as FrameworkElement)?.Tag as BankItem;
+            if (item != null) RemoveBank(item);
+        }
+
+        void BankList_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Delete) return;
+            var item = BankList.SelectedItem as BankItem;
             if (item == null) return;
+            RemoveBank(item);
+            e.Handled = true;
+        }
+
+        void RemoveBank(BankItem item)
+        {
             banks.Remove(item);
             BanksChanged();
             SetStatus(item.Name + " removed.");
@@ -568,9 +817,9 @@ namespace Gekko
             dragCandidate = null;
             var source = e.OriginalSource as DependencyObject;
             if (FindAncestor<Button>(source) != null) return;
-            var container = FindAncestor<ListBoxItem>(source);
-            if (container == null) return;
-            dragCandidate = container.DataContext as BankItem;
+            var row = FindAncestor<ListViewItem>(source);
+            if (row == null) return;
+            dragCandidate = row.DataContext as BankItem;
             dragStart = e.GetPosition(BankList);
         }
 
@@ -582,26 +831,46 @@ namespace Gekko
                 Math.Abs(moved.Y) < SystemParameters.MinimumVerticalDragDistance) return;
             BankItem item = dragCandidate;
             dragCandidate = null;
-            DragDrop.DoDragDrop(BankList, new DataObject(DragFormat, item), DragDropEffects.Move);
+            item.IsDragging = true;
+            try
+            {
+                DragDrop.DoDragDrop(BankList, new DataObject(DragFormat, item), DragDropEffects.Move);
+            }
+            finally
+            {
+                item.IsDragging = false;
+                RemoveInsertionLine();
+            }
         }
 
         void BankList_DragOver(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(DragFormat)) e.Effects = DragDropEffects.Move;
-            else if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effects = DragDropEffects.Copy;
-            else e.Effects = DragDropEffects.None;
+            bool isRow = e.Data.GetDataPresent(DragFormat);
+            bool isFile = !isRow && e.Data.GetDataPresent(DataFormats.FileDrop);
+            e.Effects = isRow ? DragDropEffects.Move : isFile ? DragDropEffects.Copy : DragDropEffects.None;
+            if (isRow || isFile) ShowInsertionLine(InsertionIndex(e.GetPosition(BankList)));
             e.Handled = true;
+        }
+
+        void BankList_DragLeave(object sender, DragEventArgs e)
+        {
+            // DragLeave also arrives when moving between rows; only remove the line when really leaving the list.
+            Point p = e.GetPosition(BankList);
+            if (p.X <= 1 || p.Y <= 1 || p.X >= BankList.ActualWidth - 1 || p.Y >= BankList.ActualHeight - 1) RemoveInsertionLine();
         }
 
         void BankList_Drop(object sender, DragEventArgs e)
         {
+            int gap = InsertionIndex(e.GetPosition(BankList));
+            RemoveInsertionLine();
+            e.Handled = true;
             if (e.Data.GetDataPresent(DragFormat))
             {
                 var item = e.Data.GetData(DragFormat) as BankItem;
-                var target = FindAncestor<ListBoxItem>(e.OriginalSource as DependencyObject);
                 int from = banks.IndexOf(item);
-                int to = target != null ? banks.IndexOf(target.DataContext as BankItem) : banks.Count - 1;
-                if (item == null || from < 0 || to < 0 || from == to) return;
+                if (item == null || from < 0) return;
+                int to = gap > from ? gap - 1 : gap;
+                if (to == from) return;
                 banks.Move(from, to);
                 BankList.SelectedItem = item;
                 BanksChanged();
@@ -609,8 +878,54 @@ namespace Gekko
             }
             else if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                AddFiles(e.Data.GetData(DataFormats.FileDrop) as string[]);
+                AddFiles(e.Data.GetData(DataFormats.FileDrop) as string[], gap);
             }
+        }
+
+        /// <summary>0..Count: the dragged row lands before the row with this index (Count = at the end).</summary>
+        int InsertionIndex(Point position)
+        {
+            for (int i = 0; i < banks.Count; i++)
+            {
+                var row = BankList.ItemContainerGenerator.ContainerFromIndex(i) as ListViewItem;
+                if (row == null) continue;
+                Point top = row.TranslatePoint(new Point(0, 0), BankList);
+                if (position.Y < top.Y + row.ActualHeight / 2) return i;
+            }
+            return banks.Count;
+        }
+
+        void ShowInsertionLine(int gap)
+        {
+            if (insertionLine == null)
+            {
+                var layer = System.Windows.Documents.AdornerLayer.GetAdornerLayer(BankList);
+                if (layer == null) return;
+                insertionLine = new InsertionLineAdorner(BankList);
+                layer.Add(insertionLine);
+            }
+
+            bool below = gap >= banks.Count;
+            int index = below ? banks.Count - 1 : gap;
+            var row = index >= 0 ? BankList.ItemContainerGenerator.ContainerFromIndex(index) as ListViewItem : null;
+            if (row == null)
+            {
+                insertionLine.HideLine();
+                return;
+            }
+            Point top = row.TranslatePoint(new Point(0, 0), BankList);
+            double y = below ? top.Y + row.ActualHeight : top.Y;
+            double left = Math.Max(3, top.X);
+            double right = Math.Min(BankList.ActualWidth - 3, top.X + row.ActualWidth);
+            insertionLine.ShowLine(y, left, right);
+        }
+
+        void RemoveInsertionLine()
+        {
+            if (insertionLine == null) return;
+            var layer = System.Windows.Documents.AdornerLayer.GetAdornerLayer(BankList);
+            if (layer != null) layer.Remove(insertionLine);
+            insertionLine = null;
         }
 
         static T FindAncestor<T>(DependencyObject d) where T : DependencyObject

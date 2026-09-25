@@ -3,8 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:Gekko"
         Title="Compare databanks"
-        Height="760" Width="1180" MinHeight="700" MinWidth="960"
-        Top="20" Left="20"        
+        Height="760" Width="1180" MinHeight="600" MinWidth="960"
+        Top="20" Left="20"
         PreviewKeyDown="Window_PreviewKeyDown">
 
     <Window.Resources>
@@ -40,6 +40,51 @@
             </Setter>
         </Style>
 
+        <!-- The small up/down triangles next to the period boxes -->
+        <Style x:Key="SpinButtonStyle" TargetType="RepeatButton">
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Background" Value="#FFF0F0F0"/>
+            <Setter Property="BorderBrush" Value="#FFACACAC"/>
+            <Setter Property="Delay" Value="400"/>
+            <Setter Property="Interval" Value="90"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RepeatButton">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FFE0E0E0"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#FFC8C8C8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Slim rows, like the Databanks window -->
+        <Style x:Key="BankRowStyle" TargetType="ListViewItem">
+            <Setter Property="Height" Value="25"/>
+            <Setter Property="Padding" Value="0,1"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="BorderThickness" Value="0,0,0,0.5"/>
+            <Setter Property="BorderBrush" Value="#FFD8D8D8"/>
+            <Setter Property="Opacity" Value="{Binding ItemOpacity}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsDragging}" Value="True">
+                    <Setter Property="FontWeight" Value="DemiBold"/>
+                    <Setter Property="Background" Value="#FFEDEDED"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
         <Style x:Key="MonoTextStyle" TargetType="TextBox">
             <Setter Property="FontFamily" Value="Consolas"/>
             <Setter Property="FontSize" Value="12.5"/>
@@ -53,25 +98,27 @@
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="Margin" Value="0,0,6,0"/>
         </Style>
+
+        <Style x:Key="PeriodBoxStyle" TargetType="TextBox">
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="2,0"/>
+            <Setter Property="BorderBrush" Value="#FFACACAC"/>
+        </Style>
     </Window.Resources>
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="130"/>
+            <RowDefinition Height="112" MinHeight="50"/>
             <RowDefinition Height="8"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="8"/>
-            <RowDefinition Height="1.25*" MinHeight="260"/>
-            <RowDefinition Height="6"/>
-            <RowDefinition Height="*" MinHeight="180"/>
+            <RowDefinition Height="*"/>
             <RowDefinition Height="8"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Drop zone and numbered, reorderable list of banks -->
+        <!-- Drop zone and numbered, reorderable list of banks. Both fill the (resizable) top part. -->
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="240"/>
+                <ColumnDefinition Width="220"/>
                 <ColumnDefinition Width="10"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
@@ -85,142 +132,235 @@
                            FontSize="14" Foreground="#FF555555" TextWrapping="Wrap" TextAlignment="Center" Margin="10"/>
             </Grid>
 
-            <ListBox Grid.Column="2" Name="BankList" HorizontalContentAlignment="Stretch" AllowDrop="True"
-                     BorderBrush="#FFACACAC" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                     PreviewMouseLeftButtonDown="BankList_PreviewMouseLeftButtonDown"
-                     PreviewMouseMove="BankList_PreviewMouseMove"
-                     DragOver="BankList_DragOver" Drop="BankList_Drop"
-                     ToolTip="Drag a bank up or down to change the order. The first two or three are compared.">
-                <ListBox.Resources>
-                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFE3E3E3"/>
-                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
-                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FFEAEAEA"/>
-                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="Black"/>
-                </ListBox.Resources>
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Grid Margin="2,3" Opacity="{Binding ItemOpacity}">
+            <ListView Grid.Column="2" Name="BankList" SelectionMode="Single" AllowDrop="True"
+                      FontFamily="Calibri" FontSize="13" BorderBrush="#FFACACAC"
+                      ItemContainerStyle="{StaticResource BankRowStyle}"
+                      PreviewMouseLeftButtonDown="BankList_PreviewMouseLeftButtonDown"
+                      PreviewMouseMove="BankList_PreviewMouseMove"
+                      PreviewKeyDown="BankList_PreviewKeyDown"
+                      DragOver="BankList_DragOver" DragLeave="BankList_DragLeave" Drop="BankList_Drop">
+                <ListView.Resources>
+                    <Style TargetType="GridViewColumnHeader">
+                        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                    </Style>
+                </ListView.Resources>
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Width="32" Header="">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Position}" Foreground="{Binding NumberBrush}"
+                                               FontWeight="{Binding NumberWeight}"
+                                               ToolTip="Drag the row up or down to change the order. The first 2 or 3 banks are compared."/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Width="180" Header="File name">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name}" Foreground="#FF1F4E79" TextTrimming="CharacterEllipsis"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Width="170" Header="Series" DisplayMemberBinding="{Binding SeriesText}"/>
+                        <GridViewColumn Width="330" Header="Full path" DisplayMemberBinding="{Binding PathText}"/>
+                        <GridViewColumn Width="80" Header="">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="Remove" Style="{StaticResource RoundedSmallButtonStyle}"
+                                            FontFamily="Segoe UI" FontSize="11"
+                                            Click="RemoveBank_Click" Tag="{Binding}"
+                                            ToolTip="Remove from the list (or select the row and press Delete)"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Grid>
+
+        <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                      ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" Background="Transparent"
+                      ToolTip="Drag to resize the bank list"/>
+
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="6"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="8"/>
+                <RowDefinition x:Name="VennRow" Height="1.25*" MinHeight="200"/>
+                <RowDefinition x:Name="VennSplitterRow" Height="6"/>
+                <RowDefinition Height="*" MinHeight="150"/>
+            </Grid.RowDefinitions>
+
+            <!-- Controls, first row: what to compare -->
+            <StackPanel Grid.Row="0" Orientation="Horizontal">
+                <TextBlock Text="Compare" Style="{StaticResource LabelStyle}" Width="62"/>
+                <RadioButton Name="Compare2Radio" Content="first 2" GroupName="CompareMode" VerticalAlignment="Center"
+                             Margin="0,0,10,0" Checked="CompareMode_Changed"/>
+                <RadioButton Name="Compare3Radio" Content="first 3" GroupName="CompareMode" VerticalAlignment="Center"
+                             Margin="0,0,26,0" IsChecked="True" Checked="CompareMode_Changed"/>
+
+                <TextBlock Text="Frequency" Style="{StaticResource LabelStyle}"/>
+                <ComboBox Name="FreqCombo" Width="110" VerticalAlignment="Center" Margin="0,0,26,0"
+                          SelectionChanged="FreqCombo_SelectionChanged"/>
+
+                <TextBlock Text="Period" Style="{StaticResource LabelStyle}"/>
+                <Grid Name="FromSpinner" Width="90" Height="22">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="15"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <TextBox Name="FromBox" Grid.RowSpan="2" Style="{StaticResource PeriodBoxStyle}"
+                             PreviewKeyDown="PeriodBox_PreviewKeyDown" LostKeyboardFocus="PeriodBox_LostKeyboardFocus"
+                             PreviewMouseWheel="PeriodBox_PreviewMouseWheel"
+                             ToolTip="First period to compare. Type e.g. 2010q1 and press Enter, or step with the arrows, Up/Down or the mouse wheel."/>
+                    <RepeatButton Grid.Column="1" Grid.Row="0" Style="{StaticResource SpinButtonStyle}" BorderThickness="0,1,1,0"
+                                  Tag="FromUp" Click="SpinButton_Click" ToolTip="Next period">
+                        <Path Data="M0,4 L3.5,0 L7,4 Z" Fill="#FF555555"/>
+                    </RepeatButton>
+                    <RepeatButton Grid.Column="1" Grid.Row="1" Style="{StaticResource SpinButtonStyle}" BorderThickness="0,1,1,1"
+                                  Tag="FromDown" Click="SpinButton_Click" ToolTip="Previous period">
+                        <Path Data="M0,0 L7,0 L3.5,4 Z" Fill="#FF555555"/>
+                    </RepeatButton>
+                </Grid>
+                <TextBlock Text="to" Style="{StaticResource LabelStyle}" Margin="6,0,6,0"/>
+                <Grid Name="ToSpinner" Width="90" Height="22">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="15"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <TextBox Name="ToBox" Grid.RowSpan="2" Style="{StaticResource PeriodBoxStyle}"
+                             PreviewKeyDown="PeriodBox_PreviewKeyDown" LostKeyboardFocus="PeriodBox_LostKeyboardFocus"
+                             PreviewMouseWheel="PeriodBox_PreviewMouseWheel"
+                             ToolTip="Last period to compare. Type e.g. 2020q4 and press Enter, or step with the arrows, Up/Down or the mouse wheel."/>
+                    <RepeatButton Grid.Column="1" Grid.Row="0" Style="{StaticResource SpinButtonStyle}" BorderThickness="0,1,1,0"
+                                  Tag="ToUp" Click="SpinButton_Click" ToolTip="Next period">
+                        <Path Data="M0,4 L3.5,0 L7,4 Z" Fill="#FF555555"/>
+                    </RepeatButton>
+                    <RepeatButton Grid.Column="1" Grid.Row="1" Style="{StaticResource SpinButtonStyle}" BorderThickness="0,1,1,1"
+                                  Tag="ToDown" Click="SpinButton_Click" ToolTip="Previous period">
+                        <Path Data="M0,0 L7,0 L3.5,4 Z" Fill="#FF555555"/>
+                    </RepeatButton>
+                </Grid>
+                <Button Name="WholePeriodButton" Content="Whole period" Style="{StaticResource RoundedSmallButtonStyle}"
+                        Margin="10,0,0,0" VerticalAlignment="Center" Click="WholePeriod_Click"
+                        ToolTip="Compare the whole universal period again"/>
+            </StackPanel>
+
+            <!-- Controls, second row: filter and diagram toggle -->
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Filter" Style="{StaticResource LabelStyle}" Width="62"/>
+                    <TextBox Name="FilterBox" Width="300" Height="22" VerticalContentAlignment="Center"
+                             TextChanged="FilterBox_TextChanged"/>
+                    <CheckBox Name="RegexCheck" Content="Regex" VerticalAlignment="Center" Margin="10,0,0,0"
+                              Checked="RegexCheck_Changed" Unchecked="RegexCheck_Changed"/>
+                    <TextBlock Name="FilterHint" Text="Wildcards * and ?, several patterns separated by spaces"
+                               Foreground="#FF888888" VerticalAlignment="Center" Margin="12,0,0,0"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <TextBlock Name="SelectionText" Visibility="Collapsed" Foreground="#FF1F4E79" VerticalAlignment="Center"
+                               Margin="12,0,12,0" MaxWidth="440" TextTrimming="CharacterEllipsis"/>
+                    <Button Name="DiagramToggle" Content="&#x25B4; Hide diagram" Style="{StaticResource RoundedSmallButtonStyle}"
+                            VerticalAlignment="Center" Click="DiagramToggle_Click"
+                            ToolTip="Hide the diagram to give the lower part more room (Ctrl+D)"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Venn diagram -->
+            <Border Grid.Row="4" Name="VennBorder" BorderBrush="#FFD5D5D5" BorderThickness="1" CornerRadius="4" Background="White">
+                <local:VennView x:Name="Venn" Margin="8"/>
+            </Border>
+
+            <GridSplitter Grid.Row="5" Name="VennSplitter" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                          ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" Background="Transparent"/>
+
+            <!-- Details -->
+            <TabControl Grid.Row="6" Name="Tabs">
+                <TabItem Header="Names" Name="NamesTab">
+                    <Grid Margin="4">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="4"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
                             <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Name="NamesHeader" Foreground="#FF444444" VerticalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis"/>
+                            <CheckBox Grid.Column="1" Name="IgnoreDimsCheck" Content="Ignore dimensions"
+                                      VerticalAlignment="Center" Margin="10,0,12,0"
+                                      ToolTip="List x[a,b] and x[a,c] as just x"
+                                      Checked="IgnoreDims_Changed" Unchecked="IgnoreDims_Changed"/>
+                            <Button Grid.Column="2" Content="Copy" Style="{StaticResource RoundedSmallButtonStyle}"
+                                    Click="CopyNames_Click"/>
+                        </Grid>
+                        <TextBox Grid.Row="2" Name="NamesText" Style="{StaticResource MonoTextStyle}"
+                                 TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
+                    </Grid>
+                </TabItem>
+
+                <TabItem Header="Histogram" Name="HistogramTab">
+                    <local:HistogramView x:Name="Histogram" Margin="4"/>
+                </TabItem>
+
+                <TabItem Header="Deviations" Name="DeviationsTab">
+                    <Grid Margin="4">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="4"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <Border Width="22" Height="22" CornerRadius="11" Background="{Binding BadgeBrush}" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding Position}" Foreground="White" FontWeight="Bold"
-                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                            <StackPanel Grid.Column="1" Margin="10,0,8,0" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding Name}" Foreground="#FF1F4E79"/>
-                                <TextBlock Text="{Binding Info}" Foreground="#FF888888" TextTrimming="CharacterEllipsis"/>
-                            </StackPanel>
-                            <Button Grid.Column="2" Content="Remove" Style="{StaticResource RoundedSmallButtonStyle}"
-                                    VerticalAlignment="Center" Click="RemoveBank_Click" Tag="{Binding}"/>
+                            <Button Name="PrevButton" Grid.Column="0" Content="&#x25B2; Previous"
+                                    Style="{StaticResource RoundedSmallButtonStyle}" Click="PrevButton_Click"
+                                    ToolTip="Previous series (Ctrl+Up)"/>
+                            <Button Name="NextButton" Grid.Column="1" Content="&#x25BC; Next" Margin="6,0,0,0"
+                                    Style="{StaticResource RoundedSmallButtonStyle}" Click="NextButton_Click"
+                                    ToolTip="Next series (Ctrl+Down)"/>
+                            <TextBlock Name="NavText" Grid.Column="2" Margin="12,0,0,0" FontWeight="SemiBold"
+                                       Foreground="#FF1F4E79" VerticalAlignment="Center"/>
+                            <TextBlock Name="LegendText" Grid.Column="3" Margin="16,0,8,0" Foreground="#FF888888"
+                                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                            <CheckBox Name="OnlyDevCheck" Grid.Column="4" Content="Deviating periods only"
+                                      VerticalAlignment="Center"
+                                      Checked="OnlyDev_Changed" Unchecked="OnlyDev_Changed"/>
                         </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                        <TextBox Grid.Row="2" Name="DevText" Style="{StaticResource MonoTextStyle}"
+                                 TextWrapping="NoWrap" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+                                 IsInactiveSelectionHighlightEnabled="True"/>
+                    </Grid>
+                </TabItem>
+            </TabControl>
         </Grid>
 
-        <!-- Controls -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal">
-            <TextBlock Text="Compare" Style="{StaticResource LabelStyle}"/>
-            <RadioButton Name="Compare2Radio" Content="first 2" GroupName="CompareMode" VerticalAlignment="Center"
-                         Margin="0,0,10,0" Checked="CompareMode_Changed"/>
-            <RadioButton Name="Compare3Radio" Content="first 3" GroupName="CompareMode" VerticalAlignment="Center"
-                         Margin="0,0,26,0" IsChecked="True" Checked="CompareMode_Changed"/>
-
-            <TextBlock Text="Frequency" Style="{StaticResource LabelStyle}"/>
-            <ComboBox Name="FreqCombo" Width="110" VerticalAlignment="Center" Margin="0,0,26,0"
-                      SelectionChanged="FreqCombo_SelectionChanged"/>
-
-            <TextBlock Text="Filter" Style="{StaticResource LabelStyle}"/>
-            <TextBox Name="FilterBox" Width="230" Height="22" VerticalContentAlignment="Center"
-                     TextChanged="FilterBox_TextChanged"/>
-            <CheckBox Name="RegexCheck" Content="Regex" VerticalAlignment="Center" Margin="10,0,0,0"
-                      Checked="RegexCheck_Changed" Unchecked="RegexCheck_Changed"/>
-            <TextBlock Name="FilterHint" Text="Wildcards * and ?, several patterns separated by spaces"
-                       Foreground="#FF888888" VerticalAlignment="Center" Margin="12,0,0,0"/>
-        </StackPanel>
-
-        <!-- Venn diagram -->
-        <Border Grid.Row="4" BorderBrush="#FFD5D5D5" BorderThickness="1" CornerRadius="4" Background="White">
-            <local:VennView x:Name="Venn" Margin="8"/>
-        </Border>
-
-        <GridSplitter Grid.Row="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                      ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" Background="Transparent"/>
-
-        <!-- Details -->
-        <TabControl Grid.Row="6" Name="Tabs">
-            <TabItem Header="Names" Name="NamesTab">
-                <Grid Margin="4">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="4"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <Grid Grid.Row="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Name="NamesHeader" Foreground="#FF444444" VerticalAlignment="Center"
-                                   TextTrimming="CharacterEllipsis"/>
-                        <CheckBox Grid.Column="1" Name="IgnoreDimsCheck" Content="Ignore dimensions"
-                                  VerticalAlignment="Center" Margin="10,0,12,0"
-                                  ToolTip="List x[a,b] and x[a,c] as just x"
-                                  Checked="IgnoreDims_Changed" Unchecked="IgnoreDims_Changed"/>
-                        <Button Grid.Column="2" Content="Copy" Style="{StaticResource RoundedSmallButtonStyle}"
-                                Click="CopyNames_Click"/>
-                    </Grid>
-                    <TextBox Grid.Row="2" Name="NamesText" Style="{StaticResource MonoTextStyle}"
-                             TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
-                </Grid>
-            </TabItem>
-
-            <TabItem Header="Histogram" Name="HistogramTab">
-                <local:HistogramView x:Name="Histogram" Margin="4"/>
-            </TabItem>
-
-            <TabItem Header="Deviations" Name="DeviationsTab">
-                <Grid Margin="4">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="4"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <Grid Grid.Row="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <Button Name="PrevButton" Grid.Column="0" Content="&#x25B2; Previous"
-                                Style="{StaticResource RoundedSmallButtonStyle}" Click="PrevButton_Click"
-                                ToolTip="Previous series (Ctrl+Up)"/>
-                        <Button Name="NextButton" Grid.Column="1" Content="&#x25BC; Next" Margin="6,0,0,0"
-                                Style="{StaticResource RoundedSmallButtonStyle}" Click="NextButton_Click"
-                                ToolTip="Next series (Ctrl+Down)"/>
-                        <TextBlock Name="NavText" Grid.Column="2" Margin="12,0,0,0" FontWeight="SemiBold"
-                                   Foreground="#FF1F4E79" VerticalAlignment="Center"/>
-                        <TextBlock Name="LegendText" Grid.Column="3" Margin="16,0,8,0" Foreground="#FF888888"
-                                   VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                        <CheckBox Name="OnlyDevCheck" Grid.Column="4" Content="Deviating periods only"
-                                  VerticalAlignment="Center"
-                                  Checked="OnlyDev_Changed" Unchecked="OnlyDev_Changed"/>
-                    </Grid>
-                    <TextBox Grid.Row="2" Name="DevText" Style="{StaticResource MonoTextStyle}"
-                             TextWrapping="NoWrap" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
-                             IsInactiveSelectionHighlightEnabled="True"/>
-                </Grid>
-            </TabItem>
-        </TabControl>
-
         <!-- Status -->
-        <Grid Grid.Row="8">
+        <Grid Grid.Row="4">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -230,4 +370,3 @@
         </Grid>
     </Grid>
 </Window>
-

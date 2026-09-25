@@ -65,6 +65,17 @@ namespace Gekko
         public int[] BankSpanEnd { get; set; }
         public int[] BankSeriesCount { get; set; }
 
+        /// <summary>Periods actually compared: the universal period limited by the chosen from/to periods.</summary>
+        public bool HasWindow { get; set; }
+        public int WindowStart { get; set; }
+        public int WindowEnd { get; set; }
+        public bool IsRestricted => HasSpan && (!HasWindow || WindowStart != SpanStart || WindowEnd != SpanEnd);
+
+        public string WindowText
+        {
+            get { return HasWindow ? PeriodText.Format(Freq, WindowStart) + "\u2013" + PeriodText.Format(Freq, WindowEnd) : "no periods"; }
+        }
+
         public string SpanText
         {
             get { return HasSpan ? PeriodText.Format(Freq, SpanStart) + "\u2013" + PeriodText.Format(Freq, SpanEnd) : "no observations"; }
@@ -94,8 +105,11 @@ namespace Gekko
         /// <summary>
         /// Builds the Venn areas for one frequency. banks are the compared banks in list order (2 or 3),
         /// active says which of them are shown, filter (may be null) selects series by name.
+        /// Observations are only compared within windowFrom..windowTo (use int.MinValue/int.MaxValue for all).
+        /// Which area a series belongs to does not depend on the window: a series exists in a bank or not.
         /// </summary>
-        public static VennResult Compute(IList<CompareBank> banks, bool[] active, CompareFreq freq, Func<string, bool> filter, IEqualityCriterion criterion)
+        public static VennResult Compute(IList<CompareBank> banks, bool[] active, CompareFreq freq, Func<string, bool> filter,
+                                         IEqualityCriterion criterion, int windowFrom, int windowTo)
         {
             int n = banks.Count;
             var result = new VennResult
@@ -142,6 +156,9 @@ namespace Gekko
             result.HasSpan = spanStart <= spanEnd;
             result.SpanStart = result.HasSpan ? spanStart : 0;
             result.SpanEnd = result.HasSpan ? spanEnd : -1;
+            result.WindowStart = result.HasSpan ? Math.Max(spanStart, windowFrom) : 0;
+            result.WindowEnd = result.HasSpan ? Math.Min(spanEnd, windowTo) : -1;
+            result.HasWindow = result.WindowStart <= result.WindowEnd;
 
             for (int mask = 1; mask < 8; mask++)
             {
@@ -154,7 +171,7 @@ namespace Gekko
                 VennArea area = result.Areas[kv.Value];
                 area.Names.Add(kv.Key);
                 if (!area.IsComparison) continue;
-                SeriesComparison c = CompareSeriesInBanks(kv.Key, area.Slots, banks, freq, criterion);
+                SeriesComparison c = CompareSeriesInBanks(kv.Key, area.Slots, banks, freq, criterion, result.WindowStart, result.WindowEnd);
                 if (c.DeviatingPeriods > 0) area.Deviations.Add(c);
             }
 
@@ -173,7 +190,8 @@ namespace Gekko
             return slots.ToArray();
         }
 
-        static SeriesComparison CompareSeriesInBanks(string name, int[] slots, IList<CompareBank> banks, CompareFreq freq, IEqualityCriterion criterion)
+        static SeriesComparison CompareSeriesInBanks(string name, int[] slots, IList<CompareBank> banks, CompareFreq freq,
+                                                     IEqualityCriterion criterion, int windowStart, int windowEnd)
         {
             var series = new CompareSeries[slots.Length];
             int start = int.MaxValue, end = int.MinValue;
@@ -184,6 +202,9 @@ namespace Gekko
                 start = Math.Min(start, series[i].Start);
                 end = Math.Max(end, series[i].End);
             }
+
+            start = Math.Max(start, windowStart);
+            end = Math.Min(end, windowEnd);
 
             var c = new SeriesComparison { Name = series[0].Name, Slots = slots, Series = series };
             if (start > end)
@@ -310,6 +331,16 @@ namespace Gekko
             }
             if (hidden.Count > 0) sb.Append(" (bank ").Append(JoinWords(hidden, "and")).Append(" hidden)");
             return sb.ToString();
+        }
+
+        /// <summary>Description plus counts, e.g. "In banks 1 and 2, not in bank 3: 100 series, 17 deviating".</summary>
+        public static string SummarizeArea(VennResult r, int mask)
+        {
+            VennArea area = r.Areas[mask];
+            string text = DescribeArea(r, mask) + ": " + area.Names.Count.ToString(Inv) + " series";
+            if (area.IsComparison)
+                text += ", " + area.Deviations.Count.ToString(Inv) + (area.Slots.Length == 3 ? " not equal in all three" : " deviating");
+            return text;
         }
 
         static string JoinWords(List<int> numbers, string conjunction)
