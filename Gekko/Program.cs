@@ -36266,7 +36266,7 @@ namespace Gekko
                 {
                     if (!G.NullOrBlanks(this.dataHash))
                     {
-                        tab.CurRow.SetText(1, "Stamp    : " + this.date + " (data-hash: " + this.dataHash + ")");
+                        tab.CurRow.SetText(1, "Stamp    : " + this.date + " (datahash: " + this.dataHash + ")");
                         tab.CurRow.Next();
                     }
                     else
@@ -36279,7 +36279,7 @@ namespace Gekko
                 {
                     if (!G.NullOrBlanks(this.dataHash))
                     {
-                        tab.CurRow.SetText(1, "Data-hash: " + this.dataHash);
+                        tab.CurRow.SetText(1, "Datahash: " + this.dataHash);
                         tab.CurRow.Next();
                     }
                     else
