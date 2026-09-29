@@ -219,7 +219,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// Handles blobs, for .dlink.       
         /// </summary>
         /// <param name="dataFile"></param>
-        public static void Blob(string dataFile, bool force)
+        public static void HandleDlink(string dataFile, bool force)
         {
             string hash = null;
             long? bytes = null;
@@ -296,7 +296,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             {
                 foreach (string dlinkFile2 in dlinkFiles) //Could probably be parallelized
                 {
-                    DlinkAutoDlinkFiles.Blob(dlinkFile2, true);
+                    DlinkAutoDlinkFiles.HandleDlink(dlinkFile2, true);
                 }
             }
             catch
@@ -426,14 +426,14 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             if (G.Equal(type, "activate")) new Writeln("Synchronizing .dlink and data files");
 
             //Sanity check -- fast, so it stays on the calling thread, before any window is shown
-            string blobsFolder = G.CleanupFolderName(Program.options.databank_dlink_folder_storage, false);
-            if (!Directory.Exists(blobsFolder))
+            string storageFolder = G.CleanupFolderName(Program.options.databank_dlink_folder_storage, false);
+            if (!Directory.Exists(storageFolder))
             {
-                new Error("Folder '" + blobsFolder + "' does not exist for file blobs/storage");
+                new Error("Folder '" + storageFolder + "' does not exist for file storage");
             }
-            if (!File.Exists(Path.Combine(blobsFolder, "blobsroot.ini")))
+            if (!File.Exists(Path.Combine(storageFolder, "storageroot.ini")))
             {
-                new Error("File '" + Path.Combine(blobsFolder, "blobsroot.ini") + "' does not exist. This is a safety precaution: you may add an empty file with that name.");
+                new Error("File '" + Path.Combine(storageFolder, "storageroot.ini") + "' does not exist. This is a safety precaution: you may add an empty file with that name.");
             }
 
             List<string> getFilesNew = new List<string>();
@@ -498,16 +498,16 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                         if (doDlinkFileAndDataFileCorrespond)
                         {
                             //Check that we have the file in blobs folder, else add it there. This happens when making a brand new datafile
-                            SyncBlobs(false, realFile.name, dlinkFileData.hash, blobsFolder, getFilesNew, getFilesOverwrite, putFiles, dlinkVersion);
+                            SyncStorage(false, realFile.name, dlinkFileData.hash, storageFolder, getFilesNew, getFilesOverwrite, putFiles, dlinkVersion);
                         }
                         else if (realFile.exists && G.Equal(type, "pre-push"))
                         {
                             //A push must never change the working copy. The data file differs from its .dlink file
                             //(probably an uncommitted local change), so leave it alone. All the push needs is that the
                             //blob the .dlink points to exists in storage.
-                            if (ResolveExistingBlob(blobsFolder, dlinkFileData.hash, realFile.name) == null)
+                            if (ResolveExistingBlob(storageFolder, dlinkFileData.hash, realFile.name) == null)
                             {
-                                new Error("For '" + realFile.name + "', could not find a blob file for hash '" + dlinkFileData.hash + "' under '" + blobsFolder + "'");
+                                new Error("For '" + realFile.name + "', could not find a storage file for hash '" + dlinkFileData.hash + "' under '" + storageFolder + "'. " + Globals.dlinkError + ".");
                             }
                         }
                         else
@@ -515,21 +515,21 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                             //Get it from blobs (A or B)
                             //If a different version of the file is already there, it is about to be overwritten. Make sure that version is safe in
                             //blob storage first. (Only if the blob we restore from exists: else SyncBlobs(true) fails below and nothing is overwritten.)
-                            if (realFile.exists && ResolveExistingBlob(blobsFolder, dlinkFileData.hash, realFile.name) != null)
+                            if (realFile.exists && ResolveExistingBlob(storageFolder, dlinkFileData.hash, realFile.name) != null)
                             {
-                                string backupPath = ParkLocalVersion(realFile, dlinkVersion, blobsFolder);
+                                string backupPath = ParkLocalVersion(realFile, dlinkVersion, storageFolder);
                                 if (backupPath != null)
                                 {
                                     backupFiles.Add(backupPath);
                                 }
                             }
-                            SyncBlobs(true, realFile.name, dlinkFileData.hash, blobsFolder, getFilesNew, getFilesOverwrite, putFiles, dlinkVersion);
+                            SyncStorage(true, realFile.name, dlinkFileData.hash, storageFolder, getFilesNew, getFilesOverwrite, putFiles, dlinkVersion);
                             FileInfo fi2 = new FileInfo(realFile.name);
                             //We update the realFile, because its contents have changed
                             realFile = new RealFile(realFile.name, dlinkFileData.hash, fi2.Length, fi2.LastWriteTimeUtc, true);
                             //Hash cache remembers this for later
                             DlinkHashCache.Set(HashCacheKey(realFile.name, dlinkVersion), fi2.Length, fi2.LastWriteTimeUtc, dlinkFileData.hash);
-                            DlinkHashCache.SetBlobConfirmed(HashCacheKey(realFile.name, dlinkVersion), dlinkFileData.hash);
+                            DlinkHashCache.SetStorageFileConfirmed(HashCacheKey(realFile.name, dlinkVersion), dlinkFileData.hash);
                         }
                         if ((currentFileIndex == dlinkFiles.Count) || progressStopwatch.ElapsedMilliseconds >= progressReportIntervalMs)
                         {
@@ -539,7 +539,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     }
                     catch (Exception ex)
                     {
-                        errors.Add(dlinkFile2 + ": " + ex.Message);
+                        errors.Add(dlinkFile2);
                     }                    
                 }
                 DlinkHashCache.Save(); //Persist any hashes computed while checking this batch of .dlink files
@@ -554,7 +554,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
             if (errors.Count > 0)
             {
-                new Error("Dlink sync failed for " + errors.Count + " file" + G.S(errors.Count) + ":" + G.NL + string.Join(G.NL, errors));
+                new Error("Dlink sync failed for " + errors.Count + " file" + G.S(errors.Count) + " (" + Globals.dlinkError + "):" + G.NL + string.Join(G.NL, errors));
             }
         }        
 
@@ -606,11 +606,11 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// backup would just duplicate what Git/blob storage already has. If a needed backup cannot be written this
         /// throws, and the caller must NOT overwrite the file.
         /// </summary>
-        private static string ParkLocalVersion(RealFile realFile, EDlinkVersion dlinkVersion, string blobsFolder)
+        private static string ParkLocalVersion(RealFile realFile, EDlinkVersion dlinkVersion, string storageFolder)
         {
             //realFile.hash is null if the byte-count check in DoDlinkFileAndDataFileCorrespond returned before hashing.
             string currentHash = realFile.hash ?? GetFileHash(realFile.name, realFile.bytes.Value, realFile.stamp.Value, dlinkVersion);
-            if (ResolveExistingBlob(blobsFolder, currentHash, realFile.name) != null)
+            if (ResolveExistingBlob(storageFolder, currentHash, realFile.name) != null)
             {
                 return null; //Already safely stored under its own hash -- no local backup needed.
             }
@@ -653,6 +653,13 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         private static string BuildSyncReportText(string type, List<string> filesNew, List<string> filesOverwritten, List<string> putFiles, List<string> backupFiles)
         {
             string s = null;
+
+            if (backupFiles.Count > 0)
+            {                
+                s += "NOTE: " + backupFiles.Count + " local backups were made (cf. 'LOCAL BACKUPS' below).";
+                s += G.NL + G.NL;
+            }
+
             s += " ---------------------- DATA FOLDER SYNC --------------------------- ";
             s += G.NL + G.NL;
             if (filesNew.Count + filesOverwritten.Count > 0)
@@ -684,13 +691,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             else
             {
                 s += "No data files added or overwritten.";
-            }
-
-            if (backupFiles.Count > 0)
-            {
-                s += G.NL + G.NL;
-                s += "NOTE: " + backupFiles.Count + "local backups were made (cf. 'LOCAL BACKUPS' below).";
-            }
+            }            
 
             s += G.NL + G.NL;
             s += " ---------------------- VERSIONS STORAGE --------------------------- ";
@@ -715,12 +716,13 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 s += G.NL + G.NL;
                 s += " ----------------------- LOCAL BACKUPS ----------------------------- ";
                 s += G.NL + G.NL;
-                s += backupFiles.Count + " local file version" + G.S(backupFiles.Count) + " saved to *.bak{n} file" + G.S(backupFiles.Count) + " before being overwritten, so nothing is lost. Compare each to the file it was renamed from, and decide which is correct:";
+                s += backupFiles.Count + " local file version" + G.S(backupFiles.Count) + " saved to *.bak{n} file" + G.S(backupFiles.Count) + " before being overwritten, so nothing is lost. " + G.NL;
+                s += "Compare each to the file it was renamed from, and decide which is correct:";
                 foreach (string f in backupFiles)
                 {
                     Match m = Regex.Match(f, @"^(.*)\.bak\d+$");
                     string original = m.Success ? m.Groups[1].Value : null;
-                    s += G.NL + f + (original != null ? " (compare to '" + original + "')" : "");
+                    s += G.NL + f + (original != null ? " (compare to: " + original + ")" : "");
                 }
             }
 
@@ -817,7 +819,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// </summary>
         /// <param name="dataFile"></param>
         /// <returns></returns>
-        public static bool ShouldZipBlobByCurrentPolicy(string dataFile)
+        public static bool ShouldZipStorageFileByCurrentPolicy(string dataFile)
         {
             return !DlinkCommon.alreadyZipped.Contains(Path.GetExtension(dataFile), StringComparer.OrdinalIgnoreCase);
         }
@@ -846,21 +848,21 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         ///      read a file once found -- that always comes from the suffix that's actually there.
         /// Returns null if the blob exists nowhere.
         /// </summary>
-        private static BlobLocation ResolveExistingBlob(string blobsFolder, string sha256, string fileNameAndPath)
+        private static BlobLocation ResolveExistingBlob(string storageFolder, string sha256, string fileNameAndPath)
         {
             string level1 = sha256.Substring(0, 2);
             string level2 = sha256.Substring(2, 2);
-            bool policyZipped = ShouldZipBlobByCurrentPolicy(fileNameAndPath);
+            bool policyZipped = ShouldZipStorageFileByCurrentPolicy(fileNameAndPath);
 
             string primarySuffix = policyZipped ? "_z" : "_r";
-            string primaryPath = Path.Combine(blobsFolder, level1, level2, sha256 + primarySuffix);
+            string primaryPath = Path.Combine(storageFolder, level1, level2, sha256 + primarySuffix);
             if (File.Exists(primaryPath))
             {
                 return new BlobLocation(primaryPath, policyZipped);
             }
 
             string otherSuffix = policyZipped ? "_r" : "_z";
-            string otherPath = Path.Combine(blobsFolder, level1, level2, sha256 + otherSuffix);
+            string otherPath = Path.Combine(storageFolder, level1, level2, sha256 + otherSuffix);
             if (File.Exists(otherPath))
             {
                 return new BlobLocation(otherPath, !policyZipped);
@@ -869,7 +871,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             return null;
         }
 
-        public static void SyncBlobs(bool isGet, string fileNameAndPath, string sha256, string blobsFolder, List<string> getFilesNew, List<string> getFilesOverwrite, List<string> putFiles, EDlinkVersion dlinkVersion = DlinkCommon.CurrentVersion)
+        public static void SyncStorage(bool isGet, string fileNameAndPath, string sha256, string storageFolder, List<string> getFilesNew, List<string> getFilesOverwrite, List<string> putFiles, EDlinkVersion dlinkVersion = DlinkCommon.CurrentVersion)
         {
             // This uses atomic writes.
 
@@ -878,10 +880,10 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 // ------------------------------------
                 // Getting
                 // ------------------------------------
-                BlobLocation location = ResolveExistingBlob(blobsFolder, sha256, fileNameAndPath);
+                BlobLocation location = ResolveExistingBlob(storageFolder, sha256, fileNameAndPath);
                 if (location == null)
                 {
-                    new Error("For '" + fileNameAndPath + "', could not find a blob file for hash '" + sha256 + "' under '" + blobsFolder + "'");                    
+                    new Error("For '" + fileNameAndPath + "', could not find a storage file for hash '" + sha256 + "' under '" + storageFolder + "'. " + Globals.dlinkError + ".");
                 }
                 else
                 {
@@ -890,7 +892,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     //dlinkVersion passed through so the re-fetched content is verified under the SAME
                     //version's hash rules this .dlink record was written with (defaults to
                     //DlinkCommon.CurrentVersion for any caller that doesn't know a specific version).
-                    BlobsFileGet(fileNameAndPath, location.path, location.zipped, sha256, dlinkVersion); //New: sha256 passed through so BlobsFileGet can verify the fetched content
+                    StorageFileGet(fileNameAndPath, location.path, location.zipped, sha256, dlinkVersion); //New: sha256 passed through so StorageFileGet can verify the fetched content
                 }
             }
             else
@@ -904,22 +906,22 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     return;
                 }
 
-                BlobLocation existingLocation = ResolveExistingBlob(blobsFolder, sha256, fileNameAndPath);
+                BlobLocation existingLocation = ResolveExistingBlob(storageFolder, sha256, fileNameAndPath);
                 if (existingLocation == null)
                 {
                     //No need to copy it if we already have it anywhere (new two-level layout,
                     //either suffix) -- this is only reached when it's genuinely nowhere yet, so
                     //write it fresh, at the new two-level, suffixed location, using today's policy
                     //(the only sensible choice for content that's never been stored).                               
-                    bool blobZipped = ShouldZipBlobByCurrentPolicy(fileNameAndPath);
+                    bool storageZipped = ShouldZipStorageFileByCurrentPolicy(fileNameAndPath);
                     string level1 = sha256.Substring(0, 2);
                     string level2 = sha256.Substring(2, 2);
-                    string blobsFile = Path.Combine(blobsFolder, level1, level2, sha256 + (blobZipped ? "_z" : "_r"));
-                    Directory.CreateDirectory(Path.Combine(blobsFolder, level1, level2));
-                    BlobsFilePut(fileNameAndPath, blobsFile, blobZipped);
+                    string storageFile = Path.Combine(storageFolder, level1, level2, sha256 + (storageZipped ? "_z" : "_r"));
+                    Directory.CreateDirectory(Path.Combine(storageFolder, level1, level2));
+                    StorageFilePut(fileNameAndPath, storageFile, storageZipped);
                     putFiles.Add(fileNameAndPath);
                 }
-                DlinkHashCache.SetBlobConfirmed(HashCacheKey(fileNameAndPath, dlinkVersion), sha256);
+                DlinkHashCache.SetStorageFileConfirmed(HashCacheKey(fileNameAndPath, dlinkVersion), sha256);
             }
         }
 
@@ -948,7 +950,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 }
 
                 //tempPath may have inherited the ReadOnly attribute from whatever writeAction copied it
-                //from (e.g. a blob file, which BlobsFilePut always marks read-only).
+                //from (e.g. a blob file, which StorageFilePut always marks read-only).
                 FileAttributes tempAttr = File.GetAttributes(tempPath);
                 if ((tempAttr & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
                 {
@@ -1007,7 +1009,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             }
         }
 
-        private static void BlobsFileGet(string fileNameAndPath, string blobsFile, bool blobZipped, string expectedHash, EDlinkVersion dlinkVersion)
+        private static void StorageFileGet(string fileNameAndPath, string storageFile, bool blobZipped, string expectedHash, EDlinkVersion dlinkVersion)
         {
             //We always create the folder in case it does not already exist. For cloning this is obviously important.
             Directory.CreateDirectory(Path.GetDirectoryName(fileNameAndPath));
@@ -1016,16 +1018,16 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             {
                 if (!blobZipped)
                 {
-                    File.Copy(blobsFile, tempPath, true);
+                    File.Copy(storageFile, tempPath, true);
                 }
                 else
                 {
-                    using (ZipArchive archive = ZipFile.OpenRead(blobsFile))
+                    using (ZipArchive archive = ZipFile.OpenRead(storageFile))
                     {
                         ZipArchiveEntry entry = archive.GetEntry("storage");
                         if (entry == null)
                         {                            
-                            new Error("File '" + blobsFile + "' is a zip archive but has no 'storage' entry which was expected -- the file may be corrupt.");
+                            new Error("File '" + storageFile + "' is a zip archive but has no 'storage' entry which was expected -- the file may be corrupt.");
                             new Error();
                         }
                         entry.ExtractToFile(tempPath, true);
@@ -1046,13 +1048,13 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             string actualHash = ComputeHashUncached(tempPath, dlinkVersion, forceFileType);
             if (!G.Equal(actualHash, expectedHash))
             {
-                new Error("Fetched blob for '" + originalFileNameAndPath + "' does not match its expected hash (expected '" + expectedHash + "', got '" + actualHash + "') -- the stored blob may be missing, corrupted, or have been replaced.");
+                new Error("Fetched storage file for '" + originalFileNameAndPath + "' does not match its expected hash (expected '" + expectedHash + "', got '" + actualHash + "') -- the stored file may be missing, corrupted, or have been replaced.");
             }
         }
 
-        private static void BlobsFilePut(string fileName, string blobsFile, bool blobZipped)
+        private static void StorageFilePut(string fileName, string storageFile, bool blobZipped)
         {            
-            AtomicWrite(blobsFile, true, tempPath =>
+            AtomicWrite(storageFile, true, tempPath =>
             {
                 if (!blobZipped) //New: was Globals.alreadyZipped.Contains(Path.GetExtension(fileName), ...) -- now decided once by SyncBlobs (ShouldZipBlobByCurrentPolicy) and passed in
                 {
@@ -1074,7 +1076,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     }
                 }
             });
-            G.ReadOnlySet(blobsFile);
+            G.ReadOnlySet(storageFile);
         }
     }    
 
@@ -1250,7 +1252,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 {                    
                     if (existing.Value.hash != hash)
                     {
-                        existing.Value.blobConfirmed = false;
+                        existing.Value.storageFileConfirmed = false;
                     }
                     existing.Value.bytes = bytes;
                     existing.Value.stamp = stamp;
@@ -1286,19 +1288,19 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 EnsureLoaded();
                 LinkedListNode<HashCacheEntry> node;
                 if (!_map.TryGetValue(filePath, out node)) return false;
-                return node.Value.hash == hash && node.Value.blobConfirmed;
+                return node.Value.hash == hash && node.Value.storageFileConfirmed;
             }
         }        
         
-        public static void SetBlobConfirmed(string filePath, string hash)
+        public static void SetStorageFileConfirmed(string filePath, string hash)
         {
             lock (_lock)
             {
                 EnsureLoaded();
                 LinkedListNode<HashCacheEntry> node;
-                if (_map.TryGetValue(filePath, out node) && node.Value.hash == hash && !node.Value.blobConfirmed)
+                if (_map.TryGetValue(filePath, out node) && node.Value.hash == hash && !node.Value.storageFileConfirmed)
                 {
-                    node.Value.blobConfirmed = true;
+                    node.Value.storageFileConfirmed = true;
                     _dirty = true;
                 }
             }
@@ -1362,10 +1364,8 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         [ProtoMember(1)] public string path;
         [ProtoMember(2)] public long bytes; 
         [ProtoMember(3)] public long stamp; //ticks (100ns units) since DlinkHashCache's fixed epoch 
-        [ProtoMember(4)] public string hash;        
-        //True once we've confirmed (via SyncBlobs) that the blob for "hash" is present in blob storage.
-        //Reset to false whenever hash changes.
-        [ProtoMember(7)] public bool blobConfirmed; //New
+        [ProtoMember(4)] public string hash;                
+        [ProtoMember(7)] public bool storageFileConfirmed; //New
     }
 
     [ProtoContract] 
@@ -1588,8 +1588,8 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             //m4                 tth\test\makrobk_grunddata\biver\_uddata\x.csv.dlink
             //m5                 tth\test\makrobk_grunddata\biver\_uddata\x.csv
             //m6                 k:\\MAKROBK_KILDE\\2025_10_01\tth\test\makrobk_grunddata\biver\_uddata\x.csv
-
-            if (Globals.tthDlink1) dlinkFile = G.Replace(dlinkFile, "c:\\tools\\k", "K:", StringComparison.OrdinalIgnoreCase, 1);
+                        
+            if (Globals.tthDlink1) dlinkFile = G.Replace(dlinkFile, "c:\\tools\\k", "K:", StringComparison.OrdinalIgnoreCase, 1);            
 
             if (!Path.IsPathRooted(Program.options.databank_dlink_folder_progs))
             {
@@ -1630,6 +1630,8 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             // m4          tth\test\makrobk_grunddata\biver\_uddata_dlink\x.csv
             // m5          tth\test\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink
             // m6          k:\\MAKROBK\tth\test\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink   (output)            
+
+            if (Globals.runningOnTTComputer) dataFile = G.Replace(dataFile, "c:\\tools\\k", "K:", StringComparison.OrdinalIgnoreCase, 1);
 
             if (!Path.IsPathRooted(Program.options.databank_dlink_folder_data))
             {

@@ -53,8 +53,9 @@ namespace Gekko
 
         // -------------------------------------
 
-        public static bool tthDlink1 = false; //On TTH computer        
+        public static bool tthDlink1 = true; //On TTH computer        
         public static bool tthDebug = false;
+        public static string dlinkError = "This may be because the .dlink and datafile do not correspond";
 
         // -------------------------------------
 
