@@ -1582,12 +1582,12 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
         public static string Dlink_FromDlinkFileToDataFile(string dlinkFile, bool reportError)
         {
-            //m1                 K:\MAKROBK\tth\test\makrobk_grunddata\biver\_progs\_uddata_dlink\x.csv.dlink
-            //m2                 tth\test\makrobk_grunddata\biver\_progs\_uddata_dlink\x.csv.dlink
-            //m3                 tth\test\biver\_uddata_dlink\x.csv.dlink
-            //m4                 tth\test\biver\_uddata\x.csv.dlink
-            //m5                 tth\test\biver\_uddata\x.csv
-            //m6                 k:\\MAKROBK_KILDE\\2025_10_01\tth\test\biver\_uddata\x.csv
+            //m1                 K:\MAKROBK\tth\test\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink
+            //m2                 tth\test\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink
+            //m3                 tth\test\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink (same)
+            //m4                 tth\test\makrobk_grunddata\biver\_uddata\x.csv.dlink
+            //m5                 tth\test\makrobk_grunddata\biver\_uddata\x.csv
+            //m6                 k:\\MAKROBK_KILDE\\2025_10_01\tth\test\makrobk_grunddata\biver\_uddata\x.csv
 
             if (Globals.tthDlink1) dlinkFile = G.Replace(dlinkFile, "c:\\tools\\k", "K:", StringComparison.OrdinalIgnoreCase, 1);
 
@@ -1610,10 +1610,8 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             }
             List<string> m1 = Stringlist.Path_FromStringToList(dlinkFile);
             List<string> m2 = Stringlist.Path_RemoveStart(m1, dataStart1, reportError);
-            if (m2 == null) return null; //Can only be == null from the above if reportError is false
-            List<string> m3 = m2.ToList(); //copy
-            if (!G.NullOrBlanks(Program.options.databank_dlink_folder_remove1)) m3 = Stringlist.Path_RemoveString(m3, Program.options.databank_dlink_folder_remove1, 1);
-            List<string> m4 = Stringlist.Path_ReplaceString(m3, Program.options.databank_dlink_folder_replace1b, Program.options.databank_dlink_folder_replace1a, 1);
+            if (m2 == null) return null; //Can only be == null from the above if reportError is false                        
+            List<string> m4 = Stringlist.Path_ReplaceString(m2, Program.options.databank_dlink_folder_replace1b, Program.options.databank_dlink_folder_replace1a, 1);
             m4 = Stringlist.Path_ReplaceString(m4, Program.options.databank_dlink_folder_replace2b, Program.options.databank_dlink_folder_replace2a, 1);
             m4 = Stringlist.Path_ReplaceString(m4, Program.options.databank_dlink_folder_replace3b, Program.options.databank_dlink_folder_replace3a, 1);
             List<string> m5 = m4.ToList();
@@ -1627,9 +1625,8 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         {
             // datastart1  k:\\MAKROBK_KILDE\\2025_10_01
             // datastart2  k:\\MAKROBK
-            // m           K:\MAKROBK_KILDE\2025_10_01\tth\test\biver\_uddata\x.csv
-            // m2          tth\test\biver\_uddata\x.csv
-            // m3          tth\test\makrobk_grunddata\biver\_uddata\x.csv
+            // m           K:\MAKROBK_KILDE\2025_10_01\tth\test\makrobk_grunddata\biver\_uddata\x.csv
+            // m2          tth\test\makrobk_grunddata\biver\_uddata\x.csv            
             // m4          tth\test\makrobk_grunddata\biver\_uddata_dlink\x.csv
             // m5          tth\test\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink
             // m6          k:\\MAKROBK\tth\test\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink   (output)            
@@ -1653,11 +1650,8 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             }
             List<string> m1 = Stringlist.Path_FromStringToList(dataFile);
             List<string> m2 = Stringlist.Path_RemoveStart(m1, dataStart1, reportError);
-            if (m2 == null) return null; //Can only be == null from the above if reportError is false. We allow this for .dlink construction, so that an opened file in a "foreign" folder is ok to read in (no .dlink constucted in that case)            
-            int i = 2; if (DlinkCommon.StagingOrMainError(m2)) i = 1;
-            List<string> m3 = m2.ToList(); //copy
-            if (!G.NullOrBlanks(Program.options.databank_dlink_folder_remove1)) m3.Insert(i, Program.options.databank_dlink_folder_remove1); //hacky, in middle
-            List<string> m4 = Stringlist.Path_ReplaceString(m3, Program.options.databank_dlink_folder_replace1a, Program.options.databank_dlink_folder_replace1b, 1);
+            if (m2 == null) return null; //Can only be == null from the above if reportError is false. We allow this for .dlink construction, so that an opened file in a "foreign" folder is ok to read in (no .dlink constucted in that case)                        
+            List<string> m4 = Stringlist.Path_ReplaceString(m2, Program.options.databank_dlink_folder_replace1a, Program.options.databank_dlink_folder_replace1b, 1);
             m4 = Stringlist.Path_ReplaceString(m4, Program.options.databank_dlink_folder_replace2a, Program.options.databank_dlink_folder_replace2b, 1);
             m4 = Stringlist.Path_ReplaceString(m4, Program.options.databank_dlink_folder_replace3a, Program.options.databank_dlink_folder_replace3b, 1);
             List<string> m5 = m4.ToList();
@@ -1665,17 +1659,6 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             List<string> m6 = m5.ToList();
             m6.InsertRange(0, dataStart2);
             return Stringlist.Path_FromListToString(m6, "\\");
-        }
-
-        public static bool StagingOrMainError(List<string> m2)
-        {
-            //Sanity check, hacky for now
-            List<string> m = new List<string>() { "staging", "main", "prod", "production", "test", "datatest" };
-            foreach (string s in m)
-            {
-                if (G.Equal(m2[0], s)) return true;
-            }
-            return false;
         }
 
         /// <summary>

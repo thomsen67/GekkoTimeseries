@@ -4371,10 +4371,10 @@ namespace UnitTests
         [TestMethod]
         public void _Test_DlinkPaths()
         {            
-            Assert.AreEqual(@"k:\MAKROBK_KILDE\2025_10_01\tth\test",
+            Assert.AreEqual(@"k:\MAKROBK_KILDE\2025_10_01\tth\test\makrobk_grunddata",
             DlinkCommon.Dlink_FromDlinkFileToDataFile(@"K:\MAKROBK\tth\test\makrobk_grunddata", false));
 
-            Assert.AreEqual(@"k:\MAKROBK_KILDE\2025_10_01\staging",
+            Assert.AreEqual(@"k:\MAKROBK_KILDE\2025_10_01\staging\makrobk_grunddata",
             DlinkCommon.Dlink_FromDlinkFileToDataFile(@"K:\MAKROBK\staging\makrobk_grunddata", false));
 
             // AA    tth test XX biver _uddata_dlink
@@ -4385,9 +4385,9 @@ namespace UnitTests
             //
 
             Assert.AreEqual(@"k:\MAKROBK\tth\test\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink",
-            DlinkCommon.Dlink_FromDataFileToDlinkFile(@"K:\MAKROBK_KILDE\2025_10_01\tth\test\biver\_uddata\x.csv", false));
+            DlinkCommon.Dlink_FromDataFileToDlinkFile(@"K:\MAKROBK_KILDE\2025_10_01\tth\test\makrobk_grunddata\biver\_uddata\x.csv", false));
 
-            Assert.AreEqual(@"k:\MAKROBK_KILDE\2025_10_01\tth\test\biver\_uddata\x.csv",
+            Assert.AreEqual(@"k:\MAKROBK_KILDE\2025_10_01\tth\test\makrobk_grunddata\biver\_uddata\x.csv",
             DlinkCommon.Dlink_FromDlinkFileToDataFile(@"K:\MAKROBK\tth\test\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink", false));
 
             // -----------------------------------------------------------------------------------------------------
@@ -4395,27 +4395,27 @@ namespace UnitTests
             // -----------------------------------------------------------------------------------------------------
 
             Assert.AreEqual(@"k:\MAKROBK\staging\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink",
-            DlinkCommon.Dlink_FromDataFileToDlinkFile(@"K:\MAKROBK_KILDE\2025_10_01\staging\biver\_uddata\x.csv", false));
+            DlinkCommon.Dlink_FromDataFileToDlinkFile(@"K:\MAKROBK_KILDE\2025_10_01\staging\makrobk_grunddata\biver\_uddata\x.csv", false));
 
-            Assert.AreEqual(@"k:\MAKROBK_KILDE\2025_10_01\staging\biver\_uddata\x.csv",
+            Assert.AreEqual(@"k:\MAKROBK_KILDE\2025_10_01\staging\makrobk_grunddata\biver\_uddata\x.csv",
             DlinkCommon.Dlink_FromDlinkFileToDataFile(@"K:\MAKROBK\staging\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink", false));
 
             Assert.AreEqual(@"k:\MAKROBK\main\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink",
-            DlinkCommon.Dlink_FromDataFileToDlinkFile(@"K:\MAKROBK_KILDE\2025_10_01\main\biver\_uddata\x.csv", false));
+            DlinkCommon.Dlink_FromDataFileToDlinkFile(@"K:\MAKROBK_KILDE\2025_10_01\main\makrobk_grunddata\biver\_uddata\x.csv", false));
 
-            Assert.AreEqual(@"k:\MAKROBK_KILDE\2025_10_01\main\biver\_uddata\x.csv",
+            Assert.AreEqual(@"k:\MAKROBK_KILDE\2025_10_01\main\makrobk_grunddata\biver\_uddata\x.csv",
             DlinkCommon.Dlink_FromDlinkFileToDataFile(@"K:\MAKROBK\main\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink", false));
 
 
-            // ------- the following is bad, but it is what it is
+            // ------- acid test
 
             //Wrong but true
             Assert.AreEqual(@"k:\MAKROBK\xxx\biver\makrobk_grunddata\_uddata_dlink\x.csv.dlink",
-            DlinkCommon.Dlink_FromDataFileToDlinkFile(@"K:\MAKROBK_KILDE\2025_10_01\xxx\biver\_uddata\x.csv", false));
+            DlinkCommon.Dlink_FromDataFileToDlinkFile(@"K:\MAKROBK_KILDE\2025_10_01\xxx\biver\makrobk_grunddata\_uddata\x.csv", false));
 
             //Wrong but true
             Assert.AreEqual(@"k:\MAKROBK_KILDE\2025_10_01\xxx\biver\_uddata\x.csv",
-            DlinkCommon.Dlink_FromDlinkFileToDataFile(@"K:\MAKROBK\xxx\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink", false));
+            DlinkCommon.Dlink_FromDlinkFileToDataFile(@"K:\MAKROBK\xxx\biver\_uddata_dlink\x.csv.dlink", false));
 
 
             // ----------------------------------------------------------------------------------------------------
@@ -4425,7 +4425,7 @@ namespace UnitTests
             try
             {
                 //Will not allow g: here
-                string xx1 = DlinkCommon.Dlink_FromDataFileToDlinkFile(@"g:\MAKROBK_KILDE\2025_10_01\tth\test\biver\_uddata\x.csv", false);
+                string xx1 = DlinkCommon.Dlink_FromDataFileToDlinkFile(@"g:\MAKROBK_KILDE\2025_10_01\tth\test\makrobk_grunddata\biver\_uddata\x.csv", false);
                 Assert.AreEqual(null, xx1);
             }
             catch
