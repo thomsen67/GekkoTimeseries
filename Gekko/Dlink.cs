@@ -440,6 +440,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             List<string> getFilesOverwrite = new List<string>();
             List<string> putFiles = new List<string>();
             List<string> backupFiles = new List<string>();
+            List<string> missingDlinkFiles = new List<string>();
             List<string> errors = new List<string>();
             
             WindowDlinkGitHook progressWindow = new WindowDlinkGitHook("Data file sync (" + type + ")");
@@ -459,7 +460,17 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                         string dLinkFileWithPath = Path.Combine(G.CleanupFolderName(gitFolder, false), G.CleanupFolderName(dlinkFile2, false));
                         if (!File.Exists(dLinkFileWithPath))
                         {
-                            new Error("This ." + Program.options.databank_dlink_name + " file does not exist: '" + dLinkFileWithPath + "'");                            
+                            if (G.Equal(type, "pre-commit"))
+                            {
+                                //The list comes from the staged .dlink files. A staged .dlink that is missing on disk
+                                //cannot be checked here, and its data file may never have been stored: keep this an error.
+                                new Error("This ." + Program.options.databank_dlink_name + " file does not exist: '" + dLinkFileWithPath + "'");
+                            }
+                            //Tracked in the index but not in the working tree: a local deletion, or a file mid-restore
+                            //(e.g. a TortoiseGit revert fires post-checkout once per file, and the .dlink file may not
+                            //be restored yet). Git doesn't treat this as an error, so neither do we: leave the data file alone.
+                            missingDlinkFiles.Add(dLinkFileWithPath);
+                            continue;
                         }
                         DlinkFile dlinkFileData = G.YamlReader<DlinkFile>(dLinkFileWithPath);
                         EDlinkVersion dlinkVersion = DlinkCommon.ParseDiskVersion(dlinkFileData.version);
@@ -544,7 +555,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 }
                 DlinkHashCache.Save(); //Persist any hashes computed while checking this batch of .dlink files
 
-                string report = BuildSyncReportText(type, getFilesNew, getFilesOverwrite, putFiles, backupFiles);
+                string report = BuildSyncReportText(type, getFilesNew, getFilesOverwrite, putFiles, backupFiles, missingDlinkFiles);
                 progressWindow.Finish(report); //fills the report in, enables OK, and lets ShowDialog() below return once the user dismisses it
             });
             worker.IsBackground = true;            
@@ -650,13 +661,19 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             return path;
         }
 
-        private static string BuildSyncReportText(string type, List<string> filesNew, List<string> filesOverwritten, List<string> putFiles, List<string> backupFiles)
+        private static string BuildSyncReportText(string type, List<string> filesNew, List<string> filesOverwritten, List<string> putFiles, List<string> backupFiles, List<string> missingDlinkFiles)
         {
             string s = null;
 
             if (backupFiles.Count > 0)
-            {                
+            {
                 s += "NOTE: " + backupFiles.Count + " local backups were made (cf. 'LOCAL BACKUPS' below).";
+                s += G.NL + G.NL;
+            }
+
+            if (missingDlinkFiles.Count > 0)
+            {
+                s += "NOTE: " + missingDlinkFiles.Count + " tracked ." + Program.options.databank_dlink_name + " file" + G.S(missingDlinkFiles.Count) + " not found in the working folder (cf. 'MISSING ." + Program.options.databank_dlink_name.ToUpper() + " FILES' below).";
                 s += G.NL + G.NL;
             }
 
@@ -723,6 +740,20 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     Match m = Regex.Match(f, @"^(.*)\.bak\d+$");
                     string original = m.Success ? m.Groups[1].Value : null;
                     s += G.NL + f + (original != null ? " (compare to: " + original + ")" : "");
+                }
+            }
+
+            if (missingDlinkFiles.Count > 0)
+            {
+                s += G.NL + G.NL;
+                s += " -------------------- MISSING ." + Program.options.databank_dlink_name.ToUpper() + " FILES ---------------------------- ";
+                s += G.NL + G.NL;
+                s += missingDlinkFiles.Count + " tracked ." + Program.options.databank_dlink_name + " file" + G.S(missingDlinkFiles.Count) + " not found in the working folder." + G.NL;
+                s += "These may have been deleted locally, or being in the process of restoring during a revert. " + G.NL;
+                s += "The corresponding data files were left untouched:";
+                foreach (string f in missingDlinkFiles)
+                {
+                    s += G.NL + f;
                 }
             }
 
