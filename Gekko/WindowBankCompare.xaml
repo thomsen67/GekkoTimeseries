@@ -102,7 +102,14 @@
         <Style x:Key="PeriodBoxStyle" TargetType="TextBox">
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Padding" Value="2,0"/>
+            <Setter Property="FontSize" Value="11.5"/>
             <Setter Property="BorderBrush" Value="#FFACACAC"/>
+        </Style>
+
+        <Style x:Key="PanelLabelStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#FF444444"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
         </Style>
     </Window.Resources>
 
@@ -149,9 +156,13 @@
                         <GridViewColumn Width="32" Header="">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Position}" Foreground="{Binding NumberBrush}"
-                                               FontWeight="{Binding NumberWeight}"
-                                               ToolTip="Drag the row up or down to change the order. The first 2 or 3 banks are compared."/>
+                                    <Border Width="18" Height="18" CornerRadius="9" Background="{Binding NumberBrush}"
+                                            HorizontalAlignment="Left"
+                                            ToolTip="Drag the row up or down to change the order. The first 2 or 3 banks are compared.">
+                                        <TextBlock Text="{Binding Position}" Foreground="White" FontWeight="Bold"
+                                                   FontFamily="Segoe UI" FontSize="11"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
@@ -185,178 +196,202 @@
 
         <Grid Grid.Row="2">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="6"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="8"/>
                 <RowDefinition x:Name="VennRow" Height="1.25*" MinHeight="200"/>
                 <RowDefinition x:Name="VennSplitterRow" Height="6"/>
                 <RowDefinition Height="*" MinHeight="150"/>
             </Grid.RowDefinitions>
 
-            <!-- Controls, first row: what to compare -->
-            <StackPanel Grid.Row="0" Orientation="Horizontal">
-                <TextBlock Text="Compare" Style="{StaticResource LabelStyle}" Width="62"/>
-                <RadioButton Name="Compare2Radio" Content="first 2" GroupName="CompareMode" VerticalAlignment="Center"
-                             Margin="0,0,10,0" Checked="CompareMode_Changed"/>
-                <RadioButton Name="Compare3Radio" Content="first 3" GroupName="CompareMode" VerticalAlignment="Center"
-                             Margin="0,0,26,0" IsChecked="True" Checked="CompareMode_Changed"/>
-
-                <TextBlock Text="Frequency" Style="{StaticResource LabelStyle}"/>
-                <ComboBox Name="FreqCombo" Width="110" VerticalAlignment="Center" Margin="0,0,26,0"
-                          SelectionChanged="FreqCombo_SelectionChanged"/>
-
-                <TextBlock Text="Period" Style="{StaticResource LabelStyle}"/>
-                <Grid Name="FromSpinner" Width="90" Height="22">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="15"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <TextBox Name="FromBox" Grid.RowSpan="2" Style="{StaticResource PeriodBoxStyle}"
-                             PreviewKeyDown="PeriodBox_PreviewKeyDown" LostKeyboardFocus="PeriodBox_LostKeyboardFocus"
-                             PreviewMouseWheel="PeriodBox_PreviewMouseWheel"
-                             ToolTip="First period to compare. Type e.g. 2010q1 and press Enter, or step with the arrows, Up/Down or the mouse wheel."/>
-                    <RepeatButton Grid.Column="1" Grid.Row="0" Style="{StaticResource SpinButtonStyle}" BorderThickness="0,1,1,0"
-                                  Tag="FromUp" Click="SpinButton_Click" ToolTip="Next period">
-                        <Path Data="M0,4 L3.5,0 L7,4 Z" Fill="#FF555555"/>
-                    </RepeatButton>
-                    <RepeatButton Grid.Column="1" Grid.Row="1" Style="{StaticResource SpinButtonStyle}" BorderThickness="0,1,1,1"
-                                  Tag="FromDown" Click="SpinButton_Click" ToolTip="Previous period">
-                        <Path Data="M0,0 L7,0 L3.5,4 Z" Fill="#FF555555"/>
-                    </RepeatButton>
-                </Grid>
-                <TextBlock Text="to" Style="{StaticResource LabelStyle}" Margin="6,0,6,0"/>
-                <Grid Name="ToSpinner" Width="90" Height="22">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="15"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <TextBox Name="ToBox" Grid.RowSpan="2" Style="{StaticResource PeriodBoxStyle}"
-                             PreviewKeyDown="PeriodBox_PreviewKeyDown" LostKeyboardFocus="PeriodBox_LostKeyboardFocus"
-                             PreviewMouseWheel="PeriodBox_PreviewMouseWheel"
-                             ToolTip="Last period to compare. Type e.g. 2020q4 and press Enter, or step with the arrows, Up/Down or the mouse wheel."/>
-                    <RepeatButton Grid.Column="1" Grid.Row="0" Style="{StaticResource SpinButtonStyle}" BorderThickness="0,1,1,0"
-                                  Tag="ToUp" Click="SpinButton_Click" ToolTip="Next period">
-                        <Path Data="M0,4 L3.5,0 L7,4 Z" Fill="#FF555555"/>
-                    </RepeatButton>
-                    <RepeatButton Grid.Column="1" Grid.Row="1" Style="{StaticResource SpinButtonStyle}" BorderThickness="0,1,1,1"
-                                  Tag="ToDown" Click="SpinButton_Click" ToolTip="Previous period">
-                        <Path Data="M0,0 L7,0 L3.5,4 Z" Fill="#FF555555"/>
-                    </RepeatButton>
-                </Grid>
-                <Button Name="WholePeriodButton" Content="Whole period" Style="{StaticResource RoundedSmallButtonStyle}"
-                        Margin="10,0,0,0" VerticalAlignment="Center" Click="WholePeriod_Click"
-                        ToolTip="Compare the whole universal period again"/>
-            </StackPanel>
-
-            <!-- Controls, second row: filter and diagram toggle -->
-            <Grid Grid.Row="2">
+            <!-- Venn diagram on the left, controls on the right. "Hide controls" hides both. -->
+            <Grid Grid.Row="0" Name="DiagramArea">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="10"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Filter" Style="{StaticResource LabelStyle}" Width="62"/>
-                    <TextBox Name="FilterBox" Width="300" Height="22" VerticalContentAlignment="Center"
-                             TextChanged="FilterBox_TextChanged"/>
-                    <CheckBox Name="RegexCheck" Content="Regex" VerticalAlignment="Center" Margin="10,0,0,0"
-                              Checked="RegexCheck_Changed" Unchecked="RegexCheck_Changed"/>
-                    <TextBlock Name="FilterHint" Text="Wildcards * and ?, several patterns separated by spaces"
-                               Foreground="#FF888888" VerticalAlignment="Center" Margin="12,0,0,0"/>
-                </StackPanel>
-                <StackPanel Grid.Column="1" Orientation="Horizontal">
-                    <TextBlock Name="SelectionText" Visibility="Collapsed" Foreground="#FF1F4E79" VerticalAlignment="Center"
-                               Margin="12,0,12,0" MaxWidth="440" TextTrimming="CharacterEllipsis"/>
-                    <Button Name="DiagramToggle" Content="&#x25B4; Hide diagram" Style="{StaticResource RoundedSmallButtonStyle}"
-                            VerticalAlignment="Center" Click="DiagramToggle_Click"
-                            ToolTip="Hide the diagram to give the lower part more room (Ctrl+D)"/>
-                </StackPanel>
+
+                <Border Grid.Column="0" BorderBrush="#FFD5D5D5" BorderThickness="1" CornerRadius="4" Background="White">
+                    <local:VennView x:Name="Venn" Margin="8"/>
+                </Border>
+
+                <Border Grid.Column="2" BorderBrush="#FFD5D5D5" BorderThickness="1" CornerRadius="4" Background="#FFFAFAFA"
+                        Padding="10,8" Width="290">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Text="Compare" Style="{StaticResource PanelLabelStyle}"/>
+                        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Margin="0,0,0,8">
+                            <RadioButton Name="Compare2Radio" Content="first 2" GroupName="CompareMode" VerticalAlignment="Center"
+                                         Margin="0,0,12,0" Checked="CompareMode_Changed"/>
+                            <RadioButton Name="Compare3Radio" Content="first 3" GroupName="CompareMode" VerticalAlignment="Center"
+                                         IsChecked="True" Checked="CompareMode_Changed"/>
+                        </StackPanel>
+
+                        <TextBlock Grid.Row="1" Text="Frequency" Style="{StaticResource PanelLabelStyle}"/>
+                        <ComboBox Grid.Row="1" Grid.Column="1" Name="FreqCombo" Width="110" Height="18" FontSize="11.5"
+                                  Padding="5,0,4,0" VerticalContentAlignment="Center" HorizontalAlignment="Left"
+                                  Margin="0,0,0,8" SelectionChanged="FreqCombo_SelectionChanged"/>
+
+                        <TextBlock Grid.Row="2" Text="Period" Style="{StaticResource PanelLabelStyle}"/>
+                        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+                        <Grid Name="FromSpinner" Width="80" Height="18">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="14"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <TextBox Name="FromBox" Grid.RowSpan="2" Style="{StaticResource PeriodBoxStyle}"
+                                     PreviewKeyDown="PeriodBox_PreviewKeyDown" LostKeyboardFocus="PeriodBox_LostKeyboardFocus"
+                                     PreviewMouseWheel="PeriodBox_PreviewMouseWheel"
+                                     ToolTip="First period to compare. Type e.g. 2010q1 and press Enter, or step with the arrows, Up/Down or the mouse wheel."/>
+                            <RepeatButton Grid.Column="1" Grid.Row="0" Style="{StaticResource SpinButtonStyle}" BorderThickness="0,1,1,0"
+                                          Tag="FromUp" Click="SpinButton_Click" ToolTip="Next period">
+                                <Path Data="M0,3.5 L3,0 L6,3.5 Z" Fill="#FF555555"/>
+                            </RepeatButton>
+                            <RepeatButton Grid.Column="1" Grid.Row="1" Style="{StaticResource SpinButtonStyle}" BorderThickness="0,1,1,1"
+                                          Tag="FromDown" Click="SpinButton_Click" ToolTip="Previous period">
+                                <Path Data="M0,0 L6,0 L3,3.5 Z" Fill="#FF555555"/>
+                            </RepeatButton>
+                        </Grid>
+                            <TextBlock Text="to" Foreground="#FF444444" VerticalAlignment="Center" Margin="6,0,6,0"/>
+                        <Grid Name="ToSpinner" Width="80" Height="18">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="14"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <TextBox Name="ToBox" Grid.RowSpan="2" Style="{StaticResource PeriodBoxStyle}"
+                                     PreviewKeyDown="PeriodBox_PreviewKeyDown" LostKeyboardFocus="PeriodBox_LostKeyboardFocus"
+                                     PreviewMouseWheel="PeriodBox_PreviewMouseWheel"
+                                     ToolTip="Last period to compare. Type e.g. 2020q4 and press Enter, or step with the arrows, Up/Down or the mouse wheel."/>
+                            <RepeatButton Grid.Column="1" Grid.Row="0" Style="{StaticResource SpinButtonStyle}" BorderThickness="0,1,1,0"
+                                          Tag="ToUp" Click="SpinButton_Click" ToolTip="Next period">
+                                <Path Data="M0,3.5 L3,0 L6,3.5 Z" Fill="#FF555555"/>
+                            </RepeatButton>
+                            <RepeatButton Grid.Column="1" Grid.Row="1" Style="{StaticResource SpinButtonStyle}" BorderThickness="0,1,1,1"
+                                          Tag="ToDown" Click="SpinButton_Click" ToolTip="Previous period">
+                                <Path Data="M0,0 L6,0 L3,3.5 Z" Fill="#FF555555"/>
+                            </RepeatButton>
+                        </Grid>
+                        </StackPanel>
+
+                        <TextBlock Grid.Row="3" Grid.Column="1" Name="SpanText" Foreground="#FF888888" FontSize="11"
+                                   TextWrapping="Wrap" Margin="0,3,0,3"/>
+                        <Button Grid.Row="4" Grid.Column="1" Name="WholePeriodButton" Content="Whole period"
+                                Style="{StaticResource RoundedSmallButtonStyle}" HorizontalAlignment="Left"
+                                Margin="0,0,0,10" Click="WholePeriod_Click"
+                                ToolTip="Compare the whole universal period again"/>
+
+                        <TextBlock Grid.Row="5" Text="Filter" Style="{StaticResource PanelLabelStyle}"/>
+                        <TextBox Grid.Row="5" Grid.Column="1" Name="FilterBox" Height="22" VerticalContentAlignment="Center"
+                                 TextChanged="FilterBox_TextChanged"/>
+                        <CheckBox Grid.Row="6" Grid.Column="1" Name="RegexCheck" Content="Regex" Margin="0,5,0,0"
+                                  Checked="RegexCheck_Changed" Unchecked="RegexCheck_Changed"/>
+                        <TextBlock Grid.Row="7" Grid.Column="1" Name="FilterHint"
+                                   Text="Wildcards * and ?, several patterns separated by spaces"
+                                   Foreground="#FF888888" FontSize="11" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                    </Grid>
+                </Border>
             </Grid>
 
-            <!-- Venn diagram -->
-            <Border Grid.Row="4" Name="VennBorder" BorderBrush="#FFD5D5D5" BorderThickness="1" CornerRadius="4" Background="White">
-                <local:VennView x:Name="Venn" Margin="8"/>
-            </Border>
-
-            <GridSplitter Grid.Row="5" Name="VennSplitter" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+            <GridSplitter Grid.Row="1" Name="VennSplitter" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                           ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" Background="Transparent"/>
 
-            <!-- Details -->
-            <TabControl Grid.Row="6" Name="Tabs">
-                <TabItem Header="Names" Name="NamesTab">
-                    <Grid Margin="4">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="4"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-                        <Grid Grid.Row="0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Name="NamesHeader" Foreground="#FF444444" VerticalAlignment="Center"
-                                       TextTrimming="CharacterEllipsis"/>
-                            <CheckBox Grid.Column="1" Name="IgnoreDimsCheck" Content="Ignore dimensions"
-                                      VerticalAlignment="Center" Margin="10,0,12,0"
-                                      ToolTip="List x[a,b] and x[a,c] as just x"
-                                      Checked="IgnoreDims_Changed" Unchecked="IgnoreDims_Changed"/>
-                            <Button Grid.Column="2" Content="Copy" Style="{StaticResource RoundedSmallButtonStyle}"
-                                    Click="CopyNames_Click"/>
+            <!-- Details. The toggle button sits to the right of the tab headers. -->
+            <Grid Grid.Row="2">
+                <TabControl Grid.Row="6" Name="Tabs">
+                    <TabItem Header="Names" Name="NamesTab">
+                        <Grid Margin="4">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="4"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Name="NamesHeader" Foreground="#FF444444" VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis"/>
+                                <CheckBox Grid.Column="1" Name="IgnoreDimsCheck" Content="Ignore dimensions"
+                                          VerticalAlignment="Center" Margin="10,0,12,0"
+                                          ToolTip="List x[a,b] and x[a,c] as just x"
+                                          Checked="IgnoreDims_Changed" Unchecked="IgnoreDims_Changed"/>
+                                <Button Grid.Column="2" Content="Copy" Style="{StaticResource RoundedSmallButtonStyle}"
+                                        Click="CopyNames_Click"/>
+                            </Grid>
+                            <TextBox Grid.Row="2" Name="NamesText" Style="{StaticResource MonoTextStyle}"
+                                     TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
                         </Grid>
-                        <TextBox Grid.Row="2" Name="NamesText" Style="{StaticResource MonoTextStyle}"
-                                 TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
-                    </Grid>
-                </TabItem>
+                    </TabItem>
 
-                <TabItem Header="Histogram" Name="HistogramTab">
-                    <local:HistogramView x:Name="Histogram" Margin="4"/>
-                </TabItem>
+                    <TabItem Header="Histogram" Name="HistogramTab">
+                        <local:HistogramView x:Name="Histogram" Margin="4"/>
+                    </TabItem>
 
-                <TabItem Header="Deviations" Name="DeviationsTab">
-                    <Grid Margin="4">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="4"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-                        <Grid Grid.Row="0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <Button Name="PrevButton" Grid.Column="0" Content="&#x25B2; Previous"
-                                    Style="{StaticResource RoundedSmallButtonStyle}" Click="PrevButton_Click"
-                                    ToolTip="Previous series (Ctrl+Up)"/>
-                            <Button Name="NextButton" Grid.Column="1" Content="&#x25BC; Next" Margin="6,0,0,0"
-                                    Style="{StaticResource RoundedSmallButtonStyle}" Click="NextButton_Click"
-                                    ToolTip="Next series (Ctrl+Down)"/>
-                            <TextBlock Name="NavText" Grid.Column="2" Margin="12,0,0,0" FontWeight="SemiBold"
-                                       Foreground="#FF1F4E79" VerticalAlignment="Center"/>
-                            <TextBlock Name="LegendText" Grid.Column="3" Margin="16,0,8,0" Foreground="#FF888888"
-                                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                            <CheckBox Name="OnlyDevCheck" Grid.Column="4" Content="Deviating periods only"
-                                      VerticalAlignment="Center"
-                                      Checked="OnlyDev_Changed" Unchecked="OnlyDev_Changed"/>
+                    <TabItem Header="Deviations" Name="DeviationsTab">
+                        <Grid Margin="4">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="4"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Button Name="PrevButton" Grid.Column="0" Content="&#x25B2; Previous"
+                                        Style="{StaticResource RoundedSmallButtonStyle}" Click="PrevButton_Click"
+                                        ToolTip="Previous series (Ctrl+Up)"/>
+                                <Button Name="NextButton" Grid.Column="1" Content="&#x25BC; Next" Margin="6,0,0,0"
+                                        Style="{StaticResource RoundedSmallButtonStyle}" Click="NextButton_Click"
+                                        ToolTip="Next series (Ctrl+Down)"/>
+                                <TextBlock Name="NavText" Grid.Column="2" Margin="12,0,0,0" FontWeight="SemiBold"
+                                           Foreground="#FF1F4E79" VerticalAlignment="Center"/>
+                                <TextBlock Name="LegendText" Grid.Column="3" Margin="16,0,8,0" Foreground="#FF888888"
+                                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                <CheckBox Name="OnlyDevCheck" Grid.Column="4" Content="Deviating periods only"
+                                          VerticalAlignment="Center"
+                                          Checked="OnlyDev_Changed" Unchecked="OnlyDev_Changed"/>
+                            </Grid>
+                            <TextBox Grid.Row="2" Name="DevText" Style="{StaticResource MonoTextStyle}"
+                                     TextWrapping="NoWrap" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+                                     IsInactiveSelectionHighlightEnabled="True"/>
                         </Grid>
-                        <TextBox Grid.Row="2" Name="DevText" Style="{StaticResource MonoTextStyle}"
-                                 TextWrapping="NoWrap" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
-                                 IsInactiveSelectionHighlightEnabled="True"/>
-                    </Grid>
-                </TabItem>
-            </TabControl>
+                    </TabItem>
+                </TabControl>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,1,2,0">
+                    <TextBlock Name="SelectionText" Visibility="Collapsed" Foreground="#FF1F4E79" VerticalAlignment="Center"
+                               Margin="0,0,12,0" MaxWidth="520" TextTrimming="CharacterEllipsis"/>
+                    <Button Name="DiagramToggle" Content="&#x25B4; Hide controls" Style="{StaticResource RoundedSmallButtonStyle}"
+                            VerticalAlignment="Center" Click="DiagramToggle_Click"
+                            ToolTip="Hide the diagram and controls to give the tabs more room (Ctrl+D)"/>
+                </StackPanel>
+            </Grid>
         </Grid>
 
         <!-- Status -->

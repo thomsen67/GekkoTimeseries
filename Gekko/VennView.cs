@@ -15,9 +15,9 @@ namespace Gekko
     {
         static readonly Color[] Palette =
         {
-            Color.FromRgb(0x3D, 0x8C, 0x4E),  // bank 1 (top): green
-            Color.FromRgb(0x2E, 0x6D, 0xB4),  // bank 2 (left): blue
-            Color.FromRgb(0xC9, 0x7A, 0x1E)   // bank 3 (right): amber
+            Color.FromRgb(0x3D, 0x8C, 0x4E),  // bank 1 (bottom left): green
+            Color.FromRgb(0x2E, 0x6D, 0xB4),  // bank 2 (bottom right): blue
+            Color.FromRgb(0xC9, 0x6A, 0x1E)   // bank 3 (top): amber (red is used for deviations)
         };
         static readonly Color Grey = Color.FromRgb(0xA6, 0xA6, 0xA6);
 
@@ -55,8 +55,8 @@ namespace Gekko
     }
 
     /// <summary>
-    /// Venn diagram for 2 or 3 banks. Bank 1 is on top, bank 2 bottom-left, bank 3 bottom-right.
-    /// The 2-bank diagram is the 3-bank diagram without the right circle: same positions, same size.
+    /// Venn diagram for 2 or 3 banks. Bank 1 is bottom-left, bank 2 bottom-right, bank 3 on top.
+    /// The 2-bank diagram is the 3-bank diagram without the top circle: same positions, same size.
     /// Raises AreaClicked(mask, deviationsClicked) and BankClicked(slot).
     /// </summary>
     public sealed class VennView : Canvas
@@ -70,9 +70,10 @@ namespace Gekko
 
         static readonly Brush HoverFill = BankColors.FromArgb(0x2A, 0, 0, 0);
         static readonly Brush SelectedFill = BankColors.FromArgb(0x16, 0, 0, 0);
-        static readonly Brush SelectedStroke = BankColors.FromRgb(0x33, 0x33, 0x33);
+        static readonly Brush SelectedStroke = BankColors.FromArgb(0x50, 0x33, 0x33, 0x33);
         static readonly Brush HiddenFill = BankColors.FromArgb(0x14, 0x80, 0x80, 0x80);
         static readonly Brush HiddenStroke = BankColors.FromRgb(0xB4, 0xB4, 0xB4);
+        static readonly Brush HiddenLine = BankColors.FromArgb(0x70, 0xB4, 0xB4, 0xB4);
         static readonly Brush TotalBrush = BankColors.FromRgb(0x1F, 0x4E, 0x79);
         static readonly Brush NumberBrush = Brushes.Black;
         static readonly Brush DeviationBrush = BankColors.FromRgb(0xB0, 0x30, 0x30);
@@ -125,23 +126,18 @@ namespace Gekko
 
             bool three = result.SlotCount == 3;
             // The layout is always the 3-circle layout, so circles keep their size and place in 2-bank mode.
-            Point[] unit3 = { new Point(0, -T3), new Point(-0.5, H3), new Point(0.5, H3) };
+            Point[] unit3 = { new Point(-0.5, H3), new Point(0.5, H3), new Point(0, -T3) };
             Point[] unit = unit3.Take(result.SlotCount).ToArray();
             const double yMin = -(T3 + 1), yMax = H3 + 1;
 
-            // Room for bank labels on the left and right, a text line on top and the caption below.
-            const double side = 225, top = 22, bottom = 26;
+            // Room for bank labels on the left and right, and for the caption below.
+            const double side = 225, top = 4, bottom = 20;
             double r = Math.Min((width - 2 * side) / 3.0, (height - top - bottom) / (yMax - yMin));
             r = Math.Max(40, Math.Min(r, 200));
             double ox = width / 2;
             double oy = top + ((height - top - bottom) - (yMax - yMin) * r) / 2 - yMin * r;
             Func<Point, Point> toPixel = p => new Point(ox + p.X * r, oy + p.Y * r);
             Point[] centers = unit.Select(toPixel).ToArray();
-
-            string freqName = result.Freq.ToString();
-            string spanLine = freqName + " series, universal period " + result.SpanText;
-            if (result.IsRestricted) spanLine += ", compared " + result.WindowText;
-            Add(new TextBlock { Text = spanLine, FontSize = 12.5, Foreground = TextBrush }, 2, 0);
 
             // Circles
             for (int s = 0; s < result.SlotCount; s++)
@@ -152,8 +148,8 @@ namespace Gekko
                     Width = 2 * r,
                     Height = 2 * r,
                     Fill = on ? BankColors.Translucent(s, 0x30) : HiddenFill,
-                    Stroke = on ? BankColors.Solid(s) : HiddenStroke,
-                    StrokeThickness = on ? 2 : 1.5,
+                    Stroke = on ? BankColors.Translucent(s, 0x60) : HiddenLine,
+                    StrokeThickness = 1,
                     IsHitTestVisible = false
                 };
                 if (!on) circle.StrokeDashArray = new DoubleCollection { 4, 3 };
@@ -171,7 +167,7 @@ namespace Gekko
                     Data = AreaGeometry(mask, circles),
                     Fill = selected ? SelectedFill : Brushes.Transparent,
                     Stroke = selected ? SelectedStroke : null,
-                    StrokeThickness = 2,
+                    StrokeThickness = 1.5,
                     Cursor = Cursors.Hand
                 };
                 path.MouseEnter += (o, e) => Hover(mask, true);
@@ -219,7 +215,7 @@ namespace Gekko
 
         /// <summary>
         /// Label position of each area, in radius units relative to the centroid.
-        /// Mask bits: 1 = bank 1 (top), 2 = bank 2 (left), 4 = bank 3 (right).
+        /// Mask bits: 1 = bank 1 (bottom left), 2 = bank 2 (bottom right), 4 = bank 3 (top).
         /// </summary>
         static Point LabelPoint(bool three, int mask)
         {
@@ -227,19 +223,19 @@ namespace Gekko
             {
                 switch (mask)
                 {
-                    case 1: return new Point(0.25, -0.8);
-                    case 2: return new Point(-0.75, 0.55);
-                    default: return new Point(-0.25, -0.144);
+                    case 1: return new Point(-1.0, H3);
+                    case 2: return new Point(1.0, H3);
+                    default: return new Point(0, H3);
                 }
             }
             switch (mask)
             {
-                case 1: return new Point(0, -1.08);
-                case 2: return new Point(-0.935, 0.54);
-                case 4: return new Point(0.935, 0.54);
-                case 3: return new Point(-0.675, -0.39);
-                case 5: return new Point(0.675, -0.39);
-                case 6: return new Point(0, 0.78);
+                case 1: return new Point(-0.935, 0.54);
+                case 2: return new Point(0.935, 0.54);
+                case 4: return new Point(0, -1.08);
+                case 3: return new Point(0, 0.78);
+                case 5: return new Point(-0.675, -0.39);
+                case 6: return new Point(0.675, -0.39);
                 default: return new Point(0, 0.02);
             }
         }
@@ -254,10 +250,13 @@ namespace Gekko
             var totalText = new TextBlock
             {
                 Text = total.ToString(CultureInfo.InvariantCulture),
+                FontWeight = FontWeights.Bold,
                 Foreground = NumberBrush,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 Padding = new Thickness(4, 0, 4, 0),
-                ToolTip = total + " series. Click to list their names."
+                ToolTip = area.IsComparison
+                    ? total + " series. Click to list their names."
+                    : total + " series. Click to see how many have an observation in each period."
             };
             if (selected && !selectedDeviations) totalText.Background = SelectedTextBack;
             MakeClickable(totalText, () => AreaClicked?.Invoke(mask, false));
@@ -269,6 +268,7 @@ namespace Gekko
                 var devText = new TextBlock
                 {
                     Text = "(" + dev.ToString(CultureInfo.InvariantCulture) + ")",
+                    FontWeight = FontWeights.Bold,
                     Foreground = dev > 0 ? DeviationBrush : MutedBrush,
                     HorizontalAlignment = HorizontalAlignment.Center,
                     Padding = new Thickness(4, 0, 4, 1)
@@ -357,8 +357,8 @@ namespace Gekko
             if (three)
             {
                 if (!on) tip += "\nClick to show this bank again.";
-                else if (result.ActiveCount == 3) tip += "\nClick to hide this bank.";
-                else tip += "\nClick to hide this bank and show the hidden one instead.";
+                else if (result.ActiveCount > 1) tip += "\nClick to hide this bank.";
+                else tip += "\nThis is the only bank shown.";
                 tag.Cursor = Cursors.Hand;
                 int slot = s;
                 tag.MouseLeftButtonUp += (o, e) => { e.Handled = true; BankClicked?.Invoke(slot); };
@@ -370,21 +370,21 @@ namespace Gekko
             double left, topPos;
             if (s == 0)
             {
-                // Left of the top circle, clear of the left circle below it
-                left = center.X - 1.3 * r - size.Width;
-                topPos = center.Y - size.Height / 2;
+                // Left of the bottom-left circle, somewhat below its center
+                left = center.X - r - 10 - size.Width;
+                topPos = center.Y + 0.45 * r - size.Height / 2;
             }
             else if (s == 1)
             {
-                // Left of the left circle, somewhat below its center
-                left = center.X - r - 10 - size.Width;
+                // Right of the bottom-right circle, somewhat below its center
+                left = center.X + r + 10;
                 topPos = center.Y + 0.45 * r - size.Height / 2;
             }
             else
             {
-                // Right of the right circle, somewhat below its center
-                left = center.X + r + 10;
-                topPos = center.Y + 0.45 * r - size.Height / 2;
+                // Left of the top circle, clear of the bottom-left circle
+                left = center.X - 1.3 * r - size.Width;
+                topPos = center.Y - size.Height / 2;
             }
             Add(tag, Math.Max(2, left), Math.Max(2, topPos));
         }

@@ -257,6 +257,26 @@ namespace Gekko
         }
 
         /// <summary>
+        /// For an area with one bank only: per period, the number of its series that have an observation
+        /// (not missing and not NaN). Used for the blue histogram.
+        /// </summary>
+        public static int[] ObservationCounts(VennResult r, VennArea area, int start, int end)
+        {
+            var counts = new int[Math.Max(0, end - start + 1)];
+            if (area.Slots.Length != 1) return counts;
+            IReadOnlyDictionary<string, CompareSeries> dict = r.Banks[area.Slots[0]].Get(r.Freq);
+            foreach (string name in area.Names)
+            {
+                CompareSeries series;
+                if (!dict.TryGetValue(name, out series)) continue;
+                int from = Math.Max(start, series.Start), to = Math.Min(end, series.End);
+                for (int p = from; p <= to; p++)
+                    if (!double.IsNaN(series.Data[p - series.Start])) counts[p - start]++;
+            }
+            return counts;
+        }
+
+        /// <summary>
         /// Wildcard mode: patterns separated by spaces, * and ? as usual, whole name must match, any pattern may match.
         /// Regex mode: case-insensitive, matches anywhere unless anchored with ^ and $.
         /// Returns null when there is no filter (or it is invalid, then error is set).
@@ -329,7 +349,7 @@ namespace Gekko
                 sb.Append("In banks ").Append(JoinWords(inside, "and"));
                 if (outside.Count > 0) sb.Append(", not in bank ").Append(JoinWords(outside, "or"));
             }
-            if (hidden.Count > 0) sb.Append(" (bank ").Append(JoinWords(hidden, "and")).Append(" hidden)");
+            if (hidden.Count > 0) sb.Append(hidden.Count == 1 ? " (bank " : " (banks ").Append(JoinWords(hidden, "and")).Append(" hidden)");
             return sb.ToString();
         }
 

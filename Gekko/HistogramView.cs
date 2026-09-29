@@ -10,8 +10,8 @@ using System.Windows.Shapes;
 namespace Gekko
 {
     /// <summary>
-    /// Bar chart of the number of deviating series per period (y) over the universal period (x).
-    /// Raises BarClicked(period) when a period column is clicked.
+    /// Bar chart per period. Red: number of deviating series (bars can be clicked, raising BarClicked(period)).
+    /// Blue: number of series with an observation, for areas with one bank only.
     /// </summary>
     public sealed class HistogramView : Canvas
     {
@@ -19,6 +19,8 @@ namespace Gekko
 
         static readonly Brush BarBrush = BankColors.FromRgb(0xB8, 0x45, 0x3C);
         static readonly Brush BarHoverBrush = BankColors.FromRgb(0x7A, 0x22, 0x1C);
+        static readonly Brush ObsBrush = BankColors.FromRgb(0x2E, 0x6D, 0xB4);
+        static readonly Brush ObsHoverBrush = BankColors.FromRgb(0x1A, 0x44, 0x75);
         static readonly Brush AxisBrush = BankColors.FromRgb(0x88, 0x88, 0x88);
         static readonly Brush GridBrush = BankColors.FromRgb(0xE6, 0xE6, 0xE6);
         static readonly Brush TextBrush = BankColors.FromRgb(0x44, 0x44, 0x44);
@@ -28,6 +30,7 @@ namespace Gekko
         CompareFreq freq;
         int start;
         int[] counts;
+        bool deviations = true;
         string message = "Click a deviation number in the diagram to see deviations per period.";
 
         public HistogramView()
@@ -37,8 +40,10 @@ namespace Gekko
             SizeChanged += (s, e) => Rebuild();
         }
 
-        public void SetData(string newTitle, CompareFreq newFreq, int firstPeriod, int[] newCounts)
+        /// <summary>showsDeviations: red clickable bars (deviations) or blue bars (observations).</summary>
+        public void SetData(string newTitle, CompareFreq newFreq, int firstPeriod, int[] newCounts, bool showsDeviations)
         {
+            deviations = showsDeviations;
             title = newTitle ?? "";
             freq = newFreq;
             start = firstPeriod;
@@ -116,7 +121,9 @@ namespace Gekko
                 if (counts[i] == 0) continue;
                 int period = start + i;
                 double h = counts[i] / yMax * ph;
-                var bar = new Rectangle { Width = barWidth, Height = Math.Max(1, h), Fill = BarBrush, IsHitTestVisible = false };
+                Brush normal = deviations ? BarBrush : ObsBrush;
+                Brush hover = deviations ? BarHoverBrush : ObsHoverBrush;
+                var bar = new Rectangle { Width = barWidth, Height = Math.Max(1, h), Fill = normal, IsHitTestVisible = false };
                 Add(bar, left + i * slot + (slot - barWidth) / 2, top + ph - h);
 
                 var column = new Rectangle
@@ -124,13 +131,18 @@ namespace Gekko
                     Width = Math.Max(1, slot),
                     Height = ph,
                     Fill = Brushes.Transparent,
-                    Cursor = Cursors.Hand,
-                    ToolTip = PeriodText.Format(freq, period) + ": " + counts[i] + (counts[i] == 1 ? " series deviates" : " series deviate")
-                              + "\nClick to show them in the Deviations tab"
+                    ToolTip = PeriodText.Format(freq, period) + ": " + counts[i]
+                              + (deviations
+                                  ? (counts[i] == 1 ? " series deviates" : " series deviate") + "\nClick to show them in the Deviations tab"
+                                  : (counts[i] == 1 ? " series with an observation" : " series with observations"))
                 };
-                column.MouseEnter += (o, e) => bar.Fill = BarHoverBrush;
-                column.MouseLeave += (o, e) => bar.Fill = BarBrush;
-                column.MouseLeftButtonUp += (o, e) => { e.Handled = true; BarClicked?.Invoke(period); };
+                column.MouseEnter += (o, e) => bar.Fill = hover;
+                column.MouseLeave += (o, e) => bar.Fill = normal;
+                if (deviations)
+                {
+                    column.Cursor = Cursors.Hand;
+                    column.MouseLeftButtonUp += (o, e) => { e.Handled = true; BarClicked?.Invoke(period); };
+                }
                 Add(column, left + i * slot, top);
             }
 

@@ -15,10 +15,11 @@ namespace Gekko
     /// <summary>One row in the numbered bank list.</summary>
     public sealed class BankItem : INotifyPropertyChanged
     {
-        static readonly Brush GreyNumber = BankColors.FromRgb(0x88, 0x88, 0x88);
+        static readonly Brush GreyNumber = BankColors.FromRgb(0xB4, 0xB4, 0xB4);
 
         int position;
         bool inComparison;
+        bool hiddenInDiagram;
         bool isDragging;
 
         public BankItem(CompareBank bank)
@@ -58,8 +59,20 @@ namespace Gekko
                 inComparison = value;
                 Raise(nameof(InComparison));
                 Raise(nameof(NumberBrush));
-                Raise(nameof(NumberWeight));
                 Raise(nameof(ItemOpacity));
+            }
+        }
+
+        /// <summary>True when the bank is compared but hidden by clicking its label in the diagram.</summary>
+        public bool HiddenInDiagram
+        {
+            get { return hiddenInDiagram; }
+            set
+            {
+                if (hiddenInDiagram == value) return;
+                hiddenInDiagram = value;
+                Raise(nameof(HiddenInDiagram));
+                Raise(nameof(NumberBrush));
             }
         }
 
@@ -75,9 +88,8 @@ namespace Gekko
             }
         }
 
-        /// <summary>The number has the circle's color for compared banks.</summary>
-        public Brush NumberBrush => InComparison ? BankColors.Solid(Position - 1) : GreyNumber;
-        public FontWeight NumberWeight => InComparison ? FontWeights.Bold : FontWeights.Normal;
+        /// <summary>The number badge has the circle's color for compared banks that are shown, grey otherwise.</summary>
+        public Brush NumberBrush => InComparison && !HiddenInDiagram ? BankColors.Solid(Position - 1) : GreyNumber;
         public double ItemOpacity => InComparison ? 1.0 : 0.6;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -111,6 +123,8 @@ namespace Gekko
         int navIndex = -1;
         int lastBarPeriod = int.MinValue;
         DeviationListing listing;
+        const string DefaultDevMessage = "Click a deviation number in the diagram to list values and deviations.";
+        string devMessage = DefaultDevMessage;
 
         // Chosen first/last period in the selected frequency. Null means: follow the universal period.
         int? userFrom;
@@ -217,6 +231,7 @@ namespace Gekko
                 ClearDetails();
                 UpdatePeriodBoxes();
                 UpdateSelectionText();
+                UpdateListBadges();
                 return;
             }
 
@@ -257,6 +272,13 @@ namespace Gekko
             }
             UpdatePeriodBoxes();
             UpdateSelectionText();
+            UpdateListBadges();
+        }
+
+        void UpdateListBadges()
+        {
+            for (int i = 0; i < banks.Count; i++)
+                banks[i].HiddenInDiagram = current != null && i < current.SlotCount && !current.Active[i];
         }
 
         // ---------------------------------------------------------------- diagram clicks
@@ -274,8 +296,8 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Clicking an active bank hides it. When only two are shown, clicking one of them swaps it
-        /// with the hidden bank, so 1-2, 1-3 and 2-3 can be compared with single clicks.
+        /// Clicking a shown bank hides it (as long as another bank is still shown); clicking a hidden bank shows it.
+        /// Hiding one bank never brings back another one.
         /// </summary>
         void Venn_BankClicked(int slot)
         {
@@ -287,16 +309,15 @@ namespace Gekko
                 active[slot] = true;
                 SetStatus(label + " is shown again.");
             }
-            else if (current.ActiveCount == 3)
+            else if (current.ActiveCount > 1)
             {
                 active[slot] = false;
                 SetStatus(label + " is hidden. Click its label to show it again.");
             }
             else
             {
-                for (int s = 0; s < 3; s++) active[s] = true;
-                active[slot] = false;
-                SetStatus(label + " is hidden, and the previously hidden bank is shown.");
+                SetStatus(label + " is the only bank shown, so it cannot be hidden.");
+                return;
             }
 
             int newActiveMask = 0;
@@ -320,7 +341,7 @@ namespace Gekko
                     ? "number of series not equal in all three banks, per period"
                     : "number of deviating series, per period";
                 Histogram.SetData(description + ": " + what, current.Freq, current.WindowStart,
-                                  CompareEngine.Histogram(area, current.WindowStart, current.WindowEnd));
+                                  CompareEngine.Histogram(area, current.WindowStart, current.WindowEnd), true);
                 navList = area.Deviations;
                 navIndex = 0;
                 if (keepName != null)
@@ -329,23 +350,38 @@ namespace Gekko
                     if (i >= 0) navIndex = i;
                 }
             }
+            else if (!area.IsComparison)
+            {
+                // One bank only: nothing to compare, so show how many of the series have an observation per period.
+                if (current.HasWindow)
+                    Histogram.SetData(description + ": number of series with an observation (not missing), per period",
+                                      current.Freq, current.WindowStart,
+                                      CompareEngine.ObservationCounts(current, area, current.WindowStart, current.WindowEnd), false);
+                else
+                    Histogram.ShowMessage("No periods to show.");
+                navList = new List<SeriesComparison>();
+                navIndex = -1;
+            }
             else
             {
-                Histogram.ShowMessage(area.IsComparison
-                    ? "No deviations in this area."
-                    : "Series that exist in only one bank have nothing to be compared with.");
+                Histogram.ShowMessage("No deviations in this area.");
                 navList = new List<SeriesComparison>();
                 navIndex = -1;
             }
             lastBarPeriod = int.MinValue;
+            devMessage = area.IsComparison
+                ? "No deviations in this area."
+                : "Series that exist in only one bank have nothing to be compared with.";
             ShowCurrentSeries(null);
 
-            if (switchTab) Tabs.SelectedItem = selectedDeviations ? HistogramTab : NamesTab;
+            // Deviation numbers and one-bank areas open the histogram; other totals open the name list.
+            if (switchTab) Tabs.SelectedItem = selectedDeviations || !area.IsComparison ? HistogramTab : NamesTab;
         }
 
         void ClearDetails()
         {
             selectedArea = null;
+            devMessage = DefaultDevMessage;
             ShowNames();
             Histogram.ShowMessage("Click a deviation number in the diagram to see deviations per period.");
             navList = new List<SeriesComparison>();
@@ -382,18 +418,18 @@ namespace Gekko
                 VennRow.MinHeight = 0;
                 VennRow.Height = new GridLength(0);
                 VennSplitterRow.Height = new GridLength(0);
-                VennBorder.Visibility = Visibility.Collapsed;
+                DiagramArea.Visibility = Visibility.Collapsed;
                 VennSplitter.Visibility = Visibility.Collapsed;
-                DiagramToggle.Content = "\u25BE Show diagram";
+                DiagramToggle.Content = "\u25BE Show controls";
             }
             else
             {
-                VennBorder.Visibility = Visibility.Visible;
+                DiagramArea.Visibility = Visibility.Visible;
                 VennSplitter.Visibility = Visibility.Visible;
                 VennRow.Height = savedVennHeight;
                 VennRow.MinHeight = 200;
                 VennSplitterRow.Height = new GridLength(6);
-                DiagramToggle.Content = "\u25B4 Hide diagram";
+                DiagramToggle.Content = "\u25B4 Hide controls";
             }
             UpdateSelectionText();
         }
@@ -410,8 +446,10 @@ namespace Gekko
             {
                 FromBox.Text = "";
                 ToBox.Text = "";
+                SpanText.Text = "";
                 return;
             }
+            SpanText.Text = "Universal period " + current.SpanText;
             ShowPeriod(FromBox, userFrom, current.SpanStart);
             ShowPeriod(ToBox, userTo, current.SpanEnd);
         }
@@ -592,7 +630,7 @@ namespace Gekko
                 listing = null;
                 NavText.Text = "";
                 LegendText.Text = "";
-                DevText.Text = "Click a deviation number in the diagram to list values and deviations.";
+                DevText.Text = devMessage;
                 return;
             }
 
@@ -649,7 +687,7 @@ namespace Gekko
             if (ready) ShowCurrentSeries(null);
         }
 
-        /// <summary>Ctrl+Up / Ctrl+Down step through the deviating series; Ctrl+D hides or shows the diagram.</summary>
+        /// <summary>Ctrl+Up / Ctrl+Down step through the deviating series; Ctrl+D hides or shows diagram and controls.</summary>
         void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (Keyboard.Modifiers != ModifierKeys.Control) return;
