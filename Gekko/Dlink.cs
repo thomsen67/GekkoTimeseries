@@ -74,7 +74,7 @@ namespace Gekko
                 // ----------------------------------------------------------------------------------------------------------                                            
                 string gekkoPath = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_storage, false), "_utilities", "Gekko").Replace("\\", "/");
                 string gekkoExePath = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_storage, false), "_utilities", "Gekko", "Gekko.exe").Replace("\\", "/");
-                // Note: -c core.quotepath=false --> without it, Git mangles æøå etc. With it, we get UTF8. Se #oowar7asdfj
+                // Note: -c core.quotepath=false --> without it, Git mangles Ã¦Ã¸Ã¥ etc. With it, we get UTF8. Se #oowar7asdfj
                 // Pre-commit only needs to sync the .dlink files that are actually part of
                 // this commit -- "git diff --cached --name-only --diff-filter=ACMR" lists just the
                 // Added/Copied/Modified/Renamed paths staged in the index (D=deleted is excluded on
@@ -383,7 +383,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 ProcessStartInfo psi = new ProcessStartInfo
                 {
                     FileName = "git",                    
-                    // Note: -c core.quotepath=false --> without it, Git mangles æøå etc. With it, we get UTF8. Se #oowar7asdfj
+                    // Note: -c core.quotepath=false --> without it, Git mangles Ã¦Ã¸Ã¥ etc. With it, we get UTF8. Se #oowar7asdfj
                     Arguments = "-c core.quotepath=false ls-files --cached -- :(icase)*.dlink",
                     WorkingDirectory = parentOfGitFolder,
                     RedirectStandardOutput = true,
@@ -686,9 +686,15 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 s += "No data files added or overwritten.";
             }
 
+            if (backupFiles.Count > 0)
+            {
+                s += G.NL + G.NL;
+                s += "NOTE: " + backupFiles.Count + "local backups were made (cf. 'LOCAL BACKUPS' below).";
+            }
+
             s += G.NL + G.NL;
             s += " ---------------------- VERSIONS STORAGE --------------------------- ";
-            s += G.NL + G.NL;
+            s += G.NL + G.NL;            
 
             if (putFiles.Count == 0)
             {
@@ -702,17 +708,19 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 {
                     s += G.NL + f;
                 }
-            }            
+            }
 
             if (backupFiles.Count > 0)
             {
                 s += G.NL + G.NL;
                 s += " ----------------------- LOCAL BACKUPS ----------------------------- ";
                 s += G.NL + G.NL;
-                s += backupFiles.Count + " local file version" + G.S(backupFiles.Count) + " saved to *.bak{n} file" + G.S(backupFiles.Count) + " before being overwritten:";
+                s += backupFiles.Count + " local file version" + G.S(backupFiles.Count) + " saved to *.bak{n} file" + G.S(backupFiles.Count) + " before being overwritten, so nothing is lost. Compare each to the file it was renamed from, and decide which is correct:";
                 foreach (string f in backupFiles)
                 {
-                    s += G.NL + f;
+                    Match m = Regex.Match(f, @"^(.*)\.bak\d+$");
+                    string original = m.Success ? m.Groups[1].Value : null;
+                    s += G.NL + f + (original != null ? " (compare to '" + original + "')" : "");
                 }
             }
 
