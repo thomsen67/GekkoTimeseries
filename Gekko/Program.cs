@@ -3077,18 +3077,20 @@ namespace Gekko
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
         {
+            if (text.ToLower().Contains("wcompare"))
+            {
+                WindowBankCompare xx = new WindowBankCompare();
+                xx.ShowDialog();
+                return;
+            }
+
             if (Globals.runningOnTTComputer)
             {
                 if (false)
                 {
                     Pool.Test();
                 }
-
-                if (true)
-                {
-                    WindowBankCompare xx = new WindowBankCompare();                    
-                    xx.ShowDialog();
-                }
+                
 
                 if (false)
                 {
@@ -24750,27 +24752,8 @@ namespace Gekko
                 string dataHash = null;
                 if (Program.options.databank_file_gbk_datahash)
                 {
-                    //At this point, the databank has been trimmed regarding series internal arrays                    
-                    DateTime t0 = DateTime.Now;
-                    DeepHashHelper helper = new DeepHashHelper();
-                    helper.includeMetadata = Program.options.databank_file_gbk_datahash_meta;
-                    foreach (var kvp in databank.storage.OrderBy(kvp => kvp.Key, StringComparer.OrdinalIgnoreCase)) kvp.Value.DeepHash(kvp.Key, helper);
-                    if (Program.options.databank_file_gbk_datahash_trace)
-                    {
-                        //With this option, we distinguish between a gbk with 0 data-traces and a gbk with > 0 data-traces
-                        //When releasing a databank, traces are sometimes removed. The contents of the data-traces is not hashed.
-                        Hashing.HashEnum1(Hashing.EHashType.SeriesTraces, helper.hash);
-                        int hasTraces = 0; if (tracesToWrite != null && tracesToWrite.Count > 0) hasTraces = 1;
-                        Hashing.HashInteger(hasTraces, helper.hash);
-                    }
-                    if (true) //Bank label
-                    {
-                        Hashing.HashEnum1(Hashing.EHashType.DatabankLabel, helper.hash);
-                        Hashing.HashString(databank.info1, helper.hash); //no .ToLower() here!                    
-                    }
-                    helper.hash.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
-                    dataHash = BitConverter.ToString(helper.hash.Hash!).Replace("-", "").ToLower();
-                    G.WritelnGray("Datahash = " + dataHash + ", " + G.Seconds(t0));
+                    //Normally, when not writing a databank, you can use databank.traces instead of tracesToWrite here.
+                    dataHash = DataHash(databank, tracesToWrite != null && tracesToWrite.Count > 0);
                 }
 
                 CreateDatabankXmlInfo(p, databank, tempTsdxPath, databankVersion, traceVersion, isCloseCommand, dataHash);
@@ -24855,6 +24838,39 @@ namespace Gekko
 
             DlinkAutoDlinkFiles.HandleDlink(blob, false); //see also #poakj34lkjafs3f
             return count;
+        }
+
+        /// <summary>
+        /// Hash of data contents. NOTE: The databank is expected to have been just trimmed before calling this!
+        /// </summary>
+        /// <param name="databank"></param>
+        /// <param name="tracesToWrite"></param>
+        /// <returns></returns>
+        public static string DataHash(Databank databank, bool hasTraces)
+        {
+            string dataHash;
+            //At this point, the databank has been trimmed regarding series internal arrays                    
+            DateTime t0 = DateTime.Now;
+            DeepHashHelper helper = new DeepHashHelper();
+            helper.includeMetadata = Program.options.databank_file_gbk_datahash_meta;
+            foreach (var kvp in databank.storage.OrderBy(kvp => kvp.Key, StringComparer.OrdinalIgnoreCase)) kvp.Value.DeepHash(kvp.Key, helper);
+            if (Program.options.databank_file_gbk_datahash_trace)
+            {
+                //With this option, we distinguish between a gbk with 0 data-traces and a gbk with > 0 data-traces
+                //When releasing a databank, traces are sometimes removed. The contents of the data-traces is not hashed.
+                Hashing.HashEnum1(Hashing.EHashType.SeriesTraces, helper.hash);
+                int iHasTraces = 0; if (hasTraces) iHasTraces = 1;
+                Hashing.HashInteger(iHasTraces, helper.hash);
+            }
+            if (true) //Bank label
+            {
+                Hashing.HashEnum1(Hashing.EHashType.DatabankLabel, helper.hash);
+                Hashing.HashString(databank.info1, helper.hash); //no .ToLower() here!                    
+            }
+            helper.hash.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
+            dataHash = BitConverter.ToString(helper.hash.Hash!).Replace("-", "").ToLower();
+            G.WritelnGray("Datahash = " + dataHash + ", " + G.Seconds(t0));
+            return dataHash;
         }
 
         /// <summary>
