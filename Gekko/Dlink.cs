@@ -439,7 +439,6 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             List<string> getFilesNew = new List<string>();
             List<string> getFilesOverwrite = new List<string>();
             List<string> putFiles = new List<string>();
-            List<string> backupFiles = new List<string>();
             List<string> missingDlinkFiles = new List<string>();
             List<string> errors = new List<string>();
             
@@ -524,16 +523,6 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                         else
                         {
                             //Get it from blobs (A or B)
-                            //If a different version of the file is already there, it is about to be overwritten. Make sure that version is safe in
-                            //blob storage first. (Only if the blob we restore from exists: else SyncBlobs(true) fails below and nothing is overwritten.)
-                            if (realFile.exists && ResolveExistingBlob(storageFolder, dlinkFileData.hash, realFile.name) != null)
-                            {
-                                string backupPath = ParkLocalVersion(realFile, dlinkVersion, storageFolder);
-                                if (backupPath != null)
-                                {
-                                    backupFiles.Add(backupPath);
-                                }
-                            }
                             SyncStorage(true, realFile.name, dlinkFileData.hash, storageFolder, getFilesNew, getFilesOverwrite, putFiles, dlinkVersion);
                             FileInfo fi2 = new FileInfo(realFile.name);
                             //We update the realFile, because its contents have changed
@@ -555,7 +544,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 }
                 DlinkHashCache.Save(); //Persist any hashes computed while checking this batch of .dlink files
 
-                string report = BuildSyncReportText(type, getFilesNew, getFilesOverwrite, putFiles, backupFiles, missingDlinkFiles);
+                string report = BuildSyncReportText(type, getFilesNew, getFilesOverwrite, putFiles, missingDlinkFiles);
                 progressWindow.Finish(report); //fills the report in, enables OK, and lets ShowDialog() below return once the user dismisses it
             });
             worker.IsBackground = true;            
@@ -605,71 +594,10 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             return true;
         }
         
-        /// <summary>
-        /// Called right before a data file that differs from its .dlink file is about to be overwritten with the
-        /// blob version. If the file's CURRENT content is not already recoverable some other way (i.e. no blob
-        /// with its hash exists -- this is the case for a locally changed file whose .dlink was never regenerated,
-        /// e.g. a csv written by Python), copies it to a sibling ".bakN" file next to it before it's lost, N being
-        /// the next unused number (".bak1", ".bak2", ...) so earlier backups are never overwritten, and returns
-        /// that path so the caller can list it in the sync report. If the current content's hash IS already a blob
-        /// somewhere (e.g. this is an older, already-committed version reached by checking out an earlier commit --
-        /// recoverable through that commit's own .dlink file), nothing is written and null is returned; a local
-        /// backup would just duplicate what Git/blob storage already has. If a needed backup cannot be written this
-        /// throws, and the caller must NOT overwrite the file.
-        /// </summary>
-        private static string ParkLocalVersion(RealFile realFile, EDlinkVersion dlinkVersion, string storageFolder)
-        {
-            //realFile.hash is null if the byte-count check in DoDlinkFileAndDataFileCorrespond returned before hashing.
-            string currentHash = realFile.hash ?? GetFileHash(realFile.name, realFile.bytes.Value, realFile.stamp.Value, dlinkVersion);
-            if (ResolveExistingBlob(storageFolder, currentHash, realFile.name) != null)
-            {
-                return null; //Already safely stored under its own hash -- no local backup needed.
-            }
-
-            string backupPath = NextBackupPath(realFile.name);
-            try
-            {
-                File.Copy(realFile.name, backupPath, true);
-                //Never leave the backup read-only -- it would make a LATER backup copy at this same path fail.
-                FileAttributes attr = File.GetAttributes(backupPath);
-                if ((attr & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
-                {
-                    File.SetAttributes(backupPath, attr & ~FileAttributes.ReadOnly);
-                }
-            }
-            catch (Exception ex)
-            {
-                new Error("'" + realFile.name + "' differs from its .dlink file and would be overwritten, but a backup copy '" + backupPath + "' could not be written first (" + ex.Message + "). The file was NOT overwritten. Move or delete it manually, and sync again.");
-            }
-            return backupPath;
-        }
-
-        /// <summary>
-        /// Next unused "fileName.bakN" path (.bak1, .bak2, ...) -- so ParkLocalVersion never overwrites an earlier
-        /// backup that hasn't been dealt with yet. No upper bound: if these are never cleaned up they accumulate
-        /// indefinitely, one per overwritten local edit.
-        /// </summary>
-        private static string NextBackupPath(string fileName)
-        {
-            int n = 1;
-            string path;
-            do
-            {
-                path = fileName + ".bak" + n;
-                n++;
-            } while (File.Exists(path));
-            return path;
-        }
-
-        private static string BuildSyncReportText(string type, List<string> filesNew, List<string> filesOverwritten, List<string> putFiles, List<string> backupFiles, List<string> missingDlinkFiles)
+        private static string BuildSyncReportText(string type, List<string> filesNew, List<string> filesOverwritten, List<string> putFiles, List<string> missingDlinkFiles)
         {
             string s = null;
 
-            if (backupFiles.Count > 0)
-            {
-                s += "NOTE: " + backupFiles.Count + " local backups were made (cf. 'LOCAL BACKUPS' below).";
-                s += G.NL + G.NL;
-            }
 
             if (missingDlinkFiles.Count > 0)
             {
@@ -728,20 +656,6 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 }
             }
 
-            if (backupFiles.Count > 0)
-            {
-                s += G.NL + G.NL;
-                s += " ----------------------- LOCAL BACKUPS ----------------------------- ";
-                s += G.NL + G.NL;
-                s += backupFiles.Count + " local file version" + G.S(backupFiles.Count) + " saved to *.bak{n} file" + G.S(backupFiles.Count) + " before being overwritten, so nothing is lost. " + G.NL;
-                s += "Compare each to the file it was renamed from, and decide which is correct:";
-                foreach (string f in backupFiles)
-                {
-                    Match m = Regex.Match(f, @"^(.*)\.bak\d+$");
-                    string original = m.Success ? m.Groups[1].Value : null;
-                    s += G.NL + f + (original != null ? " (compare to: " + original + ")" : "");
-                }
-            }
 
             if (missingDlinkFiles.Count > 0)
             {
