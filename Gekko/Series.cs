@@ -3210,6 +3210,14 @@ namespace Gekko
                 {
                     Scramble(th.scramble);
                 }
+                else if (th.type == ETraceHelper.SeeIfThereIsAtLeastOneTrace)
+                {
+                    if (th.thereIsAtLeastOneTrace) return; //We are finished already. This is used for data hashes, and compared to that, even if it will run through each and any series even if the first series has traces, the time used is neglible compared to data hashing itself.
+                    if (this?.meta?.trace2 != null)
+                    {
+                        th.thereIsAtLeastOneTrace = true;                        
+                    }
+                }
                 else
                 {
                     if (this.meta != null)

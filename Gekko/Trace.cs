@@ -60,6 +60,7 @@ namespace Gekko
         GetAllMetasAndTraces,
         OnlyGetMetas,
         TrimWithTimeShadowing,
+        SeeIfThereIsAtLeastOneTrace,
         Scramble  //not actually used for traces
     }
 
@@ -1824,6 +1825,7 @@ namespace Gekko
         public int seriesObjectCount = 0; //number of series found (probably often equal to meta count)
         public List<SeriesMetaInformation> metas = new List<SeriesMetaInformation>();
         public int depthLimit = -12345;
+        public bool thereIsAtLeastOneTrace = false;
         
         // --- the following is for stats etc. ("real" traces)        
         public int unittestTraceCountIncludeInvisible = 0; //will include combinations, traces will not

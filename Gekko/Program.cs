@@ -24734,6 +24734,13 @@ namespace Gekko
                     databank.Trim();  //to make it smaller, slack removed from each Series
                 }
 
+                //Data hash
+                string dataHash = null;
+                if (Program.options.databank_file_gbk_datahash)
+                {                    
+                    dataHash = DataHash(databank, !noTrace && Trace2.CollectAllTraces(databank, ETraceHelper.SeeIfThereIsAtLeastOneTrace).thereIsAtLeastOneTrace); //if noTrace == true, no traces are kept in gbk, and the method is called with false for the second argument
+                }
+
                 bool traceFail = false;
                 TraceHelper th = null; Dictionary<TraceID2, Trace2> dict1Inverted = null;
                 List<Trace2> tracesToWrite = null;
@@ -24746,15 +24753,7 @@ namespace Gekko
                     catch (Exception e) { traceFail = true; }
                     tracesToWrite = databank.traces;
                     databank.traces = null;
-                }
-
-                //Data hash
-                string dataHash = null;
-                if (Program.options.databank_file_gbk_datahash)
-                {
-                    //Normally, when not writing a databank, you can use databank.traces instead of tracesToWrite here.
-                    dataHash = DataHash(databank, tracesToWrite != null && tracesToWrite.Count > 0);
-                }
+                }                
 
                 CreateDatabankXmlInfo(p, databank, tempTsdxPath, databankVersion, traceVersion, isCloseCommand, dataHash);
 
@@ -24841,6 +24840,20 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Normally the two args are false.
+        /// </summary>
+        /// <param name="omitTrimBecauseAlreadyDone"></param>
+        /// <param name="knownToHaveNoTraces"></param>
+        /// <returns></returns>
+        public static string DataHash()
+        {
+            Databank databank = Program.databanks.GetFirst();
+            databank.Trim();
+            string dataHash = Program.DataHash(databank, Trace2.CollectAllTraces(databank, ETraceHelper.SeeIfThereIsAtLeastOneTrace).thereIsAtLeastOneTrace);
+            return dataHash;
+        }
+
+        /// <summary>
         /// Hash of data contents. NOTE: The databank is expected to have been just trimmed before calling this!
         /// </summary>
         /// <param name="databank"></param>
@@ -24853,7 +24866,7 @@ namespace Gekko
             DateTime t0 = DateTime.Now;
             DeepHashHelper helper = new DeepHashHelper();
             helper.includeMetadata = Program.options.databank_file_gbk_datahash_meta;
-            foreach (var kvp in databank.storage.OrderBy(kvp => kvp.Key, StringComparer.OrdinalIgnoreCase)) kvp.Value.DeepHash(kvp.Key, helper);
+            foreach (var kvp in databank.storage.OrderBy(kvp => kvp.Key.ToLowerInvariant(), StringComparer.Ordinal)) kvp.Value.DeepHash(kvp.Key, helper);
             if (Program.options.databank_file_gbk_datahash_trace)
             {
                 //With this option, we distinguish between a gbk with 0 data-traces and a gbk with > 0 data-traces

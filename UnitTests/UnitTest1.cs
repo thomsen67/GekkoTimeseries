@@ -22134,7 +22134,54 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Datahash()
         {
+            Program.Flush(); //Probably best, to avoid confusion from cache
             I("option folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+
+            string h1 = "d4faa517";
+            string h2 = "5b7fc0f4";
+
+            if (true)
+            {                
+                I("reset;");
+                I("time 2001 2003;");
+                I("x = 2, 3, 4;");               
+                Assert.AreEqual(h1, Program.DataHash().Substring(0, 8));
+                I("tracedelete();");                
+                Assert.AreEqual(h2, Program.DataHash().Substring(0, 8));
+                // -----------
+                I("reset;");
+                I("time 2001 2003;");
+                I("x = 2, 3, 4;");
+                I("write datahash;");
+                Assert.AreEqual(h1, Program.DataHash().Substring(0, 8));
+                Globals.unitTestScreenOutput.Clear();
+                I("read datahash;");                
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(" (datahash: " + h1));
+                Assert.AreEqual(h1, Program.DataHash().Substring(0, 8));
+                // -----------
+                I("reset;");
+                I("time 2001 2003;");
+                I("x = 2, 3, 4;");
+                Assert.AreEqual(h1, Program.DataHash().Substring(0, 8));
+                I("write <trace = no> datahash;");
+                Globals.unitTestScreenOutput.Clear();
+                I("read datahash;");
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(" (datahash: " + h2));
+                Assert.AreEqual(h2, Program.DataHash().Substring(0, 8));
+                // -----------
+                I("reset;");
+                I("time 2001 2003;");
+                I("x = 2, 3, 4;");
+                I("tracedelete();");
+                Assert.AreEqual(h2, Program.DataHash().Substring(0, 8));
+                I("write datahash;");
+                Globals.unitTestScreenOutput.Clear();
+                I("read datahash;");
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(" (datahash: " + h2));
+                Assert.AreEqual(h2, Program.DataHash().Substring(0, 8));
+            }
+
+
             //BEWARE: i set from 0 to 99!!
             for (int i = 0; i < 100 + 1; i++)
             {
@@ -22172,13 +22219,13 @@ namespace UnitTests
                 I("read datahash;");
                 string s = Globals.unitTestScreenOutput.ToString();
                 string truth = null;
-                if (i >= 0 && i <= 19) truth = "f74190d4";
-                else if (i >= 20 && i <= 29) truth = "68d44d6f";
-                else if (i >= 30 && i <= 39) truth = "f7d570a2";
-                else if (i >= 40 && i <= 49) truth = "c2cce21a";
-                else if (i >= 50 && i <= 59) truth = "e02e04b1";
-                else if (i >= 60 && i <= 69) truth = "a92e58d1";
-                bool b = s.Contains(" (data-hash: " + truth);
+                if (i >= 0 && i <= 19) truth = h1;
+                else if (i >= 20 && i <= 29) truth = "2f38255e";
+                else if (i >= 30 && i <= 39) truth = "a00cf07c";
+                else if (i >= 40 && i <= 49) truth = "7e0055c7";
+                else if (i >= 50 && i <= 59) truth = "4b51d1fa";
+                else if (i >= 60 && i <= 69) truth = "7ea9d377";
+                bool b = s.Contains(" (datahash: " + truth);
                 if (i == 0 || i == 20 || i == 30 || i == 40 || i == 50 || i == 60) Assert.IsTrue(b);
                 else Assert.IsFalse(b);
             }

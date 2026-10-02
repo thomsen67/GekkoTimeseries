@@ -4390,11 +4390,9 @@ namespace Gekko
         }
         public static IVariable datahash(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
-            Databank databank = Program.databanks.GetFirst();
-            databank.Trim();
-            string dataHash = Program.DataHash(databank, databank.traces != null && databank.traces.Count > 0);
+            string dataHash = Program.DataHash();
             return new ScalarString(dataHash);
-        }
+        }        
 
         public static IVariable smooth(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] x)
         {
