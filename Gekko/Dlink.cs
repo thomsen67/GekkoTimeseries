@@ -984,8 +984,13 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 VerifyFetchedBlobHash(tempPath, fileNameAndPath, expectedHash, dlinkVersion);
             });
             G.ReadOnlyRemove(fileNameAndPath);
+            //Like Git on checkout: a file fetched from storage gets the current time as its timestamp, not the
+            //timestamp carried along from storage (File.Copy and ExtractToFile both keep the stored file's time).
+            //Storage files themselves are left untouched. Done here, after the read-only flag is removed (setting
+            //the time on a read-only file fails), and before the caller reads the timestamp for the hash cache.
+            File.SetLastWriteTimeUtc(fileNameAndPath, DateTime.UtcNow);
         }
-        
+
         private static void VerifyFetchedBlobHash(string tempPath, string originalFileNameAndPath, string expectedHash, EDlinkVersion dlinkVersion)
         {
             string extension = Path.GetExtension(originalFileNameAndPath);            
