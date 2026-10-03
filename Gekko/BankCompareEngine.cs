@@ -257,23 +257,43 @@ namespace Gekko
         }
 
         /// <summary>
-        /// For an area with one bank only: per period, the number of its series that have an observation
-        /// (not missing and not NaN). Used for the blue histogram.
+        /// New (replaces ObservationCounts): per period, the number of the area's series (all of them, i.e.
+        /// the black number, never only the deviating ones) that are missing in at least one of the area's
+        /// banks. Missing = no observation in that period, or NaN. Used for the blue histogram.
         /// </summary>
-        public static int[] ObservationCounts(VennResult r, VennArea area, int start, int end)
+        public static int[] MissingCounts(VennResult r, VennArea area, int start, int end)
         {
             var counts = new int[Math.Max(0, end - start + 1)];
-            if (area.Slots.Length != 1) return counts;
-            IReadOnlyDictionary<string, CompareSeries> dict = r.Banks[area.Slots[0]].Get(r.Freq);
+            if (counts.Length == 0) return counts;
+            IReadOnlyDictionary<string, CompareSeries>[] dicts = area.Slots.Select(s => r.Banks[s].Get(r.Freq)).ToArray();
+            var series = new CompareSeries[dicts.Length];
             foreach (string name in area.Names)
             {
-                CompareSeries series;
-                if (!dict.TryGetValue(name, out series)) continue;
-                int from = Math.Max(start, series.Start), to = Math.Min(end, series.End);
-                for (int p = from; p <= to; p++)
-                    if (!double.IsNaN(series.Data[p - series.Start])) counts[p - start]++;
+                for (int i = 0; i < dicts.Length; i++)
+                {
+                    CompareSeries ts;
+                    series[i] = dicts[i].TryGetValue(name, out ts) ? ts : null;
+                }
+                for (int p = start; p <= end; p++)
+                {
+                    for (int i = 0; i < series.Length; i++)
+                    {
+                        if (IsMissing(series[i], p))
+                        {
+                            counts[p - start]++;
+                            break;
+                        }
+                    }
+                }
             }
             return counts;
+        }
+
+        static bool IsMissing(CompareSeries series, int period)
+        {
+            if (series == null) return true;
+            double? v = series.Get(period);
+            return !v.HasValue || double.IsNaN(v.Value);
         }
 
         /// <summary>

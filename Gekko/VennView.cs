@@ -21,6 +21,9 @@ namespace Gekko
         };
         static readonly Color Grey = Color.FromRgb(0xA6, 0xA6, 0xA6);
 
+        // New: dark red of the deviation numbers, also used for deviating names in the Names tab.
+        public static readonly Brush DeviationText = FromRgb(0xB0, 0x30, 0x30);
+
         public static Color ColorOf(int slot)
         {
             return slot >= 0 && slot < Palette.Length ? Palette[slot] : Grey;
@@ -56,7 +59,8 @@ namespace Gekko
 
     /// <summary>
     /// Venn diagram for 2 or 3 banks. Bank 1 is bottom-left, bank 2 bottom-right, bank 3 on top.
-    /// The 2-bank diagram is the 3-bank diagram without the top circle: same positions, same size.
+    /// The 2-bank diagram is the 3-bank diagram without the top circle: same positions, same size,
+    /// but without the vertical room the top circle needs (the window gives that room to the tabs).
     /// Raises AreaClicked(mask, deviationsClicked) and BankClicked(slot).
     /// </summary>
     public sealed class VennView : Canvas
@@ -68,6 +72,9 @@ namespace Gekko
         const double H3 = 0.288675;  // 1 / (2 * sqrt 3)
         const double T3 = 0.577350;  // 1 / sqrt 3
 
+        // Room for bank labels on the left and right, and for the caption below.
+        const double SideMargin = 225, TopMargin = 4, BottomMargin = 20;
+
         static readonly Brush HoverFill = BankColors.FromArgb(0x2A, 0, 0, 0);
         static readonly Brush SelectedFill = BankColors.FromArgb(0x16, 0, 0, 0);
         static readonly Brush SelectedStroke = BankColors.FromArgb(0x50, 0x33, 0x33, 0x33);
@@ -76,10 +83,9 @@ namespace Gekko
         static readonly Brush HiddenLine = BankColors.FromArgb(0x70, 0xB4, 0xB4, 0xB4);
         static readonly Brush TotalBrush = BankColors.FromRgb(0x1F, 0x4E, 0x79);
         static readonly Brush NumberBrush = Brushes.Black;
-        static readonly Brush DeviationBrush = BankColors.FromRgb(0xB0, 0x30, 0x30);
+        static readonly Brush DeviationBrush = BankColors.DeviationText;
         static readonly Brush MutedBrush = BankColors.FromRgb(0x88, 0x88, 0x88);
         static readonly Brush TextBrush = BankColors.FromRgb(0x44, 0x44, 0x44);
-        static readonly Brush SelectedTextBack = Brushes.White;
 
         VennResult result;
         string emptyMessage = "";
@@ -110,6 +116,31 @@ namespace Gekko
             Rebuild();
         }
 
+        // ---------------------------------------------------------------- geometry (new: public for the window)
+
+        /// <summary>Top of the diagram in radius units: the top circle (3 banks) or the bottom circles (2 banks).</summary>
+        static double YMin(int slotCount)
+        {
+            return slotCount == 3 ? -(T3 + 1) : H3 - 1;
+        }
+
+        const double YMax = H3 + 1;
+
+        /// <summary>The circle radius the diagram uses for a canvas of this size.</summary>
+        public static double RadiusFor(double width, double height, int slotCount)
+        {
+            double r = Math.Min((width - 2 * SideMargin) / 3.0, (height - TopMargin - BottomMargin) / (YMax - YMin(slotCount)));
+            return Math.Max(40, Math.Min(r, 200));
+        }
+
+        /// <summary>Vertical room that the top circle adds to the diagram, for a given radius.</summary>
+        public static double ThirdCircleHeight(double radius)
+        {
+            return (YMin(2) - YMin(3)) * radius;
+        }
+
+        // ---------------------------------------------------------------- drawing
+
         void Rebuild()
         {
             Children.Clear();
@@ -125,17 +156,14 @@ namespace Gekko
             }
 
             bool three = result.SlotCount == 3;
-            // The layout is always the 3-circle layout, so circles keep their size and place in 2-bank mode.
+            // Horizontally the layout is always the 3-circle layout, so circles keep their size and place in 2-bank mode.
             Point[] unit3 = { new Point(-0.5, H3), new Point(0.5, H3), new Point(0, -T3) };
             Point[] unit = unit3.Take(result.SlotCount).ToArray();
-            const double yMin = -(T3 + 1), yMax = H3 + 1;
+            double yMin = YMin(result.SlotCount);
 
-            // Room for bank labels on the left and right, and for the caption below.
-            const double side = 225, top = 4, bottom = 20;
-            double r = Math.Min((width - 2 * side) / 3.0, (height - top - bottom) / (yMax - yMin));
-            r = Math.Max(40, Math.Min(r, 200));
+            double r = RadiusFor(width, height, result.SlotCount);
             double ox = width / 2;
-            double oy = top + ((height - top - bottom) - (yMax - yMin) * r) / 2 - yMin * r;
+            double oy = TopMargin + ((height - TopMargin - BottomMargin) - (YMax - yMin) * r) / 2 - yMin * r;
             Func<Point, Point> toPixel = p => new Point(ox + p.X * r, oy + p.Y * r);
             Point[] centers = unit.Select(toPixel).ToArray();
 
@@ -157,6 +185,7 @@ namespace Gekko
             }
 
             // Areas as exact shapes, so hovering shows precisely which region a number belongs to.
+            // Clicking an area is the same as clicking its black number.
             Geometry[] circles = centers.Select(c => (Geometry)new EllipseGeometry(c, r, r)).ToArray();
             foreach (VennArea area in result.Areas.Values)
             {
@@ -187,11 +216,11 @@ namespace Gekko
             }
 
             // Bank labels
-            for (int s = 0; s < result.SlotCount; s++) AddBankTag(s, centers[s], r, three);
+            for (int s = 0; s < result.SlotCount; s++) AddBankTag(s, centers[s], r, three, width);
 
             idleCaption = three
-                ? "Hover over an area to see what it holds. Click a number for details. Click a bank label to hide or show that bank."
-                : "Hover over an area to see what it holds. Click a number for details.";
+                ? "Hover over an area to see what it holds. Click an area or a number to list names. Click a bank label to hide or show that bank."
+                : "Hover over an area to see what it holds. Click an area or a number to list names.";
             caption = new TextBlock { FontSize = 12, Foreground = TextBrush, TextTrimming = TextTrimming.CharacterEllipsis, Width = width - 4 };
             caption.Text = SelectionCaption() ?? idleCaption;
             Add(caption, 2, height - 20);
@@ -240,6 +269,10 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// Black number: all series in the area. Red number: the deviating ones.
+        /// Numbers are normal weight; the selected one is bold (no background).
+        /// </summary>
         FrameworkElement BuildAreaLabel(VennArea area)
         {
             int mask = area.Mask;
@@ -250,15 +283,14 @@ namespace Gekko
             var totalText = new TextBlock
             {
                 Text = total.ToString(CultureInfo.InvariantCulture),
-                FontWeight = FontWeights.Bold,
+                FontWeight = selected && !selectedDeviations ? FontWeights.Bold : FontWeights.Normal,
                 Foreground = NumberBrush,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 Padding = new Thickness(4, 0, 4, 0),
-                ToolTip = area.IsComparison
-                    ? total + " series. Click to list their names."
-                    : total + " series. Click to see how many have an observation in each period."
+                ToolTip = area.IsComparison && area.Deviations.Count > 0
+                    ? total + " series. Click to list their names (deviating ones in dark red)."
+                    : total + " series. Click to list their names."
             };
-            if (selected && !selectedDeviations) totalText.Background = SelectedTextBack;
             MakeClickable(totalText, () => AreaClicked?.Invoke(mask, false));
             panel.Children.Add(totalText);
 
@@ -268,7 +300,7 @@ namespace Gekko
                 var devText = new TextBlock
                 {
                     Text = "(" + dev.ToString(CultureInfo.InvariantCulture) + ")",
-                    FontWeight = FontWeights.Bold,
+                    FontWeight = selected && selectedDeviations ? FontWeights.Bold : FontWeights.Normal,
                     Foreground = dev > 0 ? DeviationBrush : MutedBrush,
                     HorizontalAlignment = HorizontalAlignment.Center,
                     Padding = new Thickness(4, 0, 4, 1)
@@ -276,9 +308,8 @@ namespace Gekko
                 if (dev > 0)
                 {
                     devText.ToolTip = area.Slots.Length == 3
-                        ? dev + " of " + total + " series are not equal in all three banks. Click for details."
-                        : dev + " of " + total + " series deviate between bank " + (area.Slots[0] + 1) + " and bank " + (area.Slots[1] + 1) + ". Click for details.";
-                    if (selected && selectedDeviations) devText.Background = SelectedTextBack;
+                        ? dev + " of " + total + " series are not equal in all three banks. Click to list only these."
+                        : dev + " of " + total + " series deviate between bank " + (area.Slots[0] + 1) + " and bank " + (area.Slots[1] + 1) + ". Click to list only these.";
                     MakeClickable(devText, () => AreaClicked?.Invoke(mask, true));
                 }
                 else
@@ -302,7 +333,7 @@ namespace Gekko
             text.MouseLeftButtonUp += (o, e) => { e.Handled = true; onClick(); };
         }
 
-        void AddBankTag(int s, Point center, double r, bool three)
+        void AddBankTag(int s, Point center, double r, bool three, double canvasWidth)
         {
             bool on = result.Active[s];
             CompareBank bank = result.Banks[s];
@@ -382,10 +413,11 @@ namespace Gekko
             }
             else
             {
-                // Left of the top circle, clear of the bottom-left circle
-                left = center.X - 1.3 * r - size.Width;
-                topPos = center.Y - size.Height / 2;
+                // New: right of the top circle and somewhat above its center, clear of the bottom-right circle
+                left = center.X + 1.1 * r;
+                topPos = center.Y - 0.3 * r - size.Height / 2;
             }
+            left = Math.Min(left, canvasWidth - size.Width - 2);
             Add(tag, Math.Max(2, left), Math.Max(2, topPos));
         }
 

@@ -1,10 +1,11 @@
-﻿<Window x:Class="Gekko.WindowBankCompare"
+<Window x:Class="Gekko.WindowBankCompare"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:Gekko"
         Title="Compare databanks"
         Height="760" Width="1180" MinHeight="600" MinWidth="960"
         Top="20" Left="20"
+        Loaded="Window_Loaded" Closing="Window_Closing"
         PreviewKeyDown="Window_PreviewKeyDown">
 
     <Window.Resources>
@@ -113,9 +114,10 @@
         </Style>
     </Window.Resources>
 
-    <Grid Margin="10">
+    <Grid Margin="10" Name="RootGrid">
         <Grid.RowDefinitions>
-            <RowDefinition Height="112" MinHeight="50"/>
+            <!-- Name added: its height is saved as CompareWindowSplitterDistance1 -->
+            <RowDefinition x:Name="BankListRow" Height="112" MinHeight="50"/>
             <RowDefinition Height="8"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="8"/>
@@ -175,7 +177,13 @@
                         </GridViewColumn>
                         <GridViewColumn Width="170" Header="Series" DisplayMemberBinding="{Binding SeriesText}"/>
                         <GridViewColumn Width="330" Header="Full path" DisplayMemberBinding="{Binding PathText}"/>
-                        <GridViewColumn Width="80" Header="">
+                        <GridViewColumn Width="80">
+                            <!-- New: [Recent] sits in the header, directly above the [Remove] buttons -->
+                            <GridViewColumn.Header>
+                                <Button Content="Recent" Style="{StaticResource RoundedSmallButtonStyle}"
+                                        FontFamily="Segoe UI" FontSize="11" Click="RecentButton_Click"
+                                        ToolTip="Add one of the most recently compared databanks"/>
+                            </GridViewColumn.Header>
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <Button Content="Remove" Style="{StaticResource RoundedSmallButtonStyle}"
@@ -198,7 +206,8 @@
             <Grid.RowDefinitions>
                 <RowDefinition x:Name="VennRow" Height="1.25*" MinHeight="200"/>
                 <RowDefinition x:Name="VennSplitterRow" Height="6"/>
-                <RowDefinition Height="*" MinHeight="150"/>
+                <!-- Name added: restoring CompareWindowSplitterDistance2 sets this row's share -->
+                <RowDefinition x:Name="DetailsRow" Height="*" MinHeight="150"/>
             </Grid.RowDefinitions>
 
             <!-- Venn diagram on the left, controls on the right. "Hide controls" hides both. -->
@@ -213,9 +222,10 @@
                     <local:VennView x:Name="Venn" Margin="8"/>
                 </Border>
 
-                <Border Grid.Column="2" BorderBrush="#FFD5D5D5" BorderThickness="1" CornerRadius="4" Background="#FFFAFAFA"
-                        Padding="10,8" Width="290">
-                    <Grid>
+                <!-- Names added: the diagram row is never made lower than these controls need (see FitVennRow) -->
+                <Border Grid.Column="2" Name="ControlsPanel" BorderBrush="#FFD5D5D5" BorderThickness="1" CornerRadius="4"
+                        Background="#FFFAFAFA" Padding="10,8" Width="290">
+                    <Grid Name="ControlsContent" VerticalAlignment="Top">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
@@ -340,8 +350,10 @@
                                 <Button Grid.Column="2" Content="Copy" Style="{StaticResource RoundedSmallButtonStyle}"
                                         Click="CopyNames_Click"/>
                             </Grid>
-                            <TextBox Grid.Row="2" Name="NamesText" Style="{StaticResource MonoTextStyle}"
-                                     TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
+                            <!-- New: RichTextBox instead of TextBox, so deviating names can be dark red -->
+                            <RichTextBox Grid.Row="2" Name="NamesText" IsReadOnly="True" IsReadOnlyCaretVisible="False"
+                                         FontFamily="Consolas" FontSize="12.5" BorderBrush="#FFACACAC" Padding="4,2"
+                                         VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"/>
                         </Grid>
                     </TabItem>
 

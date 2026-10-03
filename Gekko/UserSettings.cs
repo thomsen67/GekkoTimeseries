@@ -593,6 +593,67 @@ namespace Gekko
                 this["ErrorWindowLeftDistance"] = (int)value;
             }
         }
+
+        // ============= Compare window =============================
+
+        // Most recently compared databanks (LRU, max 20), full paths separated by '|'.
+        [DefaultSettingValue("")]
+        [UserScopedSetting()]
+        public string CompareRecentBanks
+        {
+            get { return ((string)this["CompareRecentBanks"]); }
+            set { this["CompareRecentBanks"] = (string)value; }
+        }
+
+        [DefaultSettingValue("0")]
+        [UserScopedSetting()]
+        public double CompareWindowWidth
+        {
+            get { return ((double)this["CompareWindowWidth"]); }
+            set { this["CompareWindowWidth"] = (double)value; }
+        }
+
+        [DefaultSettingValue("0")]
+        [UserScopedSetting()]
+        public double CompareWindowHeight
+        {
+            get { return ((double)this["CompareWindowHeight"]); }
+            set { this["CompareWindowHeight"] = (double)value; }
+        }
+
+        [DefaultSettingValue("0")]
+        [UserScopedSetting()]
+        public double CompareWindowTopDistance
+        {
+            get { return ((double)this["CompareWindowTopDistance"]); }
+            set { this["CompareWindowTopDistance"] = (double)value; }
+        }
+
+        [DefaultSettingValue("0")]
+        [UserScopedSetting()]
+        public double CompareWindowLeftDistance
+        {
+            get { return ((double)this["CompareWindowLeftDistance"]); }
+            set { this["CompareWindowLeftDistance"] = (double)value; }
+        }
+
+        // Height of the bank list (upper section).
+        [DefaultSettingValue("0")]
+        [UserScopedSetting()]
+        public double CompareWindowSplitterDistance1
+        {
+            get { return ((double)this["CompareWindowSplitterDistance1"]); }
+            set { this["CompareWindowSplitterDistance1"] = (double)value; }
+        }
+
+        // Height of the diagram and controls (middle section); the tabs (lower section) get the rest.
+        [DefaultSettingValue("0")]
+        [UserScopedSetting()]
+        public double CompareWindowSplitterDistance2
+        {
+            get { return ((double)this["CompareWindowSplitterDistance2"]); }
+            set { this["CompareWindowSplitterDistance2"] = (double)value; }
+        }
     }
 }
 

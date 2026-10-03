@@ -1,11 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -107,6 +110,13 @@ namespace Gekko
         static readonly Brush DropNormal = BankColors.FromRgb(0x99, 0x99, 0x99);
         static readonly Brush InvalidBack = BankColors.FromRgb(0xFB, 0xE3, 0xE3);
         static readonly Brush AutoPeriodBrush = BankColors.FromRgb(0x88, 0x88, 0x88);
+        // New: deviating names in the Names tab, same dark red as the deviation numbers in the diagram.
+        static readonly Brush DeviatingNameBrush = BankColors.DeviationText;
+        static readonly Brush RecentPathBrush = BankColors.FromRgb(0x88, 0x88, 0x88);
+
+        // New: length of the "Recent" list (LRU, stored in the user settings).
+        const int MaxRecentBanks = 20;
+        const char RecentSeparator = '|';  // cannot occur in a Windows path
 
         readonly ObservableCollection<BankItem> banks = new ObservableCollection<BankItem>();
         readonly IEqualityCriterion criterion = new SimpleEqualityCriterion();
@@ -126,12 +136,17 @@ namespace Gekko
         const string DefaultDevMessage = "Click a deviation number in the diagram to list values and deviations.";
         string devMessage = DefaultDevMessage;
 
+        // New: the Names tab is a RichTextBox now (for the dark red names), so keep the plain text for Copy.
+        string namesPlainText = "";
+
         // Chosen first/last period in the selected frequency. Null means: follow the universal period.
         int? userFrom;
         int? userTo;
         CompareFreq? periodFreq;
 
         bool diagramHidden;
+        // New: the number of circles (2 or 3) the diagram row height is currently fitted to. See FitVennRow.
+        int layoutSlots = 3;
         GridLength savedVennHeight = new GridLength(1.25, GridUnitType.Star);
 
         Point dragStart;
@@ -142,6 +157,7 @@ namespace Gekko
         {
             InitializeComponent();
             BankList.ItemsSource = banks;
+            RestoreWindowPlacement();  // New
 
             recomputeTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(300) };
             recomputeTimer.Tick += (s, e) => Recompute();
@@ -169,6 +185,212 @@ namespace Gekko
                 var item = FreqCombo.SelectedItem as ComboBoxItem;
                 return item == null ? (CompareFreq?)null : (CompareFreq)item.Tag;
             }
+        }
+
+        // ---------------------------------------------------------------- user settings (new)
+
+        // Adjust to however the existing UserSettings instance is reached in Gekko. Use the shared
+        // instance rather than a new UserSettings(): two instances saving would overwrite each other.
+        static UserSettings Settings => Globals.userSettings;
+
+        /// <summary>Size and position from the last session, kept inside the screen(s) present now.</summary>
+        void RestoreWindowPlacement()
+        {
+            UserSettings s = Settings;
+            double w = s.CompareWindowWidth;
+            double h = s.CompareWindowHeight;
+            if (w <= 0 || h <= 0) return;  // never saved: keep the XAML defaults
+
+            double screenLeft = SystemParameters.VirtualScreenLeft;
+            double screenTop = SystemParameters.VirtualScreenTop;
+            double screenWidth = SystemParameters.VirtualScreenWidth;
+            double screenHeight = SystemParameters.VirtualScreenHeight;
+
+            w = Math.Max(MinWidth, Math.Min(w, screenWidth));
+            h = Math.Max(MinHeight, Math.Min(h, screenHeight));
+            double left = Math.Max(screenLeft, Math.Min(s.CompareWindowLeftDistance, screenLeft + screenWidth - w));
+            double top = Math.Max(screenTop, Math.Min(s.CompareWindowTopDistance, screenTop + screenHeight - h));
+
+            WindowStartupLocation = WindowStartupLocation.Manual;
+            Width = w;
+            Height = h;
+            Left = left;
+            Top = top;
+        }
+
+        /// <summary>The splitters can only be set once the rows have their actual sizes.</summary>
+        void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            UserSettings s = Settings;
+
+            double bankListHeight = s.CompareWindowSplitterDistance1;
+            if (bankListHeight > 0)
+            {
+                // Leave room for the diagram (200), splitters and the tabs (150) below.
+                double max = Math.Max(BankListRow.MinHeight, RootGrid.ActualHeight - 420);
+                BankListRow.Height = new GridLength(Math.Max(BankListRow.MinHeight, Math.Min(bankListHeight, max)));
+                UpdateLayout();
+            }
+
+            double vennHeight = s.CompareWindowSplitterDistance2;
+            if (vennHeight > 0)
+            {
+                // Star sizes in the saved proportion, so both parts still grow when the window is resized.
+                double total = VennRow.ActualHeight + DetailsRow.ActualHeight;
+                double venn = Math.Max(VennRow.MinHeight, Math.Min(vennHeight, total - DetailsRow.MinHeight));
+                if (venn > 0 && total - venn > 0)
+                {
+                    VennRow.Height = new GridLength(venn, GridUnitType.Star);
+                    DetailsRow.Height = new GridLength(total - venn, GridUnitType.Star);
+                }
+            }
+
+            // The saved height is for 3 circles; shrink it if the window starts out comparing 2 banks.
+            UpdateLayout();
+            if (current != null) FitVennRow(current.SlotCount);
+        }
+
+        /// <summary>
+        /// New: going from 3 to 2 circles removes the room the top circle took, and gives it to the tabs
+        /// below; going back from 2 to 3 takes it back. The circles keep their size.
+        /// </summary>
+        void FitVennRow(int slots)
+        {
+            if (slots == layoutSlots || diagramHidden) return;
+            if (Venn.ActualWidth <= 0 || Venn.ActualHeight <= 0) return;  // not laid out yet, Window_Loaded does it
+
+            double radius = VennView.RadiusFor(Venn.ActualWidth, Venn.ActualHeight, layoutSlots);
+            double change = VennView.ThirdCircleHeight(radius) * (slots == 2 ? -1 : 1);
+
+            // Never smaller than the controls to the right of the diagram need.
+            double controls = ControlsContent.ActualHeight + ControlsPanel.Padding.Top + ControlsPanel.Padding.Bottom
+                              + ControlsPanel.BorderThickness.Top + ControlsPanel.BorderThickness.Bottom;
+            double total = VennRow.ActualHeight + DetailsRow.ActualHeight;
+            double min = Math.Max(VennRow.MinHeight, controls);
+            double venn = Math.Max(min, Math.Min(VennRow.ActualHeight + change, total - DetailsRow.MinHeight));
+            if (venn > 0 && total - venn > 0)
+            {
+                VennRow.Height = new GridLength(venn, GridUnitType.Star);
+                DetailsRow.Height = new GridLength(total - venn, GridUnitType.Star);
+            }
+            layoutSlots = slots;
+        }
+
+        void Window_Closing(object sender, CancelEventArgs e)
+        {
+            try
+            {
+                UserSettings s = Settings;
+                Rect r = WindowState == WindowState.Normal ? new Rect(Left, Top, ActualWidth, ActualHeight) : RestoreBounds;
+                if (!r.IsEmpty)
+                {
+                    s.CompareWindowLeftDistance = r.Left;
+                    s.CompareWindowTopDistance = r.Top;
+                    s.CompareWindowWidth = r.Width;
+                    s.CompareWindowHeight = r.Height;
+                }
+                s.CompareWindowSplitterDistance1 = BankListRow.ActualHeight;
+                // Only when the controls are shown; otherwise keep the height from when they were.
+                // Always saved as the height for 3 circles (Window_Loaded shrinks it again for 2).
+                if (!diagramHidden)
+                {
+                    double venn = VennRow.ActualHeight;
+                    if (layoutSlots == 2 && Venn.ActualWidth > 0)
+                        venn += VennView.ThirdCircleHeight(VennView.RadiusFor(Venn.ActualWidth, Venn.ActualHeight, 2));
+                    s.CompareWindowSplitterDistance2 = venn;
+                }
+                s.Save();
+            }
+            catch (Exception)
+            {
+                // Failing to save the layout must never prevent closing the window.
+            }
+        }
+
+        // ---------------------------------------------------------------- recent databanks (new)
+
+        static List<string> LoadRecentBanks()
+        {
+            string text = Settings.CompareRecentBanks ?? "";
+            return text.Split(new[] { RecentSeparator }, StringSplitOptions.RemoveEmptyEntries).ToList();
+        }
+
+        static void SaveRecentBanks(List<string> paths)
+        {
+            try
+            {
+                Settings.CompareRecentBanks = string.Join(RecentSeparator.ToString(), paths.Take(MaxRecentBanks));
+                Settings.Save();
+            }
+            catch (Exception)
+            {
+                // The list is a convenience; never fail loading a bank because of it.
+            }
+        }
+
+        /// <summary>Moves (or adds) the path to the top of the LRU list.</summary>
+        static void TouchRecentBank(string path)
+        {
+            if (string.IsNullOrEmpty(path)) return;
+            List<string> paths = LoadRecentBanks();
+            paths.RemoveAll(p => string.Equals(p, path, StringComparison.OrdinalIgnoreCase));
+            paths.Insert(0, path);
+            SaveRecentBanks(paths);
+        }
+
+        static void ForgetRecentBank(string path)
+        {
+            List<string> paths = LoadRecentBanks();
+            if (paths.RemoveAll(p => string.Equals(p, path, StringComparison.OrdinalIgnoreCase)) > 0) SaveRecentBanks(paths);
+        }
+
+        bool IsInList(string path)
+        {
+            return banks.Any(b => string.Equals(b.Bank.FilePath, path, StringComparison.OrdinalIgnoreCase));
+        }
+
+        void RecentButton_Click(object sender, RoutedEventArgs e)
+        {
+            var button = (Button)sender;
+            var menu = new ContextMenu { PlacementTarget = button, Placement = PlacementMode.Bottom };
+            List<string> paths = LoadRecentBanks();
+            if (paths.Count == 0)
+            {
+                menu.Items.Add(new MenuItem { Header = new TextBlock { Text = "No recent databanks" }, IsEnabled = false });
+            }
+            for (int i = 0; i < paths.Count; i++)
+            {
+                string path = paths[i];
+                bool open = IsInList(path);
+                // TextBlocks rather than a string header: '_' in file names would otherwise become access keys.
+                var header = new StackPanel { Orientation = Orientation.Horizontal, Opacity = open ? 0.45 : 1.0 };
+                header.Children.Add(new TextBlock { Text = (i + 1) + ".", Width = 26 });
+                header.Children.Add(new TextBlock { Text = Path.GetFileName(path), MinWidth = 160, Margin = new Thickness(0, 0, 16, 0) });
+                header.Children.Add(new TextBlock { Text = path, Foreground = RecentPathBrush });
+                var item = new MenuItem
+                {
+                    Header = header,
+                    Tag = path,
+                    IsEnabled = !open,
+                    ToolTip = open ? "Already in the list" : null
+                };
+                item.Click += RecentItem_Click;
+                menu.Items.Add(item);
+            }
+            menu.IsOpen = true;
+        }
+
+        void RecentItem_Click(object sender, RoutedEventArgs e)
+        {
+            string path = (sender as MenuItem)?.Tag as string;
+            if (path == null || IsInList(path)) return;
+            if (!File.Exists(path))
+            {
+                ForgetRecentBank(path);
+                SetStatus(path + " no longer exists and was removed from the recent list.");
+                return;
+            }
+            AddFiles(new[] { path }, banks.Count);
         }
 
         // ---------------------------------------------------------------- recomputation
@@ -257,6 +479,7 @@ namespace Gekko
             current = CompareEngine.Compute(compared, active, freq.Value, filter, criterion,
                                             userFrom ?? int.MinValue, userTo ?? int.MaxValue);
             Venn.SetResult(current, null);
+            FitVennRow(current.SlotCount);  // New
 
             VennArea area;
             if (selectedMask != 0 && current.Areas.TryGetValue(selectedMask, out area))
@@ -335,13 +558,31 @@ namespace Gekko
             string description = CompareEngine.DescribeArea(current, area.Mask);
             string keepName = keepSeries && navIndex >= 0 && navIndex < navList.Count ? navList[navIndex].Name : null;
 
+            // New: red chart (deviations) for areas with 2 or 3 banks, blue chart (missings) always.
+            // The blue chart always counts all series in the area (the black number), whichever number was clicked.
+            if (current.HasWindow)
+            {
+                string devTitle = null;
+                int[] devCounts = null;
+                if (area.IsComparison)
+                {
+                    devTitle = description + ": " + (area.Slots.Length == 3
+                        ? "number of series not equal in all three banks, per period"
+                        : "number of deviating series, per period");
+                    devCounts = CompareEngine.Histogram(area, current.WindowStart, current.WindowEnd);
+                }
+                string missTitle = description + ": number of series with a missing value"
+                                   + (area.IsComparison ? " in any of the banks" : "") + ", per period";
+                Histogram.SetData(current.Freq, current.WindowStart, devTitle, devCounts, missTitle,
+                                  CompareEngine.MissingCounts(current, area, current.WindowStart, current.WindowEnd));
+            }
+            else
+            {
+                Histogram.ShowMessage("No periods to show.");
+            }
+
             if (area.IsComparison && area.Deviations.Count > 0)
             {
-                string what = area.Slots.Length == 3
-                    ? "number of series not equal in all three banks, per period"
-                    : "number of deviating series, per period";
-                Histogram.SetData(description + ": " + what, current.Freq, current.WindowStart,
-                                  CompareEngine.Histogram(area, current.WindowStart, current.WindowEnd), true);
                 navList = area.Deviations;
                 navIndex = 0;
                 if (keepName != null)
@@ -350,21 +591,8 @@ namespace Gekko
                     if (i >= 0) navIndex = i;
                 }
             }
-            else if (!area.IsComparison)
-            {
-                // One bank only: nothing to compare, so show how many of the series have an observation per period.
-                if (current.HasWindow)
-                    Histogram.SetData(description + ": number of series with an observation (not missing), per period",
-                                      current.Freq, current.WindowStart,
-                                      CompareEngine.ObservationCounts(current, area, current.WindowStart, current.WindowEnd), false);
-                else
-                    Histogram.ShowMessage("No periods to show.");
-                navList = new List<SeriesComparison>();
-                navIndex = -1;
-            }
             else
             {
-                Histogram.ShowMessage("No deviations in this area.");
                 navList = new List<SeriesComparison>();
                 navIndex = -1;
             }
@@ -374,8 +602,8 @@ namespace Gekko
                 : "Series that exist in only one bank have nothing to be compared with.";
             ShowCurrentSeries(null);
 
-            // Deviation numbers and one-bank areas open the histogram; other totals open the name list.
-            if (switchTab) Tabs.SelectedItem = selectedDeviations || !area.IsComparison ? HistogramTab : NamesTab;
+            // New: every click on an area or a number shows the names.
+            if (switchTab) Tabs.SelectedItem = NamesTab;
         }
 
         void ClearDetails()
@@ -383,7 +611,7 @@ namespace Gekko
             selectedArea = null;
             devMessage = DefaultDevMessage;
             ShowNames();
-            Histogram.ShowMessage("Click a deviation number in the diagram to see deviations per period.");
+            Histogram.ShowMessage("Click an area or a number in the diagram to see deviations and missing values per period.");
             navList = new List<SeriesComparison>();
             navIndex = -1;
             ShowCurrentSeries(null);
@@ -430,6 +658,9 @@ namespace Gekko
                 VennRow.MinHeight = 200;
                 VennSplitterRow.Height = new GridLength(6);
                 DiagramToggle.Content = "\u25B4 Hide controls";
+                // New: "first 2" / "first 3" may have changed while the diagram was hidden.
+                UpdateLayout();
+                if (current != null) FitVennRow(current.SlotCount);
             }
             UpdateSelectionText();
         }
@@ -582,21 +813,72 @@ namespace Gekko
 
         // ---------------------------------------------------------------- names tab
 
+        /// <summary>
+        /// Area or black number: all series in the area, the deviating ones in dark red.
+        /// Red number: only the deviating series (also dark red).
+        /// </summary>
         void ShowNames()
         {
             if (selectedArea == null || current == null)
             {
-                NamesHeader.Text = "Click a number in the diagram to list the series in that area.";
-                NamesText.Text = "";
+                NamesHeader.Text = "Click a number or an area in the diagram to list the series in that area.";
+                SetNamesText(new List<string>(), new HashSet<string>());
                 return;
             }
             bool ignore = IgnoreDimsCheck.IsChecked == true;
-            List<string> names = CompareEngine.NamesForDisplay(selectedArea.Names, ignore);
-            string header = CompareEngine.DescribeArea(current, selectedArea.Mask) + ": " + selectedArea.Names.Count + " series";
-            if (ignore) header += ", " + names.Count + " names without dimensions";
+            List<string> deviatingNames = selectedArea.Deviations.Select(c => c.Name).ToList();
+            List<string> deviatingShown = CompareEngine.NamesForDisplay(deviatingNames, ignore);
+            var red = new HashSet<string>(deviatingShown, StringComparer.OrdinalIgnoreCase);
+
+            string header = CompareEngine.DescribeArea(current, selectedArea.Mask) + ": ";
+            List<string> names;
+            if (selectedDeviations)
+            {
+                names = deviatingShown;
+                header += deviatingNames.Count + " deviating series";
+                if (ignore) header += ", " + names.Count + " names without dimensions";
+            }
+            else
+            {
+                names = CompareEngine.NamesForDisplay(selectedArea.Names, ignore);
+                header += selectedArea.Names.Count + " series";
+                if (ignore) header += ", " + names.Count + " names without dimensions";
+                if (deviatingNames.Count > 0) header += " (" + deviatingNames.Count + " deviating, in dark red)";
+            }
             NamesHeader.Text = header;
-            NamesText.Text = string.Join(", ", names);
+            SetNamesText(names, red);
+        }
+
+        /// <summary>Comma-separated names; runs of consecutive deviating names become one dark red Run.</summary>
+        void SetNamesText(List<string> names, HashSet<string> red)
+        {
+            var paragraph = new Paragraph { Margin = new Thickness(0) };
+            int i = 0;
+            while (i < names.Count)
+            {
+                bool isRed = red.Contains(names[i]);
+                var sb = new StringBuilder();
+                int j = i;
+                while (j < names.Count && red.Contains(names[j]) == isRed)
+                {
+                    if (j > 0) sb.Append(", ");
+                    sb.Append(names[j]);
+                    j++;
+                }
+                var run = new Run(sb.ToString());
+                if (isRed) run.Foreground = DeviatingNameBrush;
+                paragraph.Inlines.Add(run);
+                i = j;
+            }
+            var document = new FlowDocument(paragraph)
+            {
+                PagePadding = new Thickness(0),
+                FontFamily = NamesText.FontFamily,
+                FontSize = NamesText.FontSize
+            };
+            NamesText.Document = document;
             NamesText.ScrollToHome();
+            namesPlainText = string.Join(", ", names);
         }
 
         void IgnoreDims_Changed(object sender, RoutedEventArgs e)
@@ -606,10 +888,10 @@ namespace Gekko
 
         void CopyNames_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrEmpty(NamesText.Text)) return;
+            if (string.IsNullOrEmpty(namesPlainText)) return;
             try
             {
-                Clipboard.SetText(NamesText.Text);
+                Clipboard.SetText(namesPlainText);
                 SetStatus("Names copied to the clipboard.");
             }
             catch (Exception ex)
@@ -803,7 +1085,7 @@ namespace Gekko
             string failure = null;
             foreach (string path in paths)
             {
-                if (Directory.Exists(path) || banks.Any(b => string.Equals(b.Bank.FilePath, path, StringComparison.OrdinalIgnoreCase)))
+                if (Directory.Exists(path) || IsInList(path))
                 {
                     skipped.Add(Path.GetFileName(path));
                     continue;
@@ -811,6 +1093,7 @@ namespace Gekko
                 try
                 {
                     banks.Insert(at++, new BankItem(DatabankLoader.Load(path)));
+                    TouchRecentBank(path);  // New
                     added++;
                 }
                 catch (Exception ex)
@@ -937,7 +1220,7 @@ namespace Gekko
         {
             if (insertionLine == null)
             {
-                var layer = System.Windows.Documents.AdornerLayer.GetAdornerLayer(BankList);
+                var layer = AdornerLayer.GetAdornerLayer(BankList);
                 if (layer == null) return;
                 insertionLine = new InsertionLineAdorner(BankList);
                 layer.Add(insertionLine);
@@ -961,7 +1244,7 @@ namespace Gekko
         void RemoveInsertionLine()
         {
             if (insertionLine == null) return;
-            var layer = System.Windows.Documents.AdornerLayer.GetAdornerLayer(BankList);
+            var layer = AdornerLayer.GetAdornerLayer(BankList);
             if (layer != null) layer.Remove(insertionLine);
             insertionLine = null;
         }
