@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -30,15 +31,32 @@ namespace Gekko
             Bank = bank;
         }
 
+        /// <summary>The empty row always at the end of the list (no bank). Its [Recent] button adds a bank.</summary>
+        public static BankItem CreatePlaceholder()
+        {
+            return new BankItem(null);
+        }
+
         public CompareBank Bank { get; }
-        public string Name => Bank.Name;
-        public string PathText => Bank.FilePath ?? "(artificial data)";
+        public bool IsPlaceholder => Bank == null;
+        public string Name => IsPlaceholder ? "" : Bank.Name;
+        public string PathText => IsPlaceholder ? "(empty: use Recent, or drop a file here)" : Bank.FilePath ?? "(artificial data)";
 
         /// <summary>E.g. "A 380, Q 200, M 70".</summary>
         public string SeriesText
         {
-            get { return string.Join(", ", Bank.Frequencies.Select(f => f.ToString().Substring(0, 1) + " " + Bank.Count(f))); }
+            get
+            {
+                if (IsPlaceholder) return "";
+                return string.Join(", ", Bank.Frequencies.Select(f => f.ToString().Substring(0, 1) + " " + Bank.Count(f)));
+            }
         }
+
+        /// <summary>The number badge and the remove (X) button are not shown on the empty row.</summary>
+        public Visibility RowVisibility => IsPlaceholder ? Visibility.Collapsed : Visibility.Visible;
+        public string RecentTip => IsPlaceholder
+            ? "Add one of the most recently compared databanks"
+            : "Replace this databank with one of the most recently compared databanks";
 
         public int Position
         {
@@ -66,7 +84,7 @@ namespace Gekko
             }
         }
 
-        /// <summary>True when the bank is compared but hidden by clicking its label in the diagram.</summary>
+        /// <summary>True when the bank is compared but hidden (eye icon) or greyed out by a focus on another bank.</summary>
         public bool HiddenInDiagram
         {
             get { return hiddenInDiagram; }
@@ -93,7 +111,7 @@ namespace Gekko
 
         /// <summary>The number badge has the circle's color for compared banks that are shown, grey otherwise.</summary>
         public Brush NumberBrush => InComparison && !HiddenInDiagram ? BankColors.Solid(Position - 1) : GreyNumber;
-        public double ItemOpacity => InComparison ? 1.0 : 0.6;
+        public double ItemOpacity => InComparison || IsPlaceholder ? 1.0 : 0.6;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -110,15 +128,17 @@ namespace Gekko
         static readonly Brush DropNormal = BankColors.FromRgb(0x99, 0x99, 0x99);
         static readonly Brush InvalidBack = BankColors.FromRgb(0xFB, 0xE3, 0xE3);
         static readonly Brush AutoPeriodBrush = BankColors.FromRgb(0x88, 0x88, 0x88);
-        // New: deviating names in the Names tab, same dark red as the deviation numbers in the diagram.
+        // Deviating names in the Names tab, same dark red as the deviation numbers in the diagram.
         static readonly Brush DeviatingNameBrush = BankColors.DeviationText;
         static readonly Brush RecentPathBrush = BankColors.FromRgb(0x88, 0x88, 0x88);
 
-        // New: length of the "Recent" list (LRU, stored in the user settings).
+        // Length of the "Recent" list (LRU, stored in the user settings).
         const int MaxRecentBanks = 20;
         const char RecentSeparator = '|';  // cannot occur in a Windows path
 
         readonly ObservableCollection<BankItem> banks = new ObservableCollection<BankItem>();
+        // The list shows the banks plus an empty row at the end (never part of 'banks').
+        readonly BankItem placeholder = BankItem.CreatePlaceholder();
         readonly IEqualityCriterion criterion = new SimpleEqualityCriterion();
         readonly bool[] active = { true, true, true };
         readonly DispatcherTimer recomputeTimer;
@@ -126,26 +146,41 @@ namespace Gekko
         bool busy;
 
         VennResult current;
+
+        // ---- Scope: which banks are shown (eye icons) and the focus (target icon, Alt+1/2/3).
+        // focusSlot is the only bank shown, or -1. activeBeforeFocus is the hide/show state to return to.
+        int focusSlot = -1;
+        bool[] activeBeforeFocus;
+
+        // ---- Drill-down filters (the "pivot"). Changing them never recomputes, it only re-filters.
+        //   Area:     one area (selectedMask != 0) or a whole bank (selectedBank >= 0), or nothing.
+        //   Period:   userFrom..userTo (the From/To boxes); null means the edge of the universal period.
+        //   Flags:    deviatesFilter and missingFilter, each Any / Yes / No.
+        // A series passes when it is in the area, and its flags in the selected periods match the flag filters.
         int selectedMask;
-        bool selectedDeviations;
-        VennArea selectedArea;
-        List<SeriesComparison> navList = new List<SeriesComparison>();
-        int navIndex = -1;
-        int lastBarPeriod = int.MinValue;
-        DeviationListing listing;
-        const string DefaultDevMessage = "Click a deviation number in the diagram to list values and deviations.";
-        string devMessage = DefaultDevMessage;
-
-        // New: the Names tab is a RichTextBox now (for the dark red names), so keep the plain text for Copy.
-        string namesPlainText = "";
-
-        // Chosen first/last period in the selected frequency. Null means: follow the universal period.
+        int selectedBank = -1;
+        FlagFilter deviatesFilter = FlagFilter.Any;
+        FlagFilter missingFilter = FlagFilter.Any;
         int? userFrom;
         int? userTo;
+        int? periodAnchor;  // the first bar clicked, for Shift+click ranges
         CompareFreq? periodFreq;
 
+        Selection selection;                                              // the area filter, resolved
+        List<SeriesComparison> shown = new List<SeriesComparison>();      // series passing all filters
+
+        List<SeriesComparison> navList = new List<SeriesComparison>();
+        int navIndex = -1;
+        DeviationListing listing;
+        const string NoSelectionMessage = "Click a number, an area or a bank in the diagram.";
+        string devMessage = NoSelectionMessage;
+        bool histogramShowsDeviations;  // which histogram is shown: deviations (2 or 3 circles) or missings (1 circle)
+
+        // The Names tab is a RichTextBox (for the dark red names), so keep the plain text for Copy.
+        string namesPlainText = "";
+
         bool diagramHidden;
-        // New: the number of circles (2 or 3) the diagram row height is currently fitted to. See FitVennRow.
+        // The number of circles (2 or 3) the diagram row height is currently fitted to. See FitVennRow.
         int layoutSlots = 3;
         GridLength savedVennHeight = new GridLength(1.25, GridUnitType.Star);
 
@@ -156,15 +191,22 @@ namespace Gekko
         public WindowBankCompare()
         {
             InitializeComponent();
-            BankList.ItemsSource = banks;
-            RestoreWindowPlacement();  // New
+            BankList.ItemsSource = new CompositeCollection
+            {
+                new CollectionContainer { Collection = banks },
+                placeholder
+            };
+            RestoreWindowPlacement();
 
             recomputeTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(300) };
             recomputeTimer.Tick += (s, e) => Recompute();
 
             Venn.AreaClicked += Venn_AreaClicked;
-            Venn.BankClicked += Venn_BankClicked;
-            Histogram.BarClicked += Histogram_BarClicked;
+            Venn.BankSelected += Venn_BankSelected;
+            Venn.HideClicked += ToggleHidden;
+            Venn.FocusClicked += ToggleFocus;
+            Histogram.BarClicked += (period, keys) => Bar_Clicked(period, keys, histogramShowsDeviations);
+            Histogram.BarDoubleClicked += period => Tabs.SelectedItem = NamesTab;
 
             // Artificial demo banks. Dropped files also get artificial data, see DatabankLoader.
             banks.Add(new BankItem(ArtificialData.CreateBank("base_2024.gbk", null)));
@@ -187,7 +229,7 @@ namespace Gekko
             }
         }
 
-        // ---------------------------------------------------------------- user settings (new)
+        // ---------------------------------------------------------------- user settings
 
         // Adjust to however the existing UserSettings instance is reached in Gekko. Use the shared
         // instance rather than a new UserSettings(): two instances saving would overwrite each other.
@@ -251,7 +293,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// New: going from 3 to 2 circles removes the room the top circle took, and gives it to the tabs
+        /// Going from 3 to 2 circles removes the room the top circle took, and gives it to the tabs
         /// below; going back from 2 to 3 takes it back. The circles keep their size.
         /// </summary>
         void FitVennRow(int slots)
@@ -307,7 +349,7 @@ namespace Gekko
             }
         }
 
-        // ---------------------------------------------------------------- recent databanks (new)
+        // ---------------------------------------------------------------- recent databanks
 
         static List<string> LoadRecentBanks()
         {
@@ -349,9 +391,15 @@ namespace Gekko
             return banks.Any(b => string.Equals(b.Bank.FilePath, path, StringComparison.OrdinalIgnoreCase));
         }
 
-        void RecentButton_Click(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// The [Recent] button on a row: a numbered list of the most recently compared databanks (banks already in
+        /// the list are greyed out). On a bank's row the chosen bank replaces it; on the empty row it is added.
+        /// </summary>
+        void RowRecent_Click(object sender, RoutedEventArgs e)
         {
             var button = (Button)sender;
+            var target = button.Tag as BankItem;
+            if (target == null) return;
             var menu = new ContextMenu { PlacementTarget = button, Placement = PlacementMode.Bottom };
             List<string> paths = LoadRecentBanks();
             if (paths.Count == 0)
@@ -370,27 +418,42 @@ namespace Gekko
                 var item = new MenuItem
                 {
                     Header = header,
-                    Tag = path,
                     IsEnabled = !open,
                     ToolTip = open ? "Already in the list" : null
                 };
-                item.Click += RecentItem_Click;
+                item.Click += (o, args) => OpenRecent(path, target);
                 menu.Items.Add(item);
             }
             menu.IsOpen = true;
         }
 
-        void RecentItem_Click(object sender, RoutedEventArgs e)
+        void OpenRecent(string path, BankItem target)
         {
-            string path = (sender as MenuItem)?.Tag as string;
-            if (path == null || IsInList(path)) return;
+            if (IsInList(path)) return;
             if (!File.Exists(path))
             {
                 ForgetRecentBank(path);
                 SetStatus(path + " no longer exists and was removed from the recent list.");
                 return;
             }
-            AddFiles(new[] { path }, banks.Count);
+            int index = banks.IndexOf(target);
+            if (target.IsPlaceholder || index < 0)
+            {
+                AddFiles(new[] { path }, banks.Count);
+                return;
+            }
+            try
+            {
+                var item = new BankItem(DatabankLoader.Load(path));
+                banks[index] = item;
+                TouchRecentBank(path);
+                BanksChanged();
+                SetStatus(target.Name + " replaced by " + item.Name + ".");
+            }
+            catch (Exception ex)
+            {
+                SetStatus("Could not read " + Path.GetFileName(path) + ": " + ex.Message);
+            }
         }
 
         // ---------------------------------------------------------------- recomputation
@@ -411,6 +474,8 @@ namespace Gekko
                     banks[i].InComparison = i < n;
                 }
                 for (int s = 0; s < active.Length; s++) active[s] = true;
+                focusSlot = -1;
+                activeBeforeFocus = null;
                 RefreshFrequencies();
             }
             finally
@@ -437,6 +502,10 @@ namespace Gekko
             recomputeTimer.Start();
         }
 
+        /// <summary>
+        /// Recomputes the comparison. Needed when the scope changes: banks, compare mode, hide/focus,
+        /// frequency or name filter. The drill-down filters only need Refresh().
+        /// </summary>
         void Recompute()
         {
             if (!ready) return;
@@ -446,13 +515,15 @@ namespace Gekko
             if (banks.Count < 2 || !freq.HasValue)
             {
                 current = null;
-                Venn.SetResult(null, banks.Count == 0 ? "Drag databank files into the drop field to begin."
-                                   : banks.Count == 1 ? "Add one more databank to compare."
-                                   : "The compared databanks contain no series.");
                 selectedMask = 0;
-                ClearDetails();
+                selectedBank = -1;
+                Venn.SetState(null, banks.Count == 0 ? "Drag databank files into the drop field to begin."
+                                    : banks.Count == 1 ? "Add one more databank to compare."
+                                    : "The compared databanks contain no series.",
+                              0, -1, FlagFilter.Any, FlagFilter.Any, -1);
+                selection = null;
+                ShowDetails();
                 UpdatePeriodBoxes();
-                UpdateSelectionText();
                 UpdateListBadges();
                 return;
             }
@@ -462,6 +533,7 @@ namespace Gekko
             {
                 if (userFrom.HasValue) userFrom = PeriodText.ChangeFrequency(userFrom.Value, periodFreq.Value, freq.Value, false);
                 if (userTo.HasValue) userTo = PeriodText.ChangeFrequency(userTo.Value, periodFreq.Value, freq.Value, true);
+                periodAnchor = null;
             }
             periodFreq = freq;
 
@@ -476,26 +548,60 @@ namespace Gekko
             FilterBox.ToolTip = error;
 
             List<CompareBank> compared = banks.Take(SlotCount).Select(b => b.Bank).ToList();
-            current = CompareEngine.Compute(compared, active, freq.Value, filter, criterion,
-                                            userFrom ?? int.MinValue, userTo ?? int.MaxValue);
-            Venn.SetResult(current, null);
-            FitVennRow(current.SlotCount);  // New
+            current = CompareEngine.Compute(compared, active, freq.Value, filter, criterion);
+            Refresh();
+        }
 
-            VennArea area;
-            if (selectedMask != 0 && current.Areas.TryGetValue(selectedMask, out area))
+        int PeriodFrom => current != null && current.HasSpan ? (userFrom ?? current.SpanStart) : 0;
+        int PeriodTo => current != null && current.HasSpan ? (userTo ?? current.SpanEnd) : -1;
+
+        /// <summary>Applies the drill-down filters to the current comparison and updates every view.</summary>
+        void Refresh()
+        {
+            if (current == null)
             {
-                Venn.SetSelection(selectedMask, selectedDeviations);
-                ShowArea(area, true, false);
+                Recompute();
+                return;
             }
-            else
-            {
-                selectedMask = 0;
-                Venn.SetSelection(0, false);
-                ClearDetails();
-            }
+            ClampPeriod();
+            CompareEngine.UpdateCounts(current, PeriodFrom, PeriodTo);
+
+            if (selectedBank >= 0 && (selectedBank >= current.SlotCount || !current.Active[selectedBank])) selectedBank = -1;
+            if (selectedMask != 0 && !current.Areas.ContainsKey(selectedMask)) selectedMask = 0;
+            if (selectedBank >= 0) selectedMask = 0;
+
+            Venn.SetState(current, null, selectedMask, selectedBank, missingFilter, deviatesFilter, focusSlot);
+            FitVennRow(current.SlotCount);
+
+            selection = BuildSelection();
+            ShowDetails();
             UpdatePeriodBoxes();
-            UpdateSelectionText();
             UpdateListBadges();
+        }
+
+        /// <summary>A chosen period outside the universal period (e.g. after hiding a bank) falls back to its edge.</summary>
+        void ClampPeriod()
+        {
+            if (!current.HasSpan)
+            {
+                userFrom = null;
+                userTo = null;
+                return;
+            }
+            if (userFrom.HasValue && (userFrom.Value <= current.SpanStart || userFrom.Value > current.SpanEnd)) userFrom = null;
+            if (userTo.HasValue && (userTo.Value >= current.SpanEnd || userTo.Value < current.SpanStart)) userTo = null;
+            if (PeriodFrom > PeriodTo)
+            {
+                userFrom = null;
+                userTo = null;
+            }
+        }
+
+        /// <summary>Sets the period filter (and the From/To boxes). Does not refresh.</summary>
+        void SetPeriod(int from, int to)
+        {
+            userFrom = from > current.SpanStart ? (int?)from : null;
+            userTo = to < current.SpanEnd ? (int?)to : null;
         }
 
         void UpdateListBadges()
@@ -504,168 +610,332 @@ namespace Gekko
                 banks[i].HiddenInDiagram = current != null && i < current.SlotCount && !current.Active[i];
         }
 
-        // ---------------------------------------------------------------- diagram clicks
+        // ---------------------------------------------------------------- the area filter
 
-        void Venn_AreaClicked(int mask, bool deviations)
+        /// <summary>The area filter, resolved: one area of the diagram, or a whole bank (its full circle).</summary>
+        sealed class Selection
         {
+            public string Description;              // e.g. "In banks 1 and 2, not in bank 3"
+            public List<SeriesComparison> Series;   // all series in it (the black number)
+            public int MissingMask;                 // banks in which an M counts as missing (bit s = slot s)
+            public bool IsComparison;               // false: series in one bank only, nothing to compare
+            public int Circles;                     // number of circles selected: 1 for a whole bank or a one-bank area
+        }
+
+        Selection BuildSelection()
+        {
+            if (current == null) return null;
+            if (selectedBank >= 0)
+            {
+                // A whole bank: the areas inside its circle. Deviations are those of its overlaps with other banks;
+                // missing values count in this bank only.
+                List<SeriesComparison> series = current.Areas.Values
+                    .Where(a => (a.Mask & (1 << selectedBank)) != 0)
+                    .SelectMany(a => a.Series)
+                    .OrderBy(s => s.Name, StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+                return new Selection
+                {
+                    Description = "All of bank " + (selectedBank + 1) + " (" + current.Banks[selectedBank].Name + ", "
+                                  + series.Count + " series)",
+                    Series = series,
+                    MissingMask = 1 << selectedBank,
+                    IsComparison = series.Any(s => s.Slots.Length >= 2),
+                    Circles = 1
+                };
+            }
             VennArea area;
-            if (current == null || !current.Areas.TryGetValue(mask, out area)) return;
-            bool sameArea = mask == selectedMask;
+            if (selectedMask != 0 && current.Areas.TryGetValue(selectedMask, out area))
+            {
+                return new Selection
+                {
+                    Description = CompareEngine.DescribeArea(current, area.Mask),
+                    Series = area.Series,
+                    MissingMask = area.Mask,
+                    IsComparison = area.IsComparison,
+                    Circles = area.Slots.Length
+                };
+            }
+            return null;
+        }
+
+        // ---------------------------------------------------------------- clicks that set filters
+
+        /// <summary>
+        /// Inside an area: sets the area, keeps the flag filters.
+        /// Black number: the area, both flags cleared. Red number: the area, Deviating = yes.
+        /// The missing-value filter belongs to "All of bank x" (a bank's box), so it is always cleared here.
+        /// </summary>
+        void Venn_AreaClicked(int mask, AreaClickKind kind, bool add)
+        {
+            if (current == null || !current.Areas.ContainsKey(mask)) return;
             selectedMask = mask;
-            selectedDeviations = deviations;
-            Venn.SetSelection(mask, deviations);
-            ShowArea(area, sameArea, true);
-            UpdateSelectionText();
+            selectedBank = -1;
+            missingFilter = FlagFilter.Any;  // missing values are only shown for a whole bank ("All of bank x")
+            switch (kind)
+            {
+                case AreaClickKind.Total:
+                    deviatesFilter = FlagFilter.Any;
+                    missingFilter = FlagFilter.Any;
+                    break;
+                case AreaClickKind.Deviating:
+                    deviatesFilter = FlagFilter.Yes;
+                    break;
+            }
+            Refresh();  // the selected tab stays open
+        }
+
+        /// <summary>A bank's box: the whole bank as the area filter. Keeps the flag filters.</summary>
+        void Venn_BankSelected(int slot)
+        {
+            if (current == null || slot >= current.SlotCount || !current.Active[slot]) return;
+            selectedBank = slot;
+            selectedMask = 0;
+            Refresh();  // the selected tab stays open
         }
 
         /// <summary>
-        /// Clicking a shown bank hides it (as long as another bank is still shown); clicking a hidden bank shows it.
-        /// Hiding one bank never brings back another one.
+        /// A histogram bar: sets the period (Shift: from the first clicked bar to this one) and the bar's flag
+        /// (red: Deviating = yes, blue: Missing = yes; the other flag is cleared unless Ctrl). Keeps the area.
         /// </summary>
-        void Venn_BankClicked(int slot)
+        void Bar_Clicked(int period, ModifierKeys keys, bool deviationBar)
         {
-            if (current == null || current.SlotCount != 3) return;
-            string label = "Bank " + (slot + 1) + " (" + current.Banks[slot].Name + ")";
-            int oldActiveMask = current.ActiveMask;
+            if (current == null || !current.HasSpan) return;
+            int from = period, to = period;
+            if ((keys & ModifierKeys.Shift) != 0 && periodAnchor.HasValue)
+            {
+                from = Math.Min(periodAnchor.Value, period);
+                to = Math.Max(periodAnchor.Value, period);
+            }
+            else
+            {
+                periodAnchor = period;
+            }
+            SetPeriod(from, to);
+
+            bool add = (keys & ModifierKeys.Control) != 0;
+            if (deviationBar)
+            {
+                deviatesFilter = FlagFilter.Yes;
+                if (!add) missingFilter = FlagFilter.Any;
+            }
+            else
+            {
+                missingFilter = FlagFilter.Yes;
+                if (!add) deviatesFilter = FlagFilter.Any;
+            }
+            Refresh();
+            SetStatus(shown.Count + " series match" + current.CountPeriodText + ". Double-click a bar (or see the Names tab) to list them.");
+        }
+
+        // ---------------------------------------------------------------- hide and focus (scope)
+
+        string BankLabel(int slot)
+        {
+            return "Bank " + (slot + 1) + " (" + current.Banks[slot].Name + ")";
+        }
+
+        static int MaskOf(bool[] flags, int slotCount)
+        {
+            int mask = 0;
+            for (int s = 0; s < slotCount; s++) if (flags[s]) mask |= 1 << s;
+            return mask;
+        }
+
+        /// <summary>
+        /// Sets which banks are shown, keeping a sensible area filter: "in all shown banks" stays "in all shown
+        /// banks", an area drops the banks that disappear, a whole bank stays selected unless it is hidden.
+        /// Does not recompute.
+        /// </summary>
+        void ApplyActive(bool[] newActive)
+        {
+            int n = current.SlotCount;
+            int oldMask = MaskOf(active, n);
+            for (int s = 0; s < active.Length; s++) active[s] = s >= n || newActive[s];
+            int newMask = MaskOf(active, n);
+            if (selectedMask != 0) selectedMask = selectedMask == oldMask ? newMask : selectedMask & newMask;
+            if (selectedBank >= 0 && !active[selectedBank]) selectedBank = -1;
+        }
+
+        /// <summary>
+        /// The eye icon. Without a focus: hide a shown bank (as long as another one stays shown) or show a hidden one.
+        /// With a focus: showing another bank ends the focus; the focused bank itself cannot be hidden.
+        /// </summary>
+        void ToggleHidden(int slot)
+        {
+            if (current == null || slot >= current.SlotCount) return;
+            string label = BankLabel(slot);
+            var next = (bool[])active.Clone();
+
+            if (focusSlot >= 0)
+            {
+                if (slot == focusSlot)
+                {
+                    SetStatus(label + " is in focus and cannot be hidden. Click its target to show the other banks again.");
+                    return;
+                }
+                focusSlot = -1;
+                activeBeforeFocus = null;
+                next[slot] = true;
+                ApplyActive(next);
+                Recompute();
+                SetStatus(label + " is shown again, and the focus has ended.");
+                return;
+            }
+
+            string message;
             if (!active[slot])
             {
-                active[slot] = true;
-                SetStatus(label + " is shown again.");
+                next[slot] = true;
+                message = label + " is shown again.";
             }
             else if (current.ActiveCount > 1)
             {
-                active[slot] = false;
-                SetStatus(label + " is hidden. Click its label to show it again.");
+                next[slot] = false;
+                message = label + " is hidden. Click its eye to show it again.";
             }
             else
             {
                 SetStatus(label + " is the only bank shown, so it cannot be hidden.");
                 return;
             }
-
-            int newActiveMask = 0;
-            for (int s = 0; s < 3; s++) if (active[s]) newActiveMask |= 1 << s;
-            // Keep a sensible selection: "in all shown banks" stays "in all shown banks".
-            selectedMask = selectedMask == oldActiveMask ? newActiveMask : selectedMask & newActiveMask;
+            ApplyActive(next);
             Recompute();
+            SetStatus(message);
         }
 
-        void ShowArea(VennArea area, bool keepSeries, bool switchTab)
+        /// <summary>
+        /// The target icon or Alt+1/2/3. Focus: only this bank is shown, and the whole bank becomes the area filter.
+        /// Again on the focused bank: the banks shown before the focus come back, the bank stays selected.
+        /// The flag and period filters are kept.
+        /// </summary>
+        void ToggleFocus(int slot)
         {
-            selectedArea = area;
-            ShowNames();
+            if (current == null || slot >= current.SlotCount) return;
+            string label = BankLabel(slot);
 
-            string description = CompareEngine.DescribeArea(current, area.Mask);
-            string keepName = keepSeries && navIndex >= 0 && navIndex < navList.Count ? navList[navIndex].Name : null;
-
-            // New: red chart (deviations) for areas with 2 or 3 banks, blue chart (missings) always.
-            // The blue chart always counts all series in the area (the black number), whichever number was clicked.
-            if (current.HasWindow)
+            if (focusSlot == slot)
             {
-                string devTitle = null;
-                int[] devCounts = null;
-                if (area.IsComparison)
-                {
-                    devTitle = description + ": " + (area.Slots.Length == 3
-                        ? "number of series not equal in all three banks, per period"
-                        : "number of deviating series, per period");
-                    devCounts = CompareEngine.Histogram(area, current.WindowStart, current.WindowEnd);
-                }
-                string missTitle = description + ": number of series with a missing value"
-                                   + (area.IsComparison ? " in any of the banks" : "") + ", per period";
-                Histogram.SetData(current.Freq, current.WindowStart, devTitle, devCounts, missTitle,
-                                  CompareEngine.MissingCounts(current, area, current.WindowStart, current.WindowEnd));
-            }
-            else
-            {
-                Histogram.ShowMessage("No periods to show.");
-            }
-
-            if (area.IsComparison && area.Deviations.Count > 0)
-            {
-                navList = area.Deviations;
-                navIndex = 0;
-                if (keepName != null)
-                {
-                    int i = navList.FindIndex(c => string.Equals(c.Name, keepName, StringComparison.OrdinalIgnoreCase));
-                    if (i >= 0) navIndex = i;
-                }
-            }
-            else
-            {
-                navList = new List<SeriesComparison>();
-                navIndex = -1;
-            }
-            lastBarPeriod = int.MinValue;
-            devMessage = area.IsComparison
-                ? "No deviations in this area."
-                : "Series that exist in only one bank have nothing to be compared with.";
-            ShowCurrentSeries(null);
-
-            // New: every click on an area or a number shows the names.
-            if (switchTab) Tabs.SelectedItem = NamesTab;
-        }
-
-        void ClearDetails()
-        {
-            selectedArea = null;
-            devMessage = DefaultDevMessage;
-            ShowNames();
-            Histogram.ShowMessage("Click an area or a number in the diagram to see deviations and missing values per period.");
-            navList = new List<SeriesComparison>();
-            navIndex = -1;
-            ShowCurrentSeries(null);
-        }
-
-        /// <summary>When the diagram is hidden, the selected area is summarized next to the toggle button.</summary>
-        void UpdateSelectionText()
-        {
-            VennArea area = null;
-            if (current != null && selectedMask != 0) current.Areas.TryGetValue(selectedMask, out area);
-            if (!diagramHidden || area == null)
-            {
-                SelectionText.Visibility = Visibility.Collapsed;
+                bool[] restore = activeBeforeFocus ?? new[] { true, true, true };
+                restore[slot] = true;
+                focusSlot = -1;
+                activeBeforeFocus = null;
+                ApplyActive(restore);
+                selectedMask = 0;
+                selectedBank = slot;
+                Recompute();
+                SetStatus("Focus on " + label + " ended. The whole bank stays selected.");
                 return;
             }
-            SelectionText.Text = "Selected: " + CompareEngine.SummarizeArea(current, selectedMask);
-            SelectionText.ToolTip = SelectionText.Text;
-            SelectionText.Visibility = Visibility.Visible;
+
+            if (focusSlot < 0) activeBeforeFocus = (bool[])active.Clone();
+            focusSlot = slot;
+            var only = new bool[3];
+            only[slot] = true;
+            ApplyActive(only);
+            selectedMask = 0;
+            selectedBank = slot;
+            Recompute();
+            SetStatus("Focus on " + label + ": the other banks are greyed out. Click the target again (or Alt+"
+                      + (slot + 1) + ") to show them.");
         }
 
-        void DiagramToggle_Click(object sender, RoutedEventArgs e)
-        {
-            ToggleDiagram();
-        }
+        // ---------------------------------------------------------------- details: names, histograms, values
 
-        void ToggleDiagram()
+        /// <summary>Applies the filters to the selection and fills the tabs.</summary>
+        void ShowDetails()
         {
-            diagramHidden = !diagramHidden;
-            if (diagramHidden)
+            string keepName = navIndex >= 0 && navIndex < navList.Count ? navList[navIndex].Name : null;
+
+            if (selection == null || current == null)
             {
-                savedVennHeight = VennRow.Height;
-                VennRow.MinHeight = 0;
-                VennRow.Height = new GridLength(0);
-                VennSplitterRow.Height = new GridLength(0);
-                DiagramArea.Visibility = Visibility.Collapsed;
-                VennSplitter.Visibility = Visibility.Collapsed;
-                DiagramToggle.Content = "\u25BE Show controls";
+                shown = new List<SeriesComparison>();
+                ShowNames();
+                ShowHistogram();
+                navList = shown;
+                navIndex = -1;
+                devMessage = NoSelectionMessage;
+                ShowCurrentSeries();
+                return;
+            }
+
+            int from = PeriodFrom, to = PeriodTo;
+            int mask = selection.MissingMask;
+            shown = selection.Series
+                .Where(s => SeriesComparison.Passes(deviatesFilter, s.DeviatesIn(from, to))
+                         && SeriesComparison.Passes(missingFilter, s.MissingIn(from, to, mask)))
+                .ToList();
+
+            ShowNames();
+            ShowHistogram();
+
+            navList = shown;
+            navIndex = shown.Count == 0 ? -1 : 0;
+            if (keepName != null)
+            {
+                int i = navList.FindIndex(c => string.Equals(c.Name, keepName, StringComparison.OrdinalIgnoreCase));
+                if (i >= 0) navIndex = i;
+            }
+            devMessage = "No series match the current filters.";
+            ShowCurrentSeries();
+        }
+
+        /// <summary>
+        /// One histogram tab, whose meaning follows the selection:
+        ///   "All of bank x" (a bank's box): "Missings histogram", blue, series with M in that bank per period;
+        ///   an overlap area with the deviation filter on (red number or red bar): "Deviations histogram", red;
+        ///   anything else: a message saying how to get a histogram.
+        /// It shows the whole universal period for the area only (not the flag or period filters), so the time
+        /// profile stays visible while drilling down. The selected periods are highlighted.
+        /// </summary>
+        void ShowHistogram()
+        {
+            histogramShowsDeviations = false;
+            if (selection == null || current == null)
+            {
+                HistogramTab.Header = "Histogram";
+                Histogram.ShowMessage(NoSelectionMessage);
+                return;
+            }
+
+            bool missings = selectedBank >= 0;
+            bool deviations = !missings && selection.IsComparison && deviatesFilter == FlagFilter.Yes;
+            if (!missings && !deviations)
+            {
+                HistogramTab.Header = "Histogram";
+                Histogram.ShowMessage(selection.IsComparison
+                    ? "To see deviations, click the red number. To see missing values, click a rectangular databank box."
+                    : "To see missing values, click a rectangular databank box.");
+                return;
+            }
+
+            histogramShowsDeviations = deviations;
+            HistogramTab.Header = deviations ? "Deviations histogram" : "Missings histogram";
+            if (!current.HasSpan)
+            {
+                Histogram.ShowMessage("No periods to show.");
+                return;
+            }
+            int start = current.SpanStart, end = current.SpanEnd;
+            int? hiFrom = current.IsPeriodRestricted ? PeriodFrom : (int?)null;
+            int? hiTo = current.IsPeriodRestricted ? PeriodTo : (int?)null;
+
+            if (deviations)
+            {
+                Histogram.SetData(selection.Description + ": number of deviating series, per period",
+                                  current.Freq, start, CompareEngine.DeviationCounts(selection.Series, start, end),
+                                  true, null, hiFrom, hiTo);
             }
             else
             {
-                DiagramArea.Visibility = Visibility.Visible;
-                VennSplitter.Visibility = Visibility.Visible;
-                VennRow.Height = savedVennHeight;
-                VennRow.MinHeight = 200;
-                VennSplitterRow.Height = new GridLength(6);
-                DiagramToggle.Content = "\u25B4 Hide controls";
-                // New: "first 2" / "first 3" may have changed while the diagram was hidden.
-                UpdateLayout();
-                if (current != null) FitVennRow(current.SlotCount);
+                int[][] perSlot;
+                int[] missing = CompareEngine.MissingCounts(selection.Series, selection.MissingMask, start, end, out perSlot);
+                Histogram.SetData(selection.Description + ": number of series with missing values (M), per period",
+                                  current.Freq, start, missing, false, null, hiFrom, hiTo);
             }
-            UpdateSelectionText();
         }
 
-        // ---------------------------------------------------------------- period from/to
+        // ---------------------------------------------------------------- period from/to (the period filter)
 
         void UpdatePeriodBoxes()
         {
@@ -734,7 +1004,11 @@ namespace Gekko
         {
             int? oldFrom = userFrom, oldTo = userTo;
             if (!TryCommitPeriod(isFrom)) return;
-            if (oldFrom != userFrom || oldTo != userTo) Recompute();
+            if (oldFrom != userFrom || oldTo != userTo)
+            {
+                periodAnchor = null;
+                Refresh();
+            }
             else UpdatePeriodBoxes();
         }
 
@@ -753,8 +1027,8 @@ namespace Gekko
                 to = Math.Min(current.SpanEnd, Math.Max(to + delta, from));
                 userTo = to < current.SpanEnd ? (int?)to : null;
             }
-            UpdatePeriodBoxes();
-            ScheduleRecompute();  // holding an arrow down steps quickly, so recompute once it settles
+            periodAnchor = null;
+            Refresh();  // only re-filters, no recomputation
         }
 
         void SpinButton_Click(object sender, RoutedEventArgs e)
@@ -808,44 +1082,48 @@ namespace Gekko
         {
             userFrom = null;
             userTo = null;
-            Recompute();
+            periodAnchor = null;
+            if (current != null) Refresh();
         }
 
         // ---------------------------------------------------------------- names tab
 
-        /// <summary>
-        /// Area or black number: all series in the area, the deviating ones in dark red.
-        /// Red number: only the deviating series (also dark red).
-        /// </summary>
+        /// <summary>Text for the flag filters, e.g. "deviating, without missing values". Empty when both are Any.</summary>
+        string FlagText()
+        {
+            var parts = new List<string>();
+            if (deviatesFilter == FlagFilter.Yes) parts.Add("deviating");
+            if (deviatesFilter == FlagFilter.No) parts.Add("not deviating");
+            if (missingFilter == FlagFilter.Yes) parts.Add("with missing values");
+            if (missingFilter == FlagFilter.No) parts.Add("without missing values");
+            return string.Join(", ", parts);
+        }
+
+        /// <summary>The series passing all filters. Those deviating in the selected periods are dark red.</summary>
         void ShowNames()
         {
-            if (selectedArea == null || current == null)
+            if (selection == null || current == null)
             {
-                NamesHeader.Text = "Click a number or an area in the diagram to list the series in that area.";
+                NamesTab.Header = "Names";
+                NamesHeader.Text = "Click a number, an area or a bank in the diagram to list its series.";
                 SetNamesText(new List<string>(), new HashSet<string>());
                 return;
             }
+            int from = PeriodFrom, to = PeriodTo;
             bool ignore = IgnoreDimsCheck.IsChecked == true;
-            List<string> deviatingNames = selectedArea.Deviations.Select(c => c.Name).ToList();
-            List<string> deviatingShown = CompareEngine.NamesForDisplay(deviatingNames, ignore);
-            var red = new HashSet<string>(deviatingShown, StringComparer.OrdinalIgnoreCase);
+            List<string> names = CompareEngine.NamesForDisplay(shown.Select(s => s.Name), ignore);
+            List<string> deviating = shown.Where(s => s.DeviatesIn(from, to)).Select(s => s.Name).ToList();
+            var red = new HashSet<string>(CompareEngine.NamesForDisplay(deviating, ignore), StringComparer.OrdinalIgnoreCase);
 
-            string header = CompareEngine.DescribeArea(current, selectedArea.Mask) + ": ";
-            List<string> names;
-            if (selectedDeviations)
-            {
-                names = deviatingShown;
-                header += deviatingNames.Count + " deviating series";
-                if (ignore) header += ", " + names.Count + " names without dimensions";
-            }
-            else
-            {
-                names = CompareEngine.NamesForDisplay(selectedArea.Names, ignore);
-                header += selectedArea.Names.Count + " series";
-                if (ignore) header += ", " + names.Count + " names without dimensions";
-                if (deviatingNames.Count > 0) header += " (" + deviatingNames.Count + " deviating, in dark red)";
-            }
+            string flags = FlagText();
+            string header = selection.Description + current.CountPeriodText + ": " + shown.Count
+                            + (shown.Count == selection.Series.Count ? "" : " of " + selection.Series.Count) + " series"
+                            + (flags.Length > 0 ? " " + flags : "");
+            if (ignore) header += ", " + names.Count + " names without dimensions";
+            if (deviating.Count > 0 && deviatesFilter != FlagFilter.Yes) header += " (" + deviating.Count + " deviating, in dark red)";
             NamesHeader.Text = header;
+            NamesHeader.ToolTip = header;
+            NamesTab.Header = "Names (" + shown.Count + ")";
             SetNamesText(names, red);
         }
 
@@ -900,9 +1178,10 @@ namespace Gekko
             }
         }
 
-        // ---------------------------------------------------------------- deviations tab
+        // ---------------------------------------------------------------- values tab
 
-        void ShowCurrentSeries(int? focusPeriod)
+        /// <summary>One series of the Names list, for the selected periods. M = missing, * = deviates.</summary>
+        void ShowCurrentSeries()
         {
             bool has = navIndex >= 0 && navIndex < navList.Count;
             PrevButton.IsEnabled = has && navIndex > 0;
@@ -916,34 +1195,19 @@ namespace Gekko
                 return;
             }
 
+            int from = PeriodFrom, to = PeriodTo;
             SeriesComparison c = navList[navIndex];
-            NavText.Text = c.Name + "   (" + (navIndex + 1) + " of " + navList.Count + ", "
-                           + c.DeviatingPeriods + (c.DeviatingPeriods == 1 ? " deviating period)" : " deviating periods)");
+            int dev = c.DeviatingPeriods(from, to);
+            int miss = c.MissingPeriods(from, to, selection.MissingMask);
+            NavText.Text = c.Name + "   (" + (navIndex + 1) + " of " + navList.Count + "; "
+                           + (c.Slots.Length >= 2 ? dev + (dev == 1 ? " deviating period, " : " deviating periods, ") : "")
+                           + miss + (miss == 1 ? " period" : " periods") + " with M" + current.CountPeriodText + ")";
             LegendText.Text = string.Join("   ", c.Slots.Select(s => "(" + (s + 1) + ") " + current.Banks[s].Name))
-                              + "   M = no observation   * = deviates";
-            listing = CompareEngine.FormatComparison(c, current.Freq, OnlyDevCheck.IsChecked == true);
+                              + "   M = missing   * = deviates";
+            listing = CompareEngine.FormatComparison(c, current.Freq, from, to, OnlyFlaggedCheck.IsChecked == true);
             DevText.Text = string.Join("\r\n", listing.Lines);
-
-            int line;
-            if (focusPeriod.HasValue && listing.LineOfPeriod.TryGetValue(focusPeriod.Value, out line)) SelectLine(line);
-            else
-            {
-                DevText.Select(0, 0);
-                DevText.ScrollToHome();
-            }
-        }
-
-        void SelectLine(int line)
-        {
-            int charIndex = 0;
-            for (int i = 0; i < line; i++) charIndex += listing.Lines[i].Length + 2;
-            DevText.Select(charIndex, listing.Lines[line].Length);
-            // Scrolling needs layout, which is not done yet if the tab was just switched.
-            Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(() =>
-            {
-                try { DevText.ScrollToLine(line); }
-                catch (ArgumentOutOfRangeException) { }
-            }));
+            DevText.Select(0, 0);
+            DevText.ScrollToHome();
         }
 
         void Navigate(int delta)
@@ -951,7 +1215,7 @@ namespace Gekko
             int i = navIndex + delta;
             if (i < 0 || i >= navList.Count) return;
             navIndex = i;
-            ShowCurrentSeries(null);
+            ShowCurrentSeries();
         }
 
         void PrevButton_Click(object sender, RoutedEventArgs e)
@@ -964,14 +1228,31 @@ namespace Gekko
             Navigate(1);
         }
 
-        void OnlyDev_Changed(object sender, RoutedEventArgs e)
+        void OnlyFlagged_Changed(object sender, RoutedEventArgs e)
         {
-            if (ready) ShowCurrentSeries(null);
+            if (ready) ShowCurrentSeries();
         }
 
-        /// <summary>Ctrl+Up / Ctrl+Down step through the deviating series; Ctrl+D hides or shows diagram and controls.</summary>
+        /// <summary>
+        /// Alt+1/2/3 focus on a bank (again: show all). Ctrl+Up / Ctrl+Down step through the series in the Values tab;
+        /// Ctrl+D hides or shows diagram and controls.
+        /// </summary>
         void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            if (Keyboard.Modifiers == ModifierKeys.Alt)
+            {
+                // With Alt held, WPF reports the key as Key.System and the real key in SystemKey.
+                Key key = e.Key == Key.System ? e.SystemKey : e.Key;
+                int slot = key == Key.D1 || key == Key.NumPad1 ? 0
+                         : key == Key.D2 || key == Key.NumPad2 ? 1
+                         : key == Key.D3 || key == Key.NumPad3 ? 2 : -1;
+                if (slot >= 0)
+                {
+                    ToggleFocus(slot);
+                    e.Handled = true;
+                }
+                return;
+            }
             if (Keyboard.Modifiers != ModifierKeys.Control) return;
             if (e.Key == Key.D)
             {
@@ -981,35 +1262,43 @@ namespace Gekko
             }
             if (e.Key != Key.Up && e.Key != Key.Down) return;
             if (navList.Count == 0) return;
-            if (!Equals(Tabs.SelectedItem, DeviationsTab)) Tabs.SelectedItem = DeviationsTab;
+            if (!Equals(Tabs.SelectedItem, ValuesTab)) Tabs.SelectedItem = ValuesTab;
             Navigate(e.Key == Key.Down ? 1 : -1);
             e.Handled = true;
         }
 
-        /// <summary>Clicking a bar shows the first series deviating in that period; clicking it again shows the next.</summary>
-        void Histogram_BarClicked(int period)
-        {
-            if (navList.Count == 0) return;
-            int from = period == lastBarPeriod ? navIndex + 1 : 0;
-            int found = -1;
-            for (int k = 0; k < navList.Count; k++)
-            {
-                int i = (from + k) % navList.Count;
-                if (navList[i].DeviatesAt(period))
-                {
-                    found = i;
-                    break;
-                }
-            }
-            if (found < 0) return;
+        // ---------------------------------------------------------------- diagram toggle
 
-            lastBarPeriod = period;
-            navIndex = found;
-            Tabs.SelectedItem = DeviationsTab;
-            ShowCurrentSeries(period);
-            int count = navList.Count(c => c.DeviatesAt(period));
-            SetStatus(count + (count == 1 ? " series deviates" : " series deviate") + " in " + PeriodText.Format(current.Freq, period)
-                      + ". Showing " + navList[found].Name + (count > 1 ? "; click the bar again for the next one." : "."));
+        void DiagramToggle_Click(object sender, RoutedEventArgs e)
+        {
+            ToggleDiagram();
+        }
+
+        void ToggleDiagram()
+        {
+            diagramHidden = !diagramHidden;
+            if (diagramHidden)
+            {
+                savedVennHeight = VennRow.Height;
+                VennRow.MinHeight = 0;
+                VennRow.Height = new GridLength(0);
+                VennSplitterRow.Height = new GridLength(0);
+                DiagramArea.Visibility = Visibility.Collapsed;
+                VennSplitter.Visibility = Visibility.Collapsed;
+                DiagramToggle.Content = "▾ Show controls";
+            }
+            else
+            {
+                DiagramArea.Visibility = Visibility.Visible;
+                VennSplitter.Visibility = Visibility.Visible;
+                VennRow.Height = savedVennHeight;
+                VennRow.MinHeight = 200;
+                VennSplitterRow.Height = new GridLength(6);
+                DiagramToggle.Content = "▴ Hide controls";
+                // "first 2" / "first 3" may have changed while the diagram was hidden.
+                UpdateLayout();
+                if (current != null) FitVennRow(current.SlotCount);
+            }
         }
 
         // ---------------------------------------------------------------- controls
@@ -1093,7 +1382,7 @@ namespace Gekko
                 try
                 {
                     banks.Insert(at++, new BankItem(DatabankLoader.Load(path)));
-                    TouchRecentBank(path);  // New
+                    TouchRecentBank(path);
                     added++;
                 }
                 catch (Exception ex)
@@ -1119,7 +1408,7 @@ namespace Gekko
         {
             if (e.Key != Key.Delete) return;
             var item = BankList.SelectedItem as BankItem;
-            if (item == null) return;
+            if (item == null || item.IsPlaceholder) return;
             RemoveBank(item);
             e.Handled = true;
         }
@@ -1141,6 +1430,7 @@ namespace Gekko
             var row = FindAncestor<ListViewItem>(source);
             if (row == null) return;
             dragCandidate = row.DataContext as BankItem;
+            if (dragCandidate != null && dragCandidate.IsPlaceholder) dragCandidate = null;
             dragStart = e.GetPosition(BankList);
         }
 

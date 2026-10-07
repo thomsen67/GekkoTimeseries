@@ -41,6 +41,28 @@
             </Setter>
         </Style>
 
+        <!-- Small borderless icon button (the red X in the bank list) -->
+        <Style x:Key="FlatIconButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="18"/>
+            <Setter Property="Height" Value="18"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="3">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FFFBE3E3"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <!-- The small up/down triangles next to the period boxes -->
         <Style x:Key="SpinButtonStyle" TargetType="RepeatButton">
             <Setter Property="Focusable" Value="False"/>
@@ -116,7 +138,7 @@
 
     <Grid Margin="10" Name="RootGrid">
         <Grid.RowDefinitions>
-            <!-- Name added: its height is saved as CompareWindowSplitterDistance1 -->
+            <!-- Its height is saved as CompareWindowSplitterDistance1 -->
             <RowDefinition x:Name="BankListRow" Height="112" MinHeight="50"/>
             <RowDefinition Height="8"/>
             <RowDefinition Height="*"/>
@@ -159,7 +181,7 @@
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <Border Width="18" Height="18" CornerRadius="9" Background="{Binding NumberBrush}"
-                                            HorizontalAlignment="Left"
+                                            HorizontalAlignment="Left" Visibility="{Binding RowVisibility}"
                                             ToolTip="Drag the row up or down to change the order. The first 2 or 3 banks are compared.">
                                         <TextBlock Text="{Binding Position}" Foreground="White" FontWeight="Bold"
                                                    FontFamily="Segoe UI" FontSize="11"
@@ -176,20 +198,39 @@
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
                         <GridViewColumn Width="170" Header="Series" DisplayMemberBinding="{Binding SeriesText}"/>
-                        <GridViewColumn Width="330" Header="Full path" DisplayMemberBinding="{Binding PathText}"/>
-                        <GridViewColumn Width="80">
-                            <!-- New: [Recent] sits in the header, directly above the [Remove] buttons -->
-                            <GridViewColumn.Header>
-                                <Button Content="Recent" Style="{StaticResource RoundedSmallButtonStyle}"
-                                        FontFamily="Segoe UI" FontSize="11" Click="RecentButton_Click"
-                                        ToolTip="Add one of the most recently compared databanks"/>
-                            </GridViewColumn.Header>
+                        <GridViewColumn Width="330" Header="Full path">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button Content="Remove" Style="{StaticResource RoundedSmallButtonStyle}"
-                                            FontFamily="Segoe UI" FontSize="11"
-                                            Click="RemoveBank_Click" Tag="{Binding}"
-                                            ToolTip="Remove from the list (or select the row and press Delete)"/>
+                                    <TextBlock Text="{Binding PathText}">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsPlaceholder}" Value="True">
+                                                        <Setter Property="Foreground" Value="#FF999999"/>
+                                                        <Setter Property="FontStyle" Value="Italic"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <!-- [Recent] replaces the bank on this row (adds one on the empty row); the red X removes it -->
+                        <GridViewColumn Width="96" Header="">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Content="Recent" Style="{StaticResource RoundedSmallButtonStyle}"
+                                                FontFamily="Segoe UI" FontSize="11" Padding="8,0"
+                                                Click="RowRecent_Click" Tag="{Binding}" ToolTip="{Binding RecentTip}"/>
+                                        <Button Style="{StaticResource FlatIconButtonStyle}" Margin="6,0,0,0"
+                                                Click="RemoveBank_Click" Tag="{Binding}" Visibility="{Binding RowVisibility}"
+                                                ToolTip="Remove from the list (or select the row and press Delete)">
+                                            <Path Data="M0,0 L8,8 M8,0 L0,8" Stroke="#FFC62828" StrokeThickness="1.8"
+                                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                                        </Button>
+                                    </StackPanel>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
@@ -206,11 +247,11 @@
             <Grid.RowDefinitions>
                 <RowDefinition x:Name="VennRow" Height="1.25*" MinHeight="200"/>
                 <RowDefinition x:Name="VennSplitterRow" Height="6"/>
-                <!-- Name added: restoring CompareWindowSplitterDistance2 sets this row's share -->
+                <!-- Restoring CompareWindowSplitterDistance2 sets this row's share -->
                 <RowDefinition x:Name="DetailsRow" Height="*" MinHeight="150"/>
             </Grid.RowDefinitions>
 
-            <!-- Venn diagram on the left, controls on the right. "Hide controls" hides both. -->
+                <!-- Venn diagram on the left, controls on the right. "Hide controls" hides both. -->
             <Grid Grid.Row="0" Name="DiagramArea">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -222,7 +263,7 @@
                     <local:VennView x:Name="Venn" Margin="8"/>
                 </Border>
 
-                <!-- Names added: the diagram row is never made lower than these controls need (see FitVennRow) -->
+                <!-- The diagram row is never made lower than these controls need (see FitVennRow) -->
                 <Border Grid.Column="2" Name="ControlsPanel" BorderBrush="#FFD5D5D5" BorderThickness="1" CornerRadius="4"
                         Background="#FFFAFAFA" Padding="10,8" Width="290">
                     <Grid Name="ControlsContent" VerticalAlignment="Top">
@@ -254,7 +295,8 @@
                                   Padding="5,0,4,0" VerticalContentAlignment="Center" HorizontalAlignment="Left"
                                   Margin="0,0,0,8" SelectionChanged="FreqCombo_SelectionChanged"/>
 
-                        <TextBlock Grid.Row="2" Text="Period" Style="{StaticResource PanelLabelStyle}"/>
+                        <TextBlock Grid.Row="2" Text="Period" Style="{StaticResource PanelLabelStyle}"
+                                   ToolTip="The period filter: the numbers in the diagram, the names and the values are for these periods. Clicking a histogram bar sets it too."/>
                         <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
                         <Grid Name="FromSpinner" Width="80" Height="18">
                             <Grid.ColumnDefinitions>
@@ -308,7 +350,7 @@
                         <Button Grid.Row="4" Grid.Column="1" Name="WholePeriodButton" Content="Whole period"
                                 Style="{StaticResource RoundedSmallButtonStyle}" HorizontalAlignment="Left"
                                 Margin="0,0,0,10" Click="WholePeriod_Click"
-                                ToolTip="Compare the whole universal period again"/>
+                                ToolTip="Remove the period filter: the whole universal period"/>
 
                         <TextBlock Grid.Row="5" Text="Filter" Style="{StaticResource PanelLabelStyle}"/>
                         <TextBox Grid.Row="5" Grid.Column="1" Name="FilterBox" Height="22" VerticalContentAlignment="Center"
@@ -327,7 +369,7 @@
 
             <!-- Details. The toggle button sits to the right of the tab headers. -->
             <Grid Grid.Row="2">
-                <TabControl Grid.Row="6" Name="Tabs">
+                <TabControl Name="Tabs">
                     <TabItem Header="Names" Name="NamesTab">
                         <Grid Margin="4">
                             <Grid.RowDefinitions>
@@ -350,18 +392,22 @@
                                 <Button Grid.Column="2" Content="Copy" Style="{StaticResource RoundedSmallButtonStyle}"
                                         Click="CopyNames_Click"/>
                             </Grid>
-                            <!-- New: RichTextBox instead of TextBox, so deviating names can be dark red -->
+                            <!-- RichTextBox instead of TextBox, so deviating names can be dark red -->
                             <RichTextBox Grid.Row="2" Name="NamesText" IsReadOnly="True" IsReadOnlyCaretVisible="False"
                                          FontFamily="Consolas" FontSize="12.5" BorderBrush="#FFACACAC" Padding="4,2"
                                          VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"/>
                         </Grid>
                     </TabItem>
 
-                    <TabItem Header="Histogram" Name="HistogramTab">
+                    <!-- One histogram: "Missings histogram" (blue) for "All of bank x" (a bank's box), "Deviations histogram" (red)
+                         for an overlap area after clicking its red number, otherwise a hint. The header is set in code. -->
+                    <TabItem Header="Histogram" Name="HistogramTab"
+                             ToolTip="Per period, for the selected area. Click a bar to filter on that period; double-click to list the names.">
                         <local:HistogramView x:Name="Histogram" Margin="4"/>
                     </TabItem>
 
-                    <TabItem Header="Deviations" Name="DeviationsTab">
+                    <!-- Renamed from Deviations: steps through the series in the Names list -->
+                    <TabItem Header="Values" Name="ValuesTab">
                         <Grid Margin="4">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -386,9 +432,9 @@
                                            Foreground="#FF1F4E79" VerticalAlignment="Center"/>
                                 <TextBlock Name="LegendText" Grid.Column="3" Margin="16,0,8,0" Foreground="#FF888888"
                                            VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                                <CheckBox Name="OnlyDevCheck" Grid.Column="4" Content="Deviating periods only"
+                                <CheckBox Name="OnlyFlaggedCheck" Grid.Column="4" Content="Only periods with deviations or M"
                                           VerticalAlignment="Center"
-                                          Checked="OnlyDev_Changed" Unchecked="OnlyDev_Changed"/>
+                                          Checked="OnlyFlagged_Changed" Unchecked="OnlyFlagged_Changed"/>
                             </Grid>
                             <TextBox Grid.Row="2" Name="DevText" Style="{StaticResource MonoTextStyle}"
                                      TextWrapping="NoWrap" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
@@ -396,13 +442,9 @@
                         </Grid>
                     </TabItem>
                 </TabControl>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,1,2,0">
-                    <TextBlock Name="SelectionText" Visibility="Collapsed" Foreground="#FF1F4E79" VerticalAlignment="Center"
-                               Margin="0,0,12,0" MaxWidth="520" TextTrimming="CharacterEllipsis"/>
-                    <Button Name="DiagramToggle" Content="&#x25B4; Hide controls" Style="{StaticResource RoundedSmallButtonStyle}"
-                            VerticalAlignment="Center" Click="DiagramToggle_Click"
-                            ToolTip="Hide the diagram and controls to give the tabs more room (Ctrl+D)"/>
-                </StackPanel>
+                <Button Name="DiagramToggle" Content="&#x25B4; Hide controls" Style="{StaticResource RoundedSmallButtonStyle}"
+                        HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,2,2,0" Click="DiagramToggle_Click"
+                        ToolTip="Hide the diagram and controls to give the tabs more room (Ctrl+D)"/>
             </Grid>
         </Grid>
 

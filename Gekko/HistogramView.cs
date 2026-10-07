@@ -10,32 +10,37 @@ using System.Windows.Shapes;
 namespace Gekko
 {
     /// <summary>
-    /// Bar charts per period, stacked vertically:
-    /// red (only for areas with 2 or 3 banks): number of deviating series; bars can be clicked, raising BarClicked(period).
-    /// blue (always): number of series with a missing value (in any of the area's banks).
+    /// Bar chart per period over the whole universal period. The window has two of these, each in its own tab:
+    /// red: number of deviating series; blue: number of series with missing values (M).
+    /// The selected periods (the period filter) are highlighted; bars outside them are paler.
+    /// Click a bar: BarClicked(period, modifiers). Double-click: BarDoubleClicked(period).
     /// </summary>
     public sealed class HistogramView : Canvas
     {
-        public event Action<int> BarClicked;
+        public event Action<int, ModifierKeys> BarClicked;
+        public event Action<int> BarDoubleClicked;
 
-        static readonly Brush BarBrush = BankColors.FromRgb(0xB8, 0x45, 0x3C);
-        static readonly Brush BarHoverBrush = BankColors.FromRgb(0x7A, 0x22, 0x1C);
-        static readonly Brush MissingBrush = BankColors.FromRgb(0x2E, 0x6D, 0xB4);
-        static readonly Brush MissingHoverBrush = BankColors.FromRgb(0x1A, 0x44, 0x75);
+        static readonly Brush DevBrush = BankColors.FromRgb(0xB8, 0x45, 0x3C);
+        static readonly Brush DevHoverBrush = BankColors.FromRgb(0x7A, 0x22, 0x1C);
+        static readonly Brush DevPaleBrush = BankColors.FromRgb(0xE3, 0xB5, 0xB1);
+        static readonly Brush MissBrush = BankColors.FromRgb(0x2E, 0x6D, 0xB4);
+        static readonly Brush MissHoverBrush = BankColors.FromRgb(0x1A, 0x44, 0x75);
+        static readonly Brush MissPaleBrush = BankColors.FromRgb(0xB4, 0xC9, 0xE4);
+        static readonly Brush SelectionBand = BankColors.FromArgb(0x22, 0x60, 0x60, 0x60);
         static readonly Brush AxisBrush = BankColors.FromRgb(0x88, 0x88, 0x88);
         static readonly Brush GridBrush = BankColors.FromRgb(0xE6, 0xE6, 0xE6);
         static readonly Brush TextBrush = BankColors.FromRgb(0x44, 0x44, 0x44);
         static readonly Brush MutedBrush = BankColors.FromRgb(0x88, 0x88, 0x88);
 
-        const double PanelGap = 10;
-
+        string title = "";
         CompareFreq freq;
         int start;
-        string deviationTitle;
-        int[] deviationCounts;   // null: no red chart
-        string missingTitle;
-        int[] missingCounts;     // null together with deviationCounts: show the message
-        string message = "Click an area or a number in the diagram to see deviations and missing values per period.";
+        int[] counts;
+        bool deviations = true;
+        Func<int, string> extraTip;
+        int? highlightFrom;
+        int? highlightTo;
+        string message = "Click a number, an area or a bank in the diagram.";
 
         public HistogramView()
         {
@@ -45,26 +50,33 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Both arrays start at firstPeriod. Pass devCounts = null for an area with one bank only
-        /// (nothing to compare): then only the blue chart is shown, using the full height.
+        /// counts start at firstPeriod. showsDeviations: red bars, otherwise blue. tip (may be null) adds a line to a
+        /// bar's tooltip. highlightFrom/To: the selected periods, or null for no period filter.
         /// </summary>
-        public void SetData(CompareFreq newFreq, int firstPeriod, string devTitle, int[] devCounts, string missTitle, int[] missCounts)
+        public void SetData(string newTitle, CompareFreq newFreq, int firstPeriod, int[] newCounts, bool showsDeviations,
+                            Func<int, string> tip, int? from, int? to)
         {
+            deviations = showsDeviations;
+            title = newTitle ?? "";
             freq = newFreq;
             start = firstPeriod;
-            deviationTitle = devTitle ?? "";
-            deviationCounts = devCounts;
-            missingTitle = missTitle ?? "";
-            missingCounts = missCounts;
+            counts = newCounts;
+            extraTip = tip;
+            highlightFrom = from;
+            highlightTo = to;
             Rebuild();
         }
 
         public void ShowMessage(string text)
         {
-            deviationCounts = null;
-            missingCounts = null;
+            counts = null;
             message = text ?? "";
             Rebuild();
+        }
+
+        bool IsHighlighted(int period)
+        {
+            return !highlightFrom.HasValue || (period >= highlightFrom.Value && period <= highlightTo.Value);
         }
 
         void Rebuild()
@@ -73,45 +85,15 @@ namespace Gekko
             double width = ActualWidth, height = ActualHeight;
             if (width < 100 || height < 80) return;
 
-            if (deviationCounts == null && missingCounts == null)
+            if (counts == null || counts.Length == 0)
             {
-                var info = new TextBlock
-                {
-                    Text = message,
-                    FontSize = 13,
-                    Foreground = MutedBrush,
-                    TextWrapping = TextWrapping.Wrap,
-                    TextAlignment = TextAlignment.Center,
-                    Width = width - 40
-                };
-                info.Measure(new Size(info.Width, double.PositiveInfinity));
-                Add(info, 20, (height - info.DesiredSize.Height) / 2);
+                AddCenteredText(message, 13, 20, width - 40, height / 2);
                 return;
             }
 
-            if (deviationCounts != null && missingCounts != null)
-            {
-                double h = (height - PanelGap) / 2;
-                DrawPanel(0, h, width, deviationTitle, deviationCounts, true);
-                DrawPanel(h + PanelGap, h, width, missingTitle, missingCounts, false);
-            }
-            else if (deviationCounts != null)
-            {
-                DrawPanel(0, height, width, deviationTitle, deviationCounts, true);
-            }
-            else
-            {
-                DrawPanel(0, height, width, missingTitle, missingCounts, false);
-            }
-        }
-
-        /// <summary>One chart in the band y0..y0+bandHeight.</summary>
-        void DrawPanel(double y0, double bandHeight, double width, string title, int[] counts, bool deviations)
-        {
-            const double left = 52, right = 16, top = 26, bottom = 26;
-            double pw = width - left - right, ph = bandHeight - top - bottom;
-            if (pw < 40 || ph < 20) return;
-            double plotTop = y0 + top;
+            const double left = 52, right = 16, top = 30, bottom = 30;
+            double pw = width - left - right, ph = height - top - bottom;
+            if (pw < 40 || ph < 30) return;
 
             Add(new TextBlock
             {
@@ -121,32 +103,37 @@ namespace Gekko
                 Foreground = TextBrush,
                 TextTrimming = TextTrimming.CharacterEllipsis,
                 Width = width - left
-            }, left, y0 + 3);
+            }, left, 4);
 
             int n = counts.Length;
-            if (n == 0 || counts.All(c => c == 0))
+            double slot = pw / n;
+
+            // The selected periods as a light band behind the bars.
+            if (highlightFrom.HasValue)
             {
-                double baseY = Math.Round(plotTop + ph) + 0.5;
+                int a = Math.Max(0, highlightFrom.Value - start), b = Math.Min(n - 1, highlightTo.Value - start);
+                if (a <= b)
+                    Add(new Rectangle { Width = (b - a + 1) * slot, Height = ph, Fill = SelectionBand, IsHitTestVisible = false },
+                        left + a * slot, top);
+            }
+
+            if (counts.All(c => c == 0))
+            {
+                double baseY = Math.Round(top + ph) + 0.5;
                 Children.Add(new Line { X1 = left, X2 = left + pw, Y1 = baseY, Y2 = baseY, Stroke = AxisBrush, StrokeThickness = 1 });
-                var none = new TextBlock
-                {
-                    Text = deviations ? "No deviations in the compared periods." : "No missing values in the compared periods.",
-                    FontSize = 12,
-                    Foreground = MutedBrush,
-                    Width = pw,
-                    TextAlignment = TextAlignment.Center
-                };
-                Add(none, left, plotTop + ph / 2 - 8);
+                AddCenteredText(deviations ? "No deviations in this selection." : "No missing values in this selection.",
+                                12, left, pw, top + ph / 2);
+                DrawYears(left, top, ph, slot, n);
                 return;
             }
 
             // Y axis: series count
             int max = Math.Max(1, counts.Max());
-            double step = Math.Max(1, NiceStep(max / Math.Max(2.0, Math.Min(5.0, ph / 25.0))));
+            double step = Math.Max(1, NiceStep(max / 5.0));
             double yMax = Math.Ceiling(max / step) * step;
             for (double v = 0; v <= yMax + 1e-9; v += step)
             {
-                double y = Math.Round(plotTop + ph - v / yMax * ph) + 0.5;
+                double y = Math.Round(top + ph - v / yMax * ph) + 0.5;
                 Children.Add(new Line { X1 = left, X2 = left + pw, Y1 = y, Y2 = y, Stroke = v == 0 ? AxisBrush : GridBrush, StrokeThickness = 1 });
                 Add(new TextBlock
                 {
@@ -159,39 +146,58 @@ namespace Gekko
             }
 
             // Bars. A transparent full-height column per period makes thin (monthly) bars easy to hit.
-            double slot = pw / n;
             double barWidth = slot >= 4 ? slot * 0.75 : Math.Max(1, slot);
-            Brush normal = deviations ? BarBrush : MissingBrush;
-            Brush hover = deviations ? BarHoverBrush : MissingHoverBrush;
+            Brush hover = deviations ? DevHoverBrush : MissHoverBrush;
             for (int i = 0; i < n; i++)
             {
-                if (counts[i] == 0) continue;
                 int period = start + i;
-                double h = counts[i] / yMax * ph;
-                var bar = new Rectangle { Width = barWidth, Height = Math.Max(1, h), Fill = normal, IsHitTestVisible = false };
-                Add(bar, left + i * slot + (slot - barWidth) / 2, plotTop + ph - h);
+                Brush normal = IsHighlighted(period) ? (deviations ? DevBrush : MissBrush) : (deviations ? DevPaleBrush : MissPaleBrush);
+                Rectangle bar = null;
+                if (counts[i] > 0)
+                {
+                    double h = counts[i] / yMax * ph;
+                    bar = new Rectangle { Width = barWidth, Height = Math.Max(1, h), Fill = normal, IsHitTestVisible = false };
+                    Add(bar, left + i * slot + (slot - barWidth) / 2, top + ph - h);
+                }
+
+                string tip = PeriodText.Format(freq, period) + ": " + counts[i]
+                             + (deviations
+                                 ? (counts[i] == 1 ? " series deviates" : " series deviate")
+                                 : (counts[i] == 1 ? " series with missing values" : " series with missing values"));
+                string more = extraTip?.Invoke(period);
+                if (!string.IsNullOrEmpty(more)) tip += "\n" + more;
+                tip += "\nClick: select this period (Shift: extend, Ctrl: add to the filter). Double-click: list the names.";
 
                 var column = new Rectangle
                 {
                     Width = Math.Max(1, slot),
                     Height = ph,
                     Fill = Brushes.Transparent,
-                    ToolTip = PeriodText.Format(freq, period) + ": " + counts[i]
-                              + (deviations
-                                  ? (counts[i] == 1 ? " series deviates" : " series deviate") + "\nClick to show them in the Deviations tab"
-                                  : (counts[i] == 1 ? " series with a missing value" : " series with missing values"))
+                    Cursor = Cursors.Hand,
+                    ToolTip = tip
                 };
-                column.MouseEnter += (o, e) => bar.Fill = hover;
-                column.MouseLeave += (o, e) => bar.Fill = normal;
-                if (deviations)
+                if (bar != null)
                 {
-                    column.Cursor = Cursors.Hand;
-                    column.MouseLeftButtonUp += (o, e) => { e.Handled = true; BarClicked?.Invoke(period); };
+                    Rectangle b = bar;
+                    column.MouseEnter += (o, e) => b.Fill = hover;
+                    column.MouseLeave += (o, e) => b.Fill = normal;
                 }
-                Add(column, left + i * slot, plotTop);
+                column.MouseLeftButtonDown += (o, e) =>
+                {
+                    if (e.ClickCount != 2) return;
+                    e.Handled = true;
+                    BarDoubleClicked?.Invoke(period);
+                };
+                column.MouseLeftButtonUp += (o, e) => { e.Handled = true; BarClicked?.Invoke(period, Keyboard.Modifiers); };
+                Add(column, left + i * slot, top);
             }
 
-            // X axis: one label per year, thinned so labels do not overlap
+            DrawYears(left, top, ph, slot, n);
+        }
+
+        /// <summary>X axis: one label per year, thinned so labels do not overlap.</summary>
+        void DrawYears(double left, double top, double ph, double slot, int n)
+        {
             int periodsPerYear = PeriodText.PeriodsPerYear(freq);
             int firstYear = PeriodText.Year(freq, start);
             int lastYear = PeriodText.Year(freq, start + n - 1);
@@ -202,7 +208,7 @@ namespace Gekko
                 int index = PeriodText.ToIndex(freq, year, 1) - start;
                 if (index < 0 || index >= n) continue;
                 double x = Math.Round(left + index * slot + (periodsPerYear == 1 ? slot / 2 : 0)) + 0.5;
-                Children.Add(new Line { X1 = x, X2 = x, Y1 = plotTop + ph, Y2 = plotTop + ph + 4, Stroke = AxisBrush, StrokeThickness = 1 });
+                Children.Add(new Line { X1 = x, X2 = x, Y1 = top + ph, Y2 = top + ph + 4, Stroke = AxisBrush, StrokeThickness = 1 });
                 Add(new TextBlock
                 {
                     Text = year.ToString(CultureInfo.InvariantCulture),
@@ -210,11 +216,27 @@ namespace Gekko
                     Foreground = MutedBrush,
                     Width = 50,
                     TextAlignment = TextAlignment.Center
-                }, x - 25, plotTop + ph + 5);
+                }, x - 25, top + ph + 5);
             }
         }
 
-        static double NiceStep(double raw)
+        void AddCenteredText(string text, double fontSize, double left, double width, double centerY)
+        {
+            var info = new TextBlock
+            {
+                Text = text,
+                FontSize = fontSize,
+                Foreground = MutedBrush,
+                TextWrapping = TextWrapping.Wrap,
+                TextAlignment = TextAlignment.Center,
+                Width = Math.Max(20, width),
+                IsHitTestVisible = false
+            };
+            info.Measure(new Size(info.Width, double.PositiveInfinity));
+            Add(info, left, centerY - info.DesiredSize.Height / 2);
+        }
+
+        internal static double NiceStep(double raw)
         {
             double magnitude = Math.Pow(10, Math.Floor(Math.Log10(raw)));
             double f = raw / magnitude;
@@ -222,7 +244,7 @@ namespace Gekko
             return nice * magnitude;
         }
 
-        static int NiceInt(int k)
+        internal static int NiceInt(int k)
         {
             foreach (int c in new[] { 1, 2, 5, 10, 20, 25, 50, 100 })
                 if (c >= k) return c;
