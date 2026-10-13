@@ -1732,6 +1732,68 @@ namespace Gekko
             return;
         }
 
+        public static void PrintScalarEquations()
+        {
+            ModelGamsScalar modelGamsScalar = Program.model.modelGamsScalar;
+            GekkoDictionary<string, List<EquationNameAndNumber>> combos = new GekkoDictionary<string, List<EquationNameAndNumber>>(StringComparer.OrdinalIgnoreCase);  //key:varname, value:equation names
+            GekkoTime t = new GekkoTime(EFreq.A, 2025, 1, 1);
+
+            int n = modelGamsScalar.CountEqs(1);
+            int n2 = 0;
+
+            EquationTextHelper eh = new EquationTextHelper();
+            eh.showTime = false;
+            eh.showEq = true;
+            List<IdentityHelper> eqs = new List<IdentityHelper>();
+            string fileName = Program.options.folder_working + "\\" + "equations.txt";
+            using (FileStream fs = Program.WaitForFileStream(fileName, null, Program.GekkoFileReadOrWrite.Write))
+            using (StreamWriter sw = G.GekkoStreamWriter(fs))
+            {
+                for (int i = 0; i < n; i++)
+                {
+                    DName xx = modelGamsScalar.dict_FromEqNumberToEqName[i];
+                    if (xx == null) continue;  //With model <t1 t2>
+
+                    n2++;
+
+                    if (xx.GetTime().LargerThanOrEqual(t) && xx.GetTime().SmallerThanOrEqual(t))
+                    {
+                        string lhs = "??";
+                        List<string> precedentsTemp = modelGamsScalar.GetPrecedentsNames(i, eh, t);
+                        foreach (string variableName in precedentsTemp)
+                        {
+                            if (G.StartsWith(variableName, "res_"))
+                            {
+                                lhs = variableName.Substring("res_".Length);
+                            }
+                        }
+
+                        string label = Program.GetVariableExplanation1Line(Program.DName_HACK1(lhs), false);
+
+                        sw.WriteLine();
+                        sw.WriteLine("==================================================================================================================================");
+                        sw.WriteLine("  " + lhs + "   ---   " + G.FixDanish(label)); 
+                        sw.WriteLine("==================================================================================================================================");
+
+                        GetEquationTextHelper output1 = Program.model.GetEquationText(new List<DName>() { xx }, eh, t);
+                        string s1 = output1.s_gamsOrFrnSyntax;
+                        string s2 = output1.s_scalarModel;
+
+                        List<string> xxx = Stringlist.ExtractLinesFromText(s1);
+                        sw.WriteLine();
+                        foreach (string s in xxx)
+                        {
+                            sw.WriteLine("// " + s);
+                        }
+                        sw.WriteLine();
+                        sw.WriteLine(s2);                        
+                    }
+                }
+                sw.Flush(); sw.Close();
+            }
+            new Writeln("Wrote " + n2 + " scalar equations to file: " + fileName);
+        }
+
         private static void HandleG_data(out GekkoDictionary<string, bool> names, out int dublets)
         {
             Databank db = Program.databanks.GetDatabank("m");

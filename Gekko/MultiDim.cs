@@ -822,6 +822,13 @@ namespace Gekko
         None,
         Last,
         LastExceptLag0
+
+        //Maybe:
+        //None, // x[a,2025,b] or x[a,-1,b]
+        //End, // x[a,b,2025] or x[a,b,-1]
+        //EndExceptLag0 // as above, but no x[a,b,0]
+        //Last, // x[a,b][2025] or x[a,b][-1]
+        //LastExceptLag0 // as above, but no x[a,b][0]
     }
 
     public class DNameFormat

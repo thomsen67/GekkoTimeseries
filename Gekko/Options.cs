@@ -208,6 +208,7 @@ namespace Gekko
         public bool model_gams_dep_current = false;
         public string model_gams_dep_method = "both";  //lhs|eqname|both        
         public bool model_gams_scalar_data = false;  //set yes to read data from a scalar model gams.gms file. But does not work...        
+        public string model_gams_scalar_lags = "gekko"; //gekko|gams --> gekko has x[a,b][-1] where gams has x[a,b,t-1] (where "t" is from gams_time_set)
         public bool model_gams_scalar_normalize = false;  //Scalar equations are shown in normalized form.
         public EFreq model_gams_scalar_freq = EFreq.A;  //When reading dict.txt
         public string model_infofile = "yes";  //yes/no/temp
@@ -575,6 +576,7 @@ namespace Gekko
             Add("MODEL GAMS DEP CURRENT", Globals.xbool);
             Add("MODEL GAMS DEP METHOD", Globals.xnameOrString, "lhs", "eqname", "both");            
             Add("MODEL GAMS SCALAR DATA", Globals.xbool);
+            Add("MODEL GAMS SCALAR LAGS", Globals.xnameOrString, "gekko", "gams");
             Add("MODEL GAMS SCALAR FREQ", Globals.xnameOrString2Freq, "a", "q", "m", "w", "d", "u");
             Add("MODEL GAMS SCALAR NORMALIZE", Globals.xbool);            
             Add("MODEL INFOFILE", Globals.xnameOrString, "yes", "no", "temp");

@@ -2181,7 +2181,23 @@ namespace Gekko
                             varname2 = sd.vars[varname2];
                         }                        
                     }
-                    sb.Append(G.Blanks(tokens[i].leftblanks) + varname2);
+
+                    DNameFormat format = null;
+                    if (G.Equal(Program.options.model_gams_scalar_lags, "gekko"))
+                    {
+                        format = new DNameFormat(EDNameQuotes.Normal, EDNameTime.LastExceptLag0, null, false);
+                    }
+                    else
+                    {
+                        //gams
+                        format = new DNameFormat(EDNameQuotes.Quotes, EDNameTime.None, null, false);
+                    }
+
+                    //if (varname2.GetLength() >= 4 && varname2.GetTime().super == -1)
+                    //{
+                    //}
+
+                    sb.Append(G.Blanks(tokens[i].leftblanks) + varname2.ToString(format));
                     i += 14;
                 }
                 else if (tokens[i].s == "c" && tokens[i + 1].s == "[" && tokens[i + 2].s == "d" && tokens[i + 3].s == "[" && tokens[i + 5].s == "]" && tokens[i + 6].s == "]")

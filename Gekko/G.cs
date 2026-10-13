@@ -3256,6 +3256,19 @@ namespace Gekko
             return encoding;
         }
 
+        public static string FixDanish(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+
+            return text
+                .Replace("Ã¦", "æ")
+                .Replace("Ã¸", "ø")
+                .Replace("Ã¥", "å")
+                .Replace("ÃÆ", "Æ")
+                .Replace("ÃØ", "Ø")
+                .Replace("ÃÅ", "Å");
+        }
+
         /// <summary>
         /// Get all IndexOf() from a string, cf. https://stackoverflow.com/questions/15993357/how-to-get-all-indexof-instances-of-string-in-another-string-c-sharp. Can be empty, but will never contain an element = -1.
         /// See also G.Match() and G.IsDelimited().

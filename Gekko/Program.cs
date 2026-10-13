@@ -3086,6 +3086,11 @@ namespace Gekko
 
             if (Globals.runningOnTTComputer)
             {
+                if (text.ToLower().Contains("eqs"))
+                {
+                    GamsModel.PrintScalarEquations();
+                }
+
                 if (false)
                 {
                     Pool.Test();
