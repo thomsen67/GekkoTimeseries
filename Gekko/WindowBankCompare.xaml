@@ -348,7 +348,8 @@
                                          IsChecked="True" Checked="CompareMode_Changed"/>
                         </StackPanel>
 
-                        <!-- Datafiles only: frequency and period -->
+                        <!-- Frequency and period: used by the Datafiles state (greyed out for folders, which check all
+                             frequencies and periods). Everything else in this panel is shared by both states. -->
                         <Grid Grid.Row="1" Grid.ColumnSpan="2" Name="DatafileControls">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" SharedSizeGroup="PanelLabel"/>
@@ -423,21 +424,17 @@
                                     ToolTip="Remove the period filter: the whole universal period"/>
                         </Grid>
 
-                        <!-- Folders only -->
-                        <TextBlock Grid.Row="2" Grid.Column="1" Name="FolderNote" Visibility="Collapsed" Style="{StaticResource HintStyle}"
-                                   Margin="0,0,0,10"
-                                   Text="Data files (*.gbk) in the folders and their subfolders are matched by their path relative to each folder. Click a file in the Files tab to compare its series."/>
-
                         <TextBlock Grid.Row="3" Text="Filter" Style="{StaticResource PanelLabelStyle}"/>
                         <TextBox Grid.Row="3" Grid.Column="1" Name="FilterBox" Height="22" VerticalContentAlignment="Center"
                                  TextChanged="FilterBox_TextChanged"
-                                 ToolTip="Series names (Datafiles), or file names and relative paths (Folders)"/>
+                                 ToolTip="Only these series are compared (also inside the data files of a folder comparison)"/>
                         <CheckBox Grid.Row="4" Grid.Column="1" Name="RegexCheck" Content="Regex" Margin="0,5,0,0"
                                   Checked="RegexCheck_Changed" Unchecked="RegexCheck_Changed"/>
                         <TextBlock Grid.Row="5" Grid.Column="1" Name="FilterHint" Style="{StaticResource HintStyle}"
                                    Text="Wildcards * and ?, several patterns separated by spaces" Margin="0,4,0,8"/>
 
-                        <!-- New: the check. The red numbers, the histogram, the red names and the * in Values follow it. -->
+                        <!-- The check, shared by both states. The red numbers, the histogram, the red names/files and the *
+                             in Values follow it. In the Folders state it is applied to the series inside each data file. -->
                         <TabControl Grid.Row="6" Grid.ColumnSpan="2" Name="CheckTabs" SelectionChanged="CheckTabs_SelectionChanged"
                                     Background="White">
                             <TabItem Header="Differences" Name="DifferencesCheckTab" Style="{StaticResource CheckTabStyle}"
@@ -456,14 +453,14 @@
                                         <TextBlock Style="{StaticResource HintStyle}" Margin="0,5,0,0"
                                                    Text="Values differing by more than the threshold, or a value against M, differ. M against M is equal."/>
                                     </StackPanel>
-                                    <TextBlock Name="DiffFolderNote" Visibility="Collapsed" Style="{StaticResource HintStyle}"
-                                               Text="Folders: a file in several folders differs when its contents are not identical (byte by byte)."/>
+                                    <TextBlock Style="{StaticResource HintStyle}" Margin="0,4,0,0"
+                                               Text="Folders: a file differs when, in some frequency, its copies do not have the same series, or a series differs."/>
                                 </StackPanel>
                             </TabItem>
                             <TabItem Header="Missings" Name="MissingsCheckTab" Style="{StaticResource CheckTabStyle}"
                                      ToolTip="Find series with missing values (M)">
                                 <TextBlock Margin="4,5,4,4" Style="{StaticResource HintStyle}"
-                                           Text="Series with M (missing) in at least one of the banks of the area. For a whole bank (its box): M in that bank."/>
+                                           Text="Series (or data files) with M (missing) in at least one of the banks/folders of the area. For a whole bank or folder (its box): M in that one."/>
                             </TabItem>
                             <TabItem Header="Zeroes" Name="ZeroesCheckTab" Style="{StaticResource CheckTabStyle}"
                                      ToolTip="Find series with zeroes">
@@ -475,7 +472,7 @@
                                                  ToolTip="A value counts as zero when its absolute value is at most this (0: exactly zero)"/>
                                     </StackPanel>
                                     <TextBlock Style="{StaticResource HintStyle}" Margin="0,5,0,0"
-                                               Text="Series with a zero (|value| ≤ threshold) in at least one of the banks of the area. For a whole bank: in that bank."/>
+                                               Text="Series (or data files) with a zero (|value| ≤ threshold) in at least one of the banks/folders of the area. For a whole bank or folder: in that one."/>
                                 </StackPanel>
                             </TabItem>
                         </TabControl>

@@ -190,8 +190,6 @@ namespace Gekko
             public int FocusSlot = -1;
             public bool[] ActiveBeforeFocus;
             public bool[] Active = { true, true, true };
-            public bool Compare3 = true;  // the user's choice; "first 3" is used when the list has 3 or more
-            public CheckKind Check = CheckKind.Differences;
         }
 
         const string DragFormat = "GekkoBankCompareItem";
@@ -226,7 +224,11 @@ namespace Gekko
         ViewState View => state == CompareState.Folders ? foldersView : datafilesView;
         IVennModel Model => state == CompareState.Folders ? (IVennModel)folderResult : current;
 
+        // ---- Settings shared by both states (the panel to the right of the diagram): compare first 2 or 3,
+        // the check and its thresholds, and the name filter. Frequency and period are used by the Datafiles state;
+        // the Folders state checks all frequencies and periods of each file.
         readonly CheckSettings settings = new CheckSettings();
+        bool compare3Choice = true;  // the user's choice; "first 3" is used when the list has 3 or more
         bool[] active = { true, true, true };
         readonly DispatcherTimer recomputeTimer;
         bool ready;
@@ -239,7 +241,17 @@ namespace Gekko
         bool folderComputing;
         string folderStatus;   // the last folder comparison's summary (or error), shown again with the Folders state
         bool folderFailed;     // the last folder comparison failed: do not start it again just by showing the state
-        readonly ConcurrentDictionary<string, bool> sameCache = new ConcurrentDictionary<string, bool>();
+        // DatabankLoader.Load is called both here (UI thread) and by the folder comparison (worker thread); this lock
+        // makes sure only one file is read at a time, in case the loader uses shared state.
+        static readonly object loaderLock = new object();
+
+        static CompareBank LoadBank(string path)
+        {
+            lock (loaderLock) return DatabankLoader.Load(path);
+        }
+
+        // Summaries of data files and byte comparisons from earlier folder comparisons (keyed by path, size, time, filter).
+        readonly ConcurrentDictionary<string, object> folderCache = new ConcurrentDictionary<string, object>();
         FileComparison openedFrom;   // the folder file the datafiles were opened from, if any
 
         // ---- Scope: which banks/folders are shown (eye icons) and the focus (target icon, Alt+1/2/3).
@@ -247,8 +259,8 @@ namespace Gekko
         int focusSlot = -1;
         bool[] activeBeforeFocus;
 
-        // ---- The check (tabs at the bottom of the controls panel) and the drill-down filters.
-        //   Check:  Differences, Missings or Zeroes (Folders: Differences only, byte by byte).
+        // ---- The check (tabs at the bottom of the controls panel, shared by both states) and the drill-down filters.
+        //   Check:  Differences, Missings or Zeroes.
         //   Area:   one area (selectedMask != 0) or a whole bank/folder (selectedBank >= 0), or nothing.
         //   Period: userFrom..userTo (the From/To boxes, Datafiles only); null means the edge of the universal period.
         //   Found:  foundFilter, Any or Yes (the red number / a histogram bar): only what the check finds.
@@ -489,10 +501,9 @@ namespace Gekko
                 DatafilesStateButton.IsChecked = state == CompareState.Datafiles;
                 FoldersStateButton.IsChecked = state == CompareState.Folders;
                 Compare3Radio.IsEnabled = banks.Count >= 3;
-                bool three = View.Compare3 && banks.Count >= 3;
+                bool three = compare3Choice && banks.Count >= 3;
                 Compare3Radio.IsChecked = three;
                 Compare2Radio.IsChecked = !three;
-                CheckTabs.SelectedIndex = (int)check;
             }
             finally
             {
@@ -534,7 +545,6 @@ namespace Gekko
             v.FocusSlot = focusSlot;
             v.ActiveBeforeFocus = activeBeforeFocus;
             v.Active = active;
-            v.Check = check;  // (Compare3 is kept up to date by CompareMode_Changed)
         }
 
         void LoadView()
@@ -546,20 +556,19 @@ namespace Gekko
             focusSlot = v.FocusSlot;
             activeBeforeFocus = v.ActiveBeforeFocus;
             active = v.Active;
-            check = v.Check;
         }
 
-        /// <summary>Shows the controls that belong to the current state, and names tabs and columns accordingly.</summary>
+        /// <summary>
+        /// Names tabs and columns for the current state. The settings panel is the same in both states; only frequency
+        /// and period are greyed out for folders, since a folder comparison checks all frequencies and periods.
+        /// </summary>
         void UpdateStateControls()
         {
             bool folders = state == CompareState.Folders;
             Title = folders ? "Compare folders" : "Compare databanks";
-            DatafileControls.Visibility = folders ? Visibility.Collapsed : Visibility.Visible;
-            FolderNote.Visibility = folders ? Visibility.Visible : Visibility.Collapsed;
-            MissingsCheckTab.IsEnabled = !folders;
-            ZeroesCheckTab.IsEnabled = !folders;
-            DiffThresholdPanel.Visibility = folders ? Visibility.Collapsed : Visibility.Visible;
-            DiffFolderNote.Visibility = folders ? Visibility.Visible : Visibility.Collapsed;
+            DatafileControls.IsEnabled = !folders;
+            DatafileControls.ToolTip = folders ? "Folders: all frequencies and all periods of each data file are checked." : null;
+            if (folders) SpanText.Text = "Folders: all frequencies and periods are checked.";
             NamesText.Visibility = folders ? Visibility.Collapsed : Visibility.Visible;
             FilesList.Visibility = folders ? Visibility.Visible : Visibility.Collapsed;
             IgnoreDimsCheck.Visibility = folders ? Visibility.Collapsed : Visibility.Visible;
@@ -598,7 +607,7 @@ namespace Gekko
             {
                 try
                 {
-                    loaded.Add(new BankItem(DatabankLoader.Load(fc.FullPaths[i])));
+                    loaded.Add(new BankItem(LoadBank(fc.FullPaths[i])));
                 }
                 catch (Exception ex)
                 {
@@ -616,7 +625,6 @@ namespace Gekko
             datafilesView.FocusSlot = -1;
             datafilesView.ActiveBeforeFocus = null;
             datafilesView.Active = new[] { true, true, true };
-            if (loaded.Count >= 3) datafilesView.Compare3 = true;
             userFrom = null;
             userTo = null;
             periodAnchor = null;
@@ -743,7 +751,7 @@ namespace Gekko
             }
             try
             {
-                BankItem item = folders ? BankItem.ForFolder(path) : new BankItem(DatabankLoader.Load(path));
+                BankItem item = folders ? BankItem.ForFolder(path) : new BankItem(LoadBank(path));
                 banks[index] = item;
                 TouchRecent(folders, path);
                 if (!folders) openedFrom = null;
@@ -767,7 +775,7 @@ namespace Gekko
             try
             {
                 // "first 3" whenever the user chose it and there are 3 or more (also after the list was shorter).
-                bool three = View.Compare3 && banks.Count >= 3;
+                bool three = compare3Choice && banks.Count >= 3;
                 Compare3Radio.IsEnabled = banks.Count >= 3;
                 Compare3Radio.IsChecked = three;
                 Compare2Radio.IsChecked = !three;
@@ -898,6 +906,7 @@ namespace Gekko
             }
 
             Func<string, bool> filter = ReadFilter();
+            string filterKey = (RegexCheck.IsChecked == true ? "regex:" : "wild:") + FilterBox.Text.Trim();
             List<string> paths = folderItems.Take(SlotCount).Select(f => f.FolderPath).ToList();
             bool[] shownFolders = (bool[])active.Clone();
             var cts = new CancellationTokenSource();
@@ -913,7 +922,9 @@ namespace Gekko
             string error = null;
             try
             {
-                result = await Task.Run(() => FolderCompareEngine.Compute(paths, shownFolders, filter, progress, cts.Token, sameCache));
+                // The files are read on a worker thread, one at a time (see LoadBank).
+                result = await Task.Run(() => FolderCompareEngine.Compute(paths, shownFolders, filter, filterKey,
+                                                                          LoadBank, progress, cts.Token, folderCache));
             }
             catch (OperationCanceledException)
             {
@@ -941,9 +952,10 @@ namespace Gekko
             else
             {
                 int files = result.Areas.Values.Sum(a => a.Files.Count);
-                int differ = result.Areas.Values.Sum(a => a.Files.Count(f => f.Differs));
-                folderStatus = "Folders compared: " + files + " data files; " + differ + " are in several folders with different contents."
-                               + (result.Cancelled ? " (Stopped before all contents were compared.)" : "");
+                int errors = result.Areas.Values.Sum(a => a.Files.Count(f => f.Error != null));
+                folderStatus = "Folders compared: " + files + " data files read"
+                               + (errors > 0 ? ", " + errors + " could not be read" : "") + "."
+                               + (result.Cancelled ? " (Stopped before all files were read.)" : "");
             }
             if (state != CompareState.Folders) return;  // the result and its status are shown when the Folders state is shown again
             Refresh();
@@ -992,7 +1004,7 @@ namespace Gekko
             }
             else
             {
-                folderResult.UpdateCounts();
+                folderResult.UpdateCounts(check, settings);
                 ValidateSelection();
                 Venn.SetState(folderResult, null, selectedMask, selectedBank, foundFilter, focusSlot);
                 FitVennRow(folderResult.SlotCount);
@@ -1051,16 +1063,9 @@ namespace Gekko
             if (!ReferenceEquals(e.OriginalSource, CheckTabs)) return;  // ignore SelectionChanged bubbling from inside the tabs
             if (!ready || busy) return;
             var newCheck = (CheckKind)Math.Max(0, CheckTabs.SelectedIndex);
-            if (state == CompareState.Folders && newCheck != CheckKind.Differences)
-            {
-                busy = true;
-                CheckTabs.SelectedIndex = 0;
-                busy = false;
-                return;
-            }
             if (newCheck == check) return;
             check = newCheck;
-            Refresh();  // all checks are computed already
+            Refresh();  // all checks are computed already (the other state applies it when shown)
         }
 
         /// <summary>Reads the thresholds into the settings. Returns false (and marks the box) if one is not valid.</summary>
@@ -1093,13 +1098,20 @@ namespace Gekko
             return ok;
         }
 
-        /// <summary>A threshold box or the "relative" box changed. Recomputes (after a short pause while typing).</summary>
+        /// <summary>
+        /// A threshold box or the "relative" box changed. Datafiles: recomputes (after a short pause while typing).
+        /// Folders: re-evaluates at once from the stored summaries (no reading); the Datafiles state recomputes when shown.
+        /// </summary>
         void Threshold_Changed(object sender, RoutedEventArgs e)
         {
             if (!ready) return;
             if (!ReadThresholds()) return;
             if (state == CompareState.Datafiles) ScheduleRecompute();
-            else MarkDirty(CompareState.Datafiles, DirtyRecompute);
+            else
+            {
+                MarkDirty(CompareState.Datafiles, DirtyRecompute);
+                Refresh();
+            }
         }
 
         // ---------------------------------------------------------------- the area filter
@@ -1118,6 +1130,7 @@ namespace Gekko
         {
             public string Description;
             public List<FileComparison> Files;
+            public Func<FileComparison, bool> Found;   // area: the file's copies together; whole folder: that folder's copy
         }
 
         Selection BuildSelection()
@@ -1161,11 +1174,13 @@ namespace Gekko
             if (selectedBank >= 0)
             {
                 List<FileComparison> files = folderResult.FilesOfFolder(selectedBank);
+                int slot = selectedBank;
                 return new FileSelection
                 {
                     Description = "All of folder " + (selectedBank + 1) + " (" + folderResult.SlotName(selectedBank) + ", "
                                   + files.Count + " files)",
-                    Files = files
+                    Files = files,
+                    Found = f => FolderResult.FoundInFolder(f, slot)
                 };
             }
             FolderArea area;
@@ -1174,7 +1189,8 @@ namespace Gekko
                 return new FileSelection
                 {
                     Description = CompareEngine.DescribeArea(folderResult.SlotCount, folderResult.Active, area.Mask, "folder"),
-                    Files = area.Files
+                    Files = area.Files,
+                    Found = f => f.Found
                 };
             }
             return null;
@@ -1450,17 +1466,19 @@ namespace Gekko
                 return;
             }
 
-            shownFiles = fileSelection.Files.Where(f => SeriesComparison.Passes(foundFilter, f.Differs)).ToList();
-            int differing = shownFiles.Count(f => f.Differs);
+            Func<FileComparison, bool> isFound = fileSelection.Found;
+            shownFiles = fileSelection.Files.Where(f => SeriesComparison.Passes(foundFilter, isFound(f))).ToList();
+            int found = shownFiles.Count(isFound);
+            string phrase = CheckText.Phrase(check);
             string header = fileSelection.Description + ": " + shownFiles.Count
                             + (shownFiles.Count == fileSelection.Files.Count ? "" : " of " + fileSelection.Files.Count) + " files"
-                            + (foundFilter == FlagFilter.Yes ? " that differ" : "");
-            if (differing > 0 && foundFilter != FlagFilter.Yes) header += " (" + differing + " that differ, in dark red)";
+                            + (foundFilter == FlagFilter.Yes ? " " + phrase : "");
+            if (found > 0 && foundFilter != FlagFilter.Yes) header += " (" + found + " " + phrase + ", in dark red)";
             header += ". Click a file to compare its series.";
             NamesHeader.Text = header;
             NamesHeader.ToolTip = header;
             NamesTab.Header = "Files (" + shownFiles.Count + ")";
-            FilesList.ItemsSource = shownFiles.Select(MakeFileRow).ToList();
+            FilesList.ItemsSource = shownFiles.Select(f => MakeFileRow(f, isFound(f))).ToList();
             namesPlainText = string.Join(Environment.NewLine, shownFiles.Select(f => f.RelativePath));
 
             fileNav = shownFiles;
@@ -1474,19 +1492,17 @@ namespace Gekko
             ShowCurrentItem();
         }
 
-        FileRow MakeFileRow(FileComparison f)
+        FileRow MakeFileRow(FileComparison f, bool found)
         {
             string where = (f.Slots.Length == 1 ? "Only in folder " : "In folders ")
                            + string.Join(" and ", f.Slots.Select(s => (s + 1).ToString(Inv)));
-            string tip;
-            if (!f.IsComparison) tip = where + ": nothing to compare it with.";
-            else if (f.Error != null) tip = where + ". Could not be read: " + f.Error;
-            else tip = where + (f.Differs ? ", contents differ." : ", identical contents.") + "\nClick to compare its series.";
+            string tip = where + (found && f.Why.Length > 0 ? ": " + f.Why : "") + ".";
+            tip += f.IsComparison ? "\nClick to compare its series." : "\nIn one folder only: nothing to compare it with.";
             return new FileRow
             {
                 File = f,
                 Text = f.RelativePath,
-                Foreground = f.Differs ? DeviatingNameBrush : Brushes.Black,
+                Foreground = found ? DeviatingNameBrush : Brushes.Black,
                 Tip = tip,
                 Cursor = f.IsComparison ? Cursors.Hand : Cursors.Arrow
             };
@@ -1783,7 +1799,10 @@ namespace Gekko
             DevText.ScrollToHome();
         }
 
-        /// <summary>One file of the Files list: where it is, sizes and dates, and whether the contents differ.</summary>
+        /// <summary>
+        /// One file of the Files list: per folder its size, date, series and whether the check finds something; per
+        /// pair of folders how they differ. Useful to see what a threshold does.
+        /// </summary>
         void ShowCurrentFile()
         {
             bool has = fileNavIndex >= 0 && fileNavIndex < fileNav.Count && folderResult != null;
@@ -1801,24 +1820,54 @@ namespace Gekko
             FileComparison f = fileNav[fileNavIndex];
             NavText.Text = f.RelativePath + "   (" + (fileNavIndex + 1) + " of " + fileNav.Count + ")";
             LegendText.Text = f.IsComparison ? "Click the file in the Files tab to compare its series" : "In one folder only";
-            var lines = new List<string> { "folder".PadRight(8) + "size (bytes)".PadLeft(16) + "   " + "modified".PadRight(21) + "path" };
+            string foundWord = check == CheckKind.Missings ? "has M" : check == CheckKind.Zeroes ? "has zero" : "";
+            var lines = new List<string>
+            {
+                "folder".PadRight(8) + "size (bytes)".PadLeft(14) + "   " + "modified".PadRight(21) + "series".PadLeft(8)
+                + (foundWord.Length > 0 ? "   " + foundWord.PadRight(9) : "   ") + "path"
+            };
             for (int s = 0; s < folderResult.SlotCount; s++)
             {
                 int i = Array.IndexOf(f.Slots, s);
                 string label = ("(" + (s + 1) + ")").PadRight(8);
                 if (i < 0)
                 {
-                    lines.Add(label + "not in this folder".PadLeft(16));
+                    lines.Add(label + "not in this folder".PadLeft(14));
                     continue;
                 }
-                lines.Add(label + f.Sizes[i].ToString("N0", Inv).PadLeft(16) + "   "
-                          + f.Modified[i].ToString("yyyy-MM-dd HH:mm:ss", Inv).PadRight(21) + f.FullPaths[i]);
+                CopyStats c = f.Copies[i];
+                string series = c == null || c.Error != null ? "?" : c.SeriesCount.ToString(Inv);
+                string flag = foundWord.Length == 0 ? "" : ((f.FoundInCopy != null && f.FoundInCopy[i]) ? "yes" : "no").PadRight(9) + "   ";
+                lines.Add(label + f.Sizes[i].ToString("N0", Inv).PadLeft(14) + "   "
+                          + f.Modified[i].ToString("yyyy-MM-dd HH:mm:ss", Inv).PadRight(21) + series.PadLeft(8) + "   "
+                          + flag + f.FullPaths[i]
+                          + (f.SameAs[i] != i ? "   (identical to folder " + (f.Slots[f.SameAs[i]] + 1) + ")" : ""));
+            }
+            if (f.IsComparison)
+            {
+                lines.Add("");
+                lines.Add("folders".PadRight(10) + "same series".PadRight(13) + "largest abs. diff.".PadLeft(20) + "largest rel. diff.".PadLeft(20) + "   differ");
+                for (int i = 0; i < f.Slots.Length; i++)
+                    for (int j = i + 1; j < f.Slots.Length; j++)
+                    {
+                        PairStats p = f.Pairs[i, j];
+                        string pair = ((f.Slots[i] + 1) + " and " + (f.Slots[j] + 1)).PadRight(10);
+                        if (p.Error != null)
+                        {
+                            lines.Add(pair + "could not be read: " + p.Error);
+                            continue;
+                        }
+                        lines.Add(pair + (p.StructureDiffers ? "no" : "yes").PadRight(13)
+                                  + FileComparison.FormatDiff(p, false).PadLeft(20) + FileComparison.FormatDiff(p, true).PadLeft(20)
+                                  + "   " + (p.Differs(settings) ? "yes" : "no"));
+                    }
             }
             lines.Add("");
-            if (f.Error != null) lines.Add("Could not be read: " + f.Error);
-            else if (!f.IsComparison) lines.Add("In one folder only: nothing to compare.");
-            else lines.Add(f.Differs ? "The contents differ (byte by byte). Click the file in the Files tab to compare its series."
-                                     : "The contents are identical.");
+            string error = f.Error;
+            if (error != null) lines.Add("Could not be read: " + error);
+            else if (f.Found) lines.Add("Found by the " + check.ToString().ToLowerInvariant() + " check: " + f.Why + ".");
+            else lines.Add("Not found by the " + check.ToString().ToLowerInvariant() + " check.");
+            lines.Add("All frequencies and periods of the (filtered) series are checked.");
             DevText.Text = string.Join("\r\n", lines);
             DevText.Select(0, 0);
             DevText.ScrollToHome();
@@ -1928,10 +1977,14 @@ namespace Gekko
 
         // ---------------------------------------------------------------- controls
 
+        /// <summary>"first 2" / "first 3" is shared by both states.</summary>
         void CompareMode_Changed(object sender, RoutedEventArgs e)
         {
             if (!ready || busy) return;
-            View.Compare3 = ReferenceEquals(sender, Compare3Radio);
+            compare3Choice = ReferenceEquals(sender, Compare3Radio);
+            // The other state only changes if its list is long enough for "first 3" to matter.
+            ObservableCollection<BankItem> otherList = state == CompareState.Datafiles ? folderItems : bankItems;
+            if (otherList.Count >= 3) MarkDirty(state == CompareState.Datafiles ? CompareState.Folders : CompareState.Datafiles, DirtyList);
             BanksChanged();
         }
 
@@ -2045,7 +2098,7 @@ namespace Gekko
                 }
                 try
                 {
-                    bankItems.Insert(at++, new BankItem(DatabankLoader.Load(path)));
+                    bankItems.Insert(at++, new BankItem(LoadBank(path)));
                     TouchRecent(false, path);
                     added++;
                 }
