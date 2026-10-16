@@ -10,8 +10,8 @@ using System.Windows.Shapes;
 namespace Gekko
 {
     /// <summary>
-    /// Bar chart per period over the whole universal period. The window has two of these, each in its own tab:
-    /// red: number of deviating series; blue: number of series with missing values (M).
+    /// Bar chart per period over the whole universal period: the number of series found by the current check
+    /// (series that differ, with missing values, or with zeroes).
     /// The selected periods (the period filter) are highlighted; bars outside them are paler.
     /// Click a bar: BarClicked(period, modifiers). Double-click: BarDoubleClicked(period).
     /// </summary>
@@ -23,9 +23,6 @@ namespace Gekko
         static readonly Brush DevBrush = BankColors.FromRgb(0xB8, 0x45, 0x3C);
         static readonly Brush DevHoverBrush = BankColors.FromRgb(0x7A, 0x22, 0x1C);
         static readonly Brush DevPaleBrush = BankColors.FromRgb(0xE3, 0xB5, 0xB1);
-        static readonly Brush MissBrush = BankColors.FromRgb(0x2E, 0x6D, 0xB4);
-        static readonly Brush MissHoverBrush = BankColors.FromRgb(0x1A, 0x44, 0x75);
-        static readonly Brush MissPaleBrush = BankColors.FromRgb(0xB4, 0xC9, 0xE4);
         static readonly Brush SelectionBand = BankColors.FromArgb(0x22, 0x60, 0x60, 0x60);
         static readonly Brush AxisBrush = BankColors.FromRgb(0x88, 0x88, 0x88);
         static readonly Brush GridBrush = BankColors.FromRgb(0xE6, 0xE6, 0xE6);
@@ -36,7 +33,7 @@ namespace Gekko
         CompareFreq freq;
         int start;
         int[] counts;
-        bool deviations = true;
+        string itemPhrase = "series";
         Func<int, string> extraTip;
         int? highlightFrom;
         int? highlightTo;
@@ -50,13 +47,13 @@ namespace Gekko
         }
 
         /// <summary>
-        /// counts start at firstPeriod. showsDeviations: red bars, otherwise blue. tip (may be null) adds a line to a
-        /// bar's tooltip. highlightFrom/To: the selected periods, or null for no period filter.
+        /// counts start at firstPeriod. phrase: what a bar counts, e.g. "series with missing values" (for tooltips).
+        /// tip (may be null) adds a line to a bar's tooltip. highlightFrom/To: the selected periods, or null.
         /// </summary>
-        public void SetData(string newTitle, CompareFreq newFreq, int firstPeriod, int[] newCounts, bool showsDeviations,
+        public void SetData(string newTitle, CompareFreq newFreq, int firstPeriod, int[] newCounts, string phrase,
                             Func<int, string> tip, int? from, int? to)
         {
-            deviations = showsDeviations;
+            itemPhrase = phrase ?? "series";
             title = newTitle ?? "";
             freq = newFreq;
             start = firstPeriod;
@@ -121,8 +118,7 @@ namespace Gekko
             {
                 double baseY = Math.Round(top + ph) + 0.5;
                 Children.Add(new Line { X1 = left, X2 = left + pw, Y1 = baseY, Y2 = baseY, Stroke = AxisBrush, StrokeThickness = 1 });
-                AddCenteredText(deviations ? "No deviations in this selection." : "No missing values in this selection.",
-                                12, left, pw, top + ph / 2);
+                AddCenteredText("No " + itemPhrase + " in this selection.", 12, left, pw, top + ph / 2);
                 DrawYears(left, top, ph, slot, n);
                 return;
             }
@@ -147,11 +143,11 @@ namespace Gekko
 
             // Bars. A transparent full-height column per period makes thin (monthly) bars easy to hit.
             double barWidth = slot >= 4 ? slot * 0.75 : Math.Max(1, slot);
-            Brush hover = deviations ? DevHoverBrush : MissHoverBrush;
+            Brush hover = DevHoverBrush;
             for (int i = 0; i < n; i++)
             {
                 int period = start + i;
-                Brush normal = IsHighlighted(period) ? (deviations ? DevBrush : MissBrush) : (deviations ? DevPaleBrush : MissPaleBrush);
+                Brush normal = IsHighlighted(period) ? DevBrush : DevPaleBrush;
                 Rectangle bar = null;
                 if (counts[i] > 0)
                 {
@@ -160,10 +156,7 @@ namespace Gekko
                     Add(bar, left + i * slot + (slot - barWidth) / 2, top + ph - h);
                 }
 
-                string tip = PeriodText.Format(freq, period) + ": " + counts[i]
-                             + (deviations
-                                 ? (counts[i] == 1 ? " series deviates" : " series deviate")
-                                 : (counts[i] == 1 ? " series with missing values" : " series with missing values"));
+                string tip = PeriodText.Format(freq, period) + ": " + counts[i] + " " + itemPhrase;
                 string more = extraTip?.Invoke(period);
                 if (!string.IsNullOrEmpty(more)) tip += "\n" + more;
                 tip += "\nClick: select this period (Shift: extend, Ctrl: add to the filter). Double-click: list the names.";

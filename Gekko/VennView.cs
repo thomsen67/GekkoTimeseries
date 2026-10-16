@@ -15,13 +15,13 @@ namespace Gekko
     {
         static readonly Color[] Palette =
         {
-            Color.FromRgb(0x3D, 0x8C, 0x4E),  // bank 1 (bottom left): green
-            Color.FromRgb(0x2E, 0x6D, 0xB4),  // bank 2 (bottom right): blue
-            Color.FromRgb(0xC9, 0x6A, 0x1E)   // bank 3 (top): amber (red is used for deviations)
+            Color.FromRgb(0x3D, 0x8C, 0x4E),  // bank/folder 1 (top left): green
+            Color.FromRgb(0x2E, 0x6D, 0xB4),  // bank/folder 2 (top right): blue
+            Color.FromRgb(0xC9, 0x6A, 0x1E)   // bank/folder 3 (bottom): amber (red is used for what the check finds)
         };
         static readonly Color Grey = Color.FromRgb(0xA6, 0xA6, 0xA6);
 
-        /// <summary>Dark red of the deviation numbers, also used for deviating names in the Names tab.</summary>
+        /// <summary>Dark red of the "found" numbers, also used for found names/files in the Names/Files tab.</summary>
         public static readonly Brush DeviationText = FromRgb(0xB0, 0x30, 0x30);
 
         public static Color ColorOf(int slot)
@@ -61,20 +61,21 @@ namespace Gekko
     public enum AreaClickKind { Area, Total, Deviating }
 
     /// <summary>
-    /// Venn diagram for 2 or 3 banks. Bank 1 is top-left, bank 2 top-right, bank 3 at the bottom.
-    /// The 2-bank diagram is the 3-bank diagram without the bottom circle: same positions, same size,
-    /// but without the vertical room the bottom circle needs (the window gives that room to the tabs).
+    /// Venn diagram for 2 or 3 banks or folders (anything implementing IVennModel). Slot 1 is top-left,
+    /// slot 2 top-right, slot 3 at the bottom. The 2-slot diagram is the 3-slot diagram without the bottom
+    /// circle: same positions, same size, but without the vertical room the bottom circle needs (the window
+    /// gives that room to the tabs).
     ///
-    /// Each area shows two numbers for the current period filter:
-    ///   black: all series in the area,
-    ///   red:   series deviating in at least one selected period (areas with 2 or 3 banks).
+    /// Each area shows two numbers:
+    ///   black: all items (series or files) in the area,
+    ///   red:   the items found by the current check (e.g. series that differ, files that differ).
     ///
     /// Clicks (the window turns them into drill-down filters):
     ///   inside an area                     -> AreaClicked(mask, Area, ctrl)
     ///   black / red number                 -> AreaClicked(mask, Total / Deviating, ctrl)
-    ///   a bank label (box)                 -> BankSelected(slot): the whole bank
-    ///   the eye icon on a bank label       -> HideClicked(slot)
-    ///   the target icon on a bank label    -> FocusClicked(slot)
+    ///   a box (bank or folder)             -> BankSelected(slot): the whole bank/folder
+    ///   the eye icon on a box              -> HideClicked(slot)
+    ///   the target icon on a box           -> FocusClicked(slot)
     /// </summary>
     public sealed class VennView : Canvas
     {
@@ -104,12 +105,11 @@ namespace Gekko
         static readonly Brush IconBrush = BankColors.FromRgb(0x66, 0x66, 0x66);
         static readonly Brush IconHoverBack = BankColors.FromArgb(0x1C, 0, 0, 0);
 
-        VennResult result;
+        IVennModel model;
         string emptyMessage = "";
         int selectedMask;
         int selectedBank = -1;
-        FlagFilter missingFilter;
-        FlagFilter deviatesFilter;
+        FlagFilter foundFilter;
         int focusSlot = -1;
         readonly Dictionary<int, Path> areaPaths = new Dictionary<int, Path>();
         Ellipse[] circleShapes = new Ellipse[0];
@@ -125,17 +125,15 @@ namespace Gekko
 
         /// <summary>
         /// Everything the diagram shows, in one call (one redraw). The selection is either an area (mask != 0)
-        /// or a whole bank (bank >= 0). The flag filters decide which number of the selected area is bold.
+        /// or a whole bank/folder (bank >= 0). The found filter decides which number of the selected area is bold.
         /// </summary>
-        public void SetState(VennResult newResult, string messageWhenEmpty, int mask, int bank,
-                             FlagFilter missing, FlagFilter deviates, int focus)
+        public void SetState(IVennModel newModel, string messageWhenEmpty, int mask, int bank, FlagFilter found, int focus)
         {
-            result = newResult;
+            model = newModel;
             emptyMessage = messageWhenEmpty ?? "";
             selectedMask = mask;
             selectedBank = bank;
-            missingFilter = missing;
-            deviatesFilter = deviates;
+            foundFilter = found;
             focusSlot = focus;
             Rebuild();
         }
@@ -175,29 +173,29 @@ namespace Gekko
 
             double width = ActualWidth, height = ActualHeight;
             if (width < 120 || height < 120) return;
-            if (result == null)
+            if (model == null)
             {
                 AddCenteredMessage(emptyMessage, width, height);
                 return;
             }
 
-            bool three = result.SlotCount == 3;
+            bool three = model.SlotCount == 3;
             // Horizontally the layout is always the 3-circle layout, so circles keep their size and place in 2-bank mode.
             Point[] unit3 = { new Point(-0.5, -H3), new Point(0.5, -H3), new Point(0, T3) };
-            Point[] unit = unit3.Take(result.SlotCount).ToArray();
-            double yMax = YMax(result.SlotCount);
+            Point[] unit = unit3.Take(model.SlotCount).ToArray();
+            double yMax = YMax(model.SlotCount);
 
-            double r = RadiusFor(width, height, result.SlotCount);
+            double r = RadiusFor(width, height, model.SlotCount);
             double ox = width / 2;
             double oy = TopMargin + ((height - TopMargin - BottomMargin) - (yMax - YMin) * r) / 2 - YMin * r;
             Func<Point, Point> toPixel = p => new Point(ox + p.X * r, oy + p.Y * r);
             Point[] centers = unit.Select(toPixel).ToArray();
 
             // Circles. A selected whole bank gets a solid, thicker outline in its color.
-            circleShapes = new Ellipse[result.SlotCount];
-            for (int s = 0; s < result.SlotCount; s++)
+            circleShapes = new Ellipse[model.SlotCount];
+            for (int s = 0; s < model.SlotCount; s++)
             {
-                bool on = result.Active[s];
+                bool on = model.Active[s];
                 var circle = new Ellipse
                 {
                     Width = 2 * r,
@@ -218,9 +216,9 @@ namespace Gekko
 
             // Areas as exact shapes, so hovering shows precisely which region a number belongs to.
             Geometry[] circles = centers.Select(c => (Geometry)new EllipseGeometry(c, r, r)).ToArray();
-            foreach (VennArea area in result.Areas.Values)
+            foreach (int areaMask in model.AreaMasks)
             {
-                int mask = area.Mask;
+                int mask = areaMask;
                 bool selected = mask == selectedMask;
                 var path = new Path
                 {
@@ -238,20 +236,21 @@ namespace Gekko
             }
 
             // Numbers
-            foreach (VennArea area in result.Areas.Values)
+            foreach (int mask in model.AreaMasks)
             {
-                Point p = toPixel(LabelPoint(three, area.Mask));
-                FrameworkElement label = BuildAreaLabel(area);
+                Point p = toPixel(LabelPoint(three, mask));
+                FrameworkElement label = BuildAreaLabel(mask);
                 label.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
                 Add(label, p.X - label.DesiredSize.Width / 2, p.Y - label.DesiredSize.Height / 2);
             }
 
-            // Bank labels with the eye (hide/show) and target (focus) icons
-            for (int s = 0; s < result.SlotCount; s++) AddBankTag(s, centers[s], r, width);
+            // Boxes (banks or folders) with the eye (hide/show) and target (focus) icons
+            for (int s = 0; s < model.SlotCount; s++) AddBankTag(s, centers[s], r, width);
 
-            idleCaption = focusSlot >= 0 && focusSlot < result.SlotCount
-                ? "Focus on bank " + (focusSlot + 1) + ": the other banks are greyed out. Click its target (or Alt+" + (focusSlot + 1) + ") to show them again."
-                : "Black: all series. Red: deviating. Click a number or an area. Click a bank's box for the whole bank.";
+            string word = model.SlotWord;
+            idleCaption = focusSlot >= 0 && focusSlot < model.SlotCount
+                ? "Focus on " + word + " " + (focusSlot + 1) + ": the other " + word + "s are greyed out. Click its target (or Alt+" + (focusSlot + 1) + ") to show them again."
+                : "Black: all " + model.ItemWord + ". Red: " + model.FoundPhrase + ". Click a number or an area. Click a " + word + "'s box for the whole " + word + ".";
             caption = new TextBlock { FontSize = 12, Foreground = TextBrush, TextTrimming = TextTrimming.CharacterEllipsis, Width = width - 4 };
             caption.Text = SelectionCaption() ?? idleCaption;
             Add(caption, 2, height - 20);
@@ -279,7 +278,7 @@ namespace Gekko
             }
             for (int s = 0; s < circles.Length; s++)
             {
-                if ((mask & (1 << s)) != 0 || !result.Active[s]) continue;
+                if ((mask & (1 << s)) != 0 || !model.Active[s]) continue;
                 g = new CombinedGeometry(GeometryCombineMode.Exclude, g, circles[s]);
             }
             return g;
@@ -313,45 +312,42 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Black number on top; below it red (deviating, only for 2 or 3 banks).
-        /// Numbers are normal weight; in the selected area the number matching the deviation filter is bold.
+        /// Black number on top; below it the red number in parentheses (what the current check finds; not shown
+        /// where the check has nothing to look at, e.g. differences in a one-bank area).
+        /// Numbers are normal weight; in the selected area the number matching the found filter is bold.
         /// </summary>
-        FrameworkElement BuildAreaLabel(VennArea area)
+        FrameworkElement BuildAreaLabel(int mask)
         {
-            int mask = area.Mask;
             bool selected = mask == selectedMask;
-            AreaCounts counts;
-            if (!result.Counts.TryGetValue(mask, out counts)) counts = new AreaCounts { Total = area.Series.Count };
-            string period = result.CountPeriodText;
+            AreaCounts counts = model.AreaCountsOf(mask);
 
             var panel = new StackPanel { Background = Brushes.Transparent, Cursor = Cursors.Hand };
 
             var totalText = new TextBlock
             {
                 Text = counts.Total.ToString(CultureInfo.InvariantCulture),
-                FontWeight = selected && deviatesFilter != FlagFilter.Yes ? FontWeights.Bold : FontWeights.Normal,
+                FontWeight = selected && foundFilter != FlagFilter.Yes ? FontWeights.Bold : FontWeights.Normal,
                 Foreground = NumberBrush,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 Padding = new Thickness(4, 0, 4, 0),
-                ToolTip = counts.Total + " series. Click to list all of them."
+                ToolTip = counts.Total + " " + model.ItemWord + ". Click to list all of them."
             };
             MakeClickable(totalText, () => RaiseArea(mask, AreaClickKind.Total));
             panel.Children.Add(totalText);
 
-            if (area.IsComparison)
+            if (model.ShowsFound(mask))
             {
-                var devText = new TextBlock
+                var foundText = new TextBlock
                 {
-                    Text = "(" + counts.Deviating.ToString(CultureInfo.InvariantCulture) + ")",
-                    FontWeight = selected && deviatesFilter == FlagFilter.Yes ? FontWeights.Bold : FontWeights.Normal,
-                    Foreground = counts.Deviating > 0 ? DeviationBrush : MutedBrush,
+                    Text = "(" + counts.Found.ToString(CultureInfo.InvariantCulture) + ")",
+                    FontWeight = selected && foundFilter == FlagFilter.Yes ? FontWeights.Bold : FontWeights.Normal,
+                    Foreground = counts.Found > 0 ? DeviationBrush : MutedBrush,
                     HorizontalAlignment = HorizontalAlignment.Center,
                     Padding = new Thickness(4, 0, 4, 1),
-                    ToolTip = counts.Deviating + " of " + counts.Total + " series deviate" + period
-                              + ". Click to list only these, and to see the deviations histogram."
+                    ToolTip = model.FoundText(counts) + ". Click to list only these."
                 };
-                MakeClickable(devText, () => RaiseArea(mask, AreaClickKind.Deviating));
-                panel.Children.Add(devText);
+                MakeClickable(foundText, () => RaiseArea(mask, AreaClickKind.Deviating));
+                panel.Children.Add(foundText);
             }
 
             panel.MouseEnter += (o, e) => Hover(mask, true);
@@ -372,10 +368,10 @@ namespace Gekko
 
         void AddBankTag(int s, Point center, double r, double canvasWidth)
         {
-            bool on = result.Active[s];
+            bool on = model.Active[s];
             bool focused = focusSlot == s;
             bool anyFocus = focusSlot >= 0;
-            CompareBank bank = result.Banks[s];
+            string word = model.SlotWord;
             int slot = s;
 
             var badge = new Border
@@ -398,7 +394,7 @@ namespace Gekko
             var lines = new StackPanel();
             lines.Children.Add(new TextBlock
             {
-                Text = bank.Name,
+                Text = model.SlotName(s),
                 FontWeight = FontWeights.SemiBold,
                 Foreground = on ? TotalBrush : MutedBrush,
                 MaxWidth = 140,
@@ -406,7 +402,7 @@ namespace Gekko
             });
             lines.Children.Add(new TextBlock
             {
-                Text = on ? result.BankSpanText(s) : (anyFocus ? "greyed out by the focus" : "hidden"),
+                Text = on ? model.SlotInfo(s) : (anyFocus ? "greyed out by the focus" : "hidden"),
                 FontSize = 11,
                 Foreground = MutedBrush,
                 MaxWidth = 140,
@@ -415,14 +411,14 @@ namespace Gekko
 
             // Eye: hide or show this bank. Target: focus on this bank (grey out the others) or end the focus.
             string eyeTip;
-            if (!on) eyeTip = anyFocus ? "Show this bank again (ends the focus)" : "Show this bank again";
-            else if (focused) eyeTip = "This bank is in focus. Click its target to show the other banks again.";
-            else if (result.ActiveCount > 1) eyeTip = "Hide this bank";
-            else eyeTip = "This is the only bank shown, so it cannot be hidden";
+            if (!on) eyeTip = anyFocus ? "Show this " + word + " again (ends the focus)" : "Show this " + word + " again";
+            else if (focused) eyeTip = "This " + word + " is in focus. Click its target to show the other " + word + "s again.";
+            else if (model.ActiveCount > 1) eyeTip = "Hide this " + word;
+            else eyeTip = "This is the only " + word + " shown, so it cannot be hidden";
             string key = " (Alt+" + (s + 1) + ")";
             string targetTip = focused
-                ? "End the focus: show the other banks again" + key
-                : "Focus on this bank: grey out the others" + key;
+                ? "End the focus: show the other " + word + "s again" + key
+                : "Focus on this " + word + ": grey out the others" + key;
 
             var icons = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(6, 0, 0, 0) };
             icons.Children.Add(IconButton(EyeIcon(!on, on ? IconBrush : MutedBrush), eyeTip, null, () => HideClicked?.Invoke(slot)));
@@ -445,10 +441,10 @@ namespace Gekko
                 Background = Brushes.White
             };
 
-            string tip = bank.FilePath ?? (bank.Name + " (artificial data)");
+            string tip = model.SlotTip(s);
             if (on)
             {
-                tip += "\nClick to select the whole bank.";
+                tip += "\nClick to select the whole " + word + ".";
                 tag.Cursor = Cursors.Hand;
                 tag.MouseEnter += (o, e) => HoverBank(slot, true);
                 tag.MouseLeave += (o, e) => HoverBank(slot, false);
@@ -456,7 +452,7 @@ namespace Gekko
             }
             else
             {
-                tip += "\nUse the eye to show this bank again.";
+                tip += "\nUse the eye to show this " + word + " again.";
             }
             tag.ToolTip = tip;
 
@@ -485,7 +481,7 @@ namespace Gekko
             Add(tag, Math.Max(2, left), Math.Max(2, topPos));
         }
 
-        /// <summary>A small flat icon button. Its click does not also count as a click on the bank label.</summary>
+        /// <summary>A small flat icon button. Its click does not also count as a click on the box.</summary>
         static FrameworkElement IconButton(UIElement icon, string tip, Brush activeBack, Action onClick)
         {
             Brush normalBack = activeBack ?? Brushes.Transparent;
@@ -552,31 +548,29 @@ namespace Gekko
             Path path;
             if (!areaPaths.TryGetValue(mask, out path)) return;
             path.Fill = entering ? HoverFill : (mask == selectedMask ? SelectedFill : Brushes.Transparent);
-            if (caption != null) caption.Text = entering ? CompareEngine.SummarizeArea(result, mask) : (SelectionCaption() ?? idleCaption);
+            if (caption != null) caption.Text = entering ? model.Summarize(mask) : (SelectionCaption() ?? idleCaption);
         }
 
-        /// <summary>Hovering a bank label previews the whole-bank outline.</summary>
+        /// <summary>Hovering a box previews the whole-bank/folder outline.</summary>
         void HoverBank(int slot, bool entering)
         {
-            if (slot >= circleShapes.Length || !result.Active[slot]) return;
+            if (slot >= circleShapes.Length || !model.Active[slot]) return;
             SetCircleOutline(circleShapes[slot], slot, entering || slot == selectedBank);
             if (caption != null) caption.Text = entering ? BankCaption(slot) : (SelectionCaption() ?? idleCaption);
         }
 
         string BankCaption(int slot)
         {
-            AreaCounts c = result.BankCounts[slot] ?? new AreaCounts { Total = result.BankSeriesCount[slot] };
-            return "All of bank " + (slot + 1) + " (" + result.Banks[slot].Name + "): "
-                   + CompareEngine.DescribeCounts(result, c, result.ActiveCount > 1);
+            return model.SummarizeWhole(slot);
         }
 
         string SelectionCaption()
         {
-            if (result == null) return null;
-            if (selectedBank >= 0 && selectedBank < result.SlotCount && result.Active[selectedBank])
+            if (model == null) return null;
+            if (selectedBank >= 0 && selectedBank < model.SlotCount && model.Active[selectedBank])
                 return "Selected: " + BankCaption(selectedBank);
-            if (selectedMask == 0 || !result.Areas.ContainsKey(selectedMask)) return null;
-            return "Selected: " + CompareEngine.SummarizeArea(result, selectedMask);
+            if (selectedMask == 0 || !model.AreaMasks.Contains(selectedMask)) return null;
+            return "Selected: " + model.Summarize(selectedMask);
         }
 
         void AddCenteredMessage(string text, double width, double height)

@@ -1,10 +1,14 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -16,7 +20,7 @@ using System.Windows.Threading;
 
 namespace Gekko
 {
-    /// <summary>One row in the numbered bank list.</summary>
+    /// <summary>One row in the numbered list: a databank (Datafiles state) or a folder (Folders state).</summary>
     public sealed class BankItem : INotifyPropertyChanged
     {
         static readonly Brush GreyNumber = BankColors.FromRgb(0xB4, 0xB4, 0xB4);
@@ -25,38 +29,74 @@ namespace Gekko
         bool inComparison;
         bool hiddenInDiagram;
         bool isDragging;
+        string contents;
 
         public BankItem(CompareBank bank)
         {
             Bank = bank;
         }
 
-        /// <summary>The empty row always at the end of the list (no bank). Its [Recent] button adds a bank.</summary>
-        public static BankItem CreatePlaceholder()
+        /// <summary>A row for a folder (Folders state).</summary>
+        public static BankItem ForFolder(string path)
         {
-            return new BankItem(null);
+            return new BankItem((CompareBank)null) { FolderPath = path, IsFolderRow = true };
+        }
+
+        /// <summary>The empty row always at the end of the list (no bank or folder). Its [Recent] button adds one.</summary>
+        public static BankItem CreatePlaceholder(bool folderList)
+        {
+            return new BankItem((CompareBank)null) { IsFolderRow = folderList };
         }
 
         public CompareBank Bank { get; }
-        public bool IsPlaceholder => Bank == null;
-        public string Name => IsPlaceholder ? "" : Bank.Name;
-        public string PathText => IsPlaceholder ? "(empty: use Recent, or drop a file here)" : Bank.FilePath ?? "(artificial data)";
+        public string FolderPath { get; private set; }
+        public bool IsFolderRow { get; private set; }
+        public bool IsPlaceholder => Bank == null && FolderPath == null;
 
-        /// <summary>E.g. "A 380, Q 200, M 70".</summary>
+        /// <summary>The file or folder path that identifies the row (null for artificial data and the empty row).</summary>
+        public string SourcePath => FolderPath ?? Bank?.FilePath;
+
+        public string Name => Bank != null ? Bank.Name : FolderPath != null ? FolderResult.FolderName(FolderPath) : "";
+
+        public string PathText
+        {
+            get
+            {
+                if (IsPlaceholder) return IsFolderRow ? "(empty: use Recent, or drop a folder here)" : "(empty: use Recent, or drop a file here)";
+                return FolderPath ?? Bank.FilePath ?? "(artificial data)";
+            }
+        }
+
+        /// <summary>Banks: e.g. "A 380, Q 200, M 70". Folders: e.g. "812 data files" (set when compared).</summary>
         public string SeriesText
         {
             get
             {
                 if (IsPlaceholder) return "";
+                if (Bank == null) return contents ?? "";
                 return string.Join(", ", Bank.Frequencies.Select(f => f.ToString().Substring(0, 1) + " " + Bank.Count(f)));
             }
         }
 
+        public void SetContents(string text)
+        {
+            contents = text;
+            Raise(nameof(SeriesText));
+        }
+
         /// <summary>The number badge and the remove (X) button are not shown on the empty row.</summary>
         public Visibility RowVisibility => IsPlaceholder ? Visibility.Collapsed : Visibility.Visible;
-        public string RecentTip => IsPlaceholder
-            ? "Add one of the most recently compared databanks"
-            : "Replace this databank with one of the most recently compared databanks";
+
+        public string RecentTip
+        {
+            get
+            {
+                string what = IsFolderRow ? "folder" : "databank";
+                return IsPlaceholder
+                    ? "Add one of the most recently compared " + what + "s"
+                    : "Replace this " + what + " with one of the most recently compared " + what + "s";
+            }
+        }
 
         public int Position
         {
@@ -70,7 +110,7 @@ namespace Gekko
             }
         }
 
-        /// <summary>True for the first 2 or 3 banks, which are the ones in the diagram.</summary>
+        /// <summary>True for the first 2 or 3 rows, which are the ones in the diagram.</summary>
         public bool InComparison
         {
             get { return inComparison; }
@@ -84,7 +124,7 @@ namespace Gekko
             }
         }
 
-        /// <summary>True when the bank is compared but hidden (eye icon) or greyed out by a focus on another bank.</summary>
+        /// <summary>True when the row is compared but hidden (eye icon) or greyed out by a focus on another one.</summary>
         public bool HiddenInDiagram
         {
             get { return hiddenInDiagram; }
@@ -109,7 +149,7 @@ namespace Gekko
             }
         }
 
-        /// <summary>The number badge has the circle's color for compared banks that are shown, grey otherwise.</summary>
+        /// <summary>The number badge has the circle's color for compared rows that are shown, grey otherwise.</summary>
         public Brush NumberBrush => InComparison && !HiddenInDiagram ? BankColors.Solid(Position - 1) : GreyNumber;
         public double ItemOpacity => InComparison || IsPlaceholder ? 1.0 : 0.6;
 
@@ -121,60 +161,118 @@ namespace Gekko
         }
     }
 
+    /// <summary>One line in the Files tab (Folders state).</summary>
+    public sealed class FileRow
+    {
+        public FileComparison File { get; set; }
+        public string Text { get; set; }
+        public Brush Foreground { get; set; }
+        public string Tip { get; set; }
+        public Cursor Cursor { get; set; }
+    }
+
+    /// <summary>
+    /// Compares 2 or 3 databanks ("Datafiles" state: series inside) or 2 or 3 folders ("Folders" state: data files
+    /// inside). Both states share the list at the top, the Venn diagram, the controls and the tabs; each state keeps
+    /// its own list, comparison and selection, so switching back and forth loses nothing. Clicking a file found in
+    /// several folders opens those files in the Datafiles state.
+    /// </summary>
     public partial class WindowBankCompare : Window
     {
+        enum CompareState { Datafiles, Folders }
+
+        /// <summary>The view settings of one state, swapped in and out when switching state.</summary>
+        sealed class ViewState
+        {
+            public int SelectedMask;
+            public int SelectedBank = -1;
+            public FlagFilter Found = FlagFilter.Any;
+            public int FocusSlot = -1;
+            public bool[] ActiveBeforeFocus;
+            public bool[] Active = { true, true, true };
+            public bool Compare3 = true;  // the user's choice; "first 3" is used when the list has 3 or more
+            public CheckKind Check = CheckKind.Differences;
+        }
+
         const string DragFormat = "GekkoBankCompareItem";
         static readonly Brush DropHighlight = BankColors.FromRgb(0x2E, 0x6D, 0xB4);
         static readonly Brush DropNormal = BankColors.FromRgb(0x99, 0x99, 0x99);
         static readonly Brush InvalidBack = BankColors.FromRgb(0xFB, 0xE3, 0xE3);
         static readonly Brush AutoPeriodBrush = BankColors.FromRgb(0x88, 0x88, 0x88);
-        // Deviating names in the Names tab, same dark red as the deviation numbers in the diagram.
+        // Found names/files in the Names/Files tab, same dark red as the red numbers in the diagram.
         static readonly Brush DeviatingNameBrush = BankColors.DeviationText;
         static readonly Brush RecentPathBrush = BankColors.FromRgb(0x88, 0x88, 0x88);
+        static readonly CultureInfo Inv = CultureInfo.InvariantCulture;
 
-        // Length of the "Recent" list (LRU, stored in the user settings).
+        // Length of the "Recent" lists (LRU, stored in the user settings).
         const int MaxRecentBanks = 20;
         const char RecentSeparator = '|';  // cannot occur in a Windows path
 
-        readonly ObservableCollection<BankItem> banks = new ObservableCollection<BankItem>();
-        // The list shows the banks plus an empty row at the end (never part of 'banks').
-        readonly BankItem placeholder = BankItem.CreatePlaceholder();
-        readonly IEqualityCriterion criterion = new SimpleEqualityCriterion();
-        readonly bool[] active = { true, true, true };
+        // ---- The two states. 'banks' is the list of the current state, so the list code serves both.
+        CompareState state = CompareState.Datafiles;
+        readonly ObservableCollection<BankItem> bankItems = new ObservableCollection<BankItem>();
+        readonly ObservableCollection<BankItem> folderItems = new ObservableCollection<BankItem>();
+        readonly CompositeCollection bankListSource;
+        readonly CompositeCollection folderListSource;
+        readonly ViewState datafilesView = new ViewState();
+        readonly ViewState foldersView = new ViewState();
+        // What a state needs when it is shown again, after changes made while the other state was shown:
+        // DirtyRecompute (the filter or a threshold changed) or DirtyList (its list changed: BanksChanged).
+        const int DirtyNone = 0, DirtyRecompute = 1, DirtyList = 2;
+        int datafilesDirty;
+        int foldersDirty;
+
+        ObservableCollection<BankItem> banks => state == CompareState.Folders ? folderItems : bankItems;
+        ViewState View => state == CompareState.Folders ? foldersView : datafilesView;
+        IVennModel Model => state == CompareState.Folders ? (IVennModel)folderResult : current;
+
+        readonly CheckSettings settings = new CheckSettings();
+        bool[] active = { true, true, true };
         readonly DispatcherTimer recomputeTimer;
         bool ready;
         bool busy;
 
-        VennResult current;
+        VennResult current;          // Datafiles state
+        FolderResult folderResult;   // Folders state
+        CancellationTokenSource folderCts;
+        int folderGeneration;
+        bool folderComputing;
+        string folderStatus;   // the last folder comparison's summary (or error), shown again with the Folders state
+        bool folderFailed;     // the last folder comparison failed: do not start it again just by showing the state
+        readonly ConcurrentDictionary<string, bool> sameCache = new ConcurrentDictionary<string, bool>();
+        FileComparison openedFrom;   // the folder file the datafiles were opened from, if any
 
-        // ---- Scope: which banks are shown (eye icons) and the focus (target icon, Alt+1/2/3).
-        // focusSlot is the only bank shown, or -1. activeBeforeFocus is the hide/show state to return to.
+        // ---- Scope: which banks/folders are shown (eye icons) and the focus (target icon, Alt+1/2/3).
+        // focusSlot is the only one shown, or -1. activeBeforeFocus is the hide/show state to return to.
         int focusSlot = -1;
         bool[] activeBeforeFocus;
 
-        // ---- Drill-down filters (the "pivot"). Changing them never recomputes, it only re-filters.
-        //   Area:     one area (selectedMask != 0) or a whole bank (selectedBank >= 0), or nothing.
-        //   Period:   userFrom..userTo (the From/To boxes); null means the edge of the universal period.
-        //   Flags:    deviatesFilter and missingFilter, each Any / Yes / No.
-        // A series passes when it is in the area, and its flags in the selected periods match the flag filters.
+        // ---- The check (tabs at the bottom of the controls panel) and the drill-down filters.
+        //   Check:  Differences, Missings or Zeroes (Folders: Differences only, byte by byte).
+        //   Area:   one area (selectedMask != 0) or a whole bank/folder (selectedBank >= 0), or nothing.
+        //   Period: userFrom..userTo (the From/To boxes, Datafiles only); null means the edge of the universal period.
+        //   Found:  foundFilter, Any or Yes (the red number / a histogram bar): only what the check finds.
+        CheckKind check = CheckKind.Differences;
         int selectedMask;
         int selectedBank = -1;
-        FlagFilter deviatesFilter = FlagFilter.Any;
-        FlagFilter missingFilter = FlagFilter.Any;
+        FlagFilter foundFilter = FlagFilter.Any;
         int? userFrom;
         int? userTo;
         int? periodAnchor;  // the first bar clicked, for Shift+click ranges
         CompareFreq? periodFreq;
 
-        Selection selection;                                              // the area filter, resolved
-        List<SeriesComparison> shown = new List<SeriesComparison>();      // series passing all filters
+        Selection selection;                                              // Datafiles: the area filter, resolved
+        List<SeriesComparison> shown = new List<SeriesComparison>();      // Datafiles: series passing all filters
+        FileSelection fileSelection;                                      // Folders: the area filter, resolved
+        List<FileComparison> shownFiles = new List<FileComparison>();     // Folders: files passing all filters
 
         List<SeriesComparison> navList = new List<SeriesComparison>();
         int navIndex = -1;
+        List<FileComparison> fileNav = new List<FileComparison>();
+        int fileNavIndex = -1;
         DeviationListing listing;
-        const string NoSelectionMessage = "Click a number, an area or a bank in the diagram.";
+        const string NoSelectionMessage = "Click a number, an area or a box in the diagram.";
         string devMessage = NoSelectionMessage;
-        bool histogramShowsDeviations;  // which histogram is shown: deviations (2 or 3 circles) or missings (1 circle)
 
         // The Names tab is a RichTextBox (for the dark red names), so keep the plain text for Copy.
         string namesPlainText = "";
@@ -191,11 +289,17 @@ namespace Gekko
         public WindowBankCompare()
         {
             InitializeComponent();
-            BankList.ItemsSource = new CompositeCollection
+            bankListSource = new CompositeCollection
             {
-                new CollectionContainer { Collection = banks },
-                placeholder
+                new CollectionContainer { Collection = bankItems },
+                BankItem.CreatePlaceholder(false)
             };
+            folderListSource = new CompositeCollection
+            {
+                new CollectionContainer { Collection = folderItems },
+                BankItem.CreatePlaceholder(true)
+            };
+            BankList.ItemsSource = bankListSource;
             RestoreWindowPlacement();
 
             recomputeTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(300) };
@@ -205,17 +309,20 @@ namespace Gekko
             Venn.BankSelected += Venn_BankSelected;
             Venn.HideClicked += ToggleHidden;
             Venn.FocusClicked += ToggleFocus;
-            Histogram.BarClicked += (period, keys) => Bar_Clicked(period, keys, histogramShowsDeviations);
+            Histogram.BarClicked += Bar_Clicked;
             Histogram.BarDoubleClicked += period => Tabs.SelectedItem = NamesTab;
 
+            ReadThresholds();
+
             // Artificial demo banks. Dropped files also get artificial data, see DatabankLoader.
-            banks.Add(new BankItem(ArtificialData.CreateBank("base_2024.gbk", null)));
-            banks.Add(new BankItem(ArtificialData.CreateBank("base_2025.gbk", null)));
-            banks.Add(new BankItem(ArtificialData.CreateBank("forecast_2025.gbk", null)));
+            bankItems.Add(new BankItem(ArtificialData.CreateBank("base_2024.gbk", null)));
+            bankItems.Add(new BankItem(ArtificialData.CreateBank("base_2025.gbk", null)));
+            bankItems.Add(new BankItem(ArtificialData.CreateBank("forecast_2025.gbk", null)));
 
             ready = true;
+            UpdateStateControls();
             BanksChanged();
-            SetStatus("Three databanks with artificial data are loaded. Drop files to add banks, drag rows to reorder.");
+            SetStatus("Three databanks with artificial data are loaded. Drop files or folders to compare them, drag rows to reorder.");
         }
 
         int SlotCount => Compare3Radio.IsChecked == true && banks.Count >= 3 ? 3 : 2;
@@ -287,13 +394,13 @@ namespace Gekko
                 }
             }
 
-            // The saved height is for 3 circles; shrink it if the window starts out comparing 2 banks.
+            // The saved height is for 3 circles; shrink it if the window starts out comparing 2.
             UpdateLayout();
-            if (current != null) FitVennRow(current.SlotCount);
+            if (Model != null) FitVennRow(Model.SlotCount);
         }
 
         /// <summary>
-        /// Going from 3 to 2 circles removes the room the top circle took, and gives it to the tabs
+        /// Going from 3 to 2 circles removes the room the bottom circle took, and gives it to the tabs
         /// below; going back from 2 to 3 takes it back. The circles keep their size.
         /// </summary>
         void FitVennRow(int slots)
@@ -320,6 +427,7 @@ namespace Gekko
 
         void Window_Closing(object sender, CancelEventArgs e)
         {
+            folderCts?.Cancel();
             try
             {
                 UserSettings s = Settings;
@@ -349,71 +457,260 @@ namespace Gekko
             }
         }
 
-        // ---------------------------------------------------------------- recent databanks
+        // ---------------------------------------------------------------- the two states
 
-        static List<string> LoadRecentBanks()
+        void StateButton_Checked(object sender, RoutedEventArgs e)
         {
-            string text = Settings.CompareRecentBanks ?? "";
+            if (!ready || busy) return;
+            SwitchState(ReferenceEquals(sender, FoldersStateButton) ? CompareState.Folders : CompareState.Datafiles);
+        }
+
+        /// <summary>
+        /// Switches between comparing databanks and comparing folders. Each state keeps its own list, comparison,
+        /// selection, hidden banks/folders and check, so going back shows the same as before.
+        /// </summary>
+        void SwitchState(CompareState to)
+        {
+            if (to == state) return;
+            if (recomputeTimer.IsEnabled)
+            {
+                // A recompute was pending (typing in the filter or a threshold box): do it when this state is shown again.
+                recomputeTimer.Stop();
+                MarkDirty(state, DirtyRecompute);
+            }
+            SaveView();
+            state = to;
+            LoadView();
+
+            busy = true;
+            try
+            {
+                BankList.ItemsSource = state == CompareState.Folders ? folderListSource : bankListSource;
+                DatafilesStateButton.IsChecked = state == CompareState.Datafiles;
+                FoldersStateButton.IsChecked = state == CompareState.Folders;
+                Compare3Radio.IsEnabled = banks.Count >= 3;
+                bool three = View.Compare3 && banks.Count >= 3;
+                Compare3Radio.IsChecked = three;
+                Compare2Radio.IsChecked = !three;
+                CheckTabs.SelectedIndex = (int)check;
+            }
+            finally
+            {
+                busy = false;
+            }
+            UpdateStateControls();
+
+            int dirty = state == CompareState.Folders ? foldersDirty : datafilesDirty;
+            if (dirty == DirtyList) BanksChanged();
+            else if (dirty == DirtyRecompute) Recompute();
+            else if (state == CompareState.Folders)
+            {
+                if (folderResult == null && folderItems.Count >= 2 && !folderComputing && !folderFailed) Recompute();
+                else
+                {
+                    Refresh();
+                    if (folderStatus != null && !folderComputing) SetStatus(folderStatus);
+                }
+            }
+            else
+            {
+                if (current == null) Recompute();
+                else Refresh();
+            }
+        }
+
+        void MarkDirty(CompareState which, int level)
+        {
+            if (which == CompareState.Folders) foldersDirty = Math.Max(foldersDirty, level);
+            else datafilesDirty = Math.Max(datafilesDirty, level);
+        }
+
+        void SaveView()
+        {
+            ViewState v = View;
+            v.SelectedMask = selectedMask;
+            v.SelectedBank = selectedBank;
+            v.Found = foundFilter;
+            v.FocusSlot = focusSlot;
+            v.ActiveBeforeFocus = activeBeforeFocus;
+            v.Active = active;
+            v.Check = check;  // (Compare3 is kept up to date by CompareMode_Changed)
+        }
+
+        void LoadView()
+        {
+            ViewState v = View;
+            selectedMask = v.SelectedMask;
+            selectedBank = v.SelectedBank;
+            foundFilter = v.Found;
+            focusSlot = v.FocusSlot;
+            activeBeforeFocus = v.ActiveBeforeFocus;
+            active = v.Active;
+            check = v.Check;
+        }
+
+        /// <summary>Shows the controls that belong to the current state, and names tabs and columns accordingly.</summary>
+        void UpdateStateControls()
+        {
+            bool folders = state == CompareState.Folders;
+            Title = folders ? "Compare folders" : "Compare databanks";
+            DatafileControls.Visibility = folders ? Visibility.Collapsed : Visibility.Visible;
+            FolderNote.Visibility = folders ? Visibility.Visible : Visibility.Collapsed;
+            MissingsCheckTab.IsEnabled = !folders;
+            ZeroesCheckTab.IsEnabled = !folders;
+            DiffThresholdPanel.Visibility = folders ? Visibility.Collapsed : Visibility.Visible;
+            DiffFolderNote.Visibility = folders ? Visibility.Visible : Visibility.Collapsed;
+            NamesText.Visibility = folders ? Visibility.Collapsed : Visibility.Visible;
+            FilesList.Visibility = folders ? Visibility.Visible : Visibility.Collapsed;
+            IgnoreDimsCheck.Visibility = folders ? Visibility.Collapsed : Visibility.Visible;
+            ValuesTab.Header = folders ? "Details" : "Values";
+            OnlyFoundCheck.Visibility = folders ? Visibility.Collapsed : Visibility.Visible;
+            ContentsColumn.Header = folders ? "Data files" : "Series";
+            UpdateOpenedFromText();
+        }
+
+        void UpdateOpenedFromText()
+        {
+            if (state == CompareState.Datafiles && openedFrom != null)
+            {
+                StateInfoText.Text = "Opened from the folders: " + openedFrom.RelativePath + ". Click Folders to go back.";
+                StateInfoText.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                StateInfoText.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        /// <summary>
+        /// A file in the Files tab (Folders state) was clicked: compare its 2 or 3 copies as databanks.
+        /// They replace the list of the Datafiles state, which starts with a fresh selection.
+        /// </summary>
+        void OpenFileInDatafiles(FileComparison fc)
+        {
+            if (!fc.IsComparison)
+            {
+                SetStatus(fc.RelativePath + " is only in folder " + (fc.Slots[0] + 1) + ", so there is nothing to compare it with.");
+                return;
+            }
+            var loaded = new List<BankItem>();
+            for (int i = 0; i < fc.FullPaths.Length; i++)
+            {
+                try
+                {
+                    loaded.Add(new BankItem(DatabankLoader.Load(fc.FullPaths[i])));
+                }
+                catch (Exception ex)
+                {
+                    SetStatus("Could not read " + fc.FullPaths[i] + ": " + ex.Message);
+                    return;
+                }
+            }
+
+            // Prepare the Datafiles state before showing it, so the old list is not compared first.
+            bankItems.Clear();
+            foreach (BankItem item in loaded) bankItems.Add(item);
+            datafilesView.SelectedMask = 0;
+            datafilesView.SelectedBank = -1;
+            datafilesView.Found = FlagFilter.Any;
+            datafilesView.FocusSlot = -1;
+            datafilesView.ActiveBeforeFocus = null;
+            datafilesView.Active = new[] { true, true, true };
+            if (loaded.Count >= 3) datafilesView.Compare3 = true;
+            userFrom = null;
+            userTo = null;
+            periodAnchor = null;
+            openedFrom = fc;
+            datafilesDirty = DirtyList;
+
+            if (state == CompareState.Datafiles)
+            {
+                LoadView();
+                BanksChanged();
+            }
+            else
+            {
+                SwitchState(CompareState.Datafiles);  // dirty: recomputes the new list
+            }
+            UpdateOpenedFromText();
+            SetStatus("Comparing the series of " + fc.RelativePath + " in folders "
+                      + string.Join(" and ", fc.Slots.Select(s => (s + 1).ToString(Inv))) + ". Click Folders (top left) to go back.");
+        }
+
+        // ---------------------------------------------------------------- recent databanks and folders
+
+        static List<string> LoadRecent(bool folders)
+        {
+            string text = (folders ? Settings.CompareRecentFolders : Settings.CompareRecentBanks) ?? "";
             return text.Split(new[] { RecentSeparator }, StringSplitOptions.RemoveEmptyEntries).ToList();
         }
 
-        static void SaveRecentBanks(List<string> paths)
+        static void SaveRecent(bool folders, List<string> paths)
         {
             try
             {
-                Settings.CompareRecentBanks = string.Join(RecentSeparator.ToString(), paths.Take(MaxRecentBanks));
+                string text = string.Join(RecentSeparator.ToString(), paths.Take(MaxRecentBanks));
+                if (folders) Settings.CompareRecentFolders = text;
+                else Settings.CompareRecentBanks = text;
                 Settings.Save();
             }
             catch (Exception)
             {
-                // The list is a convenience; never fail loading a bank because of it.
+                // The list is a convenience; never fail loading a bank or folder because of it.
             }
         }
 
         /// <summary>Moves (or adds) the path to the top of the LRU list.</summary>
-        static void TouchRecentBank(string path)
+        static void TouchRecent(bool folders, string path)
         {
             if (string.IsNullOrEmpty(path)) return;
-            List<string> paths = LoadRecentBanks();
+            List<string> paths = LoadRecent(folders);
             paths.RemoveAll(p => string.Equals(p, path, StringComparison.OrdinalIgnoreCase));
             paths.Insert(0, path);
-            SaveRecentBanks(paths);
+            SaveRecent(folders, paths);
         }
 
-        static void ForgetRecentBank(string path)
+        static void ForgetRecent(bool folders, string path)
         {
-            List<string> paths = LoadRecentBanks();
-            if (paths.RemoveAll(p => string.Equals(p, path, StringComparison.OrdinalIgnoreCase)) > 0) SaveRecentBanks(paths);
+            List<string> paths = LoadRecent(folders);
+            if (paths.RemoveAll(p => string.Equals(p, path, StringComparison.OrdinalIgnoreCase)) > 0) SaveRecent(folders, paths);
         }
 
-        bool IsInList(string path)
+        static bool IsIn(ObservableCollection<BankItem> list, string path)
         {
-            return banks.Any(b => string.Equals(b.Bank.FilePath, path, StringComparison.OrdinalIgnoreCase));
+            return list.Any(b => string.Equals(b.SourcePath, path, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
-        /// The [Recent] button on a row: a numbered list of the most recently compared databanks (banks already in
-        /// the list are greyed out). On a bank's row the chosen bank replaces it; on the empty row it is added.
+        /// The [Recent] button on a row: a numbered list of the most recently compared databanks (or folders, in
+        /// the Folders state); those already in the list are greyed out. On a filled row the chosen one replaces
+        /// it; on the empty row it is added.
         /// </summary>
         void RowRecent_Click(object sender, RoutedEventArgs e)
         {
             var button = (Button)sender;
             var target = button.Tag as BankItem;
             if (target == null) return;
+            bool folders = target.IsFolderRow;
             var menu = new ContextMenu { PlacementTarget = button, Placement = PlacementMode.Bottom };
-            List<string> paths = LoadRecentBanks();
+            List<string> paths = LoadRecent(folders);
             if (paths.Count == 0)
             {
-                menu.Items.Add(new MenuItem { Header = new TextBlock { Text = "No recent databanks" }, IsEnabled = false });
+                menu.Items.Add(new MenuItem { Header = new TextBlock { Text = folders ? "No recent folders" : "No recent databanks" }, IsEnabled = false });
             }
             for (int i = 0; i < paths.Count; i++)
             {
                 string path = paths[i];
-                bool open = IsInList(path);
+                bool open = IsIn(banks, path);
                 // TextBlocks rather than a string header: '_' in file names would otherwise become access keys.
                 var header = new StackPanel { Orientation = Orientation.Horizontal, Opacity = open ? 0.45 : 1.0 };
                 header.Children.Add(new TextBlock { Text = (i + 1) + ".", Width = 26 });
-                header.Children.Add(new TextBlock { Text = Path.GetFileName(path), MinWidth = 160, Margin = new Thickness(0, 0, 16, 0) });
+                header.Children.Add(new TextBlock
+                {
+                    Text = folders ? FolderResult.FolderName(path) : Path.GetFileName(path),
+                    MinWidth = 160,
+                    Margin = new Thickness(0, 0, 16, 0)
+                });
                 header.Children.Add(new TextBlock { Text = path, Foreground = RecentPathBrush });
                 var item = new MenuItem
                 {
@@ -429,25 +726,29 @@ namespace Gekko
 
         void OpenRecent(string path, BankItem target)
         {
-            if (IsInList(path)) return;
-            if (!File.Exists(path))
+            bool folders = target.IsFolderRow;
+            if (IsIn(banks, path)) return;
+            if (folders ? !Directory.Exists(path) : !File.Exists(path))
             {
-                ForgetRecentBank(path);
+                ForgetRecent(folders, path);
                 SetStatus(path + " no longer exists and was removed from the recent list.");
                 return;
             }
             int index = banks.IndexOf(target);
             if (target.IsPlaceholder || index < 0)
             {
-                AddFiles(new[] { path }, banks.Count);
+                if (folders) AddFolders(new[] { path }, folderItems.Count);
+                else AddFiles(new[] { path }, bankItems.Count);
                 return;
             }
             try
             {
-                var item = new BankItem(DatabankLoader.Load(path));
+                BankItem item = folders ? BankItem.ForFolder(path) : new BankItem(DatabankLoader.Load(path));
                 banks[index] = item;
-                TouchRecentBank(path);
+                TouchRecent(folders, path);
+                if (!folders) openedFrom = null;
                 BanksChanged();
+                UpdateOpenedFromText();
                 SetStatus(target.Name + " replaced by " + item.Name + ".");
             }
             catch (Exception ex)
@@ -458,15 +759,18 @@ namespace Gekko
 
         // ---------------------------------------------------------------- recomputation
 
-        /// <summary>Call when banks are added, removed or reordered, or the compare mode changes.</summary>
+        /// <summary>Call when the list of the current state changes (added, removed, reordered) or the compare mode changes.</summary>
         void BanksChanged()
         {
             if (!ready) return;
             busy = true;
             try
             {
+                // "first 3" whenever the user chose it and there are 3 or more (also after the list was shorter).
+                bool three = View.Compare3 && banks.Count >= 3;
                 Compare3Radio.IsEnabled = banks.Count >= 3;
-                if (banks.Count < 3 && Compare3Radio.IsChecked == true) Compare2Radio.IsChecked = true;
+                Compare3Radio.IsChecked = three;
+                Compare2Radio.IsChecked = !three;
                 int n = SlotCount;
                 for (int i = 0; i < banks.Count; i++)
                 {
@@ -476,7 +780,16 @@ namespace Gekko
                 for (int s = 0; s < active.Length; s++) active[s] = true;
                 focusSlot = -1;
                 activeBeforeFocus = null;
-                RefreshFrequencies();
+                if (state == CompareState.Datafiles)
+                {
+                    RefreshFrequencies();
+                    datafilesDirty = DirtyNone;
+                }
+                else
+                {
+                    foldersDirty = DirtyNone;
+                    for (int i = n; i < folderItems.Count; i++) folderItems[i].SetContents("");
+                }
             }
             finally
             {
@@ -489,7 +802,7 @@ namespace Gekko
         void RefreshFrequencies()
         {
             CompareFreq? previous = SelectedFreq;
-            List<CompareFreq> freqs = banks.Take(SlotCount).SelectMany(b => b.Bank.Frequencies).Distinct().OrderBy(f => f).ToList();
+            List<CompareFreq> freqs = bankItems.Take(SlotCount).SelectMany(b => b.Bank.Frequencies).Distinct().OrderBy(f => f).ToList();
             FreqCombo.Items.Clear();
             foreach (CompareFreq f in freqs) FreqCombo.Items.Add(new ComboBoxItem { Content = f.ToString(), Tag = f });
             int index = previous.HasValue ? freqs.IndexOf(previous.Value) : -1;
@@ -502,25 +815,47 @@ namespace Gekko
             recomputeTimer.Start();
         }
 
+        /// <summary>The name filter (matched against series names, or against file names and relative paths).</summary>
+        Func<string, bool> ReadFilter()
+        {
+            string error;
+            Func<string, bool> filter = CompareEngine.BuildFilter(FilterBox.Text, RegexCheck.IsChecked == true, out error);
+            if (error == null) FilterBox.ClearValue(Control.BackgroundProperty);
+            else
+            {
+                FilterBox.Background = InvalidBack;
+                SetStatus(error);
+            }
+            FilterBox.ToolTip = error;
+            return filter;
+        }
+
         /// <summary>
-        /// Recomputes the comparison. Needed when the scope changes: banks, compare mode, hide/focus,
-        /// frequency or name filter. The drill-down filters only need Refresh().
+        /// Recomputes the comparison of the current state. Needed when the scope changes: the list, compare mode,
+        /// hide/focus, frequency, name filter or a threshold. The check and the drill-down filters only need Refresh().
         /// </summary>
         void Recompute()
         {
             if (!ready) return;
             recomputeTimer.Stop();
+            if (state == CompareState.Folders)
+            {
+                if (foldersDirty == DirtyRecompute) foldersDirty = DirtyNone;
+                RecomputeFolders();
+                return;
+            }
+            if (datafilesDirty == DirtyRecompute) datafilesDirty = DirtyNone;
 
             CompareFreq? freq = SelectedFreq;
-            if (banks.Count < 2 || !freq.HasValue)
+            if (bankItems.Count < 2 || !freq.HasValue)
             {
                 current = null;
                 selectedMask = 0;
                 selectedBank = -1;
-                Venn.SetState(null, banks.Count == 0 ? "Drag databank files into the drop field to begin."
-                                    : banks.Count == 1 ? "Add one more databank to compare."
+                Venn.SetState(null, bankItems.Count == 0 ? "Drag databank files (or folders) into the drop field to begin."
+                                    : bankItems.Count == 1 ? "Add one more databank to compare."
                                     : "The compared databanks contain no series.",
-                              0, -1, FlagFilter.Any, FlagFilter.Any, -1);
+                              0, -1, FlagFilter.Any, -1);
                 selection = null;
                 ShowDetails();
                 UpdatePeriodBoxes();
@@ -537,46 +872,143 @@ namespace Gekko
             }
             periodFreq = freq;
 
-            string error;
-            Func<string, bool> filter = CompareEngine.BuildFilter(FilterBox.Text, RegexCheck.IsChecked == true, out error);
-            if (error == null) FilterBox.ClearValue(Control.BackgroundProperty);
+            Func<string, bool> filter = ReadFilter();
+            List<CompareBank> compared = bankItems.Take(SlotCount).Select(b => b.Bank).ToList();
+            current = CompareEngine.Compute(compared, active, freq.Value, filter, settings);
+            Refresh();
+        }
+
+        /// <summary>
+        /// Compares the folders in the background (listing files and comparing contents can take a while).
+        /// A newer comparison cancels an older one.
+        /// </summary>
+        async void RecomputeFolders()
+        {
+            folderCts?.Cancel();
+            int generation = ++folderGeneration;
+            folderResult = null;
+            folderFailed = false;
+            folderStatus = null;
+            if (folderItems.Count < 2)
+            {
+                folderComputing = false;
+                folderCts = null;
+                Refresh();
+                return;
+            }
+
+            Func<string, bool> filter = ReadFilter();
+            List<string> paths = folderItems.Take(SlotCount).Select(f => f.FolderPath).ToList();
+            bool[] shownFolders = (bool[])active.Clone();
+            var cts = new CancellationTokenSource();
+            folderCts = cts;
+            folderComputing = true;
+            Refresh();  // shows "Comparing the folders ..."
+            Action<string> progress = text => Dispatcher.BeginInvoke(new Action(() =>
+            {
+                if (generation == folderGeneration && state == CompareState.Folders) SetStatus(text);
+            }));
+
+            FolderResult result = null;
+            string error = null;
+            try
+            {
+                result = await Task.Run(() => FolderCompareEngine.Compute(paths, shownFolders, filter, progress, cts.Token, sameCache));
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+            catch (Exception ex)
+            {
+                error = ex.Message;
+            }
+            if (generation != folderGeneration) return;  // a newer comparison has started
+
+            folderComputing = false;
+            folderCts = null;
+            folderResult = result;
+            if (result != null)
+            {
+                for (int i = 0; i < folderItems.Count; i++)
+                    folderItems[i].SetContents(i < result.SlotCount ? result.FileCount[i] + " data files" : "");
+            }
+            if (error != null)
+            {
+                folderFailed = true;
+                folderStatus = "Could not compare the folders: " + error;
+            }
             else
             {
-                FilterBox.Background = InvalidBack;
-                SetStatus(error);
+                int files = result.Areas.Values.Sum(a => a.Files.Count);
+                int differ = result.Areas.Values.Sum(a => a.Files.Count(f => f.Differs));
+                folderStatus = "Folders compared: " + files + " data files; " + differ + " are in several folders with different contents."
+                               + (result.Cancelled ? " (Stopped before all contents were compared.)" : "");
             }
-            FilterBox.ToolTip = error;
-
-            List<CompareBank> compared = banks.Take(SlotCount).Select(b => b.Bank).ToList();
-            current = CompareEngine.Compute(compared, active, freq.Value, filter, criterion);
+            if (state != CompareState.Folders) return;  // the result and its status are shown when the Folders state is shown again
             Refresh();
+            SetStatus(folderStatus);
         }
 
         int PeriodFrom => current != null && current.HasSpan ? (userFrom ?? current.SpanStart) : 0;
         int PeriodTo => current != null && current.HasSpan ? (userTo ?? current.SpanEnd) : -1;
 
-        /// <summary>Applies the drill-down filters to the current comparison and updates every view.</summary>
+        /// <summary>Applies the check and the drill-down filters to the current comparison and updates every view.</summary>
         void Refresh()
         {
+            if (state == CompareState.Folders)
+            {
+                RefreshFolders();
+                return;
+            }
             if (current == null)
             {
                 Recompute();
                 return;
             }
             ClampPeriod();
-            CompareEngine.UpdateCounts(current, PeriodFrom, PeriodTo);
+            CompareEngine.UpdateCounts(current, check, PeriodFrom, PeriodTo);
+            ValidateSelection();
 
-            if (selectedBank >= 0 && (selectedBank >= current.SlotCount || !current.Active[selectedBank])) selectedBank = -1;
-            if (selectedMask != 0 && !current.Areas.ContainsKey(selectedMask)) selectedMask = 0;
-            if (selectedBank >= 0) selectedMask = 0;
-
-            Venn.SetState(current, null, selectedMask, selectedBank, missingFilter, deviatesFilter, focusSlot);
+            Venn.SetState(current, null, selectedMask, selectedBank, foundFilter, focusSlot);
             FitVennRow(current.SlotCount);
 
             selection = BuildSelection();
             ShowDetails();
             UpdatePeriodBoxes();
             UpdateListBadges();
+        }
+
+        void RefreshFolders()
+        {
+            if (folderResult == null)
+            {
+                // Keep the selection: while the folders are compared again (e.g. after hiding one) it is restored.
+                string message = folderComputing ? "Comparing the folders ..."
+                               : folderItems.Count == 0 ? "Drag 2 or 3 folders into the drop field to compare their data files."
+                               : folderItems.Count == 1 ? "Add one more folder to compare."
+                               : "The folders could not be compared. " + (folderStatus ?? "");
+                Venn.SetState(null, message, 0, -1, FlagFilter.Any, -1);
+            }
+            else
+            {
+                folderResult.UpdateCounts();
+                ValidateSelection();
+                Venn.SetState(folderResult, null, selectedMask, selectedBank, foundFilter, focusSlot);
+                FitVennRow(folderResult.SlotCount);
+            }
+            fileSelection = BuildFileSelection();
+            ShowDetails();
+            UpdateListBadges();
+        }
+
+        /// <summary>A selected area or bank/folder that no longer exists (e.g. after hiding) is dropped.</summary>
+        void ValidateSelection()
+        {
+            IVennModel m = Model;
+            if (selectedBank >= 0 && (selectedBank >= m.SlotCount || !m.Active[selectedBank])) selectedBank = -1;
+            if (selectedMask != 0 && !m.AreaMasks.Contains(selectedMask)) selectedMask = 0;
+            if (selectedBank >= 0) selectedMask = 0;
         }
 
         /// <summary>A chosen period outside the universal period (e.g. after hiding a bank) falls back to its edge.</summary>
@@ -606,20 +1038,86 @@ namespace Gekko
 
         void UpdateListBadges()
         {
+            IVennModel m = Model;
             for (int i = 0; i < banks.Count; i++)
-                banks[i].HiddenInDiagram = current != null && i < current.SlotCount && !current.Active[i];
+                banks[i].HiddenInDiagram = m != null && i < m.SlotCount && !m.Active[i];
+        }
+
+        // ---------------------------------------------------------------- the check and its thresholds
+
+        /// <summary>The tabs at the bottom of the controls panel: Differences, Missings, Zeroes.</summary>
+        void CheckTabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!ReferenceEquals(e.OriginalSource, CheckTabs)) return;  // ignore SelectionChanged bubbling from inside the tabs
+            if (!ready || busy) return;
+            var newCheck = (CheckKind)Math.Max(0, CheckTabs.SelectedIndex);
+            if (state == CompareState.Folders && newCheck != CheckKind.Differences)
+            {
+                busy = true;
+                CheckTabs.SelectedIndex = 0;
+                busy = false;
+                return;
+            }
+            if (newCheck == check) return;
+            check = newCheck;
+            Refresh();  // all checks are computed already
+        }
+
+        /// <summary>Reads the thresholds into the settings. Returns false (and marks the box) if one is not valid.</summary>
+        bool ReadThresholds()
+        {
+            bool ok = true;
+            double diff, zero;
+            if (CompareEngine.TryParseThreshold(DiffThresholdBox.Text, out diff))
+            {
+                settings.DiffThreshold = diff;
+                DiffThresholdBox.ClearValue(Control.BackgroundProperty);
+            }
+            else
+            {
+                DiffThresholdBox.Background = InvalidBack;
+                ok = false;
+            }
+            if (CompareEngine.TryParseThreshold(ZeroThresholdBox.Text, out zero))
+            {
+                settings.ZeroThreshold = zero;
+                ZeroThresholdBox.ClearValue(Control.BackgroundProperty);
+            }
+            else
+            {
+                ZeroThresholdBox.Background = InvalidBack;
+                ok = false;
+            }
+            settings.DiffRelative = DiffRelativeCheck.IsChecked == true;
+            if (!ok) SetStatus("A threshold must be a number of 0 or more, e.g. 0.001.");
+            return ok;
+        }
+
+        /// <summary>A threshold box or the "relative" box changed. Recomputes (after a short pause while typing).</summary>
+        void Threshold_Changed(object sender, RoutedEventArgs e)
+        {
+            if (!ready) return;
+            if (!ReadThresholds()) return;
+            if (state == CompareState.Datafiles) ScheduleRecompute();
+            else MarkDirty(CompareState.Datafiles, DirtyRecompute);
         }
 
         // ---------------------------------------------------------------- the area filter
 
-        /// <summary>The area filter, resolved: one area of the diagram, or a whole bank (its full circle).</summary>
+        /// <summary>Datafiles: the area filter, resolved: one area of the diagram, or a whole bank (its full circle).</summary>
         sealed class Selection
         {
             public string Description;              // e.g. "In banks 1 and 2, not in bank 3"
             public List<SeriesComparison> Series;   // all series in it (the black number)
-            public int MissingMask;                 // banks in which an M counts as missing (bit s = slot s)
-            public bool IsComparison;               // false: series in one bank only, nothing to compare
-            public int Circles;                     // number of circles selected: 1 for a whole bank or a one-bank area
+            public int SlotMask;                    // banks in which Missings/Zeroes look (bit s = slot s)
+            public bool IsComparison;               // false: series in one bank only, no differences to look for
+        }
+
+        /// <summary>Folders: the area filter, resolved.</summary>
+        sealed class FileSelection
+        {
+            public string Description;
+            public List<FileComparison> Files;
         }
 
         Selection BuildSelection()
@@ -627,8 +1125,8 @@ namespace Gekko
             if (current == null) return null;
             if (selectedBank >= 0)
             {
-                // A whole bank: the areas inside its circle. Deviations are those of its overlaps with other banks;
-                // missing values count in this bank only.
+                // A whole bank: the areas inside its circle. Differences are those of its overlaps with other banks;
+                // missing values and zeroes count in this bank only.
                 List<SeriesComparison> series = current.Areas.Values
                     .Where(a => (a.Mask & (1 << selectedBank)) != 0)
                     .SelectMany(a => a.Series)
@@ -639,9 +1137,8 @@ namespace Gekko
                     Description = "All of bank " + (selectedBank + 1) + " (" + current.Banks[selectedBank].Name + ", "
                                   + series.Count + " series)",
                     Series = series,
-                    MissingMask = 1 << selectedBank,
-                    IsComparison = series.Any(s => s.Slots.Length >= 2),
-                    Circles = 1
+                    SlotMask = 1 << selectedBank,
+                    IsComparison = series.Any(s => s.Slots.Length >= 2)
                 };
             }
             VennArea area;
@@ -651,9 +1148,33 @@ namespace Gekko
                 {
                     Description = CompareEngine.DescribeArea(current, area.Mask),
                     Series = area.Series,
-                    MissingMask = area.Mask,
-                    IsComparison = area.IsComparison,
-                    Circles = area.Slots.Length
+                    SlotMask = area.Mask,
+                    IsComparison = area.IsComparison
+                };
+            }
+            return null;
+        }
+
+        FileSelection BuildFileSelection()
+        {
+            if (folderResult == null) return null;
+            if (selectedBank >= 0)
+            {
+                List<FileComparison> files = folderResult.FilesOfFolder(selectedBank);
+                return new FileSelection
+                {
+                    Description = "All of folder " + (selectedBank + 1) + " (" + folderResult.SlotName(selectedBank) + ", "
+                                  + files.Count + " files)",
+                    Files = files
+                };
+            }
+            FolderArea area;
+            if (selectedMask != 0 && folderResult.Areas.TryGetValue(selectedMask, out area))
+            {
+                return new FileSelection
+                {
+                    Description = CompareEngine.DescribeArea(folderResult.SlotCount, folderResult.Active, area.Mask, "folder"),
+                    Files = area.Files
                 };
             }
             return null;
@@ -662,45 +1183,37 @@ namespace Gekko
         // ---------------------------------------------------------------- clicks that set filters
 
         /// <summary>
-        /// Inside an area: sets the area, keeps the flag filters.
-        /// Black number: the area, both flags cleared. Red number: the area, Deviating = yes.
-        /// The missing-value filter belongs to "All of bank x" (a bank's box), so it is always cleared here.
+        /// Inside an area: sets the area, keeps the found filter.
+        /// Black number: the area, all of it. Red number: the area, only what the check finds.
         /// </summary>
         void Venn_AreaClicked(int mask, AreaClickKind kind, bool add)
         {
-            if (current == null || !current.Areas.ContainsKey(mask)) return;
+            IVennModel m = Model;
+            if (m == null || !m.AreaMasks.Contains(mask)) return;
             selectedMask = mask;
             selectedBank = -1;
-            missingFilter = FlagFilter.Any;  // missing values are only shown for a whole bank ("All of bank x")
-            switch (kind)
-            {
-                case AreaClickKind.Total:
-                    deviatesFilter = FlagFilter.Any;
-                    missingFilter = FlagFilter.Any;
-                    break;
-                case AreaClickKind.Deviating:
-                    deviatesFilter = FlagFilter.Yes;
-                    break;
-            }
+            if (kind == AreaClickKind.Total) foundFilter = FlagFilter.Any;
+            if (kind == AreaClickKind.Deviating) foundFilter = FlagFilter.Yes;
             Refresh();  // the selected tab stays open
         }
 
-        /// <summary>A bank's box: the whole bank as the area filter. Keeps the flag filters.</summary>
+        /// <summary>A box: the whole bank/folder as the area filter. Keeps the found filter.</summary>
         void Venn_BankSelected(int slot)
         {
-            if (current == null || slot >= current.SlotCount || !current.Active[slot]) return;
+            IVennModel m = Model;
+            if (m == null || slot >= m.SlotCount || !m.Active[slot]) return;
             selectedBank = slot;
             selectedMask = 0;
             Refresh();  // the selected tab stays open
         }
 
         /// <summary>
-        /// A histogram bar: sets the period (Shift: from the first clicked bar to this one) and the bar's flag
-        /// (red: Deviating = yes, blue: Missing = yes; the other flag is cleared unless Ctrl). Keeps the area.
+        /// A histogram bar: sets the period (Shift: from the first clicked bar to this one) and shows only what the
+        /// check finds. Keeps the area.
         /// </summary>
-        void Bar_Clicked(int period, ModifierKeys keys, bool deviationBar)
+        void Bar_Clicked(int period, ModifierKeys keys)
         {
-            if (current == null || !current.HasSpan) return;
+            if (state != CompareState.Datafiles || current == null || !current.HasSpan) return;
             int from = period, to = period;
             if ((keys & ModifierKeys.Shift) != 0 && periodAnchor.HasValue)
             {
@@ -712,27 +1225,19 @@ namespace Gekko
                 periodAnchor = period;
             }
             SetPeriod(from, to);
-
-            bool add = (keys & ModifierKeys.Control) != 0;
-            if (deviationBar)
-            {
-                deviatesFilter = FlagFilter.Yes;
-                if (!add) missingFilter = FlagFilter.Any;
-            }
-            else
-            {
-                missingFilter = FlagFilter.Yes;
-                if (!add) deviatesFilter = FlagFilter.Any;
-            }
+            foundFilter = FlagFilter.Yes;
             Refresh();
-            SetStatus(shown.Count + " series match" + current.CountPeriodText + ". Double-click a bar (or see the Names tab) to list them.");
+            SetStatus(shown.Count + " series " + CheckText.Phrase(check) + current.CountPeriodText
+                      + ". Double-click a bar (or see the Names tab) to list them.");
         }
 
         // ---------------------------------------------------------------- hide and focus (scope)
 
         string BankLabel(int slot)
         {
-            return "Bank " + (slot + 1) + " (" + current.Banks[slot].Name + ")";
+            IVennModel m = Model;
+            string word = m.SlotWord;
+            return char.ToUpperInvariant(word[0]) + word.Substring(1) + " " + (slot + 1) + " (" + m.SlotName(slot) + ")";
         }
 
         static int MaskOf(bool[] flags, int slotCount)
@@ -743,13 +1248,13 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Sets which banks are shown, keeping a sensible area filter: "in all shown banks" stays "in all shown
-        /// banks", an area drops the banks that disappear, a whole bank stays selected unless it is hidden.
+        /// Sets which banks/folders are shown, keeping a sensible area filter: "in all shown" stays "in all shown",
+        /// an area drops the ones that disappear, a whole bank/folder stays selected unless it is hidden.
         /// Does not recompute.
         /// </summary>
         void ApplyActive(bool[] newActive)
         {
-            int n = current.SlotCount;
+            int n = Model.SlotCount;
             int oldMask = MaskOf(active, n);
             for (int s = 0; s < active.Length; s++) active[s] = s >= n || newActive[s];
             int newMask = MaskOf(active, n);
@@ -758,12 +1263,13 @@ namespace Gekko
         }
 
         /// <summary>
-        /// The eye icon. Without a focus: hide a shown bank (as long as another one stays shown) or show a hidden one.
-        /// With a focus: showing another bank ends the focus; the focused bank itself cannot be hidden.
+        /// The eye icon. Without a focus: hide a shown bank/folder (as long as another one stays shown) or show a
+        /// hidden one. With a focus: showing another one ends the focus; the focused one itself cannot be hidden.
         /// </summary>
         void ToggleHidden(int slot)
         {
-            if (current == null || slot >= current.SlotCount) return;
+            IVennModel m = Model;
+            if (m == null || slot >= m.SlotCount) return;
             string label = BankLabel(slot);
             var next = (bool[])active.Clone();
 
@@ -771,7 +1277,7 @@ namespace Gekko
             {
                 if (slot == focusSlot)
                 {
-                    SetStatus(label + " is in focus and cannot be hidden. Click its target to show the other banks again.");
+                    SetStatus(label + " is in focus and cannot be hidden. Click its target to show the others again.");
                     return;
                 }
                 focusSlot = -1;
@@ -789,14 +1295,14 @@ namespace Gekko
                 next[slot] = true;
                 message = label + " is shown again.";
             }
-            else if (current.ActiveCount > 1)
+            else if (m.ActiveCount > 1)
             {
                 next[slot] = false;
                 message = label + " is hidden. Click its eye to show it again.";
             }
             else
             {
-                SetStatus(label + " is the only bank shown, so it cannot be hidden.");
+                SetStatus(label + " is the only one shown, so it cannot be hidden.");
                 return;
             }
             ApplyActive(next);
@@ -805,13 +1311,14 @@ namespace Gekko
         }
 
         /// <summary>
-        /// The target icon or Alt+1/2/3. Focus: only this bank is shown, and the whole bank becomes the area filter.
-        /// Again on the focused bank: the banks shown before the focus come back, the bank stays selected.
-        /// The flag and period filters are kept.
+        /// The target icon or Alt+1/2/3. Focus: only this bank/folder is shown, and all of it becomes the area filter.
+        /// Again on the focused one: the ones shown before the focus come back, it stays selected.
+        /// The check and the found and period filters are kept.
         /// </summary>
         void ToggleFocus(int slot)
         {
-            if (current == null || slot >= current.SlotCount) return;
+            IVennModel m = Model;
+            if (m == null || slot >= m.SlotCount) return;
             string label = BankLabel(slot);
 
             if (focusSlot == slot)
@@ -824,7 +1331,7 @@ namespace Gekko
                 selectedMask = 0;
                 selectedBank = slot;
                 Recompute();
-                SetStatus("Focus on " + label + " ended. The whole bank stays selected.");
+                SetStatus("Focus on " + label + " ended. It stays selected.");
                 return;
             }
 
@@ -836,15 +1343,21 @@ namespace Gekko
             selectedMask = 0;
             selectedBank = slot;
             Recompute();
-            SetStatus("Focus on " + label + ": the other banks are greyed out. Click the target again (or Alt+"
+            SetStatus("Focus on " + label + ": the others are greyed out. Click the target again (or Alt+"
                       + (slot + 1) + ") to show them.");
         }
 
-        // ---------------------------------------------------------------- details: names, histograms, values
+        // ---------------------------------------------------------------- details: names/files, histogram, values/details
 
         /// <summary>Applies the filters to the selection and fills the tabs.</summary>
         void ShowDetails()
         {
+            if (state == CompareState.Folders)
+            {
+                ShowFileDetails();
+                return;
+            }
+
             string keepName = navIndex >= 0 && navIndex < navList.Count ? navList[navIndex].Name : null;
 
             if (selection == null || current == null)
@@ -855,15 +1368,14 @@ namespace Gekko
                 navList = shown;
                 navIndex = -1;
                 devMessage = NoSelectionMessage;
-                ShowCurrentSeries();
+                ShowCurrentItem();
                 return;
             }
 
             int from = PeriodFrom, to = PeriodTo;
-            int mask = selection.MissingMask;
+            int mask = selection.SlotMask;
             shown = selection.Series
-                .Where(s => SeriesComparison.Passes(deviatesFilter, s.DeviatesIn(from, to))
-                         && SeriesComparison.Passes(missingFilter, s.MissingIn(from, to, mask)))
+                .Where(s => SeriesComparison.Passes(foundFilter, s.FoundIn(check, from, to, mask)))
                 .ToList();
 
             ShowNames();
@@ -877,40 +1389,32 @@ namespace Gekko
                 if (i >= 0) navIndex = i;
             }
             devMessage = "No series match the current filters.";
-            ShowCurrentSeries();
+            ShowCurrentItem();
         }
 
         /// <summary>
-        /// One histogram tab, whose meaning follows the selection:
-        ///   "All of bank x" (a bank's box): "Missings histogram", blue, series with M in that bank per period;
-        ///   an overlap area with the deviation filter on (red number or red bar): "Deviations histogram", red;
-        ///   anything else: a message saying how to get a histogram.
-        /// It shows the whole universal period for the area only (not the flag or period filters), so the time
+        /// The histogram: per period, the number of series in the area (or whole bank) found by the current check.
+        /// It shows the whole universal period for the area only (not the found or period filters), so the time
         /// profile stays visible while drilling down. The selected periods are highlighted.
         /// </summary>
         void ShowHistogram()
         {
-            histogramShowsDeviations = false;
+            if (state == CompareState.Folders)
+            {
+                Histogram.ShowMessage("There is no histogram for folders. Click a file in the Files tab to compare its series per period.");
+                return;
+            }
             if (selection == null || current == null)
             {
-                HistogramTab.Header = "Histogram";
                 Histogram.ShowMessage(NoSelectionMessage);
                 return;
             }
-
-            bool missings = selectedBank >= 0;
-            bool deviations = !missings && selection.IsComparison && deviatesFilter == FlagFilter.Yes;
-            if (!missings && !deviations)
+            if (check == CheckKind.Differences && !selection.IsComparison)
             {
-                HistogramTab.Header = "Histogram";
-                Histogram.ShowMessage(selection.IsComparison
-                    ? "To see deviations, click the red number. To see missing values, click a rectangular databank box."
-                    : "To see missing values, click a rectangular databank box.");
+                Histogram.ShowMessage("Series that exist in only one bank have nothing to be compared with. "
+                                      + "Choose an overlap, or the Missings or Zeroes check.");
                 return;
             }
-
-            histogramShowsDeviations = deviations;
-            HistogramTab.Header = deviations ? "Deviations histogram" : "Missings histogram";
             if (!current.HasSpan)
             {
                 Histogram.ShowMessage("No periods to show.");
@@ -919,23 +1423,96 @@ namespace Gekko
             int start = current.SpanStart, end = current.SpanEnd;
             int? hiFrom = current.IsPeriodRestricted ? PeriodFrom : (int?)null;
             int? hiTo = current.IsPeriodRestricted ? PeriodTo : (int?)null;
-
-            if (deviations)
-            {
-                Histogram.SetData(selection.Description + ": number of deviating series, per period",
-                                  current.Freq, start, CompareEngine.DeviationCounts(selection.Series, start, end),
-                                  true, null, hiFrom, hiTo);
-            }
-            else
-            {
-                int[][] perSlot;
-                int[] missing = CompareEngine.MissingCounts(selection.Series, selection.MissingMask, start, end, out perSlot);
-                Histogram.SetData(selection.Description + ": number of series with missing values (M), per period",
-                                  current.Freq, start, missing, false, null, hiFrom, hiTo);
-            }
+            string phrase = "series " + CheckText.Phrase(check);
+            Histogram.SetData(selection.Description + ": number of " + phrase + ", per period",
+                              current.Freq, start, CompareEngine.FoundCounts(selection.Series, check, selection.SlotMask, start, end),
+                              phrase, null, hiFrom, hiTo);
         }
 
-        // ---------------------------------------------------------------- period from/to (the period filter)
+        /// <summary>Folders: the Files tab, the (absent) histogram and the Details tab.</summary>
+        void ShowFileDetails()
+        {
+            string keepPath = fileNavIndex >= 0 && fileNavIndex < fileNav.Count ? fileNav[fileNavIndex].RelativePath : null;
+            ShowHistogram();
+
+            if (fileSelection == null)
+            {
+                shownFiles = new List<FileComparison>();
+                NamesTab.Header = "Files";
+                NamesHeader.Text = folderResult == null ? "" : "Click a number, an area or a folder's box in the diagram to list its files.";
+                NamesHeader.ToolTip = null;
+                FilesList.ItemsSource = null;
+                namesPlainText = "";
+                fileNav = shownFiles;
+                fileNavIndex = -1;
+                devMessage = NoSelectionMessage;
+                ShowCurrentItem();
+                return;
+            }
+
+            shownFiles = fileSelection.Files.Where(f => SeriesComparison.Passes(foundFilter, f.Differs)).ToList();
+            int differing = shownFiles.Count(f => f.Differs);
+            string header = fileSelection.Description + ": " + shownFiles.Count
+                            + (shownFiles.Count == fileSelection.Files.Count ? "" : " of " + fileSelection.Files.Count) + " files"
+                            + (foundFilter == FlagFilter.Yes ? " that differ" : "");
+            if (differing > 0 && foundFilter != FlagFilter.Yes) header += " (" + differing + " that differ, in dark red)";
+            header += ". Click a file to compare its series.";
+            NamesHeader.Text = header;
+            NamesHeader.ToolTip = header;
+            NamesTab.Header = "Files (" + shownFiles.Count + ")";
+            FilesList.ItemsSource = shownFiles.Select(MakeFileRow).ToList();
+            namesPlainText = string.Join(Environment.NewLine, shownFiles.Select(f => f.RelativePath));
+
+            fileNav = shownFiles;
+            fileNavIndex = shownFiles.Count == 0 ? -1 : 0;
+            if (keepPath != null)
+            {
+                int i = fileNav.FindIndex(f => string.Equals(f.RelativePath, keepPath, StringComparison.OrdinalIgnoreCase));
+                if (i >= 0) fileNavIndex = i;
+            }
+            devMessage = "No files match the current filters.";
+            ShowCurrentItem();
+        }
+
+        FileRow MakeFileRow(FileComparison f)
+        {
+            string where = (f.Slots.Length == 1 ? "Only in folder " : "In folders ")
+                           + string.Join(" and ", f.Slots.Select(s => (s + 1).ToString(Inv)));
+            string tip;
+            if (!f.IsComparison) tip = where + ": nothing to compare it with.";
+            else if (f.Error != null) tip = where + ". Could not be read: " + f.Error;
+            else tip = where + (f.Differs ? ", contents differ." : ", identical contents.") + "\nClick to compare its series.";
+            return new FileRow
+            {
+                File = f,
+                Text = f.RelativePath,
+                Foreground = f.Differs ? DeviatingNameBrush : Brushes.Black,
+                Tip = tip,
+                Cursor = f.IsComparison ? Cursors.Hand : Cursors.Arrow
+            };
+        }
+
+        /// <summary>A click on a file in the Files tab opens it in the Datafiles state.</summary>
+        void FilesList_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            var item = FindAncestor<ListBoxItem>(e.OriginalSource as DependencyObject);
+            var row = item?.DataContext as FileRow;
+            if (row == null) return;
+            fileNavIndex = fileNav.IndexOf(row.File);
+            ShowCurrentItem();
+            OpenFileInDatafiles(row.File);
+        }
+
+        void FilesList_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Enter) return;
+            var row = FilesList.SelectedItem as FileRow;
+            if (row == null) return;
+            e.Handled = true;
+            OpenFileInDatafiles(row.File);
+        }
+
+        // ---------------------------------------------------------------- period from/to (the period filter, Datafiles)
 
         void UpdatePeriodBoxes()
         {
@@ -1069,7 +1646,7 @@ namespace Gekko
 
         void PeriodBox_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
-            if (ready) CommitPeriod(ReferenceEquals(sender, FromBox));
+            if (ready && state == CompareState.Datafiles) CommitPeriod(ReferenceEquals(sender, FromBox));
         }
 
         void PeriodBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
@@ -1086,48 +1663,38 @@ namespace Gekko
             if (current != null) Refresh();
         }
 
-        // ---------------------------------------------------------------- names tab
+        // ---------------------------------------------------------------- names tab (Datafiles)
 
-        /// <summary>Text for the flag filters, e.g. "deviating, without missing values". Empty when both are Any.</summary>
-        string FlagText()
-        {
-            var parts = new List<string>();
-            if (deviatesFilter == FlagFilter.Yes) parts.Add("deviating");
-            if (deviatesFilter == FlagFilter.No) parts.Add("not deviating");
-            if (missingFilter == FlagFilter.Yes) parts.Add("with missing values");
-            if (missingFilter == FlagFilter.No) parts.Add("without missing values");
-            return string.Join(", ", parts);
-        }
-
-        /// <summary>The series passing all filters. Those deviating in the selected periods are dark red.</summary>
+        /// <summary>The series passing all filters. Those found by the check in the selected periods are dark red.</summary>
         void ShowNames()
         {
             if (selection == null || current == null)
             {
                 NamesTab.Header = "Names";
-                NamesHeader.Text = "Click a number, an area or a bank in the diagram to list its series.";
+                NamesHeader.Text = "Click a number, an area or a bank's box in the diagram to list its series.";
+                NamesHeader.ToolTip = null;
                 SetNamesText(new List<string>(), new HashSet<string>());
                 return;
             }
             int from = PeriodFrom, to = PeriodTo;
             bool ignore = IgnoreDimsCheck.IsChecked == true;
             List<string> names = CompareEngine.NamesForDisplay(shown.Select(s => s.Name), ignore);
-            List<string> deviating = shown.Where(s => s.DeviatesIn(from, to)).Select(s => s.Name).ToList();
-            var red = new HashSet<string>(CompareEngine.NamesForDisplay(deviating, ignore), StringComparer.OrdinalIgnoreCase);
+            List<string> found = shown.Where(s => s.FoundIn(check, from, to, selection.SlotMask)).Select(s => s.Name).ToList();
+            var red = new HashSet<string>(CompareEngine.NamesForDisplay(found, ignore), StringComparer.OrdinalIgnoreCase);
+            string phrase = CheckText.Phrase(check);
 
-            string flags = FlagText();
             string header = selection.Description + current.CountPeriodText + ": " + shown.Count
                             + (shown.Count == selection.Series.Count ? "" : " of " + selection.Series.Count) + " series"
-                            + (flags.Length > 0 ? " " + flags : "");
+                            + (foundFilter == FlagFilter.Yes ? " " + phrase : "");
             if (ignore) header += ", " + names.Count + " names without dimensions";
-            if (deviating.Count > 0 && deviatesFilter != FlagFilter.Yes) header += " (" + deviating.Count + " deviating, in dark red)";
+            if (found.Count > 0 && foundFilter != FlagFilter.Yes) header += " (" + found.Count + " " + phrase + ", in dark red)";
             NamesHeader.Text = header;
             NamesHeader.ToolTip = header;
             NamesTab.Header = "Names (" + shown.Count + ")";
             SetNamesText(names, red);
         }
 
-        /// <summary>Comma-separated names; runs of consecutive deviating names become one dark red Run.</summary>
+        /// <summary>Comma-separated names; runs of consecutive found names become one dark red Run.</summary>
         void SetNamesText(List<string> names, HashSet<string> red)
         {
             var paragraph = new Paragraph { Margin = new Thickness(0) };
@@ -1161,7 +1728,7 @@ namespace Gekko
 
         void IgnoreDims_Changed(object sender, RoutedEventArgs e)
         {
-            if (ready) ShowNames();
+            if (ready && state == CompareState.Datafiles) ShowNames();
         }
 
         void CopyNames_Click(object sender, RoutedEventArgs e)
@@ -1170,7 +1737,7 @@ namespace Gekko
             try
             {
                 Clipboard.SetText(namesPlainText);
-                SetStatus("Names copied to the clipboard.");
+                SetStatus(state == CompareState.Folders ? "File paths copied to the clipboard." : "Names copied to the clipboard.");
             }
             catch (Exception ex)
             {
@@ -1178,12 +1745,18 @@ namespace Gekko
             }
         }
 
-        // ---------------------------------------------------------------- values tab
+        // ---------------------------------------------------------------- values tab (Datafiles) / details tab (Folders)
 
-        /// <summary>One series of the Names list, for the selected periods. M = missing, * = deviates.</summary>
+        void ShowCurrentItem()
+        {
+            if (state == CompareState.Folders) ShowCurrentFile();
+            else ShowCurrentSeries();
+        }
+
+        /// <summary>One series of the Names list, for the selected periods. M = missing, * = found by the check.</summary>
         void ShowCurrentSeries()
         {
-            bool has = navIndex >= 0 && navIndex < navList.Count;
+            bool has = navIndex >= 0 && navIndex < navList.Count && selection != null;
             PrevButton.IsEnabled = has && navIndex > 0;
             NextButton.IsEnabled = has && navIndex < navList.Count - 1;
             if (!has)
@@ -1197,26 +1770,78 @@ namespace Gekko
 
             int from = PeriodFrom, to = PeriodTo;
             SeriesComparison c = navList[navIndex];
-            int dev = c.DeviatingPeriods(from, to);
-            int miss = c.MissingPeriods(from, to, selection.MissingMask);
+            int found = c.FoundPeriods(check, from, to, selection.SlotMask);
+            string what = check == CheckKind.Missings ? " with M" : check == CheckKind.Zeroes ? " with zero" : " that differ";
             NavText.Text = c.Name + "   (" + (navIndex + 1) + " of " + navList.Count + "; "
-                           + (c.Slots.Length >= 2 ? dev + (dev == 1 ? " deviating period, " : " deviating periods, ") : "")
-                           + miss + (miss == 1 ? " period" : " periods") + " with M" + current.CountPeriodText + ")";
+                           + found + (found == 1 ? " period" : " periods") + what + current.CountPeriodText + ")";
+            string star = check == CheckKind.Missings ? "M in a bank" : check == CheckKind.Zeroes ? "zero in a bank" : "differs";
             LegendText.Text = string.Join("   ", c.Slots.Select(s => "(" + (s + 1) + ") " + current.Banks[s].Name))
-                              + "   M = missing   * = deviates";
-            listing = CompareEngine.FormatComparison(c, current.Freq, from, to, OnlyFlaggedCheck.IsChecked == true);
+                              + "   M = missing   * = " + star;
+            listing = CompareEngine.FormatComparison(c, current.Freq, from, to, check, selection.SlotMask, OnlyFoundCheck.IsChecked == true);
             DevText.Text = string.Join("\r\n", listing.Lines);
+            DevText.Select(0, 0);
+            DevText.ScrollToHome();
+        }
+
+        /// <summary>One file of the Files list: where it is, sizes and dates, and whether the contents differ.</summary>
+        void ShowCurrentFile()
+        {
+            bool has = fileNavIndex >= 0 && fileNavIndex < fileNav.Count && folderResult != null;
+            PrevButton.IsEnabled = has && fileNavIndex > 0;
+            NextButton.IsEnabled = has && fileNavIndex < fileNav.Count - 1;
+            if (!has)
+            {
+                listing = null;
+                NavText.Text = "";
+                LegendText.Text = "";
+                DevText.Text = devMessage;
+                return;
+            }
+
+            FileComparison f = fileNav[fileNavIndex];
+            NavText.Text = f.RelativePath + "   (" + (fileNavIndex + 1) + " of " + fileNav.Count + ")";
+            LegendText.Text = f.IsComparison ? "Click the file in the Files tab to compare its series" : "In one folder only";
+            var lines = new List<string> { "folder".PadRight(8) + "size (bytes)".PadLeft(16) + "   " + "modified".PadRight(21) + "path" };
+            for (int s = 0; s < folderResult.SlotCount; s++)
+            {
+                int i = Array.IndexOf(f.Slots, s);
+                string label = ("(" + (s + 1) + ")").PadRight(8);
+                if (i < 0)
+                {
+                    lines.Add(label + "not in this folder".PadLeft(16));
+                    continue;
+                }
+                lines.Add(label + f.Sizes[i].ToString("N0", Inv).PadLeft(16) + "   "
+                          + f.Modified[i].ToString("yyyy-MM-dd HH:mm:ss", Inv).PadRight(21) + f.FullPaths[i]);
+            }
+            lines.Add("");
+            if (f.Error != null) lines.Add("Could not be read: " + f.Error);
+            else if (!f.IsComparison) lines.Add("In one folder only: nothing to compare.");
+            else lines.Add(f.Differs ? "The contents differ (byte by byte). Click the file in the Files tab to compare its series."
+                                     : "The contents are identical.");
+            DevText.Text = string.Join("\r\n", lines);
             DevText.Select(0, 0);
             DevText.ScrollToHome();
         }
 
         void Navigate(int delta)
         {
-            int i = navIndex + delta;
-            if (i < 0 || i >= navList.Count) return;
-            navIndex = i;
-            ShowCurrentSeries();
+            if (state == CompareState.Folders)
+            {
+                int k = fileNavIndex + delta;
+                if (k < 0 || k >= fileNav.Count) return;
+                fileNavIndex = k;
+            }
+            else
+            {
+                int i = navIndex + delta;
+                if (i < 0 || i >= navList.Count) return;
+                navIndex = i;
+            }
+            ShowCurrentItem();
         }
+
+        int NavCount => state == CompareState.Folders ? fileNav.Count : navList.Count;
 
         void PrevButton_Click(object sender, RoutedEventArgs e)
         {
@@ -1228,14 +1853,14 @@ namespace Gekko
             Navigate(1);
         }
 
-        void OnlyFlagged_Changed(object sender, RoutedEventArgs e)
+        void OnlyFound_Changed(object sender, RoutedEventArgs e)
         {
-            if (ready) ShowCurrentSeries();
+            if (ready) ShowCurrentItem();
         }
 
         /// <summary>
-        /// Alt+1/2/3 focus on a bank (again: show all). Ctrl+Up / Ctrl+Down step through the series in the Values tab;
-        /// Ctrl+D hides or shows diagram and controls.
+        /// Alt+1/2/3 focus on a bank/folder (again: show all). Ctrl+Up / Ctrl+Down step through the Values/Details
+        /// tab; Ctrl+D hides or shows diagram and controls.
         /// </summary>
         void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
@@ -1261,7 +1886,7 @@ namespace Gekko
                 return;
             }
             if (e.Key != Key.Up && e.Key != Key.Down) return;
-            if (navList.Count == 0) return;
+            if (NavCount == 0) return;
             if (!Equals(Tabs.SelectedItem, ValuesTab)) Tabs.SelectedItem = ValuesTab;
             Navigate(e.Key == Key.Down ? 1 : -1);
             e.Handled = true;
@@ -1297,7 +1922,7 @@ namespace Gekko
                 DiagramToggle.Content = "▴ Hide controls";
                 // "first 2" / "first 3" may have changed while the diagram was hidden.
                 UpdateLayout();
-                if (current != null) FitVennRow(current.SlotCount);
+                if (Model != null) FitVennRow(Model.SlotCount);
             }
         }
 
@@ -1306,6 +1931,7 @@ namespace Gekko
         void CompareMode_Changed(object sender, RoutedEventArgs e)
         {
             if (!ready || busy) return;
+            View.Compare3 = ReferenceEquals(sender, Compare3Radio);
             BanksChanged();
         }
 
@@ -1315,9 +1941,12 @@ namespace Gekko
             Recompute();
         }
 
+        /// <summary>The name filter applies to both states; the other state is recomputed when it is shown again.</summary>
         void FilterBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (ready) ScheduleRecompute();
+            if (!ready) return;
+            MarkOtherStateDirty();
+            ScheduleRecompute();
         }
 
         void RegexCheck_Changed(object sender, RoutedEventArgs e)
@@ -1326,7 +1955,14 @@ namespace Gekko
             FilterHint.Text = RegexCheck.IsChecked == true
                 ? "Regular expression, case-insensitive, e.g. ^x\\d+$"
                 : "Wildcards * and ?, several patterns separated by spaces";
+            MarkOtherStateDirty();
             Recompute();
+        }
+
+        /// <summary>The filter changed: the other state is recomputed (keeping its hidden banks/folders) when shown again.</summary>
+        void MarkOtherStateDirty()
+        {
+            MarkDirty(state == CompareState.Datafiles ? CompareState.Folders : CompareState.Datafiles, DirtyRecompute);
         }
 
         void CloseButton_Click(object sender, RoutedEventArgs e)
@@ -1339,7 +1975,7 @@ namespace Gekko
             StatusText.Text = text;
         }
 
-        // ---------------------------------------------------------------- dropping files
+        // ---------------------------------------------------------------- dropping files and folders
 
         void DropZone_DragEnter(object sender, DragEventArgs e)
         {
@@ -1361,28 +1997,56 @@ namespace Gekko
         void DropZone_Drop(object sender, DragEventArgs e)
         {
             DropZoneBorder.Stroke = DropNormal;
-            AddFiles(e.Data.GetData(DataFormats.FileDrop) as string[], banks.Count);
+            HandleDrop(e.Data.GetData(DataFormats.FileDrop) as string[], banks.Count);
         }
 
-        /// <summary>Loads the files and inserts them in the list at position insertAt (0-based).</summary>
+        /// <summary>
+        /// Dropped folders go to the folder list (and show the Folders state), dropped files to the databank list
+        /// (and show the Datafiles state). insertAt is the position in the list shown when dropping.
+        /// </summary>
+        void HandleDrop(string[] paths, int insertAt)
+        {
+            if (paths == null || paths.Length == 0) return;
+            string[] dirs = paths.Where(Directory.Exists).ToArray();
+            string[] files = paths.Where(p => !Directory.Exists(p)).ToArray();
+            if (dirs.Length > 0)
+            {
+                int at = state == CompareState.Folders ? insertAt : folderItems.Count;
+                SwitchState(CompareState.Folders);
+                AddFolders(dirs, at);
+                if (files.Length > 0)
+                {
+                    AddFiles(files, bankItems.Count);
+                    SetStatus(StatusText.Text + " The dropped files were added to the Datafiles list.");
+                }
+            }
+            else
+            {
+                int at = state == CompareState.Datafiles ? insertAt : bankItems.Count;
+                SwitchState(CompareState.Datafiles);
+                AddFiles(files, at);
+            }
+        }
+
+        /// <summary>Loads the databank files and inserts them in the Datafiles list at position insertAt (0-based).</summary>
         void AddFiles(string[] paths, int insertAt)
         {
             if (paths == null || paths.Length == 0) return;
-            int at = Math.Max(0, Math.Min(insertAt, banks.Count));
+            int at = Math.Max(0, Math.Min(insertAt, bankItems.Count));
             int added = 0;
             var skipped = new List<string>();
             string failure = null;
             foreach (string path in paths)
             {
-                if (Directory.Exists(path) || IsInList(path))
+                if (Directory.Exists(path) || IsIn(bankItems, path))
                 {
                     skipped.Add(Path.GetFileName(path));
                     continue;
                 }
                 try
                 {
-                    banks.Insert(at++, new BankItem(DatabankLoader.Load(path)));
-                    TouchRecentBank(path);
+                    bankItems.Insert(at++, new BankItem(DatabankLoader.Load(path)));
+                    TouchRecent(false, path);
                     added++;
                 }
                 catch (Exception ex)
@@ -1390,18 +2054,52 @@ namespace Gekko
                     failure = "Could not read " + Path.GetFileName(path) + ": " + ex.Message;
                 }
             }
-            if (added > 0) BanksChanged();
+            if (added > 0)
+            {
+                openedFrom = null;
+                if (state == CompareState.Datafiles) BanksChanged();
+                else MarkDirty(CompareState.Datafiles, DirtyList);
+                UpdateOpenedFromText();
+            }
 
             string status = added == 1 ? "1 databank added." : added + " databanks added.";
-            if (skipped.Count > 0) status += " Skipped folders or banks already in the list: " + string.Join(", ", skipped) + ".";
+            if (skipped.Count > 0) status += " Skipped banks already in the list: " + string.Join(", ", skipped) + ".";
             if (failure != null) status += " " + failure;
             SetStatus(status);
+        }
+
+        /// <summary>Inserts folders in the Folders list at position insertAt (0-based).</summary>
+        void AddFolders(string[] paths, int insertAt)
+        {
+            if (paths == null || paths.Length == 0) return;
+            int at = Math.Max(0, Math.Min(insertAt, folderItems.Count));
+            int added = 0;
+            var skipped = new List<string>();
+            foreach (string path in paths)
+            {
+                if (IsIn(folderItems, path))
+                {
+                    skipped.Add(FolderResult.FolderName(path));
+                    continue;
+                }
+                folderItems.Insert(at++, BankItem.ForFolder(path));
+                TouchRecent(true, path);
+                added++;
+            }
+            if (added > 0)
+            {
+                if (state == CompareState.Folders) BanksChanged();
+                else MarkDirty(CompareState.Folders, DirtyList);
+            }
+            string status = added == 1 ? "1 folder added." : added + " folders added.";
+            if (skipped.Count > 0) status += " Skipped folders already in the list: " + string.Join(", ", skipped) + ".";
+            if (!folderComputing) SetStatus(status);
         }
 
         void RemoveBank_Click(object sender, RoutedEventArgs e)
         {
             var item = (sender as FrameworkElement)?.Tag as BankItem;
-            if (item != null) RemoveBank(item);
+            if (item != null && !item.IsPlaceholder) RemoveBank(item);
         }
 
         void BankList_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -1416,6 +2114,8 @@ namespace Gekko
         void RemoveBank(BankItem item)
         {
             banks.Remove(item);
+            if (state == CompareState.Datafiles) openedFrom = null;
+            UpdateOpenedFromText();
             BanksChanged();
             SetStatus(item.Name + " removed.");
         }
@@ -1489,7 +2189,7 @@ namespace Gekko
             }
             else if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                AddFiles(e.Data.GetData(DataFormats.FileDrop) as string[], gap);
+                HandleDrop(e.Data.GetData(DataFormats.FileDrop) as string[], gap);
             }
         }
 

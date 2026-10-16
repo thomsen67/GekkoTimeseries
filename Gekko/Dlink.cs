@@ -216,10 +216,10 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
     {
         
         /// <summary>
-        /// Handles blobs, for .dlink.       
+        /// Handles blobs, for .dlink. p==null signals "always dlink".    
         /// </summary>
         /// <param name="dataFile"></param>
-        public static void HandleDlink(string dataFile, bool force)
+        public static void HandleDlink(string dataFile, bool force, P p)
         {
             string hash = null;
             long? bytes = null;
@@ -228,34 +228,48 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 //Note: just because a .dlink file is constructed, this it not the same
                 //      as that it has to go into blobs storage.
 
-                string dlinkFile = DlinkCommon.Dlink_FromDataFileToDlinkFile(dataFile, false);
-
-                if (dlinkFile == null)
+                string gcm = null;
+                try
                 {
-                    //Do nothing: may be a databank on some other drive
+                    if (Program.options.databank_dlink_run)
+                    {
+                        gcm = Path.GetFileName(p?.GetExecutingGcmFile(ERunningGcm.ExcludeProcFuncIgnoreExistence));
+                    }
                 }
-                else
+                catch { }                
+                
+                if (force || !G.NullOrBlanks(gcm)) //We only want this done when a .gcm file is run with RUN. p==null signals "always dlink".
                 {
-                    if (File.Exists(dataFile))
-                    {                        
-                        hash = DlinkHooks.GetFileHash(dataFile);
+
+                    string dlinkFile = DlinkCommon.Dlink_FromDataFileToDlinkFile(dataFile, false);
+
+                    if (dlinkFile == null)
+                    {
+                        //Do nothing: may be a databank on some other drive
                     }
                     else
                     {
-                        new Error("The file '" + dataFile + "' does not exist for .dlink file construction");
+                        if (File.Exists(dataFile))
+                        {
+                            hash = DlinkHooks.GetFileHash(dataFile);
+                        }
+                        else
+                        {
+                            new Error("The file '" + dataFile + "' does not exist for .dlink file construction");
+                        }
+
+                        bytes = (new FileInfo(dataFile)).Length;
+                        if (!Directory.Exists(Path.GetDirectoryName(dlinkFile)))
+                        {
+                            Directory.CreateDirectory(Path.GetDirectoryName(dlinkFile));
+                        }
+
+                        EDlinkHashKind hashKind = DlinkHashKinds.Classify(dataFile);
+
+                        if (!DlinkHashKinds.IsByteCountMeaningful(hashKind)) bytes = null; //Not meaningful for px or gbk
+                        DlinkFile blobInfo = new DlinkFile(hash, bytes);
+                        G.YamlWriter<DlinkFile>(blobInfo, dlinkFile);
                     }
-
-                    bytes = (new FileInfo(dataFile)).Length;
-                    if (!Directory.Exists(Path.GetDirectoryName(dlinkFile)))
-                    {                        
-                        Directory.CreateDirectory(Path.GetDirectoryName(dlinkFile));
-                    }
-
-                    EDlinkHashKind hashKind = DlinkHashKinds.Classify(dataFile);
-
-                    if (!DlinkHashKinds.IsByteCountMeaningful(hashKind)) bytes = null; //Not meaningful for px or gbk
-                    DlinkFile blobInfo = new DlinkFile(hash, bytes);
-                    G.YamlWriter<DlinkFile>(blobInfo, dlinkFile);
                 }
             }
         }        
@@ -296,7 +310,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             {
                 foreach (string dlinkFile2 in dlinkFiles) //Could probably be parallelized
                 {
-                    DlinkAutoDlinkFiles.HandleDlink(dlinkFile2, true);
+                    DlinkAutoDlinkFiles.HandleDlink(dlinkFile2, true, null);
                 }
             }
             catch

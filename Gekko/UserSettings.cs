@@ -605,6 +605,15 @@ namespace Gekko
             set { this["CompareRecentBanks"] = (string)value; }
         }
 
+        // New: most recently compared folders (LRU, max 20), full paths separated by '|'.
+        [DefaultSettingValue("")]
+        [UserScopedSetting()]
+        public string CompareRecentFolders
+        {
+            get { return ((string)this["CompareRecentFolders"]); }
+            set { this["CompareRecentFolders"] = (string)value; }
+        }
+
         [DefaultSettingValue("0")]
         [UserScopedSetting()]
         public double CompareWindowWidth
@@ -654,6 +663,8 @@ namespace Gekko
             get { return ((double)this["CompareWindowSplitterDistance2"]); }
             set { this["CompareWindowSplitterDistance2"] = (double)value; }
         }
+
+
     }
 }
 

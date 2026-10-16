@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:Gekko"
         Title="Compare databanks"
-        Height="760" Width="1180" MinHeight="600" MinWidth="960"
+        Height="800" Width="1180" MinHeight="640" MinWidth="960"
         Top="20" Left="20"
         Loaded="Window_Loaded" Closing="Window_Closing"
         PreviewKeyDown="Window_PreviewKeyDown">
@@ -41,7 +41,7 @@
             </Setter>
         </Style>
 
-        <!-- Small borderless icon button (the red X in the bank list) -->
+        <!-- Small borderless icon button (the red X in the list) -->
         <Style x:Key="FlatIconButtonStyle" TargetType="Button">
             <Setter Property="Width" Value="18"/>
             <Setter Property="Height" Value="18"/>
@@ -56,6 +56,35 @@
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Background" Value="#FFFBE3E3"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- New: the two halves of the Datafiles | Folders switch at the top left. Tag holds the corner radius
+             (a Binding rather than TemplateBinding, so the text "3,0,0,3" is converted to a CornerRadius). -->
+        <Style x:Key="StateButtonStyle" TargetType="RadioButton">
+            <Setter Property="GroupName" Value="CompareState"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#FF444444"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border Name="Back" Background="#FFF0F0F0" BorderBrush="#FFACACAC" BorderThickness="1"
+                                CornerRadius="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" Padding="14,2">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Back" Property="Background" Value="#FFE5E5E5"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Back" Property="Background" Value="#FF1F4E79"/>
+                                <Setter TargetName="Back" Property="BorderBrush" Value="#FF1F4E79"/>
+                                <Setter Property="Foreground" Value="White"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -134,36 +163,65 @@
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="Margin" Value="0,0,8,0"/>
         </Style>
+
+        <Style x:Key="HintStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#FF888888"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+
+        <!-- The check tabs at the bottom of the controls panel: compact headers -->
+        <Style x:Key="CheckTabStyle" TargetType="TabItem">
+            <Setter Property="Padding" Value="8,1"/>
+            <Setter Property="FontSize" Value="11.5"/>
+        </Style>
     </Window.Resources>
 
     <Grid Margin="10" Name="RootGrid">
         <Grid.RowDefinitions>
             <!-- Its height is saved as CompareWindowSplitterDistance1 -->
-            <RowDefinition x:Name="BankListRow" Height="112" MinHeight="50"/>
+            <RowDefinition x:Name="BankListRow" Height="138" MinHeight="76"/>
             <RowDefinition Height="8"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="8"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Drop zone and numbered, reorderable list of banks. Both fill the (resizable) top part. -->
+        <!-- Top: the Datafiles | Folders switch, the drop zone and the numbered, reorderable list. -->
         <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="6"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="220"/>
                 <ColumnDefinition Width="10"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Grid Grid.Column="0" Name="DropZone" AllowDrop="True"
+            <!-- New: compare databanks (series inside) or folders (data files inside). Each keeps its own list. -->
+            <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
+                <RadioButton Name="DatafilesStateButton" Content="Datafiles" Style="{StaticResource StateButtonStyle}"
+                             Tag="3,0,0,3" IsChecked="True" Checked="StateButton_Checked"
+                             ToolTip="Compare the series in 2 or 3 databank files"/>
+                <RadioButton Name="FoldersStateButton" Content="Folders" Style="{StaticResource StateButtonStyle}"
+                             Tag="0,3,3,0" Margin="-1,0,0,0" Checked="StateButton_Checked"
+                             ToolTip="Compare the data files in 2 or 3 folders (and their subfolders)"/>
+            </StackPanel>
+            <TextBlock Grid.Row="0" Grid.Column="2" Name="StateInfoText" Visibility="Collapsed" VerticalAlignment="Center"
+                       Foreground="#FF1F4E79" TextTrimming="CharacterEllipsis"/>
+
+            <Grid Grid.Row="2" Grid.Column="0" Name="DropZone" AllowDrop="True"
                   Drop="DropZone_Drop" DragEnter="DropZone_DragEnter" DragOver="DropZone_DragOver" DragLeave="DropZone_DragLeave">
                 <Rectangle Name="DropZoneBorder" Fill="#FFF4F4F4" Stroke="#FF999999" StrokeThickness="2"
                            StrokeDashArray="4 2" RadiusX="4" RadiusY="4"/>
-                <TextBlock Name="DropZoneHintText" Text="Drag databank files here"
+                <TextBlock Name="DropZoneHintText" Text="Drag databank files or folders here"
                            HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False"
                            FontSize="14" Foreground="#FF555555" TextWrapping="Wrap" TextAlignment="Center" Margin="10"/>
             </Grid>
 
-            <ListView Grid.Column="2" Name="BankList" SelectionMode="Single" AllowDrop="True"
+            <ListView Grid.Row="2" Grid.Column="2" Name="BankList" SelectionMode="Single" AllowDrop="True"
                       FontFamily="Calibri" FontSize="13" BorderBrush="#FFACACAC"
                       ItemContainerStyle="{StaticResource BankRowStyle}"
                       PreviewMouseLeftButtonDown="BankList_PreviewMouseLeftButtonDown"
@@ -182,7 +240,7 @@
                                 <DataTemplate>
                                     <Border Width="18" Height="18" CornerRadius="9" Background="{Binding NumberBrush}"
                                             HorizontalAlignment="Left" Visibility="{Binding RowVisibility}"
-                                            ToolTip="Drag the row up or down to change the order. The first 2 or 3 banks are compared.">
+                                            ToolTip="Drag the row up or down to change the order. The first 2 or 3 are compared.">
                                         <TextBlock Text="{Binding Position}" Foreground="White" FontWeight="Bold"
                                                    FontFamily="Segoe UI" FontSize="11"
                                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -190,14 +248,15 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Width="180" Header="File name">
+                        <GridViewColumn Width="180" Header="Name">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Name}" Foreground="#FF1F4E79" TextTrimming="CharacterEllipsis"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Width="170" Header="Series" DisplayMemberBinding="{Binding SeriesText}"/>
+                        <!-- "Series" for databanks, "Data files" for folders (set in code) -->
+                        <GridViewColumn x:Name="ContentsColumn" Width="170" Header="Series" DisplayMemberBinding="{Binding SeriesText}"/>
                         <GridViewColumn Width="330" Header="Full path">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
@@ -216,7 +275,7 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <!-- [Recent] replaces the bank on this row (adds one on the empty row); the red X removes it -->
+                        <!-- [Recent] replaces the bank/folder on this row (adds one on the empty row); the red X removes it -->
                         <GridViewColumn Width="96" Header="">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
@@ -241,7 +300,7 @@
 
         <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                       ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" Background="Transparent"
-                      ToolTip="Drag to resize the bank list"/>
+                      ToolTip="Drag to resize the list"/>
 
         <Grid Grid.Row="2">
             <Grid.RowDefinitions>
@@ -251,7 +310,7 @@
                 <RowDefinition x:Name="DetailsRow" Height="*" MinHeight="150"/>
             </Grid.RowDefinitions>
 
-                <!-- Venn diagram on the left, controls on the right. "Hide controls" hides both. -->
+            <!-- Venn diagram on the left, controls on the right. "Hide controls" hides both. -->
             <Grid Grid.Row="0" Name="DiagramArea">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -266,13 +325,12 @@
                 <!-- The diagram row is never made lower than these controls need (see FitVennRow) -->
                 <Border Grid.Column="2" Name="ControlsPanel" BorderBrush="#FFD5D5D5" BorderThickness="1" CornerRadius="4"
                         Background="#FFFAFAFA" Padding="10,8" Width="290">
-                    <Grid Name="ControlsContent" VerticalAlignment="Top">
+                    <Grid Name="ControlsContent" VerticalAlignment="Top" Grid.IsSharedSizeScope="True">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="PanelLabel"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
@@ -290,76 +348,137 @@
                                          IsChecked="True" Checked="CompareMode_Changed"/>
                         </StackPanel>
 
-                        <TextBlock Grid.Row="1" Text="Frequency" Style="{StaticResource PanelLabelStyle}"/>
-                        <ComboBox Grid.Row="1" Grid.Column="1" Name="FreqCombo" Width="110" Height="18" FontSize="11.5"
-                                  Padding="5,0,4,0" VerticalContentAlignment="Center" HorizontalAlignment="Left"
-                                  Margin="0,0,0,8" SelectionChanged="FreqCombo_SelectionChanged"/>
-
-                        <TextBlock Grid.Row="2" Text="Period" Style="{StaticResource PanelLabelStyle}"
-                                   ToolTip="The period filter: the numbers in the diagram, the names and the values are for these periods. Clicking a histogram bar sets it too."/>
-                        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
-                        <Grid Name="FromSpinner" Width="80" Height="18">
+                        <!-- Datafiles only: frequency and period -->
+                        <Grid Grid.Row="1" Grid.ColumnSpan="2" Name="DatafileControls">
                             <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="PanelLabel"/>
                                 <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="14"/>
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-                            <TextBox Name="FromBox" Grid.RowSpan="2" Style="{StaticResource PeriodBoxStyle}"
-                                     PreviewKeyDown="PeriodBox_PreviewKeyDown" LostKeyboardFocus="PeriodBox_LostKeyboardFocus"
-                                     PreviewMouseWheel="PeriodBox_PreviewMouseWheel"
-                                     ToolTip="First period to compare. Type e.g. 2010q1 and press Enter, or step with the arrows, Up/Down or the mouse wheel."/>
-                            <RepeatButton Grid.Column="1" Grid.Row="0" Style="{StaticResource SpinButtonStyle}" BorderThickness="0,1,1,0"
-                                          Tag="FromUp" Click="SpinButton_Click" ToolTip="Next period">
-                                <Path Data="M0,3.5 L3,0 L6,3.5 Z" Fill="#FF555555"/>
-                            </RepeatButton>
-                            <RepeatButton Grid.Column="1" Grid.Row="1" Style="{StaticResource SpinButtonStyle}" BorderThickness="0,1,1,1"
-                                          Tag="FromDown" Click="SpinButton_Click" ToolTip="Previous period">
-                                <Path Data="M0,0 L6,0 L3,3.5 Z" Fill="#FF555555"/>
-                            </RepeatButton>
-                        </Grid>
-                            <TextBlock Text="to" Foreground="#FF444444" VerticalAlignment="Center" Margin="6,0,6,0"/>
-                        <Grid Name="ToSpinner" Width="80" Height="18">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="14"/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <TextBox Name="ToBox" Grid.RowSpan="2" Style="{StaticResource PeriodBoxStyle}"
-                                     PreviewKeyDown="PeriodBox_PreviewKeyDown" LostKeyboardFocus="PeriodBox_LostKeyboardFocus"
-                                     PreviewMouseWheel="PeriodBox_PreviewMouseWheel"
-                                     ToolTip="Last period to compare. Type e.g. 2020q4 and press Enter, or step with the arrows, Up/Down or the mouse wheel."/>
-                            <RepeatButton Grid.Column="1" Grid.Row="0" Style="{StaticResource SpinButtonStyle}" BorderThickness="0,1,1,0"
-                                          Tag="ToUp" Click="SpinButton_Click" ToolTip="Next period">
-                                <Path Data="M0,3.5 L3,0 L6,3.5 Z" Fill="#FF555555"/>
-                            </RepeatButton>
-                            <RepeatButton Grid.Column="1" Grid.Row="1" Style="{StaticResource SpinButtonStyle}" BorderThickness="0,1,1,1"
-                                          Tag="ToDown" Click="SpinButton_Click" ToolTip="Previous period">
-                                <Path Data="M0,0 L6,0 L3,3.5 Z" Fill="#FF555555"/>
-                            </RepeatButton>
-                        </Grid>
-                        </StackPanel>
 
-                        <TextBlock Grid.Row="3" Grid.Column="1" Name="SpanText" Foreground="#FF888888" FontSize="11"
-                                   TextWrapping="Wrap" Margin="0,3,0,3"/>
-                        <Button Grid.Row="4" Grid.Column="1" Name="WholePeriodButton" Content="Whole period"
-                                Style="{StaticResource RoundedSmallButtonStyle}" HorizontalAlignment="Left"
-                                Margin="0,0,0,10" Click="WholePeriod_Click"
-                                ToolTip="Remove the period filter: the whole universal period"/>
+                            <TextBlock Grid.Row="0" Text="Frequency" Style="{StaticResource PanelLabelStyle}"/>
+                            <ComboBox Grid.Row="0" Grid.Column="1" Name="FreqCombo" Width="110" Height="18" FontSize="11.5"
+                                      Padding="5,0,4,0" VerticalContentAlignment="Center" HorizontalAlignment="Left"
+                                      Margin="0,0,0,8" SelectionChanged="FreqCombo_SelectionChanged"/>
 
-                        <TextBlock Grid.Row="5" Text="Filter" Style="{StaticResource PanelLabelStyle}"/>
-                        <TextBox Grid.Row="5" Grid.Column="1" Name="FilterBox" Height="22" VerticalContentAlignment="Center"
-                                 TextChanged="FilterBox_TextChanged"/>
-                        <CheckBox Grid.Row="6" Grid.Column="1" Name="RegexCheck" Content="Regex" Margin="0,5,0,0"
+                            <TextBlock Grid.Row="1" Text="Period" Style="{StaticResource PanelLabelStyle}"
+                                       ToolTip="The period filter: the numbers in the diagram, the names and the values are for these periods. Clicking a histogram bar sets it too."/>
+                            <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+                                <Grid Name="FromSpinner" Width="80" Height="18">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="14"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <TextBox Name="FromBox" Grid.RowSpan="2" Style="{StaticResource PeriodBoxStyle}"
+                                             PreviewKeyDown="PeriodBox_PreviewKeyDown" LostKeyboardFocus="PeriodBox_LostKeyboardFocus"
+                                             PreviewMouseWheel="PeriodBox_PreviewMouseWheel"
+                                             ToolTip="First period to compare. Type e.g. 2010q1 and press Enter, or step with the arrows, Up/Down or the mouse wheel."/>
+                                    <RepeatButton Grid.Column="1" Grid.Row="0" Style="{StaticResource SpinButtonStyle}" BorderThickness="0,1,1,0"
+                                                  Tag="FromUp" Click="SpinButton_Click" ToolTip="Next period">
+                                        <Path Data="M0,3.5 L3,0 L6,3.5 Z" Fill="#FF555555"/>
+                                    </RepeatButton>
+                                    <RepeatButton Grid.Column="1" Grid.Row="1" Style="{StaticResource SpinButtonStyle}" BorderThickness="0,1,1,1"
+                                                  Tag="FromDown" Click="SpinButton_Click" ToolTip="Previous period">
+                                        <Path Data="M0,0 L6,0 L3,3.5 Z" Fill="#FF555555"/>
+                                    </RepeatButton>
+                                </Grid>
+                                <TextBlock Text="to" Foreground="#FF444444" VerticalAlignment="Center" Margin="6,0,6,0"/>
+                                <Grid Name="ToSpinner" Width="80" Height="18">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="14"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <TextBox Name="ToBox" Grid.RowSpan="2" Style="{StaticResource PeriodBoxStyle}"
+                                             PreviewKeyDown="PeriodBox_PreviewKeyDown" LostKeyboardFocus="PeriodBox_LostKeyboardFocus"
+                                             PreviewMouseWheel="PeriodBox_PreviewMouseWheel"
+                                             ToolTip="Last period to compare. Type e.g. 2020q4 and press Enter, or step with the arrows, Up/Down or the mouse wheel."/>
+                                    <RepeatButton Grid.Column="1" Grid.Row="0" Style="{StaticResource SpinButtonStyle}" BorderThickness="0,1,1,0"
+                                                  Tag="ToUp" Click="SpinButton_Click" ToolTip="Next period">
+                                        <Path Data="M0,3.5 L3,0 L6,3.5 Z" Fill="#FF555555"/>
+                                    </RepeatButton>
+                                    <RepeatButton Grid.Column="1" Grid.Row="1" Style="{StaticResource SpinButtonStyle}" BorderThickness="0,1,1,1"
+                                                  Tag="ToDown" Click="SpinButton_Click" ToolTip="Previous period">
+                                        <Path Data="M0,0 L6,0 L3,3.5 Z" Fill="#FF555555"/>
+                                    </RepeatButton>
+                                </Grid>
+                            </StackPanel>
+
+                            <TextBlock Grid.Row="2" Grid.Column="1" Name="SpanText" Style="{StaticResource HintStyle}" Margin="0,3,0,3"/>
+                            <Button Grid.Row="3" Grid.Column="1" Name="WholePeriodButton" Content="Whole period"
+                                    Style="{StaticResource RoundedSmallButtonStyle}" HorizontalAlignment="Left"
+                                    Margin="0,0,0,10" Click="WholePeriod_Click"
+                                    ToolTip="Remove the period filter: the whole universal period"/>
+                        </Grid>
+
+                        <!-- Folders only -->
+                        <TextBlock Grid.Row="2" Grid.Column="1" Name="FolderNote" Visibility="Collapsed" Style="{StaticResource HintStyle}"
+                                   Margin="0,0,0,10"
+                                   Text="Data files (*.gbk) in the folders and their subfolders are matched by their path relative to each folder. Click a file in the Files tab to compare its series."/>
+
+                        <TextBlock Grid.Row="3" Text="Filter" Style="{StaticResource PanelLabelStyle}"/>
+                        <TextBox Grid.Row="3" Grid.Column="1" Name="FilterBox" Height="22" VerticalContentAlignment="Center"
+                                 TextChanged="FilterBox_TextChanged"
+                                 ToolTip="Series names (Datafiles), or file names and relative paths (Folders)"/>
+                        <CheckBox Grid.Row="4" Grid.Column="1" Name="RegexCheck" Content="Regex" Margin="0,5,0,0"
                                   Checked="RegexCheck_Changed" Unchecked="RegexCheck_Changed"/>
-                        <TextBlock Grid.Row="7" Grid.Column="1" Name="FilterHint"
-                                   Text="Wildcards * and ?, several patterns separated by spaces"
-                                   Foreground="#FF888888" FontSize="11" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                        <TextBlock Grid.Row="5" Grid.Column="1" Name="FilterHint" Style="{StaticResource HintStyle}"
+                                   Text="Wildcards * and ?, several patterns separated by spaces" Margin="0,4,0,8"/>
+
+                        <!-- New: the check. The red numbers, the histogram, the red names and the * in Values follow it. -->
+                        <TabControl Grid.Row="6" Grid.ColumnSpan="2" Name="CheckTabs" SelectionChanged="CheckTabs_SelectionChanged"
+                                    Background="White">
+                            <TabItem Header="Differences" Name="DifferencesCheckTab" Style="{StaticResource CheckTabStyle}"
+                                     ToolTip="Find series whose values differ between the banks">
+                                <StackPanel Margin="4,5,4,4">
+                                    <StackPanel Name="DiffThresholdPanel">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Threshold" Style="{StaticResource LabelStyle}"/>
+                                            <TextBox Name="DiffThresholdBox" Width="70" Height="20" Text="0" VerticalContentAlignment="Center"
+                                                     TextChanged="Threshold_Changed"
+                                                     ToolTip="Two values are equal when they differ by at most this much (0: exactly equal)"/>
+                                            <CheckBox Name="DiffRelativeCheck" Content="relative (%)" VerticalAlignment="Center" Margin="10,0,0,0"
+                                                      Checked="Threshold_Changed" Unchecked="Threshold_Changed"
+                                                      ToolTip="The threshold is in percent of the larger of the two values"/>
+                                        </StackPanel>
+                                        <TextBlock Style="{StaticResource HintStyle}" Margin="0,5,0,0"
+                                                   Text="Values differing by more than the threshold, or a value against M, differ. M against M is equal."/>
+                                    </StackPanel>
+                                    <TextBlock Name="DiffFolderNote" Visibility="Collapsed" Style="{StaticResource HintStyle}"
+                                               Text="Folders: a file in several folders differs when its contents are not identical (byte by byte)."/>
+                                </StackPanel>
+                            </TabItem>
+                            <TabItem Header="Missings" Name="MissingsCheckTab" Style="{StaticResource CheckTabStyle}"
+                                     ToolTip="Find series with missing values (M)">
+                                <TextBlock Margin="4,5,4,4" Style="{StaticResource HintStyle}"
+                                           Text="Series with M (missing) in at least one of the banks of the area. For a whole bank (its box): M in that bank."/>
+                            </TabItem>
+                            <TabItem Header="Zeroes" Name="ZeroesCheckTab" Style="{StaticResource CheckTabStyle}"
+                                     ToolTip="Find series with zeroes">
+                                <StackPanel Margin="4,5,4,4">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Threshold" Style="{StaticResource LabelStyle}"/>
+                                        <TextBox Name="ZeroThresholdBox" Width="70" Height="20" Text="0" VerticalContentAlignment="Center"
+                                                 TextChanged="Threshold_Changed"
+                                                 ToolTip="A value counts as zero when its absolute value is at most this (0: exactly zero)"/>
+                                    </StackPanel>
+                                    <TextBlock Style="{StaticResource HintStyle}" Margin="0,5,0,0"
+                                               Text="Series with a zero (|value| ≤ threshold) in at least one of the banks of the area. For a whole bank: in that bank."/>
+                                </StackPanel>
+                            </TabItem>
+                        </TabControl>
                     </Grid>
                 </Border>
             </Grid>
@@ -370,6 +489,7 @@
             <!-- Details. The toggle button sits to the right of the tab headers. -->
             <Grid Grid.Row="2">
                 <TabControl Name="Tabs">
+                    <!-- "Names" (Datafiles) or "Files" (Folders); the header is set in code -->
                     <TabItem Header="Names" Name="NamesTab">
                         <Grid Margin="4">
                             <Grid.RowDefinitions>
@@ -392,21 +512,33 @@
                                 <Button Grid.Column="2" Content="Copy" Style="{StaticResource RoundedSmallButtonStyle}"
                                         Click="CopyNames_Click"/>
                             </Grid>
-                            <!-- RichTextBox instead of TextBox, so deviating names can be dark red -->
+                            <!-- Datafiles: the names, comma-separated; found ones in dark red -->
                             <RichTextBox Grid.Row="2" Name="NamesText" IsReadOnly="True" IsReadOnlyCaretVisible="False"
                                          FontFamily="Consolas" FontSize="12.5" BorderBrush="#FFACACAC" Padding="4,2"
                                          VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"/>
+                            <!-- New, Folders: one file per line; differing ones in dark red; click a file to compare its series -->
+                            <ListBox Grid.Row="2" Name="FilesList" Visibility="Collapsed" BorderBrush="#FFACACAC"
+                                     FontFamily="Consolas" FontSize="12.5"
+                                     VirtualizingStackPanel.IsVirtualizing="True"
+                                     MouseLeftButtonUp="FilesList_MouseLeftButtonUp" KeyDown="FilesList_KeyDown">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Text}" Foreground="{Binding Foreground}"
+                                                   ToolTip="{Binding Tip}" Cursor="{Binding Cursor}"/>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
                         </Grid>
                     </TabItem>
 
-                    <!-- One histogram: "Missings histogram" (blue) for "All of bank x" (a bank's box), "Deviations histogram" (red)
-                         for an overlap area after clicking its red number, otherwise a hint. The header is set in code. -->
+                    <!-- Per period, the number of series found by the current check (Datafiles) -->
                     <TabItem Header="Histogram" Name="HistogramTab"
-                             ToolTip="Per period, for the selected area. Click a bar to filter on that period; double-click to list the names.">
+                             ToolTip="Per period, for the selected area: the series found by the check. Click a bar to filter on that period; double-click to list the names.">
                         <local:HistogramView x:Name="Histogram" Margin="4"/>
                     </TabItem>
 
-                    <!-- Renamed from Deviations: steps through the series in the Names list -->
+                    <!-- "Values" (Datafiles): steps through the series in the Names list.
+                         "Details" (Folders): steps through the files in the Files list. -->
                     <TabItem Header="Values" Name="ValuesTab">
                         <Grid Margin="4">
                             <Grid.RowDefinitions>
@@ -424,17 +556,17 @@
                                 </Grid.ColumnDefinitions>
                                 <Button Name="PrevButton" Grid.Column="0" Content="&#x25B2; Previous"
                                         Style="{StaticResource RoundedSmallButtonStyle}" Click="PrevButton_Click"
-                                        ToolTip="Previous series (Ctrl+Up)"/>
+                                        ToolTip="Previous (Ctrl+Up)"/>
                                 <Button Name="NextButton" Grid.Column="1" Content="&#x25BC; Next" Margin="6,0,0,0"
                                         Style="{StaticResource RoundedSmallButtonStyle}" Click="NextButton_Click"
-                                        ToolTip="Next series (Ctrl+Down)"/>
+                                        ToolTip="Next (Ctrl+Down)"/>
                                 <TextBlock Name="NavText" Grid.Column="2" Margin="12,0,0,0" FontWeight="SemiBold"
                                            Foreground="#FF1F4E79" VerticalAlignment="Center"/>
                                 <TextBlock Name="LegendText" Grid.Column="3" Margin="16,0,8,0" Foreground="#FF888888"
                                            VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                                <CheckBox Name="OnlyFlaggedCheck" Grid.Column="4" Content="Only periods with deviations or M"
-                                          VerticalAlignment="Center"
-                                          Checked="OnlyFlagged_Changed" Unchecked="OnlyFlagged_Changed"/>
+                                <CheckBox Name="OnlyFoundCheck" Grid.Column="4" Content="Only periods marked *"
+                                          VerticalAlignment="Center" ToolTip="Only the periods found by the current check"
+                                          Checked="OnlyFound_Changed" Unchecked="OnlyFound_Changed"/>
                             </Grid>
                             <TextBox Grid.Row="2" Name="DevText" Style="{StaticResource MonoTextStyle}"
                                      TextWrapping="NoWrap" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"

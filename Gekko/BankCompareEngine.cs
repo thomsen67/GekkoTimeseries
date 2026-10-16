@@ -7,17 +7,114 @@ using System.Text.RegularExpressions;
 
 namespace Gekko
 {
-    /// <summary>A drill-down filter on one of the two flags: no filter, flag set, or flag not set.</summary>
+    /// <summary>A drill-down filter on the "found" flag: no filter, found, or not found.</summary>
     public enum FlagFilter { Any, Yes, No }
+
+    /// <summary>
+    /// The three independent checks (the tabs at the bottom of the controls panel). Each check marks some
+    /// series-periods as "found"; the red numbers, the histogram, the red names and the * in the values all
+    /// follow the current check.
+    ///   Differences: the area's banks do not all have the same value (beyond the threshold). M = M is equal.
+    ///   Missings:    the value is M (double.NaN) in at least one of the banks.
+    ///   Zeroes:      the value is zero (|value| &lt;= threshold) in at least one of the banks.
+    /// </summary>
+    public enum CheckKind { Differences, Missings, Zeroes }
+
+    /// <summary>The thresholds of the checks.</summary>
+    public sealed class CheckSettings
+    {
+        /// <summary>Differences: two numbers are equal when they differ by at most this much.</summary>
+        public double DiffThreshold { get; set; }
+
+        /// <summary>Differences: the threshold is in percent of the larger absolute value instead of absolute.</summary>
+        public bool DiffRelative { get; set; }
+
+        /// <summary>Zeroes: a value counts as zero when its absolute value is at most this.</summary>
+        public double ZeroThreshold { get; set; }
+
+        /// <summary>M = M counts as equal; M and a number are not equal; two numbers use the threshold.</summary>
+        public bool AreEqual(double a, double b)
+        {
+            bool ma = double.IsNaN(a), mb = double.IsNaN(b);
+            if (ma || mb) return ma && mb;
+            if (a == b) return true;  // also equal infinities
+            double d = Math.Abs(a - b);
+            if (double.IsInfinity(d) || double.IsNaN(d)) return false;
+            if (!DiffRelative) return d <= DiffThreshold;
+            double scale = Math.Max(Math.Abs(a), Math.Abs(b));  // > 0, since a != b
+            return d / scale * 100.0 <= DiffThreshold;
+        }
+
+        public bool IsZero(double v)
+        {
+            return !double.IsNaN(v) && Math.Abs(v) <= ZeroThreshold;
+        }
+    }
+
+    /// <summary>Wording for the checks, so that all views say the same.</summary>
+    public static class CheckText
+    {
+        /// <summary>"differ", "have missing values", "have zeroes".</summary>
+        public static string Verb(CheckKind k)
+        {
+            switch (k)
+            {
+                case CheckKind.Missings: return "have missing values";
+                case CheckKind.Zeroes: return "have zeroes";
+                default: return "differ";
+            }
+        }
+
+        /// <summary>"that differ", "with missing values", "with zeroes".</summary>
+        public static string Phrase(CheckKind k)
+        {
+            switch (k)
+            {
+                case CheckKind.Missings: return "with missing values";
+                case CheckKind.Zeroes: return "with zeroes";
+                default: return "that differ";
+            }
+        }
+    }
+
+    /// <summary>Counts for one Venn area or one whole bank/folder.</summary>
+    public sealed class AreaCounts
+    {
+        public int Total;  // all items (black number)
+        public int Found;  // items found by the current check (red number)
+    }
+
+    /// <summary>
+    /// What the Venn diagram shows, for banks (series inside) or folders (files inside). The diagram, its
+    /// numbers, captions and boxes only use this, so the same VennView serves both window states.
+    /// </summary>
+    public interface IVennModel
+    {
+        int SlotCount { get; }
+        bool[] Active { get; }
+        int ActiveCount { get; }
+        IEnumerable<int> AreaMasks { get; }
+        /// <summary>Whether the area gets a red number (e.g. not for one-bank areas when looking for differences).</summary>
+        bool ShowsFound(int mask);
+        AreaCounts AreaCountsOf(int mask);
+        string SlotWord { get; }      // "bank" / "folder"
+        string ItemWord { get; }      // "series" / "files"
+        string FoundPhrase { get; }   // "that differ", "with missing values", ...
+        string SlotName(int slot);    // box, first line
+        string SlotInfo(int slot);    // box, second line
+        string SlotTip(int slot);     // box tooltip (full path)
+        string FoundText(AreaCounts c);   // tooltip of a red number
+        string Summarize(int mask);       // caption when hovering an area
+        string SummarizeWhole(int slot);  // caption when hovering a box
+    }
 
     /// <summary>
     /// One series in a Venn area, compared across the area's banks over the whole universal period.
     ///
     /// M means double.NaN, nothing else. A period outside a series' stored range is also M.
-    ///   Missing (per bank):  the bank's value in the period is M.
-    ///   Deviates (per period): the area's values are not all equal, where M = M counts as equal.
-    ///   Examples for banks 1, 2, 3:  1,1,1 equal | 1,2,1 deviates | 1,1,M deviates, missing in 3 |
-    ///                                M,M,M equal, missing in all three.
+    ///   Deviates (per period): the area's values are not all equal (CheckSettings.AreEqual).
+    ///   Missing  (per bank):   the bank's value in the period is M.
+    ///   Zero     (per bank):   the bank's value in the period is zero (CheckSettings.IsZero).
     /// A series in one bank only never deviates.
     /// </summary>
     public sealed class SeriesComparison
@@ -39,21 +136,26 @@ namespace Gekko
         /// <summary>[index into Slots][period - Start]: true when that bank's value is M.</summary>
         public bool[][] Missing { get; set; }
 
-        // Prefix sums, so that "does it deviate / is it missing anywhere in from..to" is O(1).
+        /// <summary>[index into Slots][period - Start]: true when that bank's value is zero.</summary>
+        public bool[][] Zero { get; set; }
+
+        // Prefix sums, so that "found anywhere in from..to" is O(1) per bank.
         int[] devCum;
         int[][] missCum;
+        int[][] zeroCum;
 
         internal void BuildPrefixSums()
         {
-            int n = Deviates.Length;
-            devCum = new int[n + 1];
-            for (int i = 0; i < n; i++) devCum[i + 1] = devCum[i] + (Deviates[i] ? 1 : 0);
-            missCum = new int[Missing.Length][];
-            for (int s = 0; s < Missing.Length; s++)
-            {
-                missCum[s] = new int[n + 1];
-                for (int i = 0; i < n; i++) missCum[s][i + 1] = missCum[s][i] + (Missing[s][i] ? 1 : 0);
-            }
+            devCum = Cumulate(Deviates);
+            missCum = Missing.Select(Cumulate).ToArray();
+            zeroCum = Zero.Select(Cumulate).ToArray();
+        }
+
+        static int[] Cumulate(bool[] flags)
+        {
+            var cum = new int[flags.Length + 1];
+            for (int i = 0; i < flags.Length; i++) cum[i + 1] = cum[i] + (flags[i] ? 1 : 0);
+            return cum;
         }
 
         bool Clamp(int from, int to, out int lo, out int hi)
@@ -63,6 +165,11 @@ namespace Gekko
             return lo <= hi && Deviates.Length > 0;
         }
 
+        bool[][] PerBank(CheckKind kind)
+        {
+            return kind == CheckKind.Zeroes ? Zero : Missing;
+        }
+
         /// <summary>The value of the series in bank Slots[index], M (NaN) outside its stored range.</summary>
         public double Value(int index, int period)
         {
@@ -70,51 +177,42 @@ namespace Gekko
             return v.HasValue ? v.Value : double.NaN;
         }
 
-        public bool DeviatesAt(int period)
-        {
-            int i = period - Start;
-            return i >= 0 && i < Deviates.Length && Deviates[i];
-        }
-
-        /// <summary>True when the value is M in at least one of the banks in slotMask (bit s = slot s).</summary>
-        public bool MissingAt(int period, int slotMask)
+        /// <summary>
+        /// Found by the check in this period. For Missings and Zeroes only the banks in slotMask count
+        /// (bit s = slot s): the area's banks, or one bank for "All of bank x".
+        /// </summary>
+        public bool FoundAt(CheckKind kind, int period, int slotMask)
         {
             int i = period - Start;
             if (i < 0 || i >= Deviates.Length) return false;
+            if (kind == CheckKind.Differences) return Deviates[i];
+            bool[][] flags = PerBank(kind);
             for (int s = 0; s < Slots.Length; s++)
-                if ((slotMask & (1 << Slots[s])) != 0 && Missing[s][i]) return true;
+                if ((slotMask & (1 << Slots[s])) != 0 && flags[s][i]) return true;
             return false;
         }
 
-        public int DeviatingPeriods(int from, int to)
-        {
-            int lo, hi;
-            return Clamp(from, to, out lo, out hi) ? devCum[hi + 1] - devCum[lo] : 0;
-        }
-
-        /// <summary>Number of periods in from..to where the value is M in at least one of the banks in slotMask.</summary>
-        public int MissingPeriods(int from, int to, int slotMask)
+        /// <summary>Number of periods in from..to where the check finds something.</summary>
+        public int FoundPeriods(CheckKind kind, int from, int to, int slotMask)
         {
             int lo, hi;
             if (!Clamp(from, to, out lo, out hi)) return 0;
+            if (kind == CheckKind.Differences) return devCum[hi + 1] - devCum[lo];
             int count = 0;
             for (int i = lo; i <= hi; i++)
-                for (int s = 0; s < Slots.Length; s++)
-                    if ((slotMask & (1 << Slots[s])) != 0 && Missing[s][i]) { count++; break; }
+                if (FoundAt(kind, Start + i, slotMask)) count++;
             return count;
         }
 
-        public bool DeviatesIn(int from, int to)
-        {
-            return DeviatingPeriods(from, to) > 0;
-        }
-
-        public bool MissingIn(int from, int to, int slotMask)
+        /// <summary>Whether the check finds something in at least one period in from..to.</summary>
+        public bool FoundIn(CheckKind kind, int from, int to, int slotMask)
         {
             int lo, hi;
             if (!Clamp(from, to, out lo, out hi)) return false;
+            if (kind == CheckKind.Differences) return devCum[hi + 1] - devCum[lo] > 0;
+            int[][] cum = kind == CheckKind.Zeroes ? zeroCum : missCum;
             for (int s = 0; s < Slots.Length; s++)
-                if ((slotMask & (1 << Slots[s])) != 0 && missCum[s][hi + 1] - missCum[s][lo] > 0) return true;
+                if ((slotMask & (1 << Slots[s])) != 0 && cum[s][hi + 1] - cum[s][lo] > 0) return true;
             return false;
         }
 
@@ -136,15 +234,8 @@ namespace Gekko
         public bool IsComparison => Slots.Length >= 2;
     }
 
-    /// <summary>Counts for the Venn diagram, for the current period filter.</summary>
-    public sealed class AreaCounts
-    {
-        public int Total;      // all series (black number)
-        public int Deviating;  // deviating in at least one selected period (red number)
-        public int Missing;    // M in at least one selected period (blue number)
-    }
-
-    public sealed class VennResult
+    /// <summary>The comparison of 2 or 3 databanks (the "Datafiles" state).</summary>
+    public sealed class VennResult : IVennModel
     {
         public CompareFreq Freq { get; set; }
         public int SlotCount { get; set; }
@@ -163,7 +254,8 @@ namespace Gekko
         public int[] BankSpanEnd { get; set; }
         public int[] BankSeriesCount { get; set; }
 
-        /// <summary>Set by CompareEngine.UpdateCounts for the current period filter.</summary>
+        /// <summary>Set by CompareEngine.UpdateCounts for the current check and period filter.</summary>
+        public CheckKind Check { get; set; }
         public Dictionary<int, AreaCounts> Counts { get; } = new Dictionary<int, AreaCounts>();
         public AreaCounts[] BankCounts { get; set; }
         public int CountFrom { get; set; }
@@ -194,6 +286,56 @@ namespace Gekko
             if (BankSpanStart[slot] > BankSpanEnd[slot]) return count;
             return PeriodText.Format(Freq, BankSpanStart[slot]) + "–" + PeriodText.Format(Freq, BankSpanEnd[slot]) + ", " + count;
         }
+
+        // ---- IVennModel
+
+        public IEnumerable<int> AreaMasks => Areas.Keys;
+
+        public bool ShowsFound(int mask)
+        {
+            VennArea area;
+            return Areas.TryGetValue(mask, out area) && (Check != CheckKind.Differences || area.IsComparison);
+        }
+
+        public AreaCounts AreaCountsOf(int mask)
+        {
+            AreaCounts c;
+            if (Counts.TryGetValue(mask, out c)) return c;
+            VennArea area;
+            return new AreaCounts { Total = Areas.TryGetValue(mask, out area) ? area.Series.Count : 0 };
+        }
+
+        public string SlotWord => "bank";
+        public string ItemWord => "series";
+        public string FoundPhrase => "series " + CheckText.Phrase(Check);
+        public string SlotName(int slot) => Banks[slot].Name;
+        public string SlotInfo(int slot) => BankSpanText(slot);
+        public string SlotTip(int slot) => Banks[slot].FilePath ?? (Banks[slot].Name + " (artificial data)");
+
+        public string FoundText(AreaCounts c)
+        {
+            return c.Found + " of " + c.Total + " series " + CheckText.Verb(Check) + CountPeriodText;
+        }
+
+        public string Summarize(int mask)
+        {
+            return CompareEngine.DescribeArea(SlotCount, Active, mask, "bank") + ": " + DescribeCounts(AreaCountsOf(mask), ShowsFound(mask));
+        }
+
+        public string SummarizeWhole(int slot)
+        {
+            AreaCounts c = BankCounts != null && BankCounts[slot] != null ? BankCounts[slot] : new AreaCounts { Total = BankSeriesCount[slot] };
+            bool shows = Check != CheckKind.Differences || ActiveCount > 1;
+            return "All of bank " + (slot + 1) + " (" + Banks[slot].Name + "): " + DescribeCounts(c, shows);
+        }
+
+        /// <summary>E.g. "100 series, 17 that differ in 2000".</summary>
+        public string DescribeCounts(AreaCounts c, bool showsFound)
+        {
+            string text = c.Total.ToString(CultureInfo.InvariantCulture) + " series";
+            if (showsFound) text += ", " + c.Found.ToString(CultureInfo.InvariantCulture) + " " + CheckText.Phrase(Check);
+            return text + CountPeriodText;
+        }
     }
 
     /// <summary>Text lines for the value listing, plus which line shows which period.</summary>
@@ -210,11 +352,12 @@ namespace Gekko
         /// <summary>
         /// Builds the Venn areas for one frequency. banks are the compared banks in list order (2 or 3),
         /// active says which of them are shown, filter (may be null) selects series by name.
-        /// The flags are computed for the whole universal period; the period filter is applied later
-        /// (UpdateCounts and the window), so changing it does not need a recomputation.
+        /// All three checks are computed for the whole universal period; the current check and the period
+        /// filter are applied later (UpdateCounts and the window), so switching them needs no recomputation.
+        /// Changing a threshold does.
         /// </summary>
         public static VennResult Compute(IList<CompareBank> banks, bool[] active, CompareFreq freq, Func<string, bool> filter,
-                                         IEqualityCriterion criterion)
+                                         CheckSettings settings)
         {
             int n = banks.Count;
             var result = new VennResult
@@ -272,17 +415,17 @@ namespace Gekko
             foreach (KeyValuePair<string, int> kv in masks)
             {
                 VennArea area = result.Areas[kv.Value];
-                area.Series.Add(CompareSeriesInBanks(kv.Key, area.Slots, banks, freq, criterion, result.SpanStart, result.SpanEnd));
+                area.Series.Add(CompareSeriesInBanks(kv.Key, area.Slots, banks, freq, settings, result.SpanStart, result.SpanEnd));
             }
 
             foreach (VennArea area in result.Areas.Values)
                 area.Series.Sort((a, b) => StringComparer.OrdinalIgnoreCase.Compare(a.Name, b.Name));
 
-            UpdateCounts(result, result.SpanStart, result.SpanEnd);
+            UpdateCounts(result, CheckKind.Differences, result.SpanStart, result.SpanEnd);
             return result;
         }
 
-        static int[] SlotsOf(int mask, int slotCount)
+        public static int[] SlotsOf(int mask, int slotCount)
         {
             var slots = new List<int>();
             for (int s = 0; s < slotCount; s++) if ((mask & (1 << s)) != 0) slots.Add(s);
@@ -290,7 +433,7 @@ namespace Gekko
         }
 
         static SeriesComparison CompareSeriesInBanks(string name, int[] slots, IList<CompareBank> banks, CompareFreq freq,
-                                                     IEqualityCriterion criterion, int start, int end)
+                                                     CheckSettings settings, int start, int end)
         {
             var series = new CompareSeries[slots.Length];
             for (int i = 0; i < slots.Length; i++) series[i] = banks[slots[i]].Get(freq)[name];
@@ -304,9 +447,14 @@ namespace Gekko
                 Start = start,
                 End = end,
                 Deviates = new bool[length],
-                Missing = new bool[slots.Length][]
+                Missing = new bool[slots.Length][],
+                Zero = new bool[slots.Length][]
             };
-            for (int i = 0; i < slots.Length; i++) c.Missing[i] = new bool[length];
+            for (int i = 0; i < slots.Length; i++)
+            {
+                c.Missing[i] = new bool[length];
+                c.Zero[i] = new bool[length];
+            }
 
             var values = new double[slots.Length];
             for (int k = 0; k < length; k++)
@@ -316,93 +464,57 @@ namespace Gekko
                 {
                     values[i] = c.Value(i, p);
                     c.Missing[i][k] = double.IsNaN(values[i]);
+                    c.Zero[i][k] = settings.IsZero(values[i]);
                 }
-                if (slots.Length >= 2) c.Deviates[k] = !AllEqual(values, criterion);
+                if (slots.Length >= 2) c.Deviates[k] = !AllEqual(values, settings);
             }
             c.BuildPrefixSums();
             return c;
         }
 
-        /// <summary>M = M counts as equal; M and a number are not equal; two numbers use the criterion.</summary>
-        public static bool AreEqual(double a, double b, IEqualityCriterion criterion)
-        {
-            bool ma = double.IsNaN(a), mb = double.IsNaN(b);
-            if (ma || mb) return ma && mb;
-            return criterion.AreEqual(a, b);
-        }
-
         /// <summary>For 2 banks: equal. For 3 banks: all three pairwise equal.</summary>
-        public static bool AllEqual(double[] values, IEqualityCriterion criterion)
+        public static bool AllEqual(double[] values, CheckSettings settings)
         {
             for (int i = 0; i < values.Length; i++)
                 for (int j = i + 1; j < values.Length; j++)
-                    if (!AreEqual(values[i], values[j], criterion)) return false;
+                    if (!settings.AreEqual(values[i], values[j])) return false;
             return true;
         }
 
-        /// <summary>Counts per area and per whole bank, for the period filter from..to.</summary>
-        public static void UpdateCounts(VennResult r, int from, int to)
+        /// <summary>Counts per area and per whole bank, for the check and the period filter from..to.</summary>
+        public static void UpdateCounts(VennResult r, CheckKind check, int from, int to)
         {
+            r.Check = check;
             r.CountFrom = from;
             r.CountTo = to;
             r.Counts.Clear();
             foreach (VennArea area in r.Areas.Values)
-                r.Counts[area.Mask] = Count(area.Series, area.Mask, from, to);
+                r.Counts[area.Mask] = Count(area.Series, check, area.Mask, from, to);
             for (int s = 0; s < r.SlotCount; s++)
             {
                 IEnumerable<SeriesComparison> all = r.Areas.Values.Where(a => (a.Mask & (1 << s)) != 0).SelectMany(a => a.Series);
-                r.BankCounts[s] = r.Active[s] ? Count(all, 1 << s, from, to) : new AreaCounts();
+                r.BankCounts[s] = r.Active[s] ? Count(all, check, 1 << s, from, to) : new AreaCounts();
             }
         }
 
-        static AreaCounts Count(IEnumerable<SeriesComparison> series, int missingMask, int from, int to)
+        static AreaCounts Count(IEnumerable<SeriesComparison> series, CheckKind check, int slotMask, int from, int to)
         {
             var c = new AreaCounts();
             foreach (SeriesComparison s in series)
             {
                 c.Total++;
-                if (s.DeviatesIn(from, to)) c.Deviating++;
-                if (s.MissingIn(from, to, missingMask)) c.Missing++;
+                if (s.FoundIn(check, from, to, slotMask)) c.Found++;
             }
             return c;
         }
 
-        /// <summary>Per period start..end: the number of the series that deviate.</summary>
-        public static int[] DeviationCounts(IEnumerable<SeriesComparison> series, int start, int end)
+        /// <summary>Per period start..end: the number of the series found by the check (in the banks in slotMask).</summary>
+        public static int[] FoundCounts(IEnumerable<SeriesComparison> series, CheckKind check, int slotMask, int start, int end)
         {
             var counts = new int[Math.Max(0, end - start + 1)];
             foreach (SeriesComparison c in series)
                 for (int p = start; p <= end; p++)
-                    if (c.DeviatesAt(p)) counts[p - start]++;
-            return counts;
-        }
-
-        /// <summary>
-        /// Per period start..end: the number of the series that are M in at least one of the banks in slotMask.
-        /// perSlot[s][period - start] counts bank s alone (a series M in two banks counts in both).
-        /// </summary>
-        public static int[] MissingCounts(IEnumerable<SeriesComparison> series, int slotMask, int start, int end, out int[][] perSlot)
-        {
-            int length = Math.Max(0, end - start + 1);
-            var counts = new int[length];
-            perSlot = new int[3][];
-            for (int s = 0; s < 3; s++) perSlot[s] = new int[length];
-            foreach (SeriesComparison c in series)
-            {
-                for (int k = 0; k < length; k++)
-                {
-                    int i = start + k - c.Start;
-                    if (i < 0 || i >= c.Deviates.Length) continue;
-                    bool any = false;
-                    for (int j = 0; j < c.Slots.Length; j++)
-                    {
-                        if ((slotMask & (1 << c.Slots[j])) == 0 || !c.Missing[j][i]) continue;
-                        perSlot[c.Slots[j]][k]++;
-                        any = true;
-                    }
-                    if (any) counts[k]++;
-                }
-            }
+                    if (c.FoundAt(check, p, slotMask)) counts[p - start]++;
             return counts;
         }
 
@@ -456,15 +568,15 @@ namespace Gekko
             return list;
         }
 
-        /// <summary>Plain-language description of an area, e.g. "In banks 1 and 2, not in bank 3".</summary>
-        public static string DescribeArea(VennResult r, int mask)
+        /// <summary>Plain-language description of an area, e.g. "In banks 1 and 2, not in bank 3" (word: bank/folder).</summary>
+        public static string DescribeArea(int slotCount, bool[] active, int mask, string word)
         {
             var inside = new List<int>();
             var outside = new List<int>();
             var hidden = new List<int>();
-            for (int s = 0; s < r.SlotCount; s++)
+            for (int s = 0; s < slotCount; s++)
             {
-                if (!r.Active[s]) hidden.Add(s + 1);
+                if (!active[s]) hidden.Add(s + 1);
                 else if ((mask & (1 << s)) != 0) inside.Add(s + 1);
                 else outside.Add(s + 1);
             }
@@ -472,33 +584,20 @@ namespace Gekko
             var sb = new StringBuilder();
             if (inside.Count == 1)
             {
-                sb.Append(outside.Count > 0 ? "Only in bank " : "In bank ").Append(inside[0]);
+                sb.Append(outside.Count > 0 ? "Only in " + word + " " : "In " + word + " ").Append(inside[0]);
             }
             else
             {
-                sb.Append("In banks ").Append(JoinWords(inside, "and"));
-                if (outside.Count > 0) sb.Append(", not in bank ").Append(JoinWords(outside, "or"));
+                sb.Append("In " + word + "s ").Append(JoinWords(inside, "and"));
+                if (outside.Count > 0) sb.Append(", not in " + word + " ").Append(JoinWords(outside, "or"));
             }
-            if (hidden.Count > 0) sb.Append(hidden.Count == 1 ? " (bank " : " (banks ").Append(JoinWords(hidden, "and")).Append(" hidden)");
+            if (hidden.Count > 0) sb.Append(hidden.Count == 1 ? " (" + word + " " : " (" + word + "s ").Append(JoinWords(hidden, "and")).Append(" hidden)");
             return sb.ToString();
         }
 
-        /// <summary>Counts as text, e.g. "100 series, 17 deviating, 5 with missing values in 2000".</summary>
-        public static string DescribeCounts(VennResult r, AreaCounts c, bool isComparison)
+        public static string DescribeArea(VennResult r, int mask)
         {
-            string text = c.Total.ToString(Inv) + " series";
-            if (isComparison) text += ", " + c.Deviating.ToString(Inv) + " deviating";
-            text += ", " + c.Missing.ToString(Inv) + " with missing values";
-            return text + r.CountPeriodText;
-        }
-
-        /// <summary>Description plus counts, e.g. "In banks 1 and 2, not in bank 3: 100 series, 17 deviating, 5 with missing values".</summary>
-        public static string SummarizeArea(VennResult r, int mask)
-        {
-            VennArea area = r.Areas[mask];
-            AreaCounts c;
-            if (!r.Counts.TryGetValue(mask, out c)) c = new AreaCounts { Total = area.Series.Count };
-            return DescribeArea(r, mask) + ": " + DescribeCounts(r, c, area.IsComparison);
+            return DescribeArea(r.SlotCount, r.Active, mask, "bank");
         }
 
         static string JoinWords(List<int> numbers, string conjunction)
@@ -510,10 +609,11 @@ namespace Gekko
 
         /// <summary>
         /// Text listing of one series for the periods from..to. Two banks: period, x(1), x(2), abs dev., rel. dev.
-        /// One or three banks: period and the values. Deviating periods end with " *".
-        /// onlyFlagged: only periods that deviate or have M in a bank.
+        /// One or three banks: period and the values. Periods found by the check end with " *".
+        /// onlyFound: only those periods.
         /// </summary>
-        public static DeviationListing FormatComparison(SeriesComparison c, CompareFreq freq, int from, int to, bool onlyFlagged)
+        public static DeviationListing FormatComparison(SeriesComparison c, CompareFreq freq, int from, int to,
+                                                        CheckKind check, int slotMask, bool onlyFound)
         {
             var listing = new DeviationListing();
             int n = c.Series.Length;
@@ -534,12 +634,11 @@ namespace Gekko
             }
             listing.Lines.Add(sb.ToString());
 
-            int all = (1 << 3) - 1;
             var values = new double[n];
             for (int p = Math.Max(from, c.Start); p <= Math.Min(to, c.End); p++)
             {
-                bool deviates = c.DeviatesAt(p);
-                if (onlyFlagged && !deviates && !c.MissingAt(p, all)) continue;
+                bool found = c.FoundAt(check, p, slotMask);
+                if (onlyFound && !found) continue;
                 for (int i = 0; i < n; i++) values[i] = c.Value(i, p);
 
                 sb.Clear();
@@ -558,7 +657,7 @@ namespace Gekko
                         sb.Append(new string(' ', absWidth + relWidth));
                     }
                 }
-                if (deviates) sb.Append("  *");
+                if (found) sb.Append("  *");
                 listing.LineOfPeriod[p] = listing.Lines.Count;
                 listing.Lines.Add(sb.ToString());
             }
@@ -589,6 +688,20 @@ namespace Gekko
         {
             string s = Math.Abs(pct) >= 1e5 ? pct.ToString("0.##E+0", Inv) : pct.ToString("0.0###", Inv);
             return s + "%";
+        }
+
+        /// <summary>Parses a threshold typed by the user (invariant or current culture). Must be a number &gt;= 0.</summary>
+        public static bool TryParseThreshold(string text, out double value)
+        {
+            text = (text ?? "").Trim();
+            if (text.Length == 0)
+            {
+                value = 0;
+                return true;
+            }
+            if (!double.TryParse(text, NumberStyles.Float, Inv, out value) &&
+                !double.TryParse(text, NumberStyles.Float, CultureInfo.CurrentCulture, out value)) return false;
+            return value >= 0 && !double.IsNaN(value) && !double.IsInfinity(value);
         }
     }
 }

@@ -480,7 +480,7 @@ namespace Gekko
 
             try
             {                
-                await Task.Run(() => DlinkAutoDlinkFiles.HandleDlink(row.Path, true));
+                await Task.Run(() => DlinkAutoDlinkFiles.HandleDlink(row.Path, true, null));
                 row.Status = "Done";
             }
             catch (Exception)

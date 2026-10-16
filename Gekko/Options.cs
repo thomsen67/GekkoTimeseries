@@ -81,6 +81,7 @@ namespace Gekko
         public bool databank_search = true;
 
         public bool databank_dlink = false;
+        public bool databank_dlink_run = false; //if true, it only produces dlink files inside a .gcm file, not in interactive use.
         public string databank_dlink_name = "dlink";
         public string databank_dlink_folder_progs = "k:\\MAKROBK";
         public string databank_dlink_folder_data = "k:\\MAKROBK_KILDE\\2025_10_01";
@@ -460,6 +461,7 @@ namespace Gekko
             Add("DATABANK SEARCH", Globals.xbool);            
 
             Add("DATABANK DLINK", Globals.xbool);
+            Add("DATABANK DLINK RUN", Globals.xbool);
             Add("DATABANK DLINK NAME", Globals.xnameOrString, "dlink");
             Add("DATABANK DLINK FOLDER STORAGE", Globals.xnameOrString, "dlink");
             Add("DATABANK DLINK FOLDER DATA", Globals.xnameOrString, "dlink");
