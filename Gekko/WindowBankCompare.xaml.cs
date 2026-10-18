@@ -145,7 +145,7 @@ namespace Gekko
             }
         }
 
-        /// <summary>True when the row is compared but hidden (eye icon) or greyed out by a focus on another one.</summary>
+        /// <summary>True when the row is compared but hidden (hide link) or greyed out by a focus on another one.</summary>
         public bool HiddenInDiagram
         {
             get { return hiddenInDiagram; }
@@ -275,7 +275,7 @@ namespace Gekko
         readonly ConcurrentDictionary<string, object> folderCache = new ConcurrentDictionary<string, object>();
         FileComparison openedFrom;   // the folder file the datafiles were opened from, if any
 
-        // ---- Scope: which banks/folders are shown (eye icons) and the focus (target icon, Alt+1/2/3).
+        // ---- Scope: which banks/folders are shown (hide/show links) and the focus (focus/unfocus links, Alt+1/2/3).
         // focusSlot is the only one shown, or -1. activeBeforeFocus is the hide/show state to return to.
         int focusSlot = -1;
         bool[] activeBeforeFocus;
@@ -357,6 +357,9 @@ namespace Gekko
             Histogram.BarDoubleClicked += period => Tabs.SelectedItem = NamesTab;
 
             ReadThresholds();
+
+            // The grey years in the period boxes follow the datafiles in the list (see UpdateAutoPeriod).
+            bankItems.CollectionChanged += (s, e) => UpdateAutoPeriod();
 
             // Artificial demo banks. Dropped files also get artificial data, see DatabankLoader.
             bankItems.Add(new BankItem(ArtificialData.CreateBank("base_2024.gbk", null)));
@@ -462,7 +465,7 @@ namespace Gekko
             if (slots == layoutSlots || diagramHidden) return;
             if (Venn.ActualWidth <= 0 || Venn.ActualHeight <= 0) return;  // not laid out yet, Window_Loaded does it
 
-            double radius = VennView.RadiusFor(Venn.ActualWidth, Venn.ActualHeight, layoutSlots);
+            double radius = Venn.RadiusFor(Venn.ActualWidth, Venn.ActualHeight, layoutSlots);
             double change = VennView.ThirdCircleHeight(radius) * (slots == 2 ? -1 : 1);
 
             // The controls to the right of the diagram scroll when they do not fit, so only the minimum height counts.
@@ -497,7 +500,7 @@ namespace Gekko
                 {
                     double venn = VennRow.ActualHeight;
                     if (layoutSlots == 2 && Venn.ActualWidth > 0)
-                        venn += VennView.ThirdCircleHeight(VennView.RadiusFor(Venn.ActualWidth, Venn.ActualHeight, 2));
+                        venn += VennView.ThirdCircleHeight(Venn.RadiusFor(Venn.ActualWidth, Venn.ActualHeight, 2));
                     s.CompareWindowSplitterDistance2 = venn;
                 }
                 s.Save();
@@ -604,7 +607,7 @@ namespace Gekko
         {
             bool folders = state == CompareState.Folders;
             Title = folders ? "Compare folders" : "Compare databanks";
-            UpdateFreqColumn();
+            UpdateFreqBar();
             NamesText.Visibility = folders ? Visibility.Collapsed : Visibility.Visible;
             FilesList.Visibility = folders ? Visibility.Visible : Visibility.Collapsed;
             IgnoreDimsCheck.Visibility = folders ? Visibility.Collapsed : Visibility.Visible;
@@ -902,9 +905,9 @@ namespace Gekko
         }
 
         /// <summary>
-        /// The frequency buttons on the right of the diagram (Datafiles): one per frequency that exists in the compared
-        /// banks, with its name and its largest period, e.g. "Quarterly" over "1990q1–2030q4". They work like radio
-        /// buttons; the pressed one is dark blue, like the Datafiles | Folders switch.
+        /// The frequency buttons at the top of the diagram (Datafiles): one per frequency that exists in the compared
+        /// banks, side by side, each with its name and its largest period, e.g. "Quarterly 1990q1–2030q4". They work like
+        /// radio buttons; the pressed one is dark blue, like the Folders | Datafiles switch.
         /// </summary>
         void RefreshFrequencies()
         {
@@ -941,19 +944,27 @@ namespace Gekko
                 string name = PeriodConvert.FrequencyName(f);
                 string span = start <= end ? PeriodText.Format(f, start) + "–" + PeriodText.Format(f, end) : "no observations";
 
-                var content = new StackPanel();
+                var content = new StackPanel { Orientation = Orientation.Horizontal };
                 content.Children.Add(new TextBlock { Text = name, FontWeight = FontWeights.SemiBold });
-                content.Children.Add(new TextBlock { Text = span, FontSize = 10.5, Opacity = 0.8 });
+                content.Children.Add(new TextBlock
+                {
+                    Text = span,
+                    FontSize = 10.5,
+                    Opacity = 0.8,
+                    Margin = new Thickness(6, 0, 0, 0),
+                    VerticalAlignment = VerticalAlignment.Center
+                });
+                // CornerRadius(topLeft, topRight, bottomRight, bottomLeft): round the outer ends of the row.
                 CornerRadius corners = freqs.Count == 1 ? new CornerRadius(r)
-                                     : i == 0 ? new CornerRadius(r, r, 0, 0)
-                                     : i == freqs.Count - 1 ? new CornerRadius(0, 0, r, r)
+                                     : i == 0 ? new CornerRadius(r, 0, 0, r)
+                                     : i == freqs.Count - 1 ? new CornerRadius(0, r, r, 0)
                                      : new CornerRadius(0);
                 var button = new RadioButton
                 {
                     Style = (Style)FindResource("FreqButtonStyle"),
                     Content = content,
                     Tag = corners,
-                    Margin = new Thickness(0, i == 0 ? 0 : -1, 0, 0),
+                    Margin = new Thickness(i == 0 ? 0 : -1, 0, 0, 0),
                     IsChecked = selectedFreq.HasValue && f.Equals(selectedFreq.Value),
                     ToolTip = "Compare the " + name.ToLowerInvariant() + " series: " + span + " (" + string.Join(", ", counts) + ")"
                 };
@@ -961,13 +972,16 @@ namespace Gekko
                 button.Checked += (o, e) => FreqButton_Checked(chosen);
                 FreqPanel.Children.Add(button);
             }
-            UpdateFreqColumn();
+            UpdateFreqBar();
         }
 
-        /// <summary>The frequency buttons are shown in the Datafiles state, when there is something to compare.</summary>
-        void UpdateFreqColumn()
+        /// <summary>
+        /// The frequency buttons are shown in the Datafiles state, when there is something to compare. Otherwise the bar
+        /// is hidden but keeps its room, so the circles keep their size when switching state.
+        /// </summary>
+        void UpdateFreqBar()
         {
-            FreqColumn.Visibility = state == CompareState.Datafiles && FreqPanel.Children.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+            FreqBar.Visibility = state == CompareState.Datafiles && FreqPanel.Children.Count > 0 ? Visibility.Visible : Visibility.Hidden;
         }
 
         void FreqButton_Checked(CompareFreq freq)
@@ -1422,7 +1436,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// The eye icon. Without a focus: hide a shown bank/folder (as long as another one stays shown) or show a
+        /// The hide/show link. Without a focus: hide a shown bank/folder (as long as another one stays shown) or show a
         /// hidden one. With a focus: showing another one ends the focus; the focused one itself cannot be hidden.
         /// </summary>
         void ToggleHidden(int slot)
@@ -1436,7 +1450,7 @@ namespace Gekko
             {
                 if (slot == focusSlot)
                 {
-                    SetStatus(label + " is in focus and cannot be hidden. Click its target to show the others again.");
+                    SetStatus(label + " is in focus and cannot be hidden. Click its unfocus link to show the others again.");
                     return;
                 }
                 focusSlot = -1;
@@ -1457,7 +1471,7 @@ namespace Gekko
             else if (m.ActiveCount > 1)
             {
                 next[slot] = false;
-                message = label + " is hidden. Click its eye to show it again.";
+                message = label + " is hidden. Click its show link to show it again.";
             }
             else
             {
@@ -1470,7 +1484,7 @@ namespace Gekko
         }
 
         /// <summary>
-        /// The target icon or Alt+1/2/3. Focus: only this bank/folder is shown, and all of it becomes the area filter.
+        /// The focus/unfocus link or Alt+1/2/3. Focus: only this bank/folder is shown, and all of it becomes the area filter.
         /// Again on the focused one: the ones shown before the focus come back, it stays selected.
         /// The check and the found and period filters are kept.
         /// </summary>
@@ -1502,7 +1516,7 @@ namespace Gekko
             selectedMask = 0;
             selectedBank = slot;
             Recompute();
-            SetStatus("Focus on " + label + ": the others are greyed out. Click the target again (or Alt+"
+            SetStatus("Focus on " + label + ": the others are greyed out. Click unfocus (or Alt+"
                       + (slot + 1) + ") to show them.");
         }
 
@@ -1676,45 +1690,52 @@ namespace Gekko
 
         // ---------------------------------------------------------------- period from/to (the period filter, both states)
 
-        // The grey texts shown for open ends (what an unchanged grey text means when it is committed).
+        // The grey texts shown for open ends (what an unchanged grey text means when it is committed): the first and
+        // last year with data in the datafiles of the Datafiles list, over all frequencies. Blank until datafiles are
+        // selected; the same in both states and for every frequency. Set by UpdateAutoPeriod.
         string autoFromText = "";
         string autoToText = "";
         bool committingPeriod;
 
         /// <summary>
-        /// Black text: the period as typed (any frequency). Grey text: an open end, showing where the data start or end:
-        /// the universal period of the selected frequency (Datafiles) or the years with data in the files (Folders).
+        /// The grey years of the period boxes: the largest span of the datafiles in the Datafiles list, over all (dated)
+        /// frequencies, as plain years (e.g. 1990 and 2025 for annual data from 1990, quarterly data to 2025q4). Called
+        /// whenever that list changes, also when it is filled from the Folders state. An empty list leaves the years as
+        /// they were, so the period carries over to the Folders state. The period typed by the user is not touched.
+        /// </summary>
+        void UpdateAutoPeriod()
+        {
+            int first = int.MaxValue, last = int.MinValue;
+            foreach (BankItem item in bankItems)
+            {
+                if (item.Bank == null) continue;
+                foreach (CompareFreq f in item.Bank.Frequencies)
+                {
+                    if (!PeriodConvert.IsDated(f)) continue;  // undated series have no years
+                    foreach (CompareSeries ts in item.Bank.Get(f).Values)
+                    {
+                        if (ts.Data.Length == 0) continue;
+                        first = Math.Min(first, PeriodText.Year(f, ts.Start));
+                        last = Math.Max(last, PeriodText.Year(f, ts.End));
+                    }
+                }
+            }
+            if (first > last) return;
+            autoFromText = first.ToString(Inv);
+            autoToText = last.ToString(Inv);
+        }
+
+        /// <summary>
+        /// Black text: the period as typed (any frequency). Grey text: an open end, showing the years of the datafiles
+        /// (see UpdateAutoPeriod). Both are the same in the Datafiles and Folders states and for every frequency.
         /// </summary>
         void UpdatePeriodBoxes()
         {
-            autoFromText = "";
-            autoToText = "";
-            if (state == CompareState.Folders)
-            {
-                int first, last;
-                if (folderResult != null && folderResult.TryGetYears(out first, out last))
-                {
-                    autoFromText = first.ToString(Inv);
-                    autoToText = last.ToString(Inv);
-                }
-                SpanText.Text = "Used in every frequency, e.g. 2010 is 2010q1–2010q4 for quarterly series. All frequencies are checked.";
-            }
-            else if (current != null && current.HasSpan && !PeriodConvert.IsDated(current.Freq))
-            {
-                // No grey texts: an undated period typed or stepped here would be read as a year by the other frequencies.
-                SpanText.Text = "Undated data: " + current.SpanText + ". The period does not apply to undated series.";
-            }
-            else if (current != null && current.HasSpan)
-            {
-                autoFromText = PeriodText.Format(current.Freq, current.SpanStart);
-                autoToText = PeriodText.Format(current.Freq, current.SpanEnd);
-                SpanText.Text = PeriodConvert.FrequencyName(current.Freq) + " data: " + current.SpanText
-                                + ". The period is used in every frequency.";
-            }
-            else
-            {
-                SpanText.Text = "The period is used in every frequency, e.g. 2010 is 2010q1–2010q4 for quarterly series.";
-            }
+            string text = "Used in every frequency (e.g. 2010 is 2010q1–2010q4 for quarterly series), for datafiles and folders.";
+            if (autoFromText.Length > 0) text = "Grey: the whole span of the datafiles. " + text;
+            if (state == CompareState.Datafiles && current != null && !PeriodConvert.IsDated(current.Freq))
+                text += " It does not apply to undated series.";
+            SpanText.Text = text;
             ShowPeriod(FromBox, fromText, autoFromText);
             ShowPeriod(ToBox, toText, autoToText);
             WholePeriodButton.IsEnabled = fromText != null || toText != null;

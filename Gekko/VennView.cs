@@ -74,8 +74,10 @@ namespace Gekko
     ///   inside an area                     -> AreaClicked(mask, Area, ctrl)
     ///   black / red number                 -> AreaClicked(mask, Total / Deviating, ctrl)
     ///   a box (bank or folder)             -> BankSelected(slot): the whole bank/folder
-    ///   the eye icon on a box              -> HideClicked(slot)
-    ///   the target icon on a box           -> FocusClicked(slot)
+    ///   the hide/show link in a box        -> HideClicked(slot)
+    ///   the focus/unfocus link in a box    -> FocusClicked(slot)
+    ///
+    /// The boxes are measured first, and the circles leave just enough room for the widest one at the sides.
     /// </summary>
     public sealed class VennView : Canvas
     {
@@ -88,8 +90,12 @@ namespace Gekko
         const double H3 = 0.288675;  // 1 / (2 * sqrt 3)
         const double T3 = 0.577350;  // 1 / sqrt 3
 
-        // Room for bank labels on the left and right, and for the caption below.
-        const double SideMargin = 245, TopMargin = 4, BottomMargin = 20;
+        // Room for the caption below. The room for the boxes on the left and right (sideMargin) follows the widest box.
+        const double TopMargin = 4, BottomMargin = 20;
+        const double DefaultSideMargin = 200;
+
+        /// <summary>Bank and folder names in the boxes are shortened to this many characters (middle replaced by "...").</summary>
+        public const int MaxNameLength = 25;
 
         static readonly Brush HoverFill = BankColors.FromArgb(0x2A, 0, 0, 0);
         static readonly Brush SelectedFill = BankColors.FromArgb(0x16, 0, 0, 0);
@@ -102,10 +108,10 @@ namespace Gekko
         static readonly Brush DeviationBrush = BankColors.DeviationText;
         static readonly Brush MutedBrush = BankColors.FromRgb(0x88, 0x88, 0x88);
         static readonly Brush TextBrush = BankColors.FromRgb(0x44, 0x44, 0x44);
-        static readonly Brush IconBrush = BankColors.FromRgb(0x66, 0x66, 0x66);
-        static readonly Brush IconHoverBack = BankColors.FromArgb(0x1C, 0, 0, 0);
+        static readonly Brush LinkBrush = BankColors.FromRgb(0x2E, 0x6D, 0xB4);
 
         IVennModel model;
+        double sideMargin = DefaultSideMargin;
         string emptyMessage = "";
         int selectedMask;
         int selectedBank = -1;
@@ -149,11 +155,26 @@ namespace Gekko
             return slotCount == 3 ? T3 + 1 : 1 - H3;
         }
 
-        /// <summary>The circle radius the diagram uses for a canvas of this size.</summary>
-        public static double RadiusFor(double width, double height, int slotCount)
+        /// <summary>
+        /// The circle radius the diagram uses for a canvas of this size (with the room the boxes took in the last drawing).
+        /// </summary>
+        public double RadiusFor(double width, double height, int slotCount)
         {
-            double r = Math.Min((width - 2 * SideMargin) / 3.0, (height - TopMargin - BottomMargin) / (YMax(slotCount) - YMin));
+            double r = Math.Min((width - 2 * sideMargin) / 3.0, (height - TopMargin - BottomMargin) / (YMax(slotCount) - YMin));
             return Math.Max(40, Math.Min(r, 200));
+        }
+
+        /// <summary>
+        /// At most maxLength characters: a longer name keeps its start and end, with "..." in the middle
+        /// (e.g. "forecast_base_scen...ision_2025.gbk").
+        /// </summary>
+        public static string ShortName(string name, int maxLength = MaxNameLength)
+        {
+            if (name == null) return "";
+            if (name.Length <= maxLength || maxLength < 5) return name;
+            int keep = maxLength - 3;
+            int head = (keep + 1) / 2;
+            return name.Substring(0, head) + "..." + name.Substring(name.Length - (keep - head));
         }
 
         /// <summary>Vertical room that the bottom (third) circle adds to the diagram, for a given radius.</summary>
@@ -180,6 +201,18 @@ namespace Gekko
             }
 
             bool three = model.SlotCount == 3;
+
+            // The boxes first: the widest one decides how much room the circles leave at the sides.
+            var tags = new Border[model.SlotCount];
+            double widest = 0;
+            for (int s = 0; s < model.SlotCount; s++)
+            {
+                tags[s] = BuildBankTag(s);
+                tags[s].Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                widest = Math.Max(widest, tags[s].DesiredSize.Width);
+            }
+            sideMargin = widest + 14;
+
             // Horizontally the layout is always the 3-circle layout, so circles keep their size and place in 2-bank mode.
             Point[] unit3 = { new Point(-0.5, -H3), new Point(0.5, -H3), new Point(0, T3) };
             Point[] unit = unit3.Take(model.SlotCount).ToArray();
@@ -244,12 +277,13 @@ namespace Gekko
                 Add(label, p.X - label.DesiredSize.Width / 2, p.Y - label.DesiredSize.Height / 2);
             }
 
-            // Boxes (banks or folders) with the eye (hide/show) and target (focus) icons
-            for (int s = 0; s < model.SlotCount; s++) AddBankTag(s, centers[s], r, width);
+            // Boxes (banks or folders) with the hide/show and focus/unfocus links
+            double topRightBottom = double.NegativeInfinity;
+            for (int s = 0; s < model.SlotCount; s++) PlaceBankTag(tags[s], s, centers[s], r, width, ref topRightBottom);
 
             string word = model.SlotWord;
             idleCaption = focusSlot >= 0 && focusSlot < model.SlotCount
-                ? "Focus on " + word + " " + (focusSlot + 1) + ": the other " + word + "s are greyed out. Click its target (or Alt+" + (focusSlot + 1) + ") to show them again."
+                ? "Focus on " + word + " " + (focusSlot + 1) + ": the other " + word + "s are greyed out. Click unfocus (or Alt+" + (focusSlot + 1) + ") to show them again."
                 : "Black: all " + model.ItemWord + ". Red: " + model.FoundPhrase + ". Click a number or an area. Click a " + word + "'s box for the whole " + word + ".";
             caption = new TextBlock { FontSize = 12, Foreground = TextBrush, TextTrimming = TextTrimming.CharacterEllipsis, Width = width - 4 };
             caption.Text = SelectionCaption() ?? idleCaption;
@@ -366,7 +400,12 @@ namespace Gekko
 
         // ---------------------------------------------------------------- bank labels
 
-        void AddBankTag(int s, Point center, double r, double canvasWidth)
+        /// <summary>
+        /// A box: the number badge, then, one under the other, the name (at most MaxNameLength characters), the
+        /// model's info lines (e.g. "1990–2025" and "260 series", or "812 data files") and the hide/show and
+        /// focus/unfocus links.
+        /// </summary>
+        Border BuildBankTag(int s)
         {
             bool on = model.Active[s];
             bool focused = focusSlot == s;
@@ -391,57 +430,85 @@ namespace Gekko
                     VerticalAlignment = VerticalAlignment.Center
                 }
             };
+
             var lines = new StackPanel();
             lines.Children.Add(new TextBlock
             {
-                Text = model.SlotName(s),
+                Text = ShortName(model.SlotName(s)),
                 FontWeight = FontWeights.SemiBold,
-                Foreground = on ? TotalBrush : MutedBrush,
-                MaxWidth = 140,
-                TextTrimming = TextTrimming.CharacterEllipsis
+                Foreground = on ? TotalBrush : MutedBrush
             });
-            lines.Children.Add(new TextBlock
+            string info = model.SlotInfo(s);
+            if (!string.IsNullOrEmpty(info))
             {
-                Text = on ? model.SlotInfo(s) : (anyFocus ? "greyed out by the focus" : "hidden"),
-                FontSize = 11,
-                Foreground = MutedBrush,
-                MaxWidth = 140,
-                TextTrimming = TextTrimming.CharacterEllipsis
-            });
+                // One TextBlock per line ("\n" separates them), so every line has the same spacing.
+                foreach (string line in info.Split('\n'))
+                    lines.Children.Add(new TextBlock { Text = line, FontSize = 11, Foreground = MutedBrush });
+            }
+            if (!on)
+            {
+                lines.Children.Add(new TextBlock
+                {
+                    Text = anyFocus ? "greyed out by the focus" : "hidden",
+                    FontSize = 11,
+                    FontStyle = FontStyles.Italic,
+                    Foreground = MutedBrush
+                });
+            }
 
-            // Eye: hide or show this bank. Target: focus on this bank (grey out the others) or end the focus.
-            string eyeTip;
-            if (!on) eyeTip = anyFocus ? "Show this " + word + " again (ends the focus)" : "Show this " + word + " again";
-            else if (focused) eyeTip = "This " + word + " is in focus. Click its target to show the other " + word + "s again.";
-            else if (model.ActiveCount > 1) eyeTip = "Hide this " + word;
-            else eyeTip = "This is the only " + word + " shown, so it cannot be hidden";
+            // hide/show this bank; focus on it (grey out the others) or end the focus.
+            string hideTip;
+            bool hideWorks;
+            if (!on)
+            {
+                hideTip = anyFocus ? "Show this " + word + " again (ends the focus)" : "Show this " + word + " again";
+                hideWorks = true;
+            }
+            else if (focused)
+            {
+                hideTip = "This " + word + " is in focus. Click unfocus to show the other " + word + "s again.";
+                hideWorks = false;
+            }
+            else if (model.ActiveCount > 1)
+            {
+                hideTip = "Hide this " + word;
+                hideWorks = true;
+            }
+            else
+            {
+                hideTip = "This is the only " + word + " shown, so it cannot be hidden";
+                hideWorks = false;
+            }
             string key = " (Alt+" + (s + 1) + ")";
-            string targetTip = focused
+            string focusTip = focused
                 ? "End the focus: show the other " + word + "s again" + key
                 : "Focus on this " + word + ": grey out the others" + key;
 
-            var icons = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(6, 0, 0, 0) };
-            icons.Children.Add(IconButton(EyeIcon(!on, on ? IconBrush : MutedBrush), eyeTip, null, () => HideClicked?.Invoke(slot)));
-            icons.Children.Add(IconButton(TargetIcon(focused ? BankColors.Solid(s) : IconBrush, focused),
-                                          targetTip, focused ? BankColors.Translucent(s, 0x30) : null,
-                                          () => FocusClicked?.Invoke(slot)));
+            var links = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 2, 0, 0) };
+            links.Children.Add(Link(on ? "hide" : "show", hideTip, hideWorks ? LinkBrush : MutedBrush,
+                                    () => HideClicked?.Invoke(slot)));
+            TextBlock focusLink = Link(focused ? "unfocus" : "focus", focusTip, focused ? BankColors.Solid(s) : LinkBrush,
+                                       () => FocusClicked?.Invoke(slot));
+            focusLink.Margin = new Thickness(12, 0, 0, 0);
+            if (focused) focusLink.FontWeight = FontWeights.SemiBold;
+            links.Children.Add(focusLink);
+            lines.Children.Add(links);
 
             var row = new StackPanel { Orientation = Orientation.Horizontal };
             row.Children.Add(badge);
             row.Children.Add(lines);
-            row.Children.Add(icons);
 
             var tag = new Border
             {
                 Child = row,
-                Padding = new Thickness(6, 4, 5, 4),
+                Padding = new Thickness(6, 4, 8, 4),
                 CornerRadius = new CornerRadius(3),
                 BorderThickness = new Thickness(focused ? 2 : 1),
                 BorderBrush = on ? BankColors.Solid(s) : HiddenStroke,
                 Background = Brushes.White
             };
 
-            string tip = model.SlotTip(s);
+            string tip = model.SlotName(s) + "\n" + model.SlotTip(s);
             if (on)
             {
                 tip += "\nClick to select the whole " + word + ".";
@@ -452,93 +519,58 @@ namespace Gekko
             }
             else
             {
-                tip += "\nUse the eye to show this " + word + " again.";
+                tip += "\nClick show to show this " + word + " again.";
             }
             tag.ToolTip = tip;
+            return tag;
+        }
 
-            tag.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+        /// <summary>
+        /// Box 1 left of the top-left circle, box 2 right of the top-right circle, box 3 right of the bottom circle
+        /// (and never on top of box 2). topRightBottom is the bottom edge of box 2.
+        /// </summary>
+        void PlaceBankTag(Border tag, int s, Point center, double r, double canvasWidth, ref double topRightBottom)
+        {
             Size size = tag.DesiredSize;
             double left, topPos;
             if (s == 0)
             {
-                // Left of the top-left circle, somewhat above its center
                 left = center.X - r - 10 - size.Width;
                 topPos = center.Y - 0.45 * r - size.Height / 2;
             }
             else if (s == 1)
             {
-                // Right of the top-right circle, somewhat above its center
                 left = center.X + r + 10;
                 topPos = center.Y - 0.45 * r - size.Height / 2;
             }
             else
             {
-                // Right of the bottom circle and somewhat below its center, clear of the top-right circle
                 left = center.X + 1.1 * r;
                 topPos = center.Y + 0.3 * r - size.Height / 2;
             }
-            left = Math.Min(left, canvasWidth - size.Width - 2);
-            Add(tag, Math.Max(2, left), Math.Max(2, topPos));
+            left = Math.Max(2, Math.Min(left, canvasWidth - size.Width - 2));
+            topPos = Math.Max(2, topPos);
+            if (s == 2) topPos = Math.Max(topPos, topRightBottom + 6);
+            if (s == 1) topRightBottom = topPos + size.Height;
+            Add(tag, left, topPos);
         }
 
-        /// <summary>A small flat icon button. Its click does not also count as a click on the box.</summary>
-        static FrameworkElement IconButton(UIElement icon, string tip, Brush activeBack, Action onClick)
+        /// <summary>A small text link. Its click does not also count as a click on the box.</summary>
+        static TextBlock Link(string text, string tip, Brush foreground, Action onClick)
         {
-            Brush normalBack = activeBack ?? Brushes.Transparent;
-            var button = new Border
+            var link = new TextBlock
             {
-                Width = 20,
-                Height = 20,
-                CornerRadius = new CornerRadius(3),
-                Background = normalBack,
-                Margin = new Thickness(2, 0, 0, 0),
+                Text = text,
+                FontSize = 10.5,
+                Foreground = foreground,
+                Background = Brushes.Transparent,  // the whole text is clickable, not only the strokes
                 Cursor = Cursors.Hand,
-                ToolTip = tip,
-                Child = icon
+                ToolTip = tip
             };
-            button.MouseEnter += (o, e) => button.Background = activeBack ?? IconHoverBack;
-            button.MouseLeave += (o, e) => button.Background = normalBack;
-            button.MouseLeftButtonUp += (o, e) => { e.Handled = true; onClick(); };
-            return button;
-        }
-
-        static UIElement EyeIcon(bool crossed, Brush stroke)
-        {
-            var g = new GeometryGroup();
-            g.Children.Add(Geometry.Parse("M0.5,6 C3,1.5 9,1.5 11.5,6 C9,10.5 3,10.5 0.5,6 Z"));
-            g.Children.Add(new EllipseGeometry(new Point(6, 6), 1.8, 1.8));
-            if (crossed) g.Children.Add(Geometry.Parse("M1.5,11 L10.5,1"));
-            return new Path
-            {
-                Data = g,
-                Stroke = stroke,
-                StrokeThickness = 1.2,
-                Width = 12,
-                Height = 12,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            };
-        }
-
-        static UIElement TargetIcon(Brush stroke, bool filledDot)
-        {
-            var ring = new GeometryGroup();
-            ring.Children.Add(new EllipseGeometry(new Point(6, 6), 4.5, 4.5));
-            ring.Children.Add(Geometry.Parse("M6,0 L6,3 M6,9 L6,12 M0,6 L3,6 M9,6 L12,6"));
-            var grid = new Grid
-            {
-                Width = 12,
-                Height = 12,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            };
-            grid.Children.Add(new Path { Data = ring, Stroke = stroke, StrokeThickness = 1.2 });
-            grid.Children.Add(new Path
-            {
-                Data = new EllipseGeometry(new Point(6, 6), filledDot ? 2.2 : 1.5, filledDot ? 2.2 : 1.5),
-                Fill = stroke
-            });
-            return grid;
+            link.MouseEnter += (o, e) => link.TextDecorations = TextDecorations.Underline;
+            link.MouseLeave += (o, e) => link.TextDecorations = null;
+            link.MouseLeftButtonUp += (o, e) => { e.Handled = true; onClick(); };
+            return link;
         }
 
         // ---------------------------------------------------------------- hover and captions

@@ -63,7 +63,7 @@
             </Setter>
         </Style>
 
-        <!-- New: the two halves of the Datafiles | Folders switch at the top left. Tag holds the corner radius
+        <!-- The two halves of the Folders | Datafiles switch at the top left. Tag holds the corner radius
              (a Binding rather than TemplateBinding, so the text "3,0,0,3" is converted to a CornerRadius). -->
         <Style x:Key="StateButtonStyle" TargetType="RadioButton">
             <Setter Property="GroupName" Value="CompareState"/>
@@ -92,8 +92,8 @@
             </Setter>
         </Style>
 
-        <!-- New: the frequency buttons on the right of the diagram (Datafiles), stacked like a vertical version of the
-             Datafiles | Folders switch. Created in code; Tag holds the corner radius. -->
+        <!-- The frequency buttons at the top of the diagram (Datafiles), side by side like the Folders | Datafiles
+             switch. Created in code; Tag holds the corner radius. -->
         <Style x:Key="FreqButtonStyle" TargetType="RadioButton">
             <Setter Property="GroupName" Value="CompareFreq"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -102,8 +102,8 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="RadioButton">
                         <Border Name="Back" Background="#FFF0F0F0" BorderBrush="#FFACACAC" BorderThickness="1"
-                                CornerRadius="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" Padding="9,3,9,4">
-                            <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                CornerRadius="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" Padding="10,2,10,3">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
@@ -215,7 +215,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Top: the Datafiles | Folders switch, the drop zone and the numbered, reorderable list. -->
+        <!-- Top: the Folders | Datafiles switch, the drop zone and the numbered, reorderable list. -->
         <Grid Grid.Row="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -228,14 +228,15 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- New: compare databanks (series inside) or folders (data files inside). Each keeps its own list. -->
+            <!-- Compare folders (data files inside) or databanks (series inside). Each keeps its own list.
+                 Folders is on the left, but the window starts in the Datafiles state. -->
             <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
-                <RadioButton Name="DatafilesStateButton" Content="Datafiles" Style="{StaticResource StateButtonStyle}"
-                             Tag="3,0,0,3" IsChecked="True" Checked="StateButton_Checked"
-                             ToolTip="Compare the series in 2 or 3 databank files"/>
                 <RadioButton Name="FoldersStateButton" Content="Folders" Style="{StaticResource StateButtonStyle}"
-                             Tag="0,3,3,0" Margin="-1,0,0,0" Checked="StateButton_Checked"
+                             Tag="3,0,0,3" Checked="StateButton_Checked"
                              ToolTip="Compare the data files in 2 or 3 folders (and their subfolders)"/>
+                <RadioButton Name="DatafilesStateButton" Content="Datafiles" Style="{StaticResource StateButtonStyle}"
+                             Tag="0,3,3,0" Margin="-1,0,0,0" IsChecked="True" Checked="StateButton_Checked"
+                             ToolTip="Compare the series in 2 or 3 databank files"/>
             </StackPanel>
             <TextBlock Grid.Row="0" Grid.Column="2" Name="StateInfoText" Visibility="Collapsed" VerticalAlignment="Center"
                        Foreground="#FF1F4E79" TextTrimming="CharacterEllipsis"/>
@@ -349,22 +350,21 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- The diagram, with the frequency buttons on its right (Datafiles only; filled in code with the
-                     frequencies that exist in the compared databanks) -->
+                <!-- The diagram, with the frequency buttons above it (Datafiles only; filled in code with the
+                     frequencies that exist in the compared databanks). In the Folders state the bar is hidden but keeps
+                     its room, so the circles do not change size when switching state. -->
                 <Border Grid.Column="0" BorderBrush="#FFD5D5D5" BorderThickness="1" CornerRadius="4" Background="White">
                     <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <local:VennView x:Name="Venn" Margin="8"/>
-                        <ScrollViewer Grid.Column="1" Name="FreqColumn" VerticalAlignment="Center" Margin="0,8,8,8"
-                                      VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
-                            <StackPanel>
-                                <TextBlock Text="Frequency" Style="{StaticResource HintStyle}" Margin="1,0,0,3"/>
-                                <StackPanel Name="FreqPanel" MinWidth="92"/>
-                            </StackPanel>
-                        </ScrollViewer>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Name="FreqBar" Orientation="Horizontal" HorizontalAlignment="Center"
+                                    Margin="8,8,8,0" MinHeight="22">
+                            <TextBlock Text="Frequency" Style="{StaticResource HintStyle}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <StackPanel Name="FreqPanel" Orientation="Horizontal"/>
+                        </StackPanel>
+                        <local:VennView Grid.Row="1" x:Name="Venn" Margin="8,4,8,8"/>
                     </Grid>
                 </Border>
 

@@ -278,8 +278,8 @@ namespace Gekko
         string SlotWord { get; }      // "bank" / "folder"
         string ItemWord { get; }      // "series" / "files"
         string FoundPhrase { get; }   // "that differ", "with missing values", ...
-        string SlotName(int slot);    // box, first line
-        string SlotInfo(int slot);    // box, second line
+        string SlotName(int slot);    // box, first line (shortened to 25 characters by the view)
+        string SlotInfo(int slot);    // box, the lines under the name, separated by "\n"
         string SlotTip(int slot);     // box tooltip (full path)
         string FoundText(AreaCounts c);   // tooltip of a red number
         string Summarize(int mask);       // caption when hovering an area
@@ -457,13 +457,14 @@ namespace Gekko
             get { return HasSpan ? PeriodText.Format(Freq, SpanStart) + "–" + PeriodText.Format(Freq, SpanEnd) : "no observations"; }
         }
 
+        /// <summary>For the box: the bank's span and its number of series, on two lines ("1990–2025\n260 series").</summary>
         public string BankSpanText(int slot)
         {
             string freq = PeriodConvert.FrequencyName(Freq).ToLowerInvariant();
             if (BankSeriesCount[slot] == 0) return "no " + freq + " series";
             string count = BankSeriesCount[slot].ToString(CultureInfo.InvariantCulture) + " series";
             if (BankSpanStart[slot] > BankSpanEnd[slot]) return count;
-            return PeriodText.Format(Freq, BankSpanStart[slot]) + "–" + PeriodText.Format(Freq, BankSpanEnd[slot]) + ", " + count;
+            return PeriodText.Format(Freq, BankSpanStart[slot]) + "–" + PeriodText.Format(Freq, BankSpanEnd[slot]) + "\n" + count;
         }
 
         // ---- IVennModel
