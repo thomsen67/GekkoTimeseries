@@ -84,8 +84,29 @@ namespace Gekko
             Raise(nameof(SeriesText));
         }
 
-        /// <summary>The number badge and the remove (X) button are not shown on the empty row.</summary>
+        /// <summary>The number badge is not shown on the empty row.</summary>
         public Visibility RowVisibility => IsPlaceholder ? Visibility.Collapsed : Visibility.Visible;
+
+        /// <summary>
+        /// True for the databanks opened from the Folders state while folders are selected: they belong to the folder
+        /// file, so they cannot be replaced (Recent) or removed (X) here.
+        /// </summary>
+        public bool Locked
+        {
+            get { return locked; }
+            set
+            {
+                if (locked == value) return;
+                locked = value;
+                Raise(nameof(RecentVisibility));
+                Raise(nameof(RemoveVisibility));
+            }
+        }
+
+        bool locked;
+
+        public Visibility RecentVisibility => Locked ? Visibility.Collapsed : Visibility.Visible;
+        public Visibility RemoveVisibility => IsPlaceholder || Locked ? Visibility.Collapsed : Visibility.Visible;
 
         public string RecentTip
         {
@@ -225,8 +246,8 @@ namespace Gekko
         IVennModel Model => state == CompareState.Folders ? (IVennModel)folderResult : current;
 
         // ---- Settings shared by both states (the panel to the right of the diagram): compare first 2 or 3,
-        // the check and its thresholds, and the name filter. Frequency and period are used by the Datafiles state;
-        // the Folders state checks all frequencies and periods of each file.
+        // the period, the check and its thresholds, and the name filter. The frequency (buttons on the right of the
+        // diagram) is only used by the Datafiles state; the Folders state checks all frequencies of each file.
         readonly CheckSettings settings = new CheckSettings();
         bool compare3Choice = true;  // the user's choice; "first 3" is used when the list has 3 or more
         bool[] active = { true, true, true };
@@ -262,27 +283,38 @@ namespace Gekko
         // ---- The check (tabs at the bottom of the controls panel, shared by both states) and the drill-down filters.
         //   Check:  Differences, Missings or Zeroes.
         //   Area:   one area (selectedMask != 0) or a whole bank/folder (selectedBank >= 0), or nothing.
-        //   Period: userFrom..userTo (the From/To boxes, Datafiles only); null means the edge of the universal period.
+        //   Period: the From/To boxes, as typed, in any frequency (null: open). Shared by both states; each
+        //           frequency gets its own first and last period (PeriodRange).
         //   Found:  foundFilter, Any or Yes (the red number / a histogram bar): only what the check finds.
         CheckKind check = CheckKind.Differences;
         int selectedMask;
         int selectedBank = -1;
         FlagFilter foundFilter = FlagFilter.Any;
-        int? userFrom;
-        int? userTo;
-        int? periodAnchor;  // the first bar clicked, for Shift+click ranges
-        CompareFreq? periodFreq;
+        string fromText;
+        string toText;
+        int? periodAnchor;  // the first bar clicked, for Shift+click ranges (a period of the selected frequency)
+        CompareFreq? selectedFreq;  // Datafiles: the frequency button that is pressed
 
         Selection selection;                                              // Datafiles: the area filter, resolved
         List<SeriesComparison> shown = new List<SeriesComparison>();      // Datafiles: series passing all filters
         FileSelection fileSelection;                                      // Folders: the area filter, resolved
         List<FileComparison> shownFiles = new List<FileComparison>();     // Folders: files passing all filters
 
+        // Datafiles, Values tab: all series of the Names list in one text. blockStarts[k] is the line where series
+        // blockSeries[k] starts; Previous/Next jump between them. The text is only built while the tab is shown.
         List<SeriesComparison> navList = new List<SeriesComparison>();
-        int navIndex = -1;
+        readonly List<int> blockStarts = new List<int>();
+        readonly List<SeriesComparison> blockSeries = new List<SeriesComparison>();
+        bool valuesDirty = true;
+        int? pendingValuesBlock;  // scroll to this series once the text box is laid out
+        int valuesBlock = -1;     // the series shown at the top: set by jumps, and by scrolling by hand
+        double valuesOffset = double.NaN;  // the scroll position valuesBlock belongs to
+        bool applyingValuesScroll;
+        string valuesTopName;     // the series at the top of the text, kept when the text is built again
+        const int MaxValueLines = 100000;
+
         List<FileComparison> fileNav = new List<FileComparison>();
         int fileNavIndex = -1;
-        DeviationListing listing;
         const string NoSelectionMessage = "Click a number, an area or a box in the diagram.";
         string devMessage = NoSelectionMessage;
 
@@ -334,19 +366,29 @@ namespace Gekko
             ready = true;
             UpdateStateControls();
             BanksChanged();
-            SetStatus("Three databanks with artificial data are loaded. Drop files or folders to compare them, drag rows to reorder.");
+            SetStatus("Three databanks with artificial data are loaded. Drop databank files to compare them (or click Folders to compare folders), drag rows to reorder.");
         }
 
         int SlotCount => Compare3Radio.IsChecked == true && banks.Count >= 3 ? 3 : 2;
 
-        CompareFreq? SelectedFreq
+        CompareFreq? SelectedFreq => selectedFreq;
+
+        /// <summary>The period filter of the From/To boxes, for any frequency.</summary>
+        PeriodRange period = PeriodRange.All;
+
+        /// <summary>Sets the period filter (null or empty: open). Does not refresh.</summary>
+        void SetPeriodTexts(string from, string to)
         {
-            get
-            {
-                var item = FreqCombo.SelectedItem as ComboBoxItem;
-                return item == null ? (CompareFreq?)null : (CompareFreq)item.Tag;
-            }
+            period = new PeriodRange(from, to);
+            fromText = period.FromText;
+            toText = period.ToText;
         }
+
+        /// <summary>
+        /// Folders are selected (the folder list is not empty): the Datafiles state then only compares the copies of
+        /// a file opened from the Folders state, and its drop field is switched off.
+        /// </summary>
+        bool DatafilesLocked => folderItems.Count > 0;
 
         // ---------------------------------------------------------------- user settings
 
@@ -423,12 +465,9 @@ namespace Gekko
             double radius = VennView.RadiusFor(Venn.ActualWidth, Venn.ActualHeight, layoutSlots);
             double change = VennView.ThirdCircleHeight(radius) * (slots == 2 ? -1 : 1);
 
-            // Never smaller than the controls to the right of the diagram need.
-            double controls = ControlsContent.ActualHeight + ControlsPanel.Padding.Top + ControlsPanel.Padding.Bottom
-                              + ControlsPanel.BorderThickness.Top + ControlsPanel.BorderThickness.Bottom;
+            // The controls to the right of the diagram scroll when they do not fit, so only the minimum height counts.
             double total = VennRow.ActualHeight + DetailsRow.ActualHeight;
-            double min = Math.Max(VennRow.MinHeight, controls);
-            double venn = Math.Max(min, Math.Min(VennRow.ActualHeight + change, total - DetailsRow.MinHeight));
+            double venn = Math.Max(VennRow.MinHeight, Math.Min(VennRow.ActualHeight + change, total - DetailsRow.MinHeight));
             if (venn > 0 && total - venn > 0)
             {
                 VennRow.Height = new GridLength(venn, GridUnitType.Star);
@@ -497,7 +536,6 @@ namespace Gekko
             busy = true;
             try
             {
-                BankList.ItemsSource = state == CompareState.Folders ? folderListSource : bankListSource;
                 DatafilesStateButton.IsChecked = state == CompareState.Datafiles;
                 FoldersStateButton.IsChecked = state == CompareState.Folders;
                 Compare3Radio.IsEnabled = banks.Count >= 3;
@@ -559,23 +597,23 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Names tabs and columns for the current state. The settings panel is the same in both states; only frequency
-        /// and period are greyed out for folders, since a folder comparison checks all frequencies and periods.
+        /// Names tabs, columns, the drop field and the frequency buttons for the current state. The settings panel to
+        /// the right of the diagram is the same in both states.
         /// </summary>
         void UpdateStateControls()
         {
             bool folders = state == CompareState.Folders;
             Title = folders ? "Compare folders" : "Compare databanks";
-            DatafileControls.IsEnabled = !folders;
-            DatafileControls.ToolTip = folders ? "Folders: all frequencies and all periods of each data file are checked." : null;
-            if (folders) SpanText.Text = "Folders: all frequencies and periods are checked.";
+            UpdateFreqColumn();
             NamesText.Visibility = folders ? Visibility.Collapsed : Visibility.Visible;
             FilesList.Visibility = folders ? Visibility.Visible : Visibility.Collapsed;
             IgnoreDimsCheck.Visibility = folders ? Visibility.Collapsed : Visibility.Visible;
             ValuesTab.Header = folders ? "Details" : "Values";
             OnlyFoundCheck.Visibility = folders ? Visibility.Collapsed : Visibility.Visible;
             ContentsColumn.Header = folders ? "Data files" : "Series";
+            UpdateDropAndList();
             UpdateOpenedFromText();
+            UpdatePeriodBoxes();
         }
 
         void UpdateOpenedFromText()
@@ -585,10 +623,69 @@ namespace Gekko
                 StateInfoText.Text = "Opened from the folders: " + openedFrom.RelativePath + ". Click Folders to go back.";
                 StateInfoText.Visibility = Visibility.Visible;
             }
+            else if (state == CompareState.Datafiles && DatafilesLocked)
+            {
+                StateInfoText.Text = "Folders are selected: open a data file from the Files tab of the Folders view.";
+                StateInfoText.Visibility = Visibility.Visible;
+            }
             else
             {
                 StateInfoText.Visibility = Visibility.Collapsed;
             }
+        }
+
+        /// <summary>
+        /// The drop field and the list, for the current state. Datafiles: "Drag datafiles here"; while folders are
+        /// selected, the field is switched off and the rows (copies of a folder file) cannot be replaced, removed or
+        /// reordered, and there is no empty row. Folders: "Drag folders here".
+        /// </summary>
+        void UpdateDropAndList()
+        {
+            bool locked = DatafilesLocked;
+            foreach (BankItem item in bankItems) item.Locked = locked;
+            bool folders = state == CompareState.Folders;
+            System.Collections.IEnumerable source = folders ? folderListSource
+                                                  : locked ? (System.Collections.IEnumerable)bankItems
+                                                  : bankListSource;
+            if (!ReferenceEquals(BankList.ItemsSource, source)) BankList.ItemsSource = source;
+
+            bool off = !folders && locked;
+            DropZone.AllowDrop = !off;
+            BankList.AllowDrop = !off;
+            DropZone.Opacity = off ? 0.55 : 1.0;
+            DropZoneBorder.Stroke = DropNormal;
+            DropZoneHintText.Text = folders ? "Drag folders here"
+                                  : off ? "Folders are selected: you cannot drag datafiles here"
+                                  : "Drag datafiles here";
+            DropZone.ToolTip = off
+                ? "The Datafiles view compares the copies of a data file opened from the Files tab of the Folders view. Remove the folders to compare databank files of your own."
+                : null;
+        }
+
+        /// <summary>
+        /// The folder list changed (folders added, removed, replaced or reordered): the Datafiles state starts over,
+        /// waiting for a data file to be opened from the Folders state.
+        /// </summary>
+        void ResetDatafiles()
+        {
+            bankItems.Clear();
+            current = null;
+            openedFrom = null;
+            ResetDatafilesView();
+            datafilesDirty = DirtyList;
+            UpdateDropAndList();
+        }
+
+        /// <summary>A fresh selection (and no hidden banks or focus) for the Datafiles state.</summary>
+        void ResetDatafilesView()
+        {
+            datafilesView.SelectedMask = 0;
+            datafilesView.SelectedBank = -1;
+            datafilesView.Found = FlagFilter.Any;
+            datafilesView.FocusSlot = -1;
+            datafilesView.ActiveBeforeFocus = null;
+            datafilesView.Active = new[] { true, true, true };
+            periodAnchor = null;
         }
 
         /// <summary>
@@ -617,19 +714,13 @@ namespace Gekko
             }
 
             // Prepare the Datafiles state before showing it, so the old list is not compared first.
+            // The period, the check and the thresholds are shared by both states and stay as they are.
             bankItems.Clear();
             foreach (BankItem item in loaded) bankItems.Add(item);
-            datafilesView.SelectedMask = 0;
-            datafilesView.SelectedBank = -1;
-            datafilesView.Found = FlagFilter.Any;
-            datafilesView.FocusSlot = -1;
-            datafilesView.ActiveBeforeFocus = null;
-            datafilesView.Active = new[] { true, true, true };
-            userFrom = null;
-            userTo = null;
-            periodAnchor = null;
+            ResetDatafilesView();
             openedFrom = fc;
             datafilesDirty = DirtyList;
+            UpdateDropAndList();
 
             if (state == CompareState.Datafiles)
             {
@@ -736,6 +827,7 @@ namespace Gekko
         {
             bool folders = target.IsFolderRow;
             if (IsIn(banks, path)) return;
+            if (!folders && DatafilesLocked) return;  // the rows are copies of a folder file (no Recent button then)
             if (folders ? !Directory.Exists(path) : !File.Exists(path))
             {
                 ForgetRecent(folders, path);
@@ -754,7 +846,8 @@ namespace Gekko
                 BankItem item = folders ? BankItem.ForFolder(path) : new BankItem(LoadBank(path));
                 banks[index] = item;
                 TouchRecent(folders, path);
-                if (!folders) openedFrom = null;
+                if (folders) ResetDatafiles();
+                else openedFrom = null;
                 BanksChanged();
                 UpdateOpenedFromText();
                 SetStatus(target.Name + " replaced by " + item.Name + ".");
@@ -771,6 +864,8 @@ namespace Gekko
         void BanksChanged()
         {
             if (!ready) return;
+            UpdateDropAndList();
+            UpdateOpenedFromText();
             busy = true;
             try
             {
@@ -806,15 +901,82 @@ namespace Gekko
             Recompute();
         }
 
-        /// <summary>The dropdown only offers frequencies that exist in the compared banks.</summary>
+        /// <summary>
+        /// The frequency buttons on the right of the diagram (Datafiles): one per frequency that exists in the compared
+        /// banks, with its name and its largest period, e.g. "Quarterly" over "1990q1–2030q4". They work like radio
+        /// buttons; the pressed one is dark blue, like the Datafiles | Folders switch.
+        /// </summary>
         void RefreshFrequencies()
         {
-            CompareFreq? previous = SelectedFreq;
-            List<CompareFreq> freqs = bankItems.Take(SlotCount).SelectMany(b => b.Bank.Frequencies).Distinct().OrderBy(f => f).ToList();
-            FreqCombo.Items.Clear();
-            foreach (CompareFreq f in freqs) FreqCombo.Items.Add(new ComboBoxItem { Content = f.ToString(), Tag = f });
-            int index = previous.HasValue ? freqs.IndexOf(previous.Value) : -1;
-            FreqCombo.SelectedIndex = index >= 0 ? index : (freqs.Count > 0 ? 0 : -1);
+            FreqPanel.Children.Clear();
+            List<CompareBank> compared = bankItems.Count >= 2 ? bankItems.Take(SlotCount).Select(b => b.Bank).ToList() : new List<CompareBank>();
+            List<CompareFreq> freqs = compared.SelectMany(b => b.Frequencies).Distinct().OrderBy(f => f).ToList();
+            if (!selectedFreq.HasValue || !freqs.Contains(selectedFreq.Value))
+            {
+                selectedFreq = freqs.Count > 0 ? freqs[0] : (CompareFreq?)null;
+                periodAnchor = null;
+            }
+
+            const double r = 3;
+            for (int i = 0; i < freqs.Count; i++)
+            {
+                CompareFreq f = freqs[i];
+                int start = int.MaxValue, end = int.MinValue;
+                var counts = new List<string>();
+                for (int s = 0; s < compared.Count; s++)
+                {
+                    int count = 0;
+                    if (compared[s].Frequencies.Contains(f))
+                    {
+                        foreach (CompareSeries ts in compared[s].Get(f).Values)
+                        {
+                            count++;
+                            if (ts.Data.Length == 0) continue;
+                            start = Math.Min(start, ts.Start);
+                            end = Math.Max(end, ts.End);
+                        }
+                    }
+                    counts.Add("bank " + (s + 1) + ": " + count + " series");
+                }
+                string name = PeriodConvert.FrequencyName(f);
+                string span = start <= end ? PeriodText.Format(f, start) + "–" + PeriodText.Format(f, end) : "no observations";
+
+                var content = new StackPanel();
+                content.Children.Add(new TextBlock { Text = name, FontWeight = FontWeights.SemiBold });
+                content.Children.Add(new TextBlock { Text = span, FontSize = 10.5, Opacity = 0.8 });
+                CornerRadius corners = freqs.Count == 1 ? new CornerRadius(r)
+                                     : i == 0 ? new CornerRadius(r, r, 0, 0)
+                                     : i == freqs.Count - 1 ? new CornerRadius(0, 0, r, r)
+                                     : new CornerRadius(0);
+                var button = new RadioButton
+                {
+                    Style = (Style)FindResource("FreqButtonStyle"),
+                    Content = content,
+                    Tag = corners,
+                    Margin = new Thickness(0, i == 0 ? 0 : -1, 0, 0),
+                    IsChecked = selectedFreq.HasValue && f.Equals(selectedFreq.Value),
+                    ToolTip = "Compare the " + name.ToLowerInvariant() + " series: " + span + " (" + string.Join(", ", counts) + ")"
+                };
+                CompareFreq chosen = f;
+                button.Checked += (o, e) => FreqButton_Checked(chosen);
+                FreqPanel.Children.Add(button);
+            }
+            UpdateFreqColumn();
+        }
+
+        /// <summary>The frequency buttons are shown in the Datafiles state, when there is something to compare.</summary>
+        void UpdateFreqColumn()
+        {
+            FreqColumn.Visibility = state == CompareState.Datafiles && FreqPanel.Children.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        void FreqButton_Checked(CompareFreq freq)
+        {
+            if (!ready || busy) return;
+            if (selectedFreq.HasValue && selectedFreq.Value.Equals(freq)) return;
+            selectedFreq = freq;
+            periodAnchor = null;  // a period of the other frequency
+            Recompute();
         }
 
         void ScheduleRecompute()
@@ -860,10 +1022,12 @@ namespace Gekko
                 current = null;
                 selectedMask = 0;
                 selectedBank = -1;
-                Venn.SetState(null, bankItems.Count == 0 ? "Drag databank files (or folders) into the drop field to begin."
-                                    : bankItems.Count == 1 ? "Add one more databank to compare."
-                                    : "The compared databanks contain no series.",
-                              0, -1, FlagFilter.Any, -1);
+                string message = bankItems.Count == 0 && DatafilesLocked
+                                     ? "Folders are selected. Click a data file in the Files tab of the Folders view (top left) to compare its copies here."
+                               : bankItems.Count == 0 ? "Drag databank files into the drop field to begin."
+                               : bankItems.Count == 1 ? "Add one more databank to compare."
+                               : "The compared databanks contain no series.";
+                Venn.SetState(null, message, 0, -1, FlagFilter.Any, -1);
                 selection = null;
                 ShowDetails();
                 UpdatePeriodBoxes();
@@ -871,15 +1035,7 @@ namespace Gekko
                 return;
             }
 
-            // Keep the chosen periods when switching frequency (2010q3 becomes 2010m7 or 2010, and so on).
-            if (periodFreq.HasValue && periodFreq.Value != freq.Value)
-            {
-                if (userFrom.HasValue) userFrom = PeriodText.ChangeFrequency(userFrom.Value, periodFreq.Value, freq.Value, false);
-                if (userTo.HasValue) userTo = PeriodText.ChangeFrequency(userTo.Value, periodFreq.Value, freq.Value, true);
-                periodAnchor = null;
-            }
-            periodFreq = freq;
-
+            // The period boxes need no conversion here: each frequency gets its own periods from the texts.
             Func<string, bool> filter = ReadFilter();
             List<CompareBank> compared = bankItems.Take(SlotCount).Select(b => b.Bank).ToList();
             current = CompareEngine.Compute(compared, active, freq.Value, filter, settings);
@@ -962,8 +1118,9 @@ namespace Gekko
             SetStatus(folderStatus);
         }
 
-        int PeriodFrom => current != null && current.HasSpan ? (userFrom ?? current.SpanStart) : 0;
-        int PeriodTo => current != null && current.HasSpan ? (userTo ?? current.SpanEnd) : -1;
+        /// <summary>Datafiles: the period filter in the selected frequency, inside the universal period.</summary>
+        int PeriodFrom => current != null && current.HasSpan ? Math.Max(current.SpanStart, period.From(current.Freq)) : 0;
+        int PeriodTo => current != null && current.HasSpan ? Math.Min(current.SpanEnd, period.To(current.Freq)) : -1;
 
         /// <summary>Applies the check and the drill-down filters to the current comparison and updates every view.</summary>
         void Refresh()
@@ -978,7 +1135,6 @@ namespace Gekko
                 Recompute();
                 return;
             }
-            ClampPeriod();
             CompareEngine.UpdateCounts(current, check, PeriodFrom, PeriodTo);
             ValidateSelection();
 
@@ -1004,13 +1160,14 @@ namespace Gekko
             }
             else
             {
-                folderResult.UpdateCounts(check, settings);
+                folderResult.UpdateCounts(check, settings, period);
                 ValidateSelection();
                 Venn.SetState(folderResult, null, selectedMask, selectedBank, foundFilter, focusSlot);
                 FitVennRow(folderResult.SlotCount);
             }
             fileSelection = BuildFileSelection();
             ShowDetails();
+            UpdatePeriodBoxes();
             UpdateListBadges();
         }
 
@@ -1021,31 +1178,6 @@ namespace Gekko
             if (selectedBank >= 0 && (selectedBank >= m.SlotCount || !m.Active[selectedBank])) selectedBank = -1;
             if (selectedMask != 0 && !m.AreaMasks.Contains(selectedMask)) selectedMask = 0;
             if (selectedBank >= 0) selectedMask = 0;
-        }
-
-        /// <summary>A chosen period outside the universal period (e.g. after hiding a bank) falls back to its edge.</summary>
-        void ClampPeriod()
-        {
-            if (!current.HasSpan)
-            {
-                userFrom = null;
-                userTo = null;
-                return;
-            }
-            if (userFrom.HasValue && (userFrom.Value <= current.SpanStart || userFrom.Value > current.SpanEnd)) userFrom = null;
-            if (userTo.HasValue && (userTo.Value >= current.SpanEnd || userTo.Value < current.SpanStart)) userTo = null;
-            if (PeriodFrom > PeriodTo)
-            {
-                userFrom = null;
-                userTo = null;
-            }
-        }
-
-        /// <summary>Sets the period filter (and the From/To boxes). Does not refresh.</summary>
-        void SetPeriod(int from, int to)
-        {
-            userFrom = from > current.SpanStart ? (int?)from : null;
-            userTo = to < current.SpanEnd ? (int?)to : null;
         }
 
         void UpdateListBadges()
@@ -1240,9 +1372,20 @@ namespace Gekko
             {
                 periodAnchor = period;
             }
-            SetPeriod(from, to);
+            // Written in the bar's frequency; the other frequencies (and the Folders state) convert it. Undated periods
+            // have no calendar, so for undated series a bar only filters on what the check finds.
+            if (PeriodConvert.IsDated(current.Freq))
+                SetPeriodTexts(PeriodText.Format(current.Freq, from), PeriodText.Format(current.Freq, to));
             foundFilter = FlagFilter.Yes;
-            Refresh();
+            committingPeriod = true;  // also replace text typed (and not committed) in a period box
+            try
+            {
+                Refresh();
+            }
+            finally
+            {
+                committingPeriod = false;
+            }
             SetStatus(shown.Count + " series " + CheckText.Phrase(check) + current.CountPeriodText
                       + ". Double-click a bar (or see the Names tab) to list them.");
         }
@@ -1374,15 +1517,12 @@ namespace Gekko
                 return;
             }
 
-            string keepName = navIndex >= 0 && navIndex < navList.Count ? navList[navIndex].Name : null;
-
             if (selection == null || current == null)
             {
                 shown = new List<SeriesComparison>();
                 ShowNames();
                 ShowHistogram();
                 navList = shown;
-                navIndex = -1;
                 devMessage = NoSelectionMessage;
                 ShowCurrentItem();
                 return;
@@ -1398,12 +1538,6 @@ namespace Gekko
             ShowHistogram();
 
             navList = shown;
-            navIndex = shown.Count == 0 ? -1 : 0;
-            if (keepName != null)
-            {
-                int i = navList.FindIndex(c => string.Equals(c.Name, keepName, StringComparison.OrdinalIgnoreCase));
-                if (i >= 0) navIndex = i;
-            }
             devMessage = "No series match the current filters.";
             ShowCurrentItem();
         }
@@ -1508,12 +1642,24 @@ namespace Gekko
             };
         }
 
+        // The file under the mouse when the button went down. Pressing can commit a typed period (the focus moves),
+        // which rebuilds the list; only a click that starts and ends on the same file opens it.
+        FileComparison pressedFile;
+
+        void FilesList_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var item = FindAncestor<ListBoxItem>(e.OriginalSource as DependencyObject);
+            pressedFile = (item?.DataContext as FileRow)?.File;
+        }
+
         /// <summary>A click on a file in the Files tab opens it in the Datafiles state.</summary>
         void FilesList_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             var item = FindAncestor<ListBoxItem>(e.OriginalSource as DependencyObject);
             var row = item?.DataContext as FileRow;
-            if (row == null) return;
+            FileComparison pressed = pressedFile;
+            pressedFile = null;
+            if (row == null || !ReferenceEquals(row.File, pressed)) return;
             fileNavIndex = fileNav.IndexOf(row.File);
             ShowCurrentItem();
             OpenFileInDatafiles(row.File);
@@ -1528,100 +1674,170 @@ namespace Gekko
             OpenFileInDatafiles(row.File);
         }
 
-        // ---------------------------------------------------------------- period from/to (the period filter, Datafiles)
+        // ---------------------------------------------------------------- period from/to (the period filter, both states)
 
+        // The grey texts shown for open ends (what an unchanged grey text means when it is committed).
+        string autoFromText = "";
+        string autoToText = "";
+        bool committingPeriod;
+
+        /// <summary>
+        /// Black text: the period as typed (any frequency). Grey text: an open end, showing where the data start or end:
+        /// the universal period of the selected frequency (Datafiles) or the years with data in the files (Folders).
+        /// </summary>
         void UpdatePeriodBoxes()
         {
-            bool has = current != null && current.HasSpan;
-            FromSpinner.IsEnabled = has;
-            ToSpinner.IsEnabled = has;
-            WholePeriodButton.IsEnabled = has && (userFrom.HasValue || userTo.HasValue);
-            if (!has)
+            autoFromText = "";
+            autoToText = "";
+            if (state == CompareState.Folders)
             {
-                FromBox.Text = "";
-                ToBox.Text = "";
-                SpanText.Text = "";
-                return;
+                int first, last;
+                if (folderResult != null && folderResult.TryGetYears(out first, out last))
+                {
+                    autoFromText = first.ToString(Inv);
+                    autoToText = last.ToString(Inv);
+                }
+                SpanText.Text = "Used in every frequency, e.g. 2010 is 2010q1–2010q4 for quarterly series. All frequencies are checked.";
             }
-            SpanText.Text = "Universal period " + current.SpanText;
-            ShowPeriod(FromBox, userFrom, current.SpanStart);
-            ShowPeriod(ToBox, userTo, current.SpanEnd);
+            else if (current != null && current.HasSpan && !PeriodConvert.IsDated(current.Freq))
+            {
+                // No grey texts: an undated period typed or stepped here would be read as a year by the other frequencies.
+                SpanText.Text = "Undated data: " + current.SpanText + ". The period does not apply to undated series.";
+            }
+            else if (current != null && current.HasSpan)
+            {
+                autoFromText = PeriodText.Format(current.Freq, current.SpanStart);
+                autoToText = PeriodText.Format(current.Freq, current.SpanEnd);
+                SpanText.Text = PeriodConvert.FrequencyName(current.Freq) + " data: " + current.SpanText
+                                + ". The period is used in every frequency.";
+            }
+            else
+            {
+                SpanText.Text = "The period is used in every frequency, e.g. 2010 is 2010q1–2010q4 for quarterly series.";
+            }
+            ShowPeriod(FromBox, fromText, autoFromText);
+            ShowPeriod(ToBox, toText, autoToText);
+            WholePeriodButton.IsEnabled = fromText != null || toText != null;
         }
 
-        /// <summary>Grey text: follows the universal period. Black text: chosen by the user.</summary>
-        void ShowPeriod(TextBox box, int? chosen, int automatic)
+        void ShowPeriod(TextBox box, string chosen, string automatic)
         {
-            box.Text = PeriodText.Format(current.Freq, chosen ?? automatic);
-            if (chosen.HasValue) box.ClearValue(Control.ForegroundProperty);
+            // Do not overwrite what is being typed and not yet committed (e.g. when a folder comparison finishes
+            // meanwhile). box.Tag holds the text last shown here.
+            if (box.IsKeyboardFocused && !committingPeriod && !string.Equals(box.Text, box.Tag as string ?? "", StringComparison.Ordinal)) return;
+            box.Text = chosen ?? automatic;
+            box.Tag = box.Text;
+            if (chosen != null) box.ClearValue(Control.ForegroundProperty);
             else box.Foreground = AutoPeriodBrush;
             box.ClearValue(Control.BackgroundProperty);
+        }
+
+        /// <summary>A period text: "2010", "2010q3", "2010m7", or what Gekko reads in the selected frequency.</summary>
+        bool IsPeriodText(string text, bool isEnd)
+        {
+            int year, sub, p;
+            char letter;
+            if (PeriodConvert.TrySplit(text, out year, out letter, out sub)) return true;
+            return selectedFreq.HasValue && PeriodText.TryParse(text, selectedFreq.Value, isEnd, out p);
+        }
+
+        /// <summary>From must not be after To (compared in months, or in the selected frequency).</summary>
+        bool PeriodOrderOk(string from, string to)
+        {
+            if (from == null || to == null) return true;
+            int a, b;
+            if (PeriodConvert.TryMonth(from, false, out a) && PeriodConvert.TryMonth(to, true, out b)) return a <= b;
+            if (selectedFreq.HasValue && PeriodConvert.TryConvert(from, selectedFreq.Value, false, out a)
+                && PeriodConvert.TryConvert(to, selectedFreq.Value, true, out b)) return a <= b;
+            return true;
         }
 
         /// <summary>Reads the typed period. Returns false (and marks the box) if it is not valid.</summary>
         bool TryCommitPeriod(bool isFrom)
         {
-            if (current == null || !current.HasSpan) return false;
             TextBox box = isFrom ? FromBox : ToBox;
             string text = box.Text.Trim();
+            string old = isFrom ? fromText : toText;
+            string auto = isFrom ? autoFromText : autoToText;
 
-            int? value = null;
-            if (text.Length > 0)
+            // Empty, or the grey text left as it was: an open end.
+            string value = text.Length == 0 || (old == null && string.Equals(text, auto, StringComparison.OrdinalIgnoreCase)) ? null : text;
+            if (value != null && !IsPeriodText(value, !isFrom))
             {
-                int p;
-                if (!PeriodText.TryParse(text, current.Freq, !isFrom, out p))
-                {
-                    box.Background = InvalidBack;
-                    SetStatus("\"" + text + "\" is not a " + current.Freq.ToString().ToLowerInvariant()
-                              + " period. Type for example " + PeriodText.Format(current.Freq, current.SpanStart) + ".");
-                    return false;
-                }
-                value = p;
+                box.Background = InvalidBack;
+                SetStatus("\"" + value + "\" is not a period. Type for example 2010, 2010q3 or 2010m7 (any frequency).");
+                return false;
             }
-
-            int from = isFrom ? (value ?? current.SpanStart) : (userFrom ?? current.SpanStart);
-            int to = isFrom ? (userTo ?? current.SpanEnd) : (value ?? current.SpanEnd);
-            if (from > to)
+            string from = isFrom ? value : fromText;
+            string to = isFrom ? toText : value;
+            if (!PeriodOrderOk(from, to))
             {
                 box.Background = InvalidBack;
                 SetStatus("The first period must not be after the last period.");
                 return false;
             }
-
             box.ClearValue(Control.BackgroundProperty);
-            if (isFrom) userFrom = value.HasValue && value.Value > current.SpanStart ? value : null;
-            else userTo = value.HasValue && value.Value < current.SpanEnd ? value : null;
+            SetPeriodTexts(from, to);
             return true;
         }
 
         void CommitPeriod(bool isFrom)
         {
-            int? oldFrom = userFrom, oldTo = userTo;
+            string oldFrom = fromText, oldTo = toText;
             if (!TryCommitPeriod(isFrom)) return;
-            if (oldFrom != userFrom || oldTo != userTo)
+            committingPeriod = true;
+            try
             {
-                periodAnchor = null;
-                Refresh();
+                if (oldFrom != fromText || oldTo != toText)
+                {
+                    periodAnchor = null;
+                    RefreshForPeriod();
+                }
+                else UpdatePeriodBoxes();
             }
-            else UpdatePeriodBoxes();
+            finally
+            {
+                committingPeriod = false;
+            }
         }
 
+        /// <summary>
+        /// The arrows, Up/Down and the mouse wheel step the text in its own frequency: 1990 becomes 1991, 1990q4
+        /// becomes 1991q1. An open end steps from its grey text.
+        /// </summary>
         void StepPeriod(bool isFrom, int delta)
         {
             if (!TryCommitPeriod(isFrom)) return;
-            int from = userFrom ?? current.SpanStart;
-            int to = userTo ?? current.SpanEnd;
-            if (isFrom)
+            TextBox box = isFrom ? FromBox : ToBox;
+            string text = (isFrom ? fromText : toText) ?? box.Text.Trim();
+            string stepped;
+            if (!PeriodConvert.TryStep(text, delta, out stepped))
             {
-                from = Math.Max(current.SpanStart, Math.Min(from + delta, to));
-                userFrom = from > current.SpanStart ? (int?)from : null;
+                int p;
+                if (!selectedFreq.HasValue || !PeriodText.TryParse(text, selectedFreq.Value, !isFrom, out p)) return;
+                stepped = PeriodText.Format(selectedFreq.Value, p + delta);
             }
-            else
-            {
-                to = Math.Min(current.SpanEnd, Math.Max(to + delta, from));
-                userTo = to < current.SpanEnd ? (int?)to : null;
-            }
+            string from = isFrom ? stepped : fromText;
+            string to = isFrom ? toText : stepped;
+            if (!PeriodOrderOk(from, to)) return;  // would pass the other end
+            SetPeriodTexts(from, to);
             periodAnchor = null;
-            Refresh();  // only re-filters, no recomputation
+            committingPeriod = true;
+            try
+            {
+                RefreshForPeriod();  // only re-filters (the Folders state re-evaluates its summaries), no reading
+            }
+            finally
+            {
+                committingPeriod = false;
+            }
+        }
+
+        /// <summary>The period changed: both states use it (the other one when it is shown again).</summary>
+        void RefreshForPeriod()
+        {
+            if (state == CompareState.Datafiles && current == null) UpdatePeriodBoxes();
+            else Refresh();
         }
 
         void SpinButton_Click(object sender, RoutedEventArgs e)
@@ -1646,7 +1862,16 @@ namespace Gekko
                     e.Handled = true;
                     break;
                 case Key.Escape:
-                    UpdatePeriodBoxes();
+                    // Back to the period in force (the box has the focus, so say that this is not typing).
+                    committingPeriod = true;
+                    try
+                    {
+                        UpdatePeriodBoxes();
+                    }
+                    finally
+                    {
+                        committingPeriod = false;
+                    }
                     e.Handled = true;
                     break;
                 case Key.Up:
@@ -1662,21 +1887,42 @@ namespace Gekko
 
         void PeriodBox_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
-            if (ready && state == CompareState.Datafiles) CommitPeriod(ReferenceEquals(sender, FromBox));
+            if (ready) CommitPeriod(ReferenceEquals(sender, FromBox));
         }
 
+        /// <summary>The wheel steps the period only in a box that has the focus; otherwise it scrolls the panel.</summary>
         void PeriodBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
+            var box = (TextBox)sender;
+            if (!box.IsKeyboardFocused)
+            {
+                // The text box's own scroll viewer would swallow the wheel; pass it on so the panel scrolls.
+                e.Handled = true;
+                var parent = VisualTreeHelper.GetParent(box) as UIElement;
+                parent?.RaiseEvent(new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta)
+                {
+                    RoutedEvent = UIElement.MouseWheelEvent,
+                    Source = box
+                });
+                return;
+            }
             StepPeriod(ReferenceEquals(sender, FromBox), e.Delta > 0 ? 1 : -1);
             e.Handled = true;
         }
 
         void WholePeriod_Click(object sender, RoutedEventArgs e)
         {
-            userFrom = null;
-            userTo = null;
+            SetPeriodTexts(null, null);
             periodAnchor = null;
-            if (current != null) Refresh();
+            committingPeriod = true;
+            try
+            {
+                RefreshForPeriod();
+            }
+            finally
+            {
+                committingPeriod = false;
+            }
         }
 
         // ---------------------------------------------------------------- names tab (Datafiles)
@@ -1766,51 +2012,220 @@ namespace Gekko
         void ShowCurrentItem()
         {
             if (state == CompareState.Folders) ShowCurrentFile();
-            else ShowCurrentSeries();
+            else ShowValues();
         }
 
-        /// <summary>One series of the Names list, for the selected periods. M = missing, * = found by the check.</summary>
-        void ShowCurrentSeries()
+        /// <summary>Datafiles: the Values text can be long, so it is only built while its tab is shown.</summary>
+        void ShowValues()
         {
-            bool has = navIndex >= 0 && navIndex < navList.Count && selection != null;
-            PrevButton.IsEnabled = has && navIndex > 0;
-            NextButton.IsEnabled = has && navIndex < navList.Count - 1;
-            if (!has)
+            valuesDirty = true;
+            if (Equals(Tabs.SelectedItem, ValuesTab)) BuildValuesText();
+        }
+
+        void Tabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!ReferenceEquals(e.OriginalSource, Tabs)) return;  // ignore SelectionChanged bubbling from inside the tabs
+            if (ready && state == CompareState.Datafiles && valuesDirty && Equals(Tabs.SelectedItem, ValuesTab)) BuildValuesText();
+        }
+
+        /// <summary>
+        /// All series of the Names list in one text, for the selected periods. Per series: a title line, the column
+        /// header ("period ...") and one line per period (M = missing, * = found by the check), then an empty line.
+        /// The series that was at the top stays at the top. Previous/Next jump between the series.
+        /// </summary>
+        void BuildValuesText()
+        {
+            valuesDirty = false;
+            string keep = valuesTopName;
+            blockStarts.Clear();
+            blockSeries.Clear();
+            pendingValuesBlock = null;
+            valuesBlock = -1;
+            valuesOffset = double.NaN;
+            if (selection == null || current == null || navList.Count == 0)
             {
-                listing = null;
                 NavText.Text = "";
                 LegendText.Text = "";
                 DevText.Text = devMessage;
+                DevText.ScrollToHome();
+                PrevButton.IsEnabled = false;
+                NextButton.IsEnabled = false;
                 return;
             }
 
             int from = PeriodFrom, to = PeriodTo;
-            SeriesComparison c = navList[navIndex];
-            int found = c.FoundPeriods(check, from, to, selection.SlotMask);
+            bool onlyFound = OnlyFoundCheck.IsChecked == true;
             string what = check == CheckKind.Missings ? " with M" : check == CheckKind.Zeroes ? " with zero" : " that differ";
-            NavText.Text = c.Name + "   (" + (navIndex + 1) + " of " + navList.Count + "; "
-                           + found + (found == 1 ? " period" : " periods") + what + current.CountPeriodText + ")";
+            var sb = new StringBuilder();
+            int line = 0;
+            foreach (SeriesComparison c in navList)
+            {
+                if (line >= MaxValueLines) break;
+                int found = c.FoundPeriods(check, from, to, selection.SlotMask);
+                blockStarts.Add(line);
+                blockSeries.Add(c);
+                sb.Append(c.Name + "   (" + blockSeries.Count + " of " + navList.Count + ": " + found
+                          + (found == 1 ? " period" : " periods") + what + current.CountPeriodText + ")\r\n");
+                line++;
+                DeviationListing listing = CompareEngine.FormatComparison(c, current.Freq, from, to, check, selection.SlotMask, onlyFound);
+                foreach (string l in listing.Lines)
+                {
+                    sb.Append(l).Append("\r\n");
+                    line++;
+                }
+                if (onlyFound && found == 0)
+                {
+                    sb.Append("(no periods marked *)\r\n");
+                    line++;
+                }
+                sb.Append("\r\n");
+                line++;
+            }
+            if (blockSeries.Count < navList.Count)
+                sb.Append("... and " + (navList.Count - blockSeries.Count) + " more series, left out to keep the text manageable. Narrow the "
+                          + "selection (a red number, a histogram bar or the filter), or tick 'Only periods marked *'.");
+
             string star = check == CheckKind.Missings ? "M in a bank" : check == CheckKind.Zeroes ? "zero in a bank" : "differs";
-            LegendText.Text = string.Join("   ", c.Slots.Select(s => "(" + (s + 1) + ") " + current.Banks[s].Name))
+            LegendText.Text = string.Join("   ", Enumerable.Range(0, current.SlotCount).Where(s => current.Active[s])
+                                                          .Select(s => "(" + (s + 1) + ") " + current.Banks[s].Name))
                               + "   M = missing   * = " + star;
-            listing = CompareEngine.FormatComparison(c, current.Freq, from, to, check, selection.SlotMask, OnlyFoundCheck.IsChecked == true);
-            DevText.Text = string.Join("\r\n", listing.Lines);
+            DevText.Text = sb.ToString();
             DevText.Select(0, 0);
-            DevText.ScrollToHome();
+
+            int target = 0;
+            if (keep != null)
+            {
+                int i = blockSeries.FindIndex(c => string.Equals(c.Name, keep, StringComparison.OrdinalIgnoreCase));
+                if (i >= 0) target = i;
+            }
+            ScrollValuesToBlock(target);
+        }
+
+        /// <summary>Scrolls the Values text so that the series starts at the top (once the text box is laid out).</summary>
+        void ScrollValuesToBlock(int block)
+        {
+            pendingValuesBlock = block;
+            valuesBlock = block;
+            ShowValuesNav();
+            if (DevText.IsVisible) ApplyPendingValuesScroll();
+        }
+
+        void ApplyPendingValuesScroll()
+        {
+            if (!pendingValuesBlock.HasValue || !DevText.IsVisible) return;
+            if (blockStarts.Count == 0)
+            {
+                pendingValuesBlock = null;
+                return;
+            }
+            applyingValuesScroll = true;
+            try
+            {
+                DevText.UpdateLayout();
+                double height = ValuesLineHeight();
+                if (height <= 0) return;  // not laid out yet: DevText_IsVisibleChanged tries again
+                int block = Math.Max(0, Math.Min(pendingValuesBlock.Value, blockStarts.Count - 1));
+                pendingValuesBlock = null;
+                // A couple of pixels higher, so the series' first line is never cut (what shows above it is the empty
+                // line that ends the series before). Near the end the text cannot scroll that far; valuesBlock still
+                // says which series was jumped to, so Next keeps going.
+                DevText.ScrollToVerticalOffset(Math.Max(0, blockStarts[block] * height - 2));
+                DevText.UpdateLayout();
+                valuesBlock = block;
+                valuesOffset = DevText.VerticalOffset;
+                ShowValuesNav();
+            }
+            finally
+            {
+                applyingValuesScroll = false;
+            }
+        }
+
+        /// <summary>One font and no wrapping: all lines of the Values text have the same height.</summary>
+        double ValuesLineHeight()
+        {
+            int count = DevText.LineCount;
+            return count > 0 && DevText.ExtentHeight > 0 ? DevText.ExtentHeight / count : 0;
+        }
+
+        /// <summary>The line at the top of the Values text, by the same measure that ApplyPendingValuesScroll scrolls with.</summary>
+        int ValuesTopLine()
+        {
+            double height = ValuesLineHeight();
+            return height > 0 ? Math.Max(0, (int)Math.Round(DevText.VerticalOffset / height)) : 0;
+        }
+
+        bool valuesScrollScheduled;
+
+        /// <summary>Applies the pending scroll after the current layout pass (never from inside one).</summary>
+        void ScheduleValuesScroll()
+        {
+            if (valuesScrollScheduled) return;
+            valuesScrollScheduled = true;
+            Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(() =>
+            {
+                valuesScrollScheduled = false;
+                ApplyPendingValuesScroll();
+            }));
+        }
+
+        void DevText_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (DevText.IsVisible && pendingValuesBlock.HasValue) ScheduleValuesScroll();
+        }
+
+        /// <summary>Scrolling by hand: the series at the top becomes the current one.</summary>
+        void DevText_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            if (state != CompareState.Datafiles || blockStarts.Count == 0 || applyingValuesScroll) return;
+            if (pendingValuesBlock.HasValue)
+            {
+                ScheduleValuesScroll();
+                return;
+            }
+            if (Math.Abs(DevText.VerticalOffset - valuesOffset) < 0.5) return;  // still where the last jump put it
+            valuesBlock = BlockAt(ValuesTopLine());
+            valuesOffset = DevText.VerticalOffset;
+            ShowValuesNav();
+        }
+
+        /// <summary>The current series above the text, and whether Previous/Next can jump.</summary>
+        void ShowValuesNav()
+        {
+            if (valuesBlock < 0 || valuesBlock >= blockStarts.Count) return;
+            SeriesComparison c = blockSeries[valuesBlock];
+            valuesTopName = c.Name;
+            NavText.Text = c.Name + "   (" + (valuesBlock + 1) + " of " + navList.Count + ")";
+            PrevButton.IsEnabled = valuesBlock > 0 || ValuesTopLine() > blockStarts[valuesBlock];
+            NextButton.IsEnabled = valuesBlock < blockStarts.Count - 1;
+        }
+
+        /// <summary>The series whose lines include this line.</summary>
+        int BlockAt(int line)
+        {
+            int i = blockStarts.BinarySearch(line);
+            if (i < 0) i = ~i - 1;
+            return Math.Max(0, Math.Min(i, blockStarts.Count - 1));
         }
 
         /// <summary>
         /// One file of the Files list: per folder its size, date, series and whether the check finds something; per
-        /// pair of folders how they differ. Useful to see what a threshold does.
+        /// pair of folders how they differ in the period. Useful to see what a threshold does.
         /// </summary>
         void ShowCurrentFile()
         {
+            // The Values text of the Datafiles state is built again when that state is shown.
+            blockStarts.Clear();
+            blockSeries.Clear();
+            pendingValuesBlock = null;
+            valuesBlock = -1;
+            valuesDirty = true;
+
             bool has = fileNavIndex >= 0 && fileNavIndex < fileNav.Count && folderResult != null;
             PrevButton.IsEnabled = has && fileNavIndex > 0;
             NextButton.IsEnabled = has && fileNavIndex < fileNav.Count - 1;
             if (!has)
             {
-                listing = null;
                 NavText.Text = "";
                 LegendText.Text = "";
                 DevText.Text = devMessage;
@@ -1857,9 +2272,11 @@ namespace Gekko
                             lines.Add(pair + "could not be read: " + p.Error);
                             continue;
                         }
+                        double abs, rel;
+                        p.Largest(period, out abs, out rel);
                         lines.Add(pair + (p.StructureDiffers ? "no" : "yes").PadRight(13)
-                                  + FileComparison.FormatDiff(p, false).PadLeft(20) + FileComparison.FormatDiff(p, true).PadLeft(20)
-                                  + "   " + (p.Differs(settings) ? "yes" : "no"));
+                                  + FileComparison.FormatDiff(abs, false).PadLeft(20) + FileComparison.FormatDiff(rel, true).PadLeft(20)
+                                  + "   " + (p.Differs(settings, period) ? "yes" : "no"));
                     }
             }
             lines.Add("");
@@ -1867,12 +2284,15 @@ namespace Gekko
             if (error != null) lines.Add("Could not be read: " + error);
             else if (f.Found) lines.Add("Found by the " + check.ToString().ToLowerInvariant() + " check: " + f.Why + ".");
             else lines.Add("Not found by the " + check.ToString().ToLowerInvariant() + " check.");
-            lines.Add("All frequencies and periods of the (filtered) series are checked.");
+            lines.Add(period.IsOpen
+                ? "All frequencies and periods of the (filtered) series are checked."
+                : "All frequencies of the (filtered) series are checked," + period.Suffix + " (in each frequency's own periods).");
             DevText.Text = string.Join("\r\n", lines);
             DevText.Select(0, 0);
             DevText.ScrollToHome();
         }
 
+        /// <summary>Datafiles: jump to the next/previous series in the Values text. Folders: the next/previous file.</summary>
         void Navigate(int delta)
         {
             if (state == CompareState.Folders)
@@ -1880,17 +2300,19 @@ namespace Gekko
                 int k = fileNavIndex + delta;
                 if (k < 0 || k >= fileNav.Count) return;
                 fileNavIndex = k;
+                ShowCurrentFile();
+                return;
             }
-            else
-            {
-                int i = navIndex + delta;
-                if (i < 0 || i >= navList.Count) return;
-                navIndex = i;
-            }
-            ShowCurrentItem();
+            if (blockStarts.Count == 0) return;
+            int top = ValuesTopLine();
+            int block = valuesBlock >= 0 && valuesBlock < blockStarts.Count ? valuesBlock : BlockAt(top);
+            // Previous: to the start of the current series if it was scrolled into, else to the one before it.
+            int target = delta > 0 ? block + 1 : (top > blockStarts[block] ? block : block - 1);
+            if (target < 0 || target >= blockStarts.Count) return;
+            ScrollValuesToBlock(target);
         }
 
-        int NavCount => state == CompareState.Folders ? fileNav.Count : navList.Count;
+        int NavCount => state == CompareState.Folders ? fileNav.Count : blockStarts.Count;
 
         void PrevButton_Click(object sender, RoutedEventArgs e)
         {
@@ -1908,8 +2330,8 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Alt+1/2/3 focus on a bank/folder (again: show all). Ctrl+Up / Ctrl+Down step through the Values/Details
-        /// tab; Ctrl+D hides or shows diagram and controls.
+        /// Alt+1/2/3 focus on a bank/folder (again: show all). Ctrl+Up / Ctrl+Down jump between the series of the
+        /// Values tab (the files of the Details tab); Ctrl+D hides or shows diagram and controls.
         /// </summary>
         void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
@@ -1935,8 +2357,13 @@ namespace Gekko
                 return;
             }
             if (e.Key != Key.Up && e.Key != Key.Down) return;
+            if (!Equals(Tabs.SelectedItem, ValuesTab))
+            {
+                Tabs.SelectedItem = ValuesTab;  // first show where we are
+                e.Handled = true;
+                return;
+            }
             if (NavCount == 0) return;
-            if (!Equals(Tabs.SelectedItem, ValuesTab)) Tabs.SelectedItem = ValuesTab;
             Navigate(e.Key == Key.Down ? 1 : -1);
             e.Handled = true;
         }
@@ -1988,12 +2415,6 @@ namespace Gekko
             BanksChanged();
         }
 
-        void FreqCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (!ready || busy) return;
-            Recompute();
-        }
-
         /// <summary>The name filter applies to both states; the other state is recomputed when it is shown again.</summary>
         void FilterBox_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -2030,15 +2451,45 @@ namespace Gekko
 
         // ---------------------------------------------------------------- dropping files and folders
 
+        // What the dragged paths can do in the current state (worked out once per drag, see DropEffectFor).
+        object dragData;
+        DragDropEffects dragEffect;
+
+        /// <summary>
+        /// Datafiles: databank files can be dropped (not while folders are selected). Folders: folders can be dropped.
+        /// Anything else gets the "no" cursor.
+        /// </summary>
+        DragDropEffects DropEffectFor(DragEventArgs e)
+        {
+            if (!e.Data.GetDataPresent(DataFormats.FileDrop)) return DragDropEffects.None;
+            if (ReferenceEquals(e.Data, dragData)) return dragEffect;
+            var paths = e.Data.GetData(DataFormats.FileDrop) as string[];
+            bool ok;
+            if (paths == null) ok = false;
+            else if (state == CompareState.Folders) ok = paths.Any(Directory.Exists);
+            else ok = !DatafilesLocked && paths.Any(path => !Directory.Exists(path));
+            dragData = e.Data;
+            dragEffect = ok ? DragDropEffects.Copy : DragDropEffects.None;
+            if (!ok) SetStatus(DropRefusal());
+            return dragEffect;
+        }
+
+        string DropRefusal()
+        {
+            if (state == CompareState.Folders) return "Only folders can be dropped here. Click Datafiles (top left) to compare databank files.";
+            if (DatafilesLocked) return "Folders are selected: open a data file from the Files tab of the Folders view, or remove the folders to compare databank files of your own.";
+            return "Only databank files can be dropped here. Click Folders (top left) to compare folders.";
+        }
+
         void DropZone_DragEnter(object sender, DragEventArgs e)
         {
             RemoveInsertionLine();
-            if (e.Data.GetDataPresent(DataFormats.FileDrop)) DropZoneBorder.Stroke = DropHighlight;
+            if (DropEffectFor(e) != DragDropEffects.None) DropZoneBorder.Stroke = DropHighlight;
         }
 
         void DropZone_DragOver(object sender, DragEventArgs e)
         {
-            e.Effects = e.Data.GetDataPresent(DataFormats.FileDrop) ? DragDropEffects.Copy : DragDropEffects.None;
+            e.Effects = DropEffectFor(e);
             e.Handled = true;
         }
 
@@ -2050,34 +2501,38 @@ namespace Gekko
         void DropZone_Drop(object sender, DragEventArgs e)
         {
             DropZoneBorder.Stroke = DropNormal;
+            dragData = null;
             HandleDrop(e.Data.GetData(DataFormats.FileDrop) as string[], banks.Count);
         }
 
         /// <summary>
-        /// Dropped folders go to the folder list (and show the Folders state), dropped files to the databank list
-        /// (and show the Datafiles state). insertAt is the position in the list shown when dropping.
+        /// Datafiles: the dropped databank files are added (folders are left out). Folders: the dropped folders are
+        /// added (files are left out). insertAt is the position in the list.
         /// </summary>
         void HandleDrop(string[] paths, int insertAt)
         {
             if (paths == null || paths.Length == 0) return;
             string[] dirs = paths.Where(Directory.Exists).ToArray();
-            string[] files = paths.Where(p => !Directory.Exists(p)).ToArray();
-            if (dirs.Length > 0)
+            string[] files = paths.Where(path => !Directory.Exists(path)).ToArray();
+            if (state == CompareState.Folders)
             {
-                int at = state == CompareState.Folders ? insertAt : folderItems.Count;
-                SwitchState(CompareState.Folders);
-                AddFolders(dirs, at);
-                if (files.Length > 0)
+                if (dirs.Length == 0)
                 {
-                    AddFiles(files, bankItems.Count);
-                    SetStatus(StatusText.Text + " The dropped files were added to the Datafiles list.");
+                    SetStatus(DropRefusal());
+                    return;
                 }
+                AddFolders(dirs, insertAt);
+                if (files.Length > 0) SetStatus(StatusText.Text + " Files were left out: only folders are compared here.");
             }
             else
             {
-                int at = state == CompareState.Datafiles ? insertAt : bankItems.Count;
-                SwitchState(CompareState.Datafiles);
-                AddFiles(files, at);
+                if (DatafilesLocked || files.Length == 0)
+                {
+                    SetStatus(DropRefusal());
+                    return;
+                }
+                AddFiles(files, insertAt);
+                if (dirs.Length > 0) SetStatus(StatusText.Text + " Folders were left out: click Folders (top left) to compare folders.");
             }
         }
 
@@ -2085,6 +2540,11 @@ namespace Gekko
         void AddFiles(string[] paths, int insertAt)
         {
             if (paths == null || paths.Length == 0) return;
+            if (DatafilesLocked)
+            {
+                SetStatus(DropRefusal());
+                return;
+            }
             int at = Math.Max(0, Math.Min(insertAt, bankItems.Count));
             int added = 0;
             var skipped = new List<string>();
@@ -2141,6 +2601,7 @@ namespace Gekko
             }
             if (added > 0)
             {
+                ResetDatafiles();  // the Datafiles state waits for a file to be opened from the folders
                 if (state == CompareState.Folders) BanksChanged();
                 else MarkDirty(CompareState.Folders, DirtyList);
             }
@@ -2152,14 +2613,14 @@ namespace Gekko
         void RemoveBank_Click(object sender, RoutedEventArgs e)
         {
             var item = (sender as FrameworkElement)?.Tag as BankItem;
-            if (item != null && !item.IsPlaceholder) RemoveBank(item);
+            if (item != null && !item.IsPlaceholder && !item.Locked) RemoveBank(item);
         }
 
         void BankList_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key != Key.Delete) return;
             var item = BankList.SelectedItem as BankItem;
-            if (item == null || item.IsPlaceholder) return;
+            if (item == null || item.IsPlaceholder || item.Locked) return;
             RemoveBank(item);
             e.Handled = true;
         }
@@ -2168,6 +2629,7 @@ namespace Gekko
         {
             banks.Remove(item);
             if (state == CompareState.Datafiles) openedFrom = null;
+            else ResetDatafiles();  // the folder list changed
             UpdateOpenedFromText();
             BanksChanged();
             SetStatus(item.Name + " removed.");
@@ -2183,7 +2645,8 @@ namespace Gekko
             var row = FindAncestor<ListViewItem>(source);
             if (row == null) return;
             dragCandidate = row.DataContext as BankItem;
-            if (dragCandidate != null && dragCandidate.IsPlaceholder) dragCandidate = null;
+            // The empty row, and the copies of a folder file (numbered as their folders), cannot be dragged.
+            if (dragCandidate != null && (dragCandidate.IsPlaceholder || dragCandidate.Locked)) dragCandidate = null;
             dragStart = e.GetPosition(BankList);
         }
 
@@ -2210,9 +2673,9 @@ namespace Gekko
         void BankList_DragOver(object sender, DragEventArgs e)
         {
             bool isRow = e.Data.GetDataPresent(DragFormat);
-            bool isFile = !isRow && e.Data.GetDataPresent(DataFormats.FileDrop);
-            e.Effects = isRow ? DragDropEffects.Move : isFile ? DragDropEffects.Copy : DragDropEffects.None;
-            if (isRow || isFile) ShowInsertionLine(InsertionIndex(e.GetPosition(BankList)));
+            e.Effects = isRow ? DragDropEffects.Move : DropEffectFor(e);
+            if (e.Effects != DragDropEffects.None) ShowInsertionLine(InsertionIndex(e.GetPosition(BankList)));
+            else RemoveInsertionLine();
             e.Handled = true;
         }
 
@@ -2237,11 +2700,13 @@ namespace Gekko
                 if (to == from) return;
                 banks.Move(from, to);
                 BankList.SelectedItem = item;
+                if (state == CompareState.Folders) ResetDatafiles();  // the folder numbers changed
                 BanksChanged();
                 SetStatus(item.Name + " moved to position " + (to + 1) + ".");
             }
             else if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
+                dragData = null;
                 HandleDrop(e.Data.GetData(DataFormats.FileDrop) as string[], gap);
             }
         }

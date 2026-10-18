@@ -92,6 +92,34 @@
             </Setter>
         </Style>
 
+        <!-- New: the frequency buttons on the right of the diagram (Datafiles), stacked like a vertical version of the
+             Datafiles | Folders switch. Created in code; Tag holds the corner radius. -->
+        <Style x:Key="FreqButtonStyle" TargetType="RadioButton">
+            <Setter Property="GroupName" Value="CompareFreq"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Foreground" Value="#FF444444"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border Name="Back" Background="#FFF0F0F0" BorderBrush="#FFACACAC" BorderThickness="1"
+                                CornerRadius="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" Padding="9,3,9,4">
+                            <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Back" Property="Background" Value="#FFE5E5E5"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Back" Property="Background" Value="#FF1F4E79"/>
+                                <Setter TargetName="Back" Property="BorderBrush" Value="#FF1F4E79"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <!-- The small up/down triangles next to the period boxes -->
         <Style x:Key="SpinButtonStyle" TargetType="RepeatButton">
             <Setter Property="Focusable" Value="False"/>
@@ -212,11 +240,13 @@
             <TextBlock Grid.Row="0" Grid.Column="2" Name="StateInfoText" Visibility="Collapsed" VerticalAlignment="Center"
                        Foreground="#FF1F4E79" TextTrimming="CharacterEllipsis"/>
 
+            <!-- "Drag datafiles here" (Datafiles) or "Drag folders here" (Folders). While folders are selected, the
+                 Datafiles state only shows files opened from the Folders state, and this field is switched off there. -->
             <Grid Grid.Row="2" Grid.Column="0" Name="DropZone" AllowDrop="True"
                   Drop="DropZone_Drop" DragEnter="DropZone_DragEnter" DragOver="DropZone_DragOver" DragLeave="DropZone_DragLeave">
                 <Rectangle Name="DropZoneBorder" Fill="#FFF4F4F4" Stroke="#FF999999" StrokeThickness="2"
                            StrokeDashArray="4 2" RadiusX="4" RadiusY="4"/>
-                <TextBlock Name="DropZoneHintText" Text="Drag databank files or folders here"
+                <TextBlock Name="DropZoneHintText" Text="Drag datafiles here"
                            HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False"
                            FontSize="14" Foreground="#FF555555" TextWrapping="Wrap" TextAlignment="Center" Margin="10"/>
             </Grid>
@@ -282,9 +312,10 @@
                                     <StackPanel Orientation="Horizontal">
                                         <Button Content="Recent" Style="{StaticResource RoundedSmallButtonStyle}"
                                                 FontFamily="Segoe UI" FontSize="11" Padding="8,0"
-                                                Click="RowRecent_Click" Tag="{Binding}" ToolTip="{Binding RecentTip}"/>
+                                                Click="RowRecent_Click" Tag="{Binding}" ToolTip="{Binding RecentTip}"
+                                                Visibility="{Binding RecentVisibility}"/>
                                         <Button Style="{StaticResource FlatIconButtonStyle}" Margin="6,0,0,0"
-                                                Click="RemoveBank_Click" Tag="{Binding}" Visibility="{Binding RowVisibility}"
+                                                Click="RemoveBank_Click" Tag="{Binding}" Visibility="{Binding RemoveVisibility}"
                                                 ToolTip="Remove from the list (or select the row and press Delete)">
                                             <Path Data="M0,0 L8,8 M8,0 L0,8" Stroke="#FFC62828" StrokeThickness="1.8"
                                                   StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
@@ -318,14 +349,30 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
+                <!-- The diagram, with the frequency buttons on its right (Datafiles only; filled in code with the
+                     frequencies that exist in the compared databanks) -->
                 <Border Grid.Column="0" BorderBrush="#FFD5D5D5" BorderThickness="1" CornerRadius="4" Background="White">
-                    <local:VennView x:Name="Venn" Margin="8"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <local:VennView x:Name="Venn" Margin="8"/>
+                        <ScrollViewer Grid.Column="1" Name="FreqColumn" VerticalAlignment="Center" Margin="0,8,8,8"
+                                      VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                            <StackPanel>
+                                <TextBlock Text="Frequency" Style="{StaticResource HintStyle}" Margin="1,0,0,3"/>
+                                <StackPanel Name="FreqPanel" MinWidth="92"/>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
                 </Border>
 
-                <!-- The diagram row is never made lower than these controls need (see FitVennRow) -->
+                <!-- Scrolls when the controls do not fit -->
                 <Border Grid.Column="2" Name="ControlsPanel" BorderBrush="#FFD5D5D5" BorderThickness="1" CornerRadius="4"
-                        Background="#FFFAFAFA" Padding="10,8" Width="290">
-                    <Grid Name="ControlsContent" VerticalAlignment="Top" Grid.IsSharedSizeScope="True">
+                        Background="#FFFAFAFA" Width="290">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                    <Grid Name="ControlsContent" Margin="10,8" VerticalAlignment="Top" Grid.IsSharedSizeScope="True">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" SharedSizeGroup="PanelLabel"/>
                             <ColumnDefinition Width="*"/>
@@ -348,9 +395,9 @@
                                          IsChecked="True" Checked="CompareMode_Changed"/>
                         </StackPanel>
 
-                        <!-- Frequency and period: used by the Datafiles state (greyed out for folders, which check all
-                             frequencies and periods). Everything else in this panel is shared by both states. -->
-                        <Grid Grid.Row="1" Grid.ColumnSpan="2" Name="DatafileControls">
+                        <!-- The period, in any frequency: it applies to all frequencies, in both states (e.g. 2010 is
+                             2010q1-2010q4 for quarterly series). Everything in this panel is shared by both states. -->
+                        <Grid Grid.Row="1" Grid.ColumnSpan="2" Name="PeriodControls">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" SharedSizeGroup="PanelLabel"/>
                                 <ColumnDefinition Width="*"/>
@@ -359,17 +406,11 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" Text="Frequency" Style="{StaticResource PanelLabelStyle}"/>
-                            <ComboBox Grid.Row="0" Grid.Column="1" Name="FreqCombo" Width="110" Height="18" FontSize="11.5"
-                                      Padding="5,0,4,0" VerticalContentAlignment="Center" HorizontalAlignment="Left"
-                                      Margin="0,0,0,8" SelectionChanged="FreqCombo_SelectionChanged"/>
-
-                            <TextBlock Grid.Row="1" Text="Period" Style="{StaticResource PanelLabelStyle}"
-                                       ToolTip="The period filter: the numbers in the diagram, the names and the values are for these periods. Clicking a histogram bar sets it too."/>
-                            <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+                            <TextBlock Grid.Row="0" Text="Period" Style="{StaticResource PanelLabelStyle}"
+                                       ToolTip="The period filter, in any frequency (e.g. 2010, 2010q3 or 2010m7). It applies to all frequencies, for databanks and folders. Clicking a histogram bar sets it too."/>
+                            <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
                                 <Grid Name="FromSpinner" Width="80" Height="18">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
@@ -382,7 +423,7 @@
                                     <TextBox Name="FromBox" Grid.RowSpan="2" Style="{StaticResource PeriodBoxStyle}"
                                              PreviewKeyDown="PeriodBox_PreviewKeyDown" LostKeyboardFocus="PeriodBox_LostKeyboardFocus"
                                              PreviewMouseWheel="PeriodBox_PreviewMouseWheel"
-                                             ToolTip="First period to compare. Type e.g. 2010q1 and press Enter, or step with the arrows, Up/Down or the mouse wheel."/>
+                                             ToolTip="First period, in any frequency: type e.g. 2010 or 2010q1 and press Enter, or step with the arrows, Up/Down or the mouse wheel. Grey: from the start."/>
                                     <RepeatButton Grid.Column="1" Grid.Row="0" Style="{StaticResource SpinButtonStyle}" BorderThickness="0,1,1,0"
                                                   Tag="FromUp" Click="SpinButton_Click" ToolTip="Next period">
                                         <Path Data="M0,3.5 L3,0 L6,3.5 Z" Fill="#FF555555"/>
@@ -405,7 +446,7 @@
                                     <TextBox Name="ToBox" Grid.RowSpan="2" Style="{StaticResource PeriodBoxStyle}"
                                              PreviewKeyDown="PeriodBox_PreviewKeyDown" LostKeyboardFocus="PeriodBox_LostKeyboardFocus"
                                              PreviewMouseWheel="PeriodBox_PreviewMouseWheel"
-                                             ToolTip="Last period to compare. Type e.g. 2020q4 and press Enter, or step with the arrows, Up/Down or the mouse wheel."/>
+                                             ToolTip="Last period, in any frequency: type e.g. 2020 or 2020q4 and press Enter, or step with the arrows, Up/Down or the mouse wheel. Grey: to the end."/>
                                     <RepeatButton Grid.Column="1" Grid.Row="0" Style="{StaticResource SpinButtonStyle}" BorderThickness="0,1,1,0"
                                                   Tag="ToUp" Click="SpinButton_Click" ToolTip="Next period">
                                         <Path Data="M0,3.5 L3,0 L6,3.5 Z" Fill="#FF555555"/>
@@ -417,11 +458,11 @@
                                 </Grid>
                             </StackPanel>
 
-                            <TextBlock Grid.Row="2" Grid.Column="1" Name="SpanText" Style="{StaticResource HintStyle}" Margin="0,3,0,3"/>
-                            <Button Grid.Row="3" Grid.Column="1" Name="WholePeriodButton" Content="Whole period"
+                            <TextBlock Grid.Row="1" Grid.Column="1" Name="SpanText" Style="{StaticResource HintStyle}" Margin="0,3,0,3"/>
+                            <Button Grid.Row="2" Grid.Column="1" Name="WholePeriodButton" Content="Whole period"
                                     Style="{StaticResource RoundedSmallButtonStyle}" HorizontalAlignment="Left"
                                     Margin="0,0,0,10" Click="WholePeriod_Click"
-                                    ToolTip="Remove the period filter: the whole universal period"/>
+                                    ToolTip="Remove the period filter: all periods"/>
                         </Grid>
 
                         <TextBlock Grid.Row="3" Text="Filter" Style="{StaticResource PanelLabelStyle}"/>
@@ -454,7 +495,7 @@
                                                    Text="Values differing by more than the threshold, or a value against M, differ. M against M is equal."/>
                                     </StackPanel>
                                     <TextBlock Style="{StaticResource HintStyle}" Margin="0,4,0,0"
-                                               Text="Folders: a file differs when, in some frequency, its copies do not have the same series, or a series differs."/>
+                                               Text="Folders: a file differs when, in some frequency, its copies do not have the same series, or a series differs in the period."/>
                                 </StackPanel>
                             </TabItem>
                             <TabItem Header="Missings" Name="MissingsCheckTab" Style="{StaticResource CheckTabStyle}"
@@ -477,6 +518,7 @@
                             </TabItem>
                         </TabControl>
                     </Grid>
+                    </ScrollViewer>
                 </Border>
             </Grid>
 
@@ -485,7 +527,7 @@
 
             <!-- Details. The toggle button sits to the right of the tab headers. -->
             <Grid Grid.Row="2">
-                <TabControl Name="Tabs">
+                <TabControl Name="Tabs" SelectionChanged="Tabs_SelectionChanged">
                     <!-- "Names" (Datafiles) or "Files" (Folders); the header is set in code -->
                     <TabItem Header="Names" Name="NamesTab">
                         <Grid Margin="4">
@@ -517,6 +559,7 @@
                             <ListBox Grid.Row="2" Name="FilesList" Visibility="Collapsed" BorderBrush="#FFACACAC"
                                      FontFamily="Consolas" FontSize="12.5"
                                      VirtualizingStackPanel.IsVirtualizing="True"
+                                     PreviewMouseLeftButtonDown="FilesList_PreviewMouseLeftButtonDown"
                                      MouseLeftButtonUp="FilesList_MouseLeftButtonUp" KeyDown="FilesList_KeyDown">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
@@ -534,7 +577,7 @@
                         <local:HistogramView x:Name="Histogram" Margin="4"/>
                     </TabItem>
 
-                    <!-- "Values" (Datafiles): steps through the series in the Names list.
+                    <!-- "Values" (Datafiles): all series of the Names list in one text; Previous/Next jump between them.
                          "Details" (Folders): steps through the files in the Files list. -->
                     <TabItem Header="Values" Name="ValuesTab">
                         <Grid Margin="4">
@@ -553,10 +596,10 @@
                                 </Grid.ColumnDefinitions>
                                 <Button Name="PrevButton" Grid.Column="0" Content="&#x25B2; Previous"
                                         Style="{StaticResource RoundedSmallButtonStyle}" Click="PrevButton_Click"
-                                        ToolTip="Previous (Ctrl+Up)"/>
+                                        ToolTip="Jump to the previous series (Ctrl+Up)"/>
                                 <Button Name="NextButton" Grid.Column="1" Content="&#x25BC; Next" Margin="6,0,0,0"
                                         Style="{StaticResource RoundedSmallButtonStyle}" Click="NextButton_Click"
-                                        ToolTip="Next (Ctrl+Down)"/>
+                                        ToolTip="Jump to the next series (Ctrl+Down)"/>
                                 <TextBlock Name="NavText" Grid.Column="2" Margin="12,0,0,0" FontWeight="SemiBold"
                                            Foreground="#FF1F4E79" VerticalAlignment="Center"/>
                                 <TextBlock Name="LegendText" Grid.Column="3" Margin="16,0,8,0" Foreground="#FF888888"
@@ -567,7 +610,8 @@
                             </Grid>
                             <TextBox Grid.Row="2" Name="DevText" Style="{StaticResource MonoTextStyle}"
                                      TextWrapping="NoWrap" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
-                                     IsInactiveSelectionHighlightEnabled="True"/>
+                                     IsInactiveSelectionHighlightEnabled="True"
+                                     ScrollViewer.ScrollChanged="DevText_ScrollChanged" IsVisibleChanged="DevText_IsVisibleChanged"/>
                         </Grid>
                     </TabItem>
                 </TabControl>

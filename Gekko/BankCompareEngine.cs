@@ -77,6 +77,184 @@ namespace Gekko
         }
     }
 
+    /// <summary>
+    /// Period texts in any frequency, as typed in the From/To boxes: "1990" (annual), "1990q3", "1990m7", or anything
+    /// PeriodText.TryParse accepts for the frequency at hand. A simple stand-in for Gekko's own conversion between
+    /// frequencies; replace the body of TryConvert with that if wanted:
+    ///   to a lower frequency:  1990q3 becomes 1990, 1990m8 becomes 1990q3;
+    ///   to a higher frequency: 1990 becomes 1990q1 as the first period and 1990q4 as the last,
+    ///                          1990q3 becomes 1990m7 as the first period and 1990m9 as the last.
+    /// </summary>
+    public static class PeriodConvert
+    {
+        static readonly CultureInfo Inv = CultureInfo.InvariantCulture;
+
+        /// <summary>Splits "1990" (letter '\0'), "1990q3" ('q') or "1990m7" ('m'). Case-insensitive.</summary>
+        public static bool TrySplit(string text, out int year, out char letter, out int sub)
+        {
+            year = 0;
+            letter = '\0';
+            sub = 1;
+            text = (text ?? "").Trim();
+            int i = 0;
+            while (i < text.Length && text[i] >= '0' && text[i] <= '9') i++;
+            if (i == 0 || i > 5) return false;
+            year = int.Parse(text.Substring(0, i), NumberStyles.None, Inv);
+            if (i == text.Length) return true;
+
+            char c = char.ToLowerInvariant(text[i]);
+            if (c != 'q' && c != 'm') return false;
+            string rest = text.Substring(i + 1);
+            if (rest.Length == 0 || rest.Length > 2 || rest.Any(ch => ch < '0' || ch > '9')) return false;
+            int s = int.Parse(rest, NumberStyles.None, Inv);
+            if (s < 1 || s > PerYear(c)) return false;
+            letter = c;
+            sub = s;
+            return true;
+        }
+
+        static int PerYear(char letter)
+        {
+            return letter == 'q' ? 4 : letter == 'm' ? 12 : 1;
+        }
+
+        static string Join(int year, char letter, int sub)
+        {
+            string y = year.ToString(Inv);
+            return letter == '\0' ? y : y + letter + sub.ToString(Inv);
+        }
+
+        /// <summary>The first (isEnd false) or last (isEnd true) period of freq that the text covers.</summary>
+        public static bool TryConvert(string text, CompareFreq freq, bool isEnd, out int period)
+        {
+            int year, sub;
+            char letter;
+            if (TrySplit(text, out year, out letter, out sub))
+            {
+                int target = PeriodText.PeriodsPerYear(freq);
+                int source = PerYear(letter);
+                if (target == 1 || target == 4 || target == 12)
+                {
+                    int t = isEnd ? (sub * target + source - 1) / source : (sub - 1) * target / source + 1;
+                    period = PeriodText.ToIndex(freq, year, t);
+                    return true;
+                }
+            }
+            return PeriodText.TryParse((text ?? "").Trim(), freq, isEnd, out period);
+        }
+
+        /// <summary>One period later or earlier in the text's own frequency: 1990 -> 1991, 1990q4 -> 1991q1.</summary>
+        public static bool TryStep(string text, int delta, out string result)
+        {
+            result = null;
+            int year, sub;
+            char letter;
+            if (!TrySplit(text, out year, out letter, out sub)) return false;
+            int per = PerYear(letter);
+            int index = year * per + (sub - 1) + delta;
+            if (index < 0) return false;
+            result = Join(index / per, letter, index % per + 1);
+            return true;
+        }
+
+        /// <summary>The text's first (or last) month counted from year 0, to check that From is not after To.</summary>
+        public static bool TryMonth(string text, bool isEnd, out int month)
+        {
+            month = 0;
+            int year, sub;
+            char letter;
+            if (!TrySplit(text, out year, out letter, out sub)) return false;
+            int per = PerYear(letter);
+            month = year * 12 + (isEnd ? sub * 12 / per - 1 : (sub - 1) * 12 / per);
+            return true;
+        }
+
+        /// <summary>
+        /// False for undated series: they have no calendar, so the period filter does not apply to them (they keep all
+        /// their periods). Adjust if Gekko names the undated frequency differently.
+        /// </summary>
+        public static bool IsDated(CompareFreq freq)
+        {
+            return FrequencyName(freq) != "Undated";
+        }
+
+        /// <summary>"Annual", "Quarterly", "Monthly", ... for the frequency buttons.</summary>
+        public static string FrequencyName(CompareFreq freq)
+        {
+            string s = freq.ToString();
+            switch (s.ToLowerInvariant())
+            {
+                case "a": case "annual": return "Annual";
+                case "q": case "quarterly": return "Quarterly";
+                case "m": case "monthly": return "Monthly";
+                case "w": case "weekly": return "Weekly";
+                case "d": case "daily": return "Daily";
+                case "u": case "undated": return "Undated";
+                default: return s.Length > 0 ? char.ToUpperInvariant(s[0]) + s.Substring(1) : s;
+            }
+        }
+    }
+
+    /// <summary>
+    /// The period filter (the From/To boxes, shared by both window states): two period texts in any frequency, null
+    /// when open. Each frequency gets its own first and last period (PeriodConvert), so one filter serves them all.
+    /// Use on the UI thread (the conversions are remembered per frequency).
+    /// </summary>
+    public sealed class PeriodRange
+    {
+        public static readonly PeriodRange All = new PeriodRange(null, null);
+        readonly Dictionary<CompareFreq, int[]> bounds = new Dictionary<CompareFreq, int[]>();
+
+        public PeriodRange(string fromText, string toText)
+        {
+            FromText = string.IsNullOrWhiteSpace(fromText) ? null : fromText.Trim();
+            ToText = string.IsNullOrWhiteSpace(toText) ? null : toText.Trim();
+        }
+
+        public string FromText { get; }
+        public string ToText { get; }
+        public bool IsOpen => FromText == null && ToText == null;
+
+        /// <summary>The first period of freq in the filter (int.MinValue when open, or when the text does not convert).</summary>
+        public int From(CompareFreq freq)
+        {
+            return Bounds(freq)[0];
+        }
+
+        /// <summary>The last period of freq in the filter (int.MaxValue when open, or when the text does not convert).</summary>
+        public int To(CompareFreq freq)
+        {
+            return Bounds(freq)[1];
+        }
+
+        int[] Bounds(CompareFreq freq)
+        {
+            int[] b;
+            if (bounds.TryGetValue(freq, out b)) return b;
+            int from = int.MinValue, to = int.MaxValue;
+            if (PeriodConvert.IsDated(freq))  // undated series keep all their periods
+            {
+                if (FromText == null || !PeriodConvert.TryConvert(FromText, freq, false, out from)) from = int.MinValue;
+                if (ToText == null || !PeriodConvert.TryConvert(ToText, freq, true, out to)) to = int.MaxValue;
+            }
+            bounds[freq] = b = new[] { from, to };
+            return b;
+        }
+
+        /// <summary>" in 2000–2010", " from 2000", " until 2010", or "" when open.</summary>
+        public string Suffix
+        {
+            get
+            {
+                if (FromText != null && ToText != null)
+                    return " in " + (string.Equals(FromText, ToText, StringComparison.OrdinalIgnoreCase) ? FromText : FromText + "–" + ToText);
+                if (FromText != null) return " from " + FromText;
+                if (ToText != null) return " until " + ToText;
+                return "";
+            }
+        }
+    }
+
     /// <summary>Counts for one Venn area or one whole bank/folder.</summary>
     public sealed class AreaCounts
     {
@@ -269,6 +447,7 @@ namespace Gekko
             get
             {
                 if (!IsPeriodRestricted) return "";
+                if (CountFrom > CountTo) return " in the chosen period (no " + PeriodConvert.FrequencyName(Freq).ToLowerInvariant() + " data there)";
                 return " in " + PeriodText.Format(Freq, CountFrom) + (CountFrom == CountTo ? "" : "–" + PeriodText.Format(Freq, CountTo));
             }
         }
@@ -280,7 +459,7 @@ namespace Gekko
 
         public string BankSpanText(int slot)
         {
-            string freq = Freq.ToString().ToLowerInvariant();
+            string freq = PeriodConvert.FrequencyName(Freq).ToLowerInvariant();
             if (BankSeriesCount[slot] == 0) return "no " + freq + " series";
             string count = BankSeriesCount[slot].ToString(CultureInfo.InvariantCulture) + " series";
             if (BankSpanStart[slot] > BankSpanEnd[slot]) return count;
