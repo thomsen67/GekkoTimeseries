@@ -97,6 +97,9 @@ namespace Gekko
         /// <summary>Bank and folder names in the boxes are shortened to this many characters (middle replaced by "...").</summary>
         public const int MaxNameLength = 25;
 
+        /// <summary>Gap between the bottom (third) circle and its box, in radii (keeps the box clear of the top-right circle).</summary>
+        const double BottomBoxGap = 0.3;
+
         static readonly Brush HoverFill = BankColors.FromArgb(0x2A, 0, 0, 0);
         static readonly Brush SelectedFill = BankColors.FromArgb(0x16, 0, 0, 0);
         static readonly Brush SelectedStroke = BankColors.FromArgb(0x50, 0x33, 0x33, 0x33);
@@ -487,10 +490,8 @@ namespace Gekko
             var links = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 2, 0, 0) };
             links.Children.Add(Link(on ? "hide" : "show", hideTip, hideWorks ? LinkBrush : MutedBrush,
                                     () => HideClicked?.Invoke(slot)));
-            TextBlock focusLink = Link(focused ? "unfocus" : "focus", focusTip, focused ? BankColors.Solid(s) : LinkBrush,
-                                       () => FocusClicked?.Invoke(slot));
+            TextBlock focusLink = Link(focused ? "unfocus" : "focus", focusTip, LinkBrush, () => FocusClicked?.Invoke(slot));
             focusLink.Margin = new Thickness(12, 0, 0, 0);
-            if (focused) focusLink.FontWeight = FontWeights.SemiBold;
             links.Children.Add(focusLink);
             lines.Children.Add(links);
 
@@ -526,8 +527,8 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Box 1 left of the top-left circle, box 2 right of the top-right circle, box 3 right of the bottom circle
-        /// (and never on top of box 2). topRightBottom is the bottom edge of box 2.
+        /// Box 1 left of the top-left circle, box 2 right of the top-right circle, box 3 right of the bottom circle,
+        /// BottomBoxGap radii away from it (and never on top of box 2). topRightBottom is the bottom edge of box 2.
         /// </summary>
         void PlaceBankTag(Border tag, int s, Point center, double r, double canvasWidth, ref double topRightBottom)
         {
@@ -545,7 +546,7 @@ namespace Gekko
             }
             else
             {
-                left = center.X + 1.1 * r;
+                left = center.X + (1 + BottomBoxGap) * r;
                 topPos = center.Y + 0.3 * r - size.Height / 2;
             }
             left = Math.Max(2, Math.Min(left, canvasWidth - size.Width - 2));

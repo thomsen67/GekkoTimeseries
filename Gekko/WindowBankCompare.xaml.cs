@@ -211,6 +211,10 @@ namespace Gekko
             public int FocusSlot = -1;
             public bool[] ActiveBeforeFocus;
             public bool[] Active = { true, true, true };
+
+            // The filter box: series names (Datafiles) or data files (Folders). Swapped in by SwitchState only.
+            public string FilterText = "";
+            public bool FilterRegex;
         }
 
         const string DragFormat = "GekkoBankCompareItem";
@@ -234,7 +238,7 @@ namespace Gekko
         readonly CompositeCollection bankListSource;
         readonly CompositeCollection folderListSource;
         readonly ViewState datafilesView = new ViewState();
-        readonly ViewState foldersView = new ViewState();
+        readonly ViewState foldersView = new ViewState { FilterText = FolderCompareEngine.DefaultFileFilter };
         // What a state needs when it is shown again, after changes made while the other state was shown:
         // DirtyRecompute (the filter or a threshold changed) or DirtyList (its list changed: BanksChanged).
         const int DirtyNone = 0, DirtyRecompute = 1, DirtyList = 2;
@@ -246,14 +250,16 @@ namespace Gekko
         IVennModel Model => state == CompareState.Folders ? (IVennModel)folderResult : current;
 
         // ---- Settings shared by both states (the panel to the right of the diagram): compare first 2 or 3,
-        // the period, the check and its thresholds, and the name filter. The frequency (buttons on the right of the
-        // diagram) is only used by the Datafiles state; the Folders state checks all frequencies of each file.
+        // the period, the check and its thresholds. The filter box is per state: series names (Datafiles) or data
+        // files (Folders, "*.gbk" to begin with). The frequency (buttons at the top, right of the Folders | Datafiles
+        // switch) is only used by the Datafiles state; the Folders state checks all frequencies of each file.
         readonly CheckSettings settings = new CheckSettings();
         bool compare3Choice = true;  // the user's choice; "first 3" is used when the list has 3 or more
         bool[] active = { true, true, true };
         readonly DispatcherTimer recomputeTimer;
         bool ready;
         bool busy;
+        bool loadingFilter;  // the filter box is being swapped by SwitchState: no recompute
 
         VennResult current;          // Datafiles state
         FolderResult folderResult;   // Folders state
@@ -355,6 +361,7 @@ namespace Gekko
             Venn.FocusClicked += ToggleFocus;
             Histogram.BarClicked += Bar_Clicked;
             Histogram.BarDoubleClicked += period => Tabs.SelectedItem = NamesTab;
+            BuildNamesContextMenu();
 
             ReadThresholds();
 
@@ -533,8 +540,10 @@ namespace Gekko
                 MarkDirty(state, DirtyRecompute);
             }
             SaveView();
+            SaveFilter();
             state = to;
             LoadView();
+            LoadFilter();
 
             busy = true;
             try
@@ -588,6 +597,47 @@ namespace Gekko
             v.Active = active;
         }
 
+        /// <summary>The filter box belongs to the state: series names (Datafiles) or data files (Folders).</summary>
+        void SaveFilter()
+        {
+            View.FilterText = FilterBox.Text;
+            View.FilterRegex = RegexCheck.IsChecked == true;
+        }
+
+        void LoadFilter()
+        {
+            loadingFilter = true;
+            try
+            {
+                FilterBox.Text = View.FilterText ?? "";
+                RegexCheck.IsChecked = View.FilterRegex;
+                FilterBox.ClearValue(Control.BackgroundProperty);
+            }
+            finally
+            {
+                loadingFilter = false;
+            }
+            UpdateFilterHint();
+        }
+
+        /// <summary>The hint under the filter box and its tooltip, for the state and the Regex choice.</summary>
+        void UpdateFilterHint()
+        {
+            bool regex = RegexCheck.IsChecked == true;
+            if (state == CompareState.Folders)
+                FilterHint.Text = regex
+                    ? "Data files: regular expression, case-insensitive, e.g. \\.gbk$"
+                    : "Data files: wildcards * and ?, several patterns separated by spaces, e.g. *.gbk";
+            else
+                FilterHint.Text = regex
+                    ? "Series: regular expression, case-insensitive, e.g. ^x\\d+$"
+                    : "Series: wildcards * and ?, several patterns separated by spaces";
+        }
+
+        string FilterTip => state == CompareState.Folders
+            ? "Only these data files are compared (matched against the file name and the path inside the folder, e.g. *.gbk or sub\\*.gbk). Empty: all files."
+            : "Only these series are compared. Empty: all series.";
+
         void LoadView()
         {
             ViewState v = View;
@@ -608,6 +658,8 @@ namespace Gekko
             bool folders = state == CompareState.Folders;
             Title = folders ? "Compare folders" : "Compare databanks";
             UpdateFreqBar();
+            UpdateFilterHint();
+            FilterBox.ToolTip = FilterTip;
             NamesText.Visibility = folders ? Visibility.Collapsed : Visibility.Visible;
             FilesList.Visibility = folders ? Visibility.Visible : Visibility.Collapsed;
             IgnoreDimsCheck.Visibility = folders ? Visibility.Collapsed : Visibility.Visible;
@@ -904,15 +956,45 @@ namespace Gekko
             Recompute();
         }
 
+        /// <summary>A frequency button and its period text (updated when banks are hidden or focused).</summary>
+        sealed class FreqButton
+        {
+            public CompareFreq Freq;
+            public string Name;
+            public RadioButton Button;
+            public TextBlock SpanText;
+        }
+
+        readonly List<FreqButton> freqButtons = new List<FreqButton>();
+
+        /// <summary>Datafiles: the number of banks compared (2 or 3), also while the Folders state is shown.</summary>
+        int DatafilesSlotCount => compare3Choice && bankItems.Count >= 3 ? 3 : 2;
+
+        /// <summary>Datafiles: which compared banks are shown (not hidden, not greyed out by a focus), in either state.</summary>
+        bool[] DatafilesActive => (state == CompareState.Datafiles ? active : datafilesView.Active) ?? new[] { true, true, true };
+
+        /// <summary>The compared datafiles that are shown in the diagram.</summary>
+        List<CompareBank> ShownDatafiles()
+        {
+            bool[] shown = DatafilesActive;
+            return bankItems.Take(DatafilesSlotCount)
+                            .Select((b, i) => new { b.Bank, i })
+                            .Where(x => x.Bank != null && (x.i >= shown.Length || shown[x.i]))
+                            .Select(x => x.Bank)
+                            .ToList();
+        }
+
         /// <summary>
-        /// The frequency buttons at the top of the diagram (Datafiles): one per frequency that exists in the compared
-        /// banks, side by side, each with its name and its largest period, e.g. "Quarterly 1990q1–2030q4". They work like
-        /// radio buttons; the pressed one is dark blue, like the Folders | Datafiles switch.
+        /// The frequency buttons at the top of the window, right of the Folders | Datafiles switch (Datafiles): one per
+        /// frequency that exists in the compared banks, side by side, each with its name and its largest period in the
+        /// shown banks, e.g. "Quarterly 2000q1–2025q4". They work like radio buttons; the pressed one is dark grey, like
+        /// the Folders | Datafiles switch.
         /// </summary>
         void RefreshFrequencies()
         {
             FreqPanel.Children.Clear();
-            List<CompareBank> compared = bankItems.Count >= 2 ? bankItems.Take(SlotCount).Select(b => b.Bank).ToList() : new List<CompareBank>();
+            freqButtons.Clear();
+            List<CompareBank> compared = bankItems.Count >= 2 ? bankItems.Take(DatafilesSlotCount).Select(b => b.Bank).ToList() : new List<CompareBank>();
             List<CompareFreq> freqs = compared.SelectMany(b => b.Frequencies).Distinct().OrderBy(f => f).ToList();
             if (!selectedFreq.HasValue || !freqs.Contains(selectedFreq.Value))
             {
@@ -924,36 +1006,17 @@ namespace Gekko
             for (int i = 0; i < freqs.Count; i++)
             {
                 CompareFreq f = freqs[i];
-                int start = int.MaxValue, end = int.MinValue;
-                var counts = new List<string>();
-                for (int s = 0; s < compared.Count; s++)
-                {
-                    int count = 0;
-                    if (compared[s].Frequencies.Contains(f))
-                    {
-                        foreach (CompareSeries ts in compared[s].Get(f).Values)
-                        {
-                            count++;
-                            if (ts.Data.Length == 0) continue;
-                            start = Math.Min(start, ts.Start);
-                            end = Math.Max(end, ts.End);
-                        }
-                    }
-                    counts.Add("bank " + (s + 1) + ": " + count + " series");
-                }
                 string name = PeriodConvert.FrequencyName(f);
-                string span = start <= end ? PeriodText.Format(f, start) + "–" + PeriodText.Format(f, end) : "no observations";
-
-                var content = new StackPanel { Orientation = Orientation.Horizontal };
-                content.Children.Add(new TextBlock { Text = name, FontWeight = FontWeights.SemiBold });
-                content.Children.Add(new TextBlock
+                var spanText = new TextBlock
                 {
-                    Text = span,
                     FontSize = 10.5,
                     Opacity = 0.8,
                     Margin = new Thickness(6, 0, 0, 0),
                     VerticalAlignment = VerticalAlignment.Center
-                });
+                };
+                var content = new StackPanel { Orientation = Orientation.Horizontal };
+                content.Children.Add(new TextBlock { Text = name, FontWeight = FontWeights.SemiBold });
+                content.Children.Add(spanText);
                 // CornerRadius(topLeft, topRight, bottomRight, bottomLeft): round the outer ends of the row.
                 CornerRadius corners = freqs.Count == 1 ? new CornerRadius(r)
                                      : i == 0 ? new CornerRadius(r, 0, 0, r)
@@ -965,23 +1028,57 @@ namespace Gekko
                     Content = content,
                     Tag = corners,
                     Margin = new Thickness(i == 0 ? 0 : -1, 0, 0, 0),
-                    IsChecked = selectedFreq.HasValue && f.Equals(selectedFreq.Value),
-                    ToolTip = "Compare the " + name.ToLowerInvariant() + " series: " + span + " (" + string.Join(", ", counts) + ")"
+                    IsChecked = selectedFreq.HasValue && f.Equals(selectedFreq.Value)
                 };
                 CompareFreq chosen = f;
                 button.Checked += (o, e) => FreqButton_Checked(chosen);
                 FreqPanel.Children.Add(button);
+                freqButtons.Add(new FreqButton { Freq = f, Name = name, Button = button, SpanText = spanText });
             }
+            UpdateFrequencySpans();
             UpdateFreqBar();
         }
 
         /// <summary>
-        /// The frequency buttons are shown in the Datafiles state, when there is something to compare. Otherwise the bar
-        /// is hidden but keeps its room, so the circles keep their size when switching state.
+        /// The period in each frequency button, over the shown banks only: hiding a bank or focusing on one changes it.
+        /// The tooltip lists the series count per bank.
         /// </summary>
+        void UpdateFrequencySpans()
+        {
+            if (freqButtons.Count == 0) return;
+            List<CompareBank> compared = bankItems.Take(DatafilesSlotCount).Select(b => b.Bank).ToList();
+            bool[] shown = DatafilesActive;
+            foreach (FreqButton fb in freqButtons)
+            {
+                int start = int.MaxValue, end = int.MinValue;
+                var counts = new List<string>();
+                for (int s = 0; s < compared.Count; s++)
+                {
+                    bool on = s >= shown.Length || shown[s];
+                    int count = compared[s] == null ? 0 : compared[s].Count(fb.Freq);
+                    if (on && count > 0)
+                    {
+                        foreach (CompareSeries ts in compared[s].Get(fb.Freq).Values)
+                        {
+                            if (ts.Data.Length == 0) continue;
+                            start = Math.Min(start, ts.Start);
+                            end = Math.Max(end, ts.End);
+                        }
+                    }
+                    counts.Add("bank " + (s + 1) + ": " + count + " series" + (on ? "" : " (not shown)"));
+                }
+                string span = start <= end ? PeriodText.Format(fb.Freq, start) + "–" + PeriodText.Format(fb.Freq, end)
+                                           : "no data shown";
+                fb.SpanText.Text = span;
+                fb.Button.ToolTip = "Compare the " + fb.Name.ToLowerInvariant() + " series. Shown banks: " + span
+                                    + " (" + string.Join(", ", counts) + ")";
+            }
+        }
+
+        /// <summary>The frequency buttons are shown in the Datafiles state, when there is something to compare.</summary>
         void UpdateFreqBar()
         {
-            FreqBar.Visibility = state == CompareState.Datafiles && FreqPanel.Children.Count > 0 ? Visibility.Visible : Visibility.Hidden;
+            FreqPanel.Visibility = state == CompareState.Datafiles && FreqPanel.Children.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
         }
 
         void FreqButton_Checked(CompareFreq freq)
@@ -1010,7 +1107,7 @@ namespace Gekko
                 FilterBox.Background = InvalidBack;
                 SetStatus(error);
             }
-            FilterBox.ToolTip = error;
+            FilterBox.ToolTip = error ?? FilterTip;
             return filter;
         }
 
@@ -1029,6 +1126,10 @@ namespace Gekko
                 return;
             }
             if (datafilesDirty == DirtyRecompute) datafilesDirty = DirtyNone;
+
+            // Hiding or focusing banks changes the periods in the frequency buttons and the grey period years.
+            UpdateFrequencySpans();
+            UpdateAutoPeriod();
 
             CompareFreq? freq = SelectedFreq;
             if (bankItems.Count < 2 || !freq.HasValue)
@@ -1075,8 +1176,9 @@ namespace Gekko
                 return;
             }
 
-            Func<string, bool> filter = ReadFilter();
-            string filterKey = (RegexCheck.IsChecked == true ? "regex:" : "wild:") + FilterBox.Text.Trim();
+            // The filter box selects the data files here; all series inside them are compared.
+            Func<string, bool> fileFilter = ReadFilter();
+            const string filterKey = "";
             List<string> paths = folderItems.Take(SlotCount).Select(f => f.FolderPath).ToList();
             bool[] shownFolders = (bool[])active.Clone();
             var cts = new CancellationTokenSource();
@@ -1093,7 +1195,7 @@ namespace Gekko
             try
             {
                 // The files are read on a worker thread, one at a time (see LoadBank).
-                result = await Task.Run(() => FolderCompareEngine.Compute(paths, shownFolders, filter, filterKey,
+                result = await Task.Run(() => FolderCompareEngine.Compute(paths, shownFolders, fileFilter, null, filterKey,
                                                                           LoadBank, progress, cts.Token, folderCache));
             }
             catch (OperationCanceledException)
@@ -1698,21 +1800,21 @@ namespace Gekko
         bool committingPeriod;
 
         /// <summary>
-        /// The grey years of the period boxes: the largest span of the datafiles in the Datafiles list, over all (dated)
-        /// frequencies, as plain years (e.g. 1990 and 2025 for annual data from 1990, quarterly data to 2025q4). Called
-        /// whenever that list changes, also when it is filled from the Folders state. An empty list leaves the years as
-        /// they were, so the period carries over to the Folders state. The period typed by the user is not touched.
+        /// The grey years of the period boxes: the largest span of the compared datafiles that are shown (not hidden,
+        /// not greyed out by a focus), over all (dated) frequencies, as plain years (e.g. 1990 and 2025 for annual data
+        /// from 1990, quarterly data to 2025q4). Called when the Datafiles list changes (also when it is filled from the
+        /// Folders state) and when banks are hidden or focused. No datafiles leaves the years as they were, so the
+        /// period carries over to the Folders state. A period typed by the user (black) is not touched.
         /// </summary>
         void UpdateAutoPeriod()
         {
             int first = int.MaxValue, last = int.MinValue;
-            foreach (BankItem item in bankItems)
+            foreach (CompareBank bank in ShownDatafiles())
             {
-                if (item.Bank == null) continue;
-                foreach (CompareFreq f in item.Bank.Frequencies)
+                foreach (CompareFreq f in bank.Frequencies)
                 {
                     if (!PeriodConvert.IsDated(f)) continue;  // undated series have no years
-                    foreach (CompareSeries ts in item.Bank.Get(f).Values)
+                    foreach (CompareSeries ts in bank.Get(f).Values)
                     {
                         if (ts.Data.Length == 0) continue;
                         first = Math.Min(first, PeriodText.Year(f, ts.Start));
@@ -1732,7 +1834,7 @@ namespace Gekko
         void UpdatePeriodBoxes()
         {
             string text = "Used in every frequency (e.g. 2010 is 2010q1–2010q4 for quarterly series), for datafiles and folders.";
-            if (autoFromText.Length > 0) text = "Grey: the whole span of the datafiles. " + text;
+            if (autoFromText.Length > 0) text = "Grey: the whole span of the shown datafiles. " + text;
             if (state == CompareState.Datafiles && current != null && !PeriodConvert.IsDated(current.Freq))
                 text += " It does not apply to undated series.";
             SpanText.Text = text;
@@ -1977,25 +2079,45 @@ namespace Gekko
             SetNamesText(names, red);
         }
 
-        /// <summary>Comma-separated names; runs of consecutive found names become one dark red Run.</summary>
+        /// <summary>
+        /// Comma-separated names; runs of consecutive found names become one dark red Run. Remembers where each name is,
+        /// for clicking, selecting whole names and the context menu.
+        /// </summary>
         void SetNamesText(List<string> names, HashSet<string> red)
         {
+            namesShown = names;
+            nameStarts = new int[names.Count];
+            nameEnds = new int[names.Count];
+            nameRuns.Clear();
+            nameRunStarts.Clear();
+            nameRunStartOf.Clear();
             var paragraph = new Paragraph { Margin = new Thickness(0) };
-            int i = 0;
+            int i = 0, pos = 0;
             while (i < names.Count)
             {
                 bool isRed = red.Contains(names[i]);
                 var sb = new StringBuilder();
+                int runStart = pos;
                 int j = i;
                 while (j < names.Count && red.Contains(names[j]) == isRed)
                 {
-                    if (j > 0) sb.Append(", ");
+                    if (j > 0)
+                    {
+                        sb.Append(", ");
+                        pos += 2;
+                    }
+                    nameStarts[j] = pos;
                     sb.Append(names[j]);
+                    pos += names[j].Length;
+                    nameEnds[j] = pos;
                     j++;
                 }
                 var run = new Run(sb.ToString());
                 if (isRed) run.Foreground = DeviatingNameBrush;
                 paragraph.Inlines.Add(run);
+                nameRuns.Add(run);
+                nameRunStarts.Add(runStart);
+                nameRunStartOf[run] = runStart;
                 i = j;
             }
             var document = new FlowDocument(paragraph)
@@ -2026,6 +2148,253 @@ namespace Gekko
             {
                 SetStatus("Could not copy to the clipboard: " + ex.Message);
             }
+        }
+
+        // ---------------------------------------------------------------- names tab: click, select whole names, plot
+
+        // Where each name sits in the Names text (character offsets in namesPlainText), and the Runs it is made of,
+        // so text positions and names can be mapped both ways. Set by SetNamesText.
+        List<string> namesShown = new List<string>();
+        int[] nameStarts = new int[0];
+        int[] nameEnds = new int[0];
+        readonly List<Run> nameRuns = new List<Run>();
+        readonly List<int> nameRunStarts = new List<int>();
+        readonly Dictionary<Run, int> nameRunStartOf = new Dictionary<Run, int>();
+
+        Point namesDownPoint;
+        int namesDownClicks;
+        List<string> contextNames;      // what the context menu's Plot works on
+        bool contextFromMouse;          // contextNames was set by a right-click (not the keyboard)
+        MenuItem plotMenuItem;
+
+        /// <summary>The context menu of the Names text: Plot, Copy and Select all. Called once, from the constructor.</summary>
+        void BuildNamesContextMenu()
+        {
+            plotMenuItem = new MenuItem { Header = "Plot", FontWeight = FontWeights.SemiBold };
+            plotMenuItem.Click += PlotNames_Click;
+            var menu = new ContextMenu();
+            menu.Items.Add(plotMenuItem);
+            menu.Items.Add(new Separator());
+            menu.Items.Add(new MenuItem { Header = "Copy", Command = ApplicationCommands.Copy, CommandTarget = NamesText });
+            menu.Items.Add(new MenuItem { Header = "Select all", Command = ApplicationCommands.SelectAll, CommandTarget = NamesText });
+            NamesText.ContextMenu = menu;
+        }
+
+        int NamesTextLength => nameEnds.Length == 0 ? 0 : nameEnds[nameEnds.Length - 1];
+
+        /// <summary>The character offset (in namesPlainText) of a position in the Names text.</summary>
+        int OffsetOf(TextPointer p)
+        {
+            int start;
+            var run = p.Parent as Run;
+            if (run != null && nameRunStartOf.TryGetValue(run, out start)) return start + run.ContentStart.GetOffsetToPosition(p);
+            // Between two Runs, or at the edge of the paragraph.
+            var next = p.GetAdjacentElement(LogicalDirection.Forward) as Run;
+            if (next != null && nameRunStartOf.TryGetValue(next, out start)) return start;
+            var previous = p.GetAdjacentElement(LogicalDirection.Backward) as Run;
+            if (previous != null && nameRunStartOf.TryGetValue(previous, out start)) return start + previous.Text.Length;
+            if (nameRuns.Count == 0) return 0;
+            return p.CompareTo(nameRuns[0].ContentStart) <= 0 ? 0 : NamesTextLength;
+        }
+
+        /// <summary>The position in the Names text at a character offset.</summary>
+        TextPointer PointerAt(int offset)
+        {
+            if (nameRuns.Count == 0) return null;
+            int k = nameRunStarts.BinarySearch(offset);
+            if (k < 0) k = ~k - 1;
+            k = Math.Max(0, Math.Min(k, nameRuns.Count - 1));
+            Run run = nameRuns[k];
+            int within = Math.Max(0, Math.Min(offset - nameRunStarts[k], run.Text.Length));
+            return run.ContentStart.GetPositionAtOffset(within);
+        }
+
+        /// <summary>The name that character c belongs to, or -1 (a separator).</summary>
+        int NameIndexAtChar(int c)
+        {
+            if (c < 0 || c >= NamesTextLength) return -1;
+            int k = Array.BinarySearch(nameStarts, c);
+            if (k < 0) k = ~k - 1;
+            return k >= 0 && c < nameEnds[k] ? k : -1;
+        }
+
+        /// <summary>Whether the point (relative to NamesText) is on character c.</summary>
+        bool PointOverChar(int c, Point pt)
+        {
+            if (c < 0 || c >= NamesTextLength) return false;
+            TextPointer a = PointerAt(c), b = PointerAt(c + 1);
+            if (a == null || b == null) return false;
+            Rect left = a.GetCharacterRect(LogicalDirection.Forward);
+            Rect right = b.GetCharacterRect(LogicalDirection.Backward);  // Backward: still on c's line when c ends a line
+            if (left.IsEmpty || right.IsEmpty) return false;
+            double x1 = Math.Min(left.Left, right.Left), x2 = Math.Max(left.Left, right.Left);
+            return pt.Y >= left.Top && pt.Y <= left.Bottom && pt.X >= x1 - 0.5 && pt.X <= x2 + 0.5;
+        }
+
+        /// <summary>The name under the mouse (point relative to NamesText), or -1 (a separator, empty space, a scroll bar).</summary>
+        int NameIndexAtPoint(Point pt)
+        {
+            if (namesShown.Count == 0) return -1;
+            TextPointer p = NamesText.GetPositionFromPoint(pt, true);
+            if (p == null) return -1;
+            int offset = OffsetOf(p);
+            for (int c = offset - 1; c <= offset; c++)
+                if (PointOverChar(c, pt)) return NameIndexAtChar(c);
+            return -1;
+        }
+
+        /// <summary>The names that the character range a..b (b excluded) touches, as first..last. False if none.</summary>
+        bool NamesInRange(int a, int b, out int first, out int last)
+        {
+            first = 0;
+            last = -1;
+            if (namesShown.Count == 0 || a >= b) return false;
+            first = Array.BinarySearch(nameEnds, a + 1);  // the first name ending after a
+            if (first < 0) first = ~first;
+            last = Array.BinarySearch(nameStarts, b - 1); // the last name starting before b
+            if (last < 0) last = ~last - 1;
+            return first <= last && first < namesShown.Count && last >= 0;
+        }
+
+        /// <summary>The selected names (whole names), or null when nothing is selected.</summary>
+        List<string> SelectedNames(out int first, out int last)
+        {
+            first = 0;
+            last = -1;
+            TextSelection sel = NamesText.Selection;
+            if (sel == null || sel.IsEmpty || namesShown.Count == 0) return null;
+            if (!NamesInRange(OffsetOf(sel.Start), OffsetOf(sel.End), out first, out last)) return null;
+            return namesShown.GetRange(first, last - first + 1);
+        }
+
+        void SelectNames(int first, int last)
+        {
+            TextPointer a = PointerAt(nameStarts[first]), b = PointerAt(nameEnds[last]);
+            if (a != null && b != null) NamesText.Selection.Select(a, b);
+        }
+
+        /// <summary>A selection made with the mouse always covers whole names: "ab" in "abc[de,fg]" becomes all of it.</summary>
+        void SnapNamesSelection()
+        {
+            TextSelection sel = NamesText.Selection;
+            if (sel == null || sel.IsEmpty || namesShown.Count == 0) return;
+            int first, last;
+            if (NamesInRange(OffsetOf(sel.Start), OffsetOf(sel.End), out first, out last)) SelectNames(first, last);
+            else sel.Select(sel.Start, sel.Start);  // only a separator: nothing
+        }
+
+        void NamesText_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            namesDownPoint = e.GetPosition(NamesText);
+            namesDownClicks = e.ClickCount;
+        }
+
+        /// <summary>
+        /// A plain click on a name (no drag, no Shift/Ctrl): jump to it in the Values tab. Otherwise the selection is
+        /// widened to whole names. Done after the RichTextBox has finished its own handling of the click.
+        /// </summary>
+        void NamesText_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (state != CompareState.Datafiles || namesShown.Count == 0) return;
+            Point pt = e.GetPosition(NamesText);
+            bool click = namesDownClicks == 1 && Keyboard.Modifiers == ModifierKeys.None && (pt - namesDownPoint).Length < 4;
+            Dispatcher.BeginInvoke(DispatcherPriority.Input, new Action(() =>
+            {
+                if (click && NamesText.Selection.IsEmpty)
+                {
+                    int k = NameIndexAtPoint(pt);
+                    if (k >= 0)
+                    {
+                        JumpToName(namesShown[k]);
+                        return;
+                    }
+                }
+                SnapNamesSelection();
+            }));
+        }
+
+        /// <summary>
+        /// Right-click inside the selection: the context menu works on the selected names. Right-click on another name:
+        /// that name is selected and the menu works on it alone (no need to mark a single name first).
+        /// </summary>
+        void NamesText_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            contextFromMouse = true;
+            contextNames = null;
+            if (state != CompareState.Datafiles || namesShown.Count == 0) return;
+            int first, last;
+            List<string> selected = SelectedNames(out first, out last);
+            int k = NameIndexAtPoint(e.GetPosition(NamesText));
+            if (selected != null && (k < 0 || (k >= first && k <= last)))
+            {
+                contextNames = selected;
+            }
+            else if (k >= 0)
+            {
+                SelectNames(k, k);
+                contextNames = new List<string> { namesShown[k] };
+            }
+            NamesText.Focus();
+            e.Handled = true;  // the RichTextBox would move the caret and drop the selection; the menu still opens
+        }
+
+        void NamesText_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            if (!contextFromMouse)
+            {
+                // Opened with the keyboard (Shift+F10 or the menu key): the selection.
+                int first, last;
+                contextNames = SelectedNames(out first, out last);
+            }
+            contextFromMouse = false;
+            int n = contextNames?.Count ?? 0;
+            plotMenuItem.IsEnabled = n > 0 && state == CompareState.Datafiles;
+            plotMenuItem.Header = n == 0 ? "Plot" : n == 1 ? "Plot " + contextNames[0] : "Plot " + n + " series";
+        }
+
+        void PlotNames_Click(object sender, RoutedEventArgs e)
+        {
+            if (contextNames == null || contextNames.Count == 0) return;
+            // The period as shown in the boxes: typed (black), or the grey whole span. Null when there is none.
+            string from = fromText ?? (autoFromText.Length > 0 ? autoFromText : null);
+            string to = toText ?? (autoToText.Length > 0 ? autoToText : null);
+            Plot(new List<string>(contextNames), from, to, selectedFreq);
+        }
+
+        /// <summary>
+        /// TODO (Gekko): plot the series. Called from the context menu of the Names tab.
+        ///   names: the names as listed in the Names tab (without dimensions when "Ignore dimensions" is ticked).
+        ///   from, to: the period as shown in the period boxes, in any frequency (e.g. "1990q3" and "2025"), or null.
+        ///   freq: the selected frequency (the names are series of this frequency).
+        /// The compared banks are current.Banks (slot order), and current.Active says which are shown.
+        /// </summary>
+        void Plot(List<string> names, string from, string to, CompareFreq? freq)
+        {
+            string list = string.Join(", ", names.Take(10)) + (names.Count > 10 ? ", ... (" + names.Count + " in all)" : "");
+            SetStatus("Plot " + list + " " + (from ?? "?") + "–" + (to ?? "?") + ": not wired up yet (WindowBankCompare.Plot).");
+        }
+
+        /// <summary>
+        /// Shows the Values tab with this series at the top. With "Ignore dimensions" the name is without dimensions:
+        /// the first series with that name is shown.
+        /// </summary>
+        void JumpToName(string name)
+        {
+            bool ignore = IgnoreDimsCheck.IsChecked == true;
+            int index = navList.FindIndex(c => string.Equals(ignore ? CompareEngine.StripDimensions(c.Name) : c.Name, name,
+                                                             StringComparison.OrdinalIgnoreCase));
+            if (index < 0) return;
+            SeriesComparison target = navList[index];
+            valuesTopName = target.Name;  // a Values text built now keeps it at the top
+            if (!Equals(Tabs.SelectedItem, ValuesTab)) Tabs.SelectedItem = ValuesTab;
+            else if (valuesDirty) BuildValuesText();
+            int block = blockSeries.FindIndex(c => ReferenceEquals(c, target));
+            if (block < 0)
+            {
+                SetStatus(target.Name + " is left out of the Values text (too many series). Narrow the selection to see it.");
+                return;
+            }
+            ScrollValuesToBlock(block);
         }
 
         // ---------------------------------------------------------------- values tab (Datafiles) / details tab (Folders)
@@ -2436,28 +2805,19 @@ namespace Gekko
             BanksChanged();
         }
 
-        /// <summary>The name filter applies to both states; the other state is recomputed when it is shown again.</summary>
+        /// <summary>The filter belongs to the current state (series or data files); the other state keeps its own.</summary>
         void FilterBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (!ready) return;
-            MarkOtherStateDirty();
+            if (!ready || loadingFilter) return;
             ScheduleRecompute();
         }
 
         void RegexCheck_Changed(object sender, RoutedEventArgs e)
         {
             if (!ready) return;
-            FilterHint.Text = RegexCheck.IsChecked == true
-                ? "Regular expression, case-insensitive, e.g. ^x\\d+$"
-                : "Wildcards * and ?, several patterns separated by spaces";
-            MarkOtherStateDirty();
+            UpdateFilterHint();
+            if (loadingFilter) return;
             Recompute();
-        }
-
-        /// <summary>The filter changed: the other state is recomputed (keeping its hidden banks/folders) when shown again.</summary>
-        void MarkOtherStateDirty()
-        {
-            MarkDirty(state == CompareState.Datafiles ? CompareState.Folders : CompareState.Datafiles, DirtyRecompute);
         }
 
         void CloseButton_Click(object sender, RoutedEventArgs e)

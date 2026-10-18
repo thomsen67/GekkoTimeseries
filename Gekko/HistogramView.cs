@@ -123,10 +123,11 @@ namespace Gekko
                 return;
             }
 
-            // Y axis: series count
+            // Y axis: series count. The top grid line is always above the highest bar (one more line when the
+            // highest bar would end exactly on a line).
             int max = Math.Max(1, counts.Max());
             double step = Math.Max(1, NiceStep(max / 5.0));
-            double yMax = Math.Ceiling(max / step) * step;
+            double yMax = (Math.Floor(max / step) + 1) * step;
             for (double v = 0; v <= yMax + 1e-9; v += step)
             {
                 double y = Math.Round(top + ph - v / yMax * ph) + 0.5;

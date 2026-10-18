@@ -64,7 +64,8 @@
         </Style>
 
         <!-- The two halves of the Folders | Datafiles switch at the top left. Tag holds the corner radius
-             (a Binding rather than TemplateBinding, so the text "3,0,0,3" is converted to a CornerRadius). -->
+             (a Binding rather than TemplateBinding, so the text "3,0,0,3" is converted to a CornerRadius).
+             The pressed one is dark grey. -->
         <Style x:Key="StateButtonStyle" TargetType="RadioButton">
             <Setter Property="GroupName" Value="CompareState"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -82,8 +83,8 @@
                                 <Setter TargetName="Back" Property="Background" Value="#FFE5E5E5"/>
                             </Trigger>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Back" Property="Background" Value="#FF1F4E79"/>
-                                <Setter TargetName="Back" Property="BorderBrush" Value="#FF1F4E79"/>
+                                <Setter TargetName="Back" Property="Background" Value="#FF474747"/>
+                                <Setter TargetName="Back" Property="BorderBrush" Value="#FF474747"/>
                                 <Setter Property="Foreground" Value="White"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -92,8 +93,9 @@
             </Setter>
         </Style>
 
-        <!-- The frequency buttons at the top of the diagram (Datafiles), side by side like the Folders | Datafiles
-             switch. Created in code; Tag holds the corner radius. -->
+        <!-- The frequency buttons at the top of the window, right of the Folders | Datafiles switch (Datafiles only),
+             side by side like the switch. Created in code; Tag holds the corner radius. The pressed one is a lighter
+             grey than the switch. -->
         <Style x:Key="FreqButtonStyle" TargetType="RadioButton">
             <Setter Property="GroupName" Value="CompareFreq"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -102,7 +104,7 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="RadioButton">
                         <Border Name="Back" Background="#FFF0F0F0" BorderBrush="#FFACACAC" BorderThickness="1"
-                                CornerRadius="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" Padding="10,2,10,3">
+                                CornerRadius="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" Padding="10,2">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -110,8 +112,8 @@
                                 <Setter TargetName="Back" Property="Background" Value="#FFE5E5E5"/>
                             </Trigger>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Back" Property="Background" Value="#FF1F4E79"/>
-                                <Setter TargetName="Back" Property="BorderBrush" Value="#FF1F4E79"/>
+                                <Setter TargetName="Back" Property="Background" Value="#FF707070"/>
+                                <Setter TargetName="Back" Property="BorderBrush" Value="#FF707070"/>
                                 <Setter Property="Foreground" Value="White"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -215,7 +217,8 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Top: the Folders | Datafiles switch, the drop zone and the numbered, reorderable list. -->
+        <!-- Top: the Folders | Datafiles switch with the frequency buttons, the drop zone and the numbered,
+             reorderable list. -->
         <Grid Grid.Row="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -229,17 +232,23 @@
             </Grid.ColumnDefinitions>
 
             <!-- Compare folders (data files inside) or databanks (series inside). Each keeps its own list.
-                 Folders is on the left, but the window starts in the Datafiles state. -->
-            <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
-                <RadioButton Name="FoldersStateButton" Content="Folders" Style="{StaticResource StateButtonStyle}"
-                             Tag="3,0,0,3" Checked="StateButton_Checked"
-                             ToolTip="Compare the data files in 2 or 3 folders (and their subfolders)"/>
-                <RadioButton Name="DatafilesStateButton" Content="Datafiles" Style="{StaticResource StateButtonStyle}"
-                             Tag="0,3,3,0" Margin="-1,0,0,0" IsChecked="True" Checked="StateButton_Checked"
-                             ToolTip="Compare the series in 2 or 3 databank files"/>
-            </StackPanel>
-            <TextBlock Grid.Row="0" Grid.Column="2" Name="StateInfoText" Visibility="Collapsed" VerticalAlignment="Center"
-                       Foreground="#FF1F4E79" TextTrimming="CharacterEllipsis"/>
+                 Folders is on the left, but the window starts in the Datafiles state.
+                 Then, with a gap, the frequency buttons (Datafiles only; filled in code with the frequencies of the
+                 compared databanks), then a line of information. -->
+            <DockPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" LastChildFill="True">
+                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Center">
+                    <RadioButton Name="FoldersStateButton" Content="Folders" Style="{StaticResource StateButtonStyle}"
+                                 Tag="3,0,0,3" Checked="StateButton_Checked"
+                                 ToolTip="Compare the data files in 2 or 3 folders (and their subfolders)"/>
+                    <RadioButton Name="DatafilesStateButton" Content="Datafiles" Style="{StaticResource StateButtonStyle}"
+                                 Tag="0,3,3,0" Margin="-1,0,0,0" IsChecked="True" Checked="StateButton_Checked"
+                                 ToolTip="Compare the series in 2 or 3 databank files"/>
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Left" Name="FreqPanel" Orientation="Horizontal" VerticalAlignment="Center"
+                            Margin="40,0,0,0"/>
+                <TextBlock Name="StateInfoText" Visibility="Collapsed" VerticalAlignment="Center" Margin="24,0,0,0"
+                           Foreground="#FF1F4E79" TextTrimming="CharacterEllipsis"/>
+            </DockPanel>
 
             <!-- "Drag datafiles here" (Datafiles) or "Drag folders here" (Folders). While folders are selected, the
                  Datafiles state only shows files opened from the Folders state, and this field is switched off there. -->
@@ -350,22 +359,9 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- The diagram, with the frequency buttons above it (Datafiles only; filled in code with the
-                     frequencies that exist in the compared databanks). In the Folders state the bar is hidden but keeps
-                     its room, so the circles do not change size when switching state. -->
+                <!-- The diagram -->
                 <Border Grid.Column="0" BorderBrush="#FFD5D5D5" BorderThickness="1" CornerRadius="4" Background="White">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-                        <StackPanel Grid.Row="0" Name="FreqBar" Orientation="Horizontal" HorizontalAlignment="Center"
-                                    Margin="8,8,8,0" MinHeight="22">
-                            <TextBlock Text="Frequency" Style="{StaticResource HintStyle}" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                            <StackPanel Name="FreqPanel" Orientation="Horizontal"/>
-                        </StackPanel>
-                        <local:VennView Grid.Row="1" x:Name="Venn" Margin="8,4,8,8"/>
-                    </Grid>
+                    <local:VennView x:Name="Venn" Margin="8"/>
                 </Border>
 
                 <!-- Scrolls when the controls do not fit -->
@@ -468,7 +464,7 @@
                         <TextBlock Grid.Row="3" Text="Filter" Style="{StaticResource PanelLabelStyle}"/>
                         <TextBox Grid.Row="3" Grid.Column="1" Name="FilterBox" Height="22" VerticalContentAlignment="Center"
                                  TextChanged="FilterBox_TextChanged"
-                                 ToolTip="Only these series are compared (also inside the data files of a folder comparison)"/>
+                                 ToolTip="Datafiles: only these series are compared. Folders: only these data files are compared."/>
                         <CheckBox Grid.Row="4" Grid.Column="1" Name="RegexCheck" Content="Regex" Margin="0,5,0,0"
                                   Checked="RegexCheck_Changed" Unchecked="RegexCheck_Changed"/>
                         <TextBlock Grid.Row="5" Grid.Column="1" Name="FilterHint" Style="{StaticResource HintStyle}"
@@ -529,7 +525,8 @@
             <Grid Grid.Row="2">
                 <TabControl Name="Tabs" SelectionChanged="Tabs_SelectionChanged">
                     <!-- "Names" (Datafiles) or "Files" (Folders); the header is set in code -->
-                    <TabItem Header="Names" Name="NamesTab">
+                    <TabItem Header="Names" Name="NamesTab"
+                             ToolTip="Datafiles: click a name to see its values. Drag over names to select them (whole names only); right-click to plot them.">
                         <Grid Margin="4">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -551,10 +548,16 @@
                                 <Button Grid.Column="2" Content="Copy" Style="{StaticResource RoundedSmallButtonStyle}"
                                         Click="CopyNames_Click"/>
                             </Grid>
-                            <!-- Datafiles: the names, comma-separated; found ones in dark red -->
+                            <!-- Datafiles: the names, comma-separated; found ones in dark red. Click a name: its values.
+                                 A selection always covers whole names; right-click: Plot (the context menu is made in code). -->
                             <RichTextBox Grid.Row="2" Name="NamesText" IsReadOnly="True" IsReadOnlyCaretVisible="False"
                                          FontFamily="Consolas" FontSize="12.5" BorderBrush="#FFACACAC" Padding="4,2"
-                                         VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"/>
+                                         VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                                         IsInactiveSelectionHighlightEnabled="True"
+                                         PreviewMouseLeftButtonDown="NamesText_PreviewMouseLeftButtonDown"
+                                         PreviewMouseLeftButtonUp="NamesText_PreviewMouseLeftButtonUp"
+                                         PreviewMouseRightButtonDown="NamesText_PreviewMouseRightButtonDown"
+                                         ContextMenuOpening="NamesText_ContextMenuOpening"/>
                             <!-- New, Folders: one file per line; differing ones in dark red; click a file to compare its series -->
                             <ListBox Grid.Row="2" Name="FilesList" Visibility="Collapsed" BorderBrush="#FFACACAC"
                                      FontFamily="Consolas" FontSize="12.5"
