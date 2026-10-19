@@ -6,9 +6,12 @@
         Height="800" Width="1180" MinHeight="640" MinWidth="960"
         Top="20" Left="20"
         Loaded="Window_Loaded" Closing="Window_Closing"
-        PreviewKeyDown="Window_PreviewKeyDown">
+        PreviewKeyDown="Window_PreviewKeyDown" KeyDown="Window_KeyDown">
 
     <Window.Resources>
+        <!-- The pressed button of the Folders | Datafiles switch and of the frequency buttons (white text on it) -->
+        <SolidColorBrush x:Key="SelectedStateBrush" Color="#FF888888"/>
+
         <Style x:Key="RoundedSmallButtonStyle" TargetType="Button">
             <Setter Property="Height" Value="18"/>
             <Setter Property="Padding" Value="12,0"/>
@@ -65,7 +68,7 @@
 
         <!-- The two halves of the Folders | Datafiles switch at the top left. Tag holds the corner radius
              (a Binding rather than TemplateBinding, so the text "3,0,0,3" is converted to a CornerRadius).
-             The pressed one is dark grey. -->
+             The pressed one is grey (SelectedStateBrush). -->
         <Style x:Key="StateButtonStyle" TargetType="RadioButton">
             <Setter Property="GroupName" Value="CompareState"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -83,8 +86,8 @@
                                 <Setter TargetName="Back" Property="Background" Value="#FFE5E5E5"/>
                             </Trigger>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Back" Property="Background" Value="#FF474747"/>
-                                <Setter TargetName="Back" Property="BorderBrush" Value="#FF474747"/>
+                                <Setter TargetName="Back" Property="Background" Value="{StaticResource SelectedStateBrush}"/>
+                                <Setter TargetName="Back" Property="BorderBrush" Value="{StaticResource SelectedStateBrush}"/>
                                 <Setter Property="Foreground" Value="White"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -94,8 +97,8 @@
         </Style>
 
         <!-- The frequency buttons at the top of the window, right of the Folders | Datafiles switch (Datafiles only),
-             side by side like the switch. Created in code; Tag holds the corner radius. The pressed one is a lighter
-             grey than the switch. -->
+             side by side like the switch, with short names (A, Q, M, ...). Created in code; Tag holds the corner
+             radius. The pressed one is grey (SelectedStateBrush), like the switch. -->
         <Style x:Key="FreqButtonStyle" TargetType="RadioButton">
             <Setter Property="GroupName" Value="CompareFreq"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -112,8 +115,8 @@
                                 <Setter TargetName="Back" Property="Background" Value="#FFE5E5E5"/>
                             </Trigger>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Back" Property="Background" Value="#FF707070"/>
-                                <Setter TargetName="Back" Property="BorderBrush" Value="#FF707070"/>
+                                <Setter TargetName="Back" Property="Background" Value="{StaticResource SelectedStateBrush}"/>
+                                <Setter TargetName="Back" Property="BorderBrush" Value="{StaticResource SelectedStateBrush}"/>
                                 <Setter Property="Foreground" Value="White"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -548,12 +551,15 @@
                                 <Button Grid.Column="2" Content="Copy" Style="{StaticResource RoundedSmallButtonStyle}"
                                         Click="CopyNames_Click"/>
                             </Grid>
-                            <!-- Datafiles: the names, comma-separated; found ones in dark red. Click a name: its values.
-                                 A selection always covers whole names; right-click: Plot (the context menu is made in code). -->
+                            <!-- Datafiles: the names, comma-separated; found ones in dark red, the commas black. A name under
+                                 the mouse is underlined like a link; click it: its values. A selection always covers whole
+                                 names; right-click: Plot (the context menu is made in code). -->
                             <RichTextBox Grid.Row="2" Name="NamesText" IsReadOnly="True" IsReadOnlyCaretVisible="False"
                                          FontFamily="Consolas" FontSize="12.5" BorderBrush="#FFACACAC" Padding="4,2"
                                          VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                                          IsInactiveSelectionHighlightEnabled="True"
+                                         PreviewMouseMove="NamesText_PreviewMouseMove" MouseLeave="NamesText_MouseLeave"
+                                         ScrollViewer.ScrollChanged="NamesText_ScrollChanged"
                                          PreviewMouseLeftButtonDown="NamesText_PreviewMouseLeftButtonDown"
                                          PreviewMouseLeftButtonUp="NamesText_PreviewMouseLeftButtonUp"
                                          PreviewMouseRightButtonDown="NamesText_PreviewMouseRightButtonDown"

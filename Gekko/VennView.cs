@@ -100,6 +100,9 @@ namespace Gekko
         /// <summary>Gap between the bottom (third) circle and its box, in radii (keeps the box clear of the top-right circle).</summary>
         const double BottomBoxGap = 0.3;
 
+        /// <summary>How far below the bottom circle's center the middle of its box is, in radii.</summary>
+        const double BottomBoxDrop = 0.45;
+
         static readonly Brush HoverFill = BankColors.FromArgb(0x2A, 0, 0, 0);
         static readonly Brush SelectedFill = BankColors.FromArgb(0x16, 0, 0, 0);
         static readonly Brush SelectedStroke = BankColors.FromArgb(0x50, 0x33, 0x33, 0x33);
@@ -282,7 +285,7 @@ namespace Gekko
 
             // Boxes (banks or folders) with the hide/show and focus/unfocus links
             double topRightBottom = double.NegativeInfinity;
-            for (int s = 0; s < model.SlotCount; s++) PlaceBankTag(tags[s], s, centers[s], r, width, ref topRightBottom);
+            for (int s = 0; s < model.SlotCount; s++) PlaceBankTag(tags[s], s, centers[s], r, width, height, ref topRightBottom);
 
             string word = model.SlotWord;
             idleCaption = focusSlot >= 0 && focusSlot < model.SlotCount
@@ -528,9 +531,10 @@ namespace Gekko
 
         /// <summary>
         /// Box 1 left of the top-left circle, box 2 right of the top-right circle, box 3 right of the bottom circle,
-        /// BottomBoxGap radii away from it (and never on top of box 2). topRightBottom is the bottom edge of box 2.
+        /// BottomBoxGap radii away from it and BottomBoxDrop radii down (and never on top of box 2). topRightBottom is
+        /// the bottom edge of box 2.
         /// </summary>
-        void PlaceBankTag(Border tag, int s, Point center, double r, double canvasWidth, ref double topRightBottom)
+        void PlaceBankTag(Border tag, int s, Point center, double r, double canvasWidth, double canvasHeight, ref double topRightBottom)
         {
             Size size = tag.DesiredSize;
             double left, topPos;
@@ -547,7 +551,8 @@ namespace Gekko
             else
             {
                 left = center.X + (1 + BottomBoxGap) * r;
-                topPos = center.Y + 0.3 * r - size.Height / 2;
+                topPos = center.Y + BottomBoxDrop * r - size.Height / 2;
+                topPos = Math.Min(topPos, canvasHeight - BottomMargin - size.Height - 2);  // above the caption
             }
             left = Math.Max(2, Math.Min(left, canvasWidth - size.Width - 2));
             topPos = Math.Max(2, topPos);

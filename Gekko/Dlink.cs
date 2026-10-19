@@ -611,14 +611,11 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         private static string BuildSyncReportText(string type, List<string> filesNew, List<string> filesOverwritten, List<string> putFiles, List<string> missingDlinkFiles)
         {
             string s = null;
-
-
             if (missingDlinkFiles.Count > 0)
             {
                 s += "NOTE: " + missingDlinkFiles.Count + " tracked ." + Program.options.databank_dlink_name + " file" + G.S(missingDlinkFiles.Count) + " not found in the working folder (cf. 'MISSING ." + Program.options.databank_dlink_name.ToUpper() + " FILES' below).";
                 s += G.NL + G.NL;
             }
-
             s += " ---------------------- DATA FOLDER SYNC --------------------------- ";
             s += G.NL + G.NL;
             if (filesNew.Count + filesOverwritten.Count > 0)
@@ -670,7 +667,6 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 }
             }
 
-
             if (missingDlinkFiles.Count > 0)
             {
                 s += G.NL + G.NL;
@@ -684,15 +680,6 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     s += G.NL + f;
                 }
             }
-
-            if (false && G.Equal(Environment.UserName, "tth"))
-            {
-                s += G.NL + G.NL;
-                s += " ------------------------- HASH CACHE ------------------------------ ";
-                s += G.NL + G.NL;
-                s += "TTH: Queries = " + DlinkHashCache.countAsk + ", hits = " + DlinkHashCache.countHit + ", size = " + DlinkHashCache.Count() + G.NL;                
-            }
-
             return s;
         }
 

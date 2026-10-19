@@ -362,6 +362,9 @@ namespace Gekko
             Histogram.BarClicked += Bar_Clicked;
             Histogram.BarDoubleClicked += period => Tabs.SelectedItem = NamesTab;
             BuildNamesContextMenu();
+            // The RichTextBox sets (and handles) its own I-beam cursor in QueryCursor, and there is no Preview version
+            // of that event; so listen to handled events too: this runs after the box and can put the hand there.
+            NamesText.AddHandler(Mouse.QueryCursorEvent, new QueryCursorEventHandler(NamesText_QueryCursor), true);
 
             ReadThresholds();
 
@@ -1015,7 +1018,7 @@ namespace Gekko
                     VerticalAlignment = VerticalAlignment.Center
                 };
                 var content = new StackPanel { Orientation = Orientation.Horizontal };
-                content.Children.Add(new TextBlock { Text = name, FontWeight = FontWeights.SemiBold });
+                content.Children.Add(new TextBlock { Text = ShortFrequencyName(f), FontWeight = FontWeights.SemiBold });
                 content.Children.Add(spanText);
                 // CornerRadius(topLeft, topRight, bottomRight, bottomLeft): round the outer ends of the row.
                 CornerRadius corners = freqs.Count == 1 ? new CornerRadius(r)
@@ -1073,6 +1076,13 @@ namespace Gekko
                 fb.Button.ToolTip = "Compare the " + fb.Name.ToLowerInvariant() + " series. Shown banks: " + span
                                     + " (" + string.Join(", ", counts) + ")";
             }
+        }
+
+        /// <summary>"A", "Q", "M", ... for the frequency buttons (the tooltip has the full name).</summary>
+        static string ShortFrequencyName(CompareFreq freq)
+        {
+            string name = PeriodConvert.FrequencyName(freq);
+            return name.Length > 0 ? name.Substring(0, 1).ToUpperInvariant() : name;
         }
 
         /// <summary>The frequency buttons are shown in the Datafiles state, when there is something to compare.</summary>
@@ -1985,6 +1995,11 @@ namespace Gekko
                     e.Handled = true;
                     break;
                 case Key.Escape:
+                    // Nothing typed to undo: let Esc close the window (Window_KeyDown).
+                    string inForce = isFrom ? (fromText ?? autoFromText) : (toText ?? autoToText);
+                    TextBox periodBox = isFrom ? FromBox : ToBox;
+                    if (string.Equals(periodBox.Text.Trim(), inForce, StringComparison.OrdinalIgnoreCase)
+                        && periodBox.ReadLocalValue(Control.BackgroundProperty) == DependencyProperty.UnsetValue) break;
                     // Back to the period in force (the box has the focus, so say that this is not typing).
                     committingPeriod = true;
                     try
@@ -2080,46 +2095,56 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Comma-separated names; runs of consecutive found names become one dark red Run. Remembers where each name is,
-        /// for clicking, selecting whole names and the context menu.
+        /// Comma-separated names. Found names are dark red, one Run each; everything else (other names and all the
+        /// separating commas) is black, in as few Runs as possible. Remembers where each name is, for clicking,
+        /// hovering, selecting whole names and the context menu.
         /// </summary>
         void SetNamesText(List<string> names, HashSet<string> red)
         {
+            HideNameHover();
             namesShown = names;
             nameStarts = new int[names.Count];
             nameEnds = new int[names.Count];
+            nameIsRed = new bool[names.Count];
             nameRuns.Clear();
             nameRunStarts.Clear();
             nameRunStartOf.Clear();
             var paragraph = new Paragraph { Margin = new Thickness(0) };
-            int i = 0, pos = 0;
-            while (i < names.Count)
+            var black = new StringBuilder();
+            int pos = 0, blackStart = 0;
+            Action<string, Brush, int> addRun = (text, brush, start) =>
             {
-                bool isRed = red.Contains(names[i]);
-                var sb = new StringBuilder();
-                int runStart = pos;
-                int j = i;
-                while (j < names.Count && red.Contains(names[j]) == isRed)
-                {
-                    if (j > 0)
-                    {
-                        sb.Append(", ");
-                        pos += 2;
-                    }
-                    nameStarts[j] = pos;
-                    sb.Append(names[j]);
-                    pos += names[j].Length;
-                    nameEnds[j] = pos;
-                    j++;
-                }
-                var run = new Run(sb.ToString());
-                if (isRed) run.Foreground = DeviatingNameBrush;
+                var run = new Run(text);
+                if (brush != null) run.Foreground = brush;
                 paragraph.Inlines.Add(run);
                 nameRuns.Add(run);
-                nameRunStarts.Add(runStart);
-                nameRunStartOf[run] = runStart;
-                i = j;
+                nameRunStarts.Add(start);
+                nameRunStartOf[run] = start;
+            };
+            for (int j = 0; j < names.Count; j++)
+            {
+                if (j > 0)
+                {
+                    black.Append(", ");
+                    pos += 2;
+                }
+                nameStarts[j] = pos;
+                nameEnds[j] = pos + names[j].Length;
+                nameIsRed[j] = red.Contains(names[j]);
+                if (nameIsRed[j])
+                {
+                    if (black.Length > 0) addRun(black.ToString(), null, blackStart);
+                    black.Clear();
+                    addRun(names[j], DeviatingNameBrush, pos);
+                    blackStart = nameEnds[j];
+                }
+                else
+                {
+                    black.Append(names[j]);
+                }
+                pos = nameEnds[j];
             }
+            if (black.Length > 0) addRun(black.ToString(), null, blackStart);
             var document = new FlowDocument(paragraph)
             {
                 PagePadding = new Thickness(0),
@@ -2161,8 +2186,13 @@ namespace Gekko
         readonly List<int> nameRunStarts = new List<int>();
         readonly Dictionary<Run, int> nameRunStartOf = new Dictionary<Run, int>();
 
+        bool[] nameIsRed = new bool[0];
+
         Point namesDownPoint;
         int namesDownClicks;
+        bool namesDownHadSelection;  // a click that only ends a selection does nothing else
+        int hoverName = -1;          // the name under the mouse (underlined, hand cursor), or -1
+        NameUnderlineAdorner hoverAdorner;
         List<string> contextNames;      // what the context menu's Plot works on
         bool contextFromMouse;          // contextNames was set by a right-click (not the keyboard)
         MenuItem plotMenuItem;
@@ -2287,19 +2317,30 @@ namespace Gekko
         {
             namesDownPoint = e.GetPosition(NamesText);
             namesDownClicks = e.ClickCount;
+            namesDownHadSelection = NamesText.Selection != null && !NamesText.Selection.IsEmpty;
+            HideNameHover();
         }
 
         /// <summary>
-        /// A plain click on a name (no drag, no Shift/Ctrl): jump to it in the Values tab. Otherwise the selection is
-        /// widened to whole names. Done after the RichTextBox has finished its own handling of the click.
+        /// A plain click on a name (no drag, no Shift/Ctrl): jump to it in the Values tab. A plain click while names are
+        /// selected only removes the selection. Otherwise (a drag) the selection is widened to whole names. Done after
+        /// the RichTextBox has finished its own handling of the click.
         /// </summary>
         void NamesText_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if (state != CompareState.Datafiles || namesShown.Count == 0) return;
             Point pt = e.GetPosition(NamesText);
             bool click = namesDownClicks == 1 && Keyboard.Modifiers == ModifierKeys.None && (pt - namesDownPoint).Length < 4;
+            bool endsSelection = click && namesDownHadSelection;
             Dispatcher.BeginInvoke(DispatcherPriority.Input, new Action(() =>
             {
+                if (endsSelection)
+                {
+                    TextSelection sel = NamesText.Selection;
+                    if (sel != null && !sel.IsEmpty) sel.Select(sel.Start, sel.Start);
+                    UpdateNameHover(Mouse.GetPosition(NamesText));
+                    return;
+                }
                 if (click && NamesText.Selection.IsEmpty)
                 {
                     int k = NameIndexAtPoint(pt);
@@ -2313,12 +2354,128 @@ namespace Gekko
             }));
         }
 
+        // ---- Hovering a name: underlined like a link (the hide/focus links in the diagram), with a hand cursor.
+        // Only while nothing is selected, since a click then only removes the selection.
+
+        void NamesText_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            UpdateNameHover(e.GetPosition(NamesText));
+        }
+
+        void NamesText_MouseLeave(object sender, MouseEventArgs e)
+        {
+            HideNameHover();
+        }
+
+        void NamesText_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            if (hoverName < 0) return;
+            HideNameHover();
+            if (NamesText.IsMouseOver) UpdateNameHover(Mouse.GetPosition(NamesText));
+        }
+
+        void NamesText_QueryCursor(object sender, QueryCursorEventArgs e)
+        {
+            if (hoverName < 0) return;
+            e.Cursor = Cursors.Hand;
+            e.Handled = true;
+        }
+
+        void UpdateNameHover(Point pt)
+        {
+            bool canClick = state == CompareState.Datafiles && NamesText.IsVisible && namesShown.Count > 0
+                            && Mouse.LeftButton != MouseButtonState.Pressed
+                            && (NamesText.Selection == null || NamesText.Selection.IsEmpty);
+            int k = canClick ? NameIndexAtPoint(pt) : -1;
+            if (k == hoverName) return;
+            hoverName = k;
+            if (k < 0)
+            {
+                hoverAdorner?.HideLine();
+                return;
+            }
+            if (hoverAdorner == null)
+            {
+                AdornerLayer layer = AdornerLayer.GetAdornerLayer(NamesText);
+                if (layer == null) return;
+                hoverAdorner = new NameUnderlineAdorner(NamesText);
+                layer.Add(hoverAdorner);
+            }
+            hoverAdorner.ShowLine(NameSegments(k), nameIsRed[k] ? DeviatingNameBrush : NamesText.Foreground);
+        }
+
+        void HideNameHover()
+        {
+            hoverName = -1;
+            hoverAdorner?.HideLine();
+        }
+
+        /// <summary>The name's character boxes, one rectangle per line it is on (relative to NamesText).</summary>
+        List<Rect> NameSegments(int k)
+        {
+            var segments = new List<Rect>();
+            for (int c = nameStarts[k]; c < nameEnds[k]; c++)
+            {
+                TextPointer a = PointerAt(c), b = PointerAt(c + 1);
+                if (a == null || b == null) continue;
+                Rect left = a.GetCharacterRect(LogicalDirection.Forward);
+                Rect right = b.GetCharacterRect(LogicalDirection.Backward);
+                if (left.IsEmpty || right.IsEmpty) continue;
+                double x1 = Math.Min(left.Left, right.Left), x2 = Math.Max(left.Left, right.Left);
+                int last = segments.Count - 1;
+                if (last >= 0 && Math.Abs(segments[last].Top - left.Top) < 0.5)
+                    segments[last] = new Rect(new Point(Math.Min(segments[last].Left, x1), segments[last].Top),
+                                              new Point(Math.Max(segments[last].Right, x2), segments[last].Bottom));
+                else segments.Add(new Rect(new Point(x1, left.Top), new Point(x2, left.Bottom)));
+            }
+            return segments;
+        }
+
+        /// <summary>The underline under the hovered name in the Names tab.</summary>
+        sealed class NameUnderlineAdorner : Adorner
+        {
+            List<Rect> segments = new List<Rect>();
+            Pen pen;
+
+            public NameUnderlineAdorner(UIElement adornedElement) : base(adornedElement)
+            {
+                IsHitTestVisible = false;
+            }
+
+            public void ShowLine(List<Rect> lineSegments, Brush brush)
+            {
+                segments = lineSegments ?? new List<Rect>();
+                pen = new Pen(brush, 1);
+                pen.Freeze();
+                InvalidateVisual();
+            }
+
+            public void HideLine()
+            {
+                if (segments.Count == 0) return;
+                segments = new List<Rect>();
+                InvalidateVisual();
+            }
+
+            protected override void OnRender(DrawingContext dc)
+            {
+                if (pen == null) return;
+                // Just above the bottom of the line box, under the text's baseline; on whole pixels so it is sharp.
+                foreach (Rect r in segments)
+                {
+                    double y = Math.Round(r.Bottom - 2) + 0.5;
+                    dc.DrawLine(pen, new Point(r.Left, y), new Point(r.Right, y));
+                }
+            }
+        }
+
         /// <summary>
         /// Right-click inside the selection: the context menu works on the selected names. Right-click on another name:
         /// that name is selected and the menu works on it alone (no need to mark a single name first).
         /// </summary>
         void NamesText_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
+            HideNameHover();
             contextFromMouse = true;
             contextNames = null;
             if (state != CompareState.Datafiles || namesShown.Count == 0) return;
@@ -2380,6 +2537,7 @@ namespace Gekko
         /// </summary>
         void JumpToName(string name)
         {
+            HideNameHover();
             bool ignore = IgnoreDimsCheck.IsChecked == true;
             int index = navList.FindIndex(c => string.Equals(ignore ? CompareEngine.StripDimensions(c.Name) : c.Name, name,
                                                              StringComparison.OrdinalIgnoreCase));
@@ -2723,6 +2881,17 @@ namespace Gekko
         /// Alt+1/2/3 focus on a bank/folder (again: show all). Ctrl+Up / Ctrl+Down jump between the series of the
         /// Values tab (the files of the Details tab); Ctrl+D hides or shows diagram and controls.
         /// </summary>
+        /// <summary>
+        /// Esc closes the window. This is the bubbling KeyDown, so Esc that something else uses first (closing a menu,
+        /// undoing typing in a period box, cancelling a splitter drag) does not close it.
+        /// </summary>
+        void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Escape || Keyboard.Modifiers != ModifierKeys.None) return;
+            e.Handled = true;
+            Close();
+        }
+
         void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (Keyboard.Modifiers == ModifierKeys.Alt)
