@@ -7792,7 +7792,7 @@ namespace Gekko
                 O.AddIVariableWithOverwriteFromString(collectionName, output);
                 G.Writeln2("Imported " + type.ToString().ToLower() + " " + collectionName + " (" + rr + "x" + cc + " elements)");
             }
-            DlinkAutoDlinkFiles.HandleDlink(blob, false, o.p);
+            DlinkAutoDlinkFiles.HandleDlink(blob, false, o?.p);
         }
 
         /// <summary>
@@ -24208,7 +24208,7 @@ namespace Gekko
                     {
                         GamsData.WriteGdxSlow(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list1Sorted); //probably cannot handle list2
                     }
-                    DlinkAutoDlinkFiles.HandleDlink(blob, false, o.p);
+                    DlinkAutoDlinkFiles.HandleDlink(blob, false, o?.p);
                     return 0;
                 }
                 else if (o.opt_arrow != null)
@@ -24236,7 +24236,7 @@ namespace Gekko
                         }
                         throw;
                     }
-                    DlinkAutoDlinkFiles.HandleDlink(blob, false, o.p);
+                    DlinkAutoDlinkFiles.HandleDlink(blob, false, o?.p);
                     return 0;
                 }
                 else if (o.opt_parquet != null)
@@ -24264,7 +24264,7 @@ namespace Gekko
                         }
                         throw;
                     }
-                    DlinkAutoDlinkFiles.HandleDlink(blob, false, o.p);
+                    DlinkAutoDlinkFiles.HandleDlink(blob, false, o?.p);
                     return 0;
                 }
                 else if (isRecordsFormat)
@@ -24439,7 +24439,7 @@ namespace Gekko
                 }
                 file.Flush();
             }
-            DlinkAutoDlinkFiles.HandleDlink(blob, false, o.p);
+            DlinkAutoDlinkFiles.HandleDlink(blob, false, o?.p);
             G.Writeln2("R export of " + o.list1.Count() + " matrices, " + fullFileName);            
         }
 
@@ -24488,7 +24488,7 @@ namespace Gekko
                 }
                 file.Flush();
             }
-            DlinkAutoDlinkFiles.HandleDlink(blob, false, o.p);
+            DlinkAutoDlinkFiles.HandleDlink(blob, false, o?.p);
             G.Writeln2("Python export of " + o.list1.Count() + " matrices, " + fullFileName);
         }
 

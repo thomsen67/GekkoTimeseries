@@ -214,7 +214,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
     public static class DlinkAutoDlinkFiles
     {
-        
+
         /// <summary>
         /// Handles blobs, for .dlink. p==null signals "always dlink".    
         /// </summary>
@@ -223,22 +223,23 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         {
             string hash = null;
             long? bytes = null;
-            if (force || Program.options.databank_dlink)
+            if (force || (G.Equal(Program.options.databank_dlink, "yes") || G.Equal(Program.options.databank_dlink, "run"))) //option is 'yes' or 'run'
             {
                 //Note: just because a .dlink file is constructed, this it not the same
                 //      as that it has to go into blobs storage.
 
-                string gcm = null;
+                bool force2 = true;                
                 try
                 {
-                    if (Program.options.databank_dlink_run)
+                    if (G.Equal(Program.options.databank_dlink, "run"))
                     {
-                        gcm = Path.GetFileName(p?.GetExecutingGcmFile(ERunningGcm.ExcludeProcFuncIgnoreExistence));
+                        string gcm = Path.GetFileName(p?.GetExecutingGcmFile(ERunningGcm.ExcludeProcFuncIgnoreExistence));
+                        if (G.NullOrBlanks(gcm)) force2 = false; //Only set false if: we have "run" option AND we are not inside a RUN job.
                     }
                 }
                 catch { }                
-                
-                if (force || !G.NullOrBlanks(gcm)) //We only want this done when a .gcm file is run with RUN. p==null signals "always dlink".
+
+                if (force || force2) //We only want this done when a .gcm file is run with RUN. p==null signals "always dlink".
                 {
 
                     string dlinkFile = DlinkCommon.Dlink_FromDataFileToDlinkFile(dataFile, false);
@@ -272,8 +273,8 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     }
                 }
             }
-        }        
-    }    
+        }
+    }
 
     /// <summary>
     /// For instance if Python creates a csv file. Or already existing .gbk files are to be put into Git as .dlink files.        
