@@ -24154,7 +24154,7 @@ namespace Gekko
                     if (G.Equal(o.opt_csv, "yes")) format = EdataFormat.Csv;
                     else if (G.Equal(o.opt_prn, "yes")) format = EdataFormat.Prn;
                     CheckSomethingToWrite(list2Sorted.Count);
-                    return CsvPrnWrite(list2Sorted, fileName, tStart, tEnd, format, G.Equal(o.opt_cols, "yes"), o.opt_dateformat, o.p);
+                    return CsvPrnWrite(list2Sorted, fileName, tStart, tEnd, format, G.Equal(o.opt_cols, "yes"), o.opt_dateformat, o?.p);
                 }
                 else if (G.Equal(o.opt_xls, "yes") || G.Equal(o.opt_xlsx, "yes"))
                 {
@@ -24179,14 +24179,14 @@ namespace Gekko
                     //
                     ErrorIfMatrix(variablesType);
                     CheckSomethingToWrite(list2Sorted.Count);
-                    return GnuplotWrite(list2Sorted, fileName, tStart, tEnd, o.p);
+                    return GnuplotWrite(list2Sorted, fileName, tStart, tEnd, o?.p);
                 }
                 else if (G.Equal(o.opt_tsp, "yes"))
                 {
                     //RECORDS
                     ErrorIfMatrix(variablesType);
                     CheckSomethingToWrite(list2Sorted.Count);
-                    return Tspwrite(list2Sorted, fileName, tStart, tEnd, isCaps, o.p);
+                    return Tspwrite(list2Sorted, fileName, tStart, tEnd, isCaps, o?.p);
                 }
                 else if (o.opt_gdx != null)
                 {
@@ -24275,19 +24275,19 @@ namespace Gekko
                     //first argument (the databank) is only used if list = null
                     if (isDefault)
                     {
-                        return WriteGbk(o.p, list, Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, writeOption, writeAllVariables, false, G.Equal(o.opt_trace, "no"));
+                        return WriteGbk(o?.p, list, Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, writeOption, writeAllVariables, false, G.Equal(o.opt_trace, "no"));
                     }
                     if (writeType == EDatabankWriteType.Tsd)
                     {                        
-                        return WriteTsd(list, Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, writeOption, writeAllVariables, false, o.p);
+                        return WriteTsd(list, Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, writeOption, writeAllVariables, false, o?.p);
                     }
                     else if (writeType == EDatabankWriteType.Flat)
                     {
-                        return WriteFlat(list2Sorted, tStart, tEnd, fileName, o.p);
+                        return WriteFlat(list2Sorted, tStart, tEnd, fileName, o?.p);
                     }
                     else if (writeType == EDatabankWriteType.Gcm)
                     {
-                        Program.WriteGcm(list2Sorted, tStart, tEnd, o.opt_op, fileName, o.p);
+                        Program.WriteGcm(list2Sorted, tStart, tEnd, o.opt_op, fileName, o?.p);
                         return 0;
                     }
                     else
@@ -33001,7 +33001,7 @@ namespace Gekko
         {
             if (G.Equal(Program.options.sheet_engine, "internal"))
             {
-                return WriteExcel_EPPlus(eo, oPrt, isMulprt, isMatrix, dateformat, datetype, oPrt.p);
+                return WriteExcel_EPPlus(eo, oPrt, isMulprt, isMatrix, dateformat, datetype, oPrt?.p);
             }
             else
             {
@@ -33017,7 +33017,7 @@ namespace Gekko
                 {
                     new Error("Option 'datetype' can only be used with 'option sheet engine = internal'.");
                 }
-                return WriteExcel_Interop(eo, oPrt, isMulprt, oPrt.p);
+                return WriteExcel_Interop(eo, oPrt, isMulprt, oPrt?.p);
             }
         }
 
