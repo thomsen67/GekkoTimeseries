@@ -5954,20 +5954,18 @@ namespace Gekko
             }
         }
 
-        public static T YamlReader<T>(string fileName)
+        public static T YamlReader<T>(string fileName, List<string> loopErrors = null)
         {
             T output = default(T);
             try
             {
                 string s = File.ReadAllText(fileName);
-                var deserializer = new YamlDotNet.Serialization.DeserializerBuilder()
-                    .IgnoreUnmatchedProperties()
-                    .Build();
-                output = deserializer.Deserialize<T>(s);
+                if (Globals.yamlDeserializer == null) Globals.yamlDeserializer = new YamlDotNet.Serialization.DeserializerBuilder().IgnoreUnmatchedProperties().Build();                
+                output = Globals.yamlDeserializer.Deserialize<T>(s);
             }
-            catch
+            catch (Exception ex)
             {
-                new Error("Yaml reader problem");
+                DlinkLoopErrors.Error("Problem reading ." + Program.options.databank_dlink_name + " file '" + fileName + "': " + ex.Message, loopErrors);
             }
             return output;
         }

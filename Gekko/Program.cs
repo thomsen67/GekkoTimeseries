@@ -3086,18 +3086,7 @@ namespace Gekko
 
             if (Globals.runningOnTTComputer)
             {
-                //List<string> loopErrors = new List<string>();
-                //Globals.showErrorsAsMessageBox = true;
-                //loopErrors.Add("Failing file 1...");
-                //loopErrors.Add("Failing file 2...");
-                //loopErrors.Add("Failing file 3...");
-                //loopErrors.Add("Failing file 4...");
-                //loopErrors.Add("Failing file 5 because bla bla bla bla bla blabla bla blabla bla blabla bla blabla bla blabla bla blabla bla blabla bla blabla bla blabla bla blabla bla blabla bla blabla bla bla");
-                //loopErrors.Add("Failing file 6 because bla bla bla bla bla blabla bla blabla bla blabla bla blabla bla blabla bla blabla bla blabla bla blabla bla blabla bla blabla bla blabla bla blabla bla bla");
-                //loopErrors.Add("Failing file 7 because bla bla bla bla bla blabla bla blabla bla blabla bla blabla bla blabla bla blabla bla blabla bla blabla bla blabla bla blabla bla blabla bla blabla bla bla");
-                //DlinkLoopErrors.Report("Dlink sync failed for " + loopErrors.Count + " file" + G.S(loopErrors.Count) + " (" + Globals.dlinkError + ")", loopErrors);
-
-
+                
                 if (text.ToLower().Contains("eqs"))
                 {
                     GamsModel.PrintScalarEquations();

@@ -276,7 +276,7 @@ namespace Gekko
 
             if (File.Exists(targetDlink))
             {
-                DlinkFile existing = G.YamlReader<DlinkFile>(targetDlink);
+                DlinkFile existing = G.YamlReader<DlinkFile>(targetDlink, null);
                 if (existing != null && G.Equal(existing.hash, result.ComputedHash))
                 {
                     result.Kind = DlinkImportRowKind.AlreadyInSync;

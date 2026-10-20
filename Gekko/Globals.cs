@@ -56,6 +56,7 @@ namespace Gekko
         public static bool tthDlink1 = false; //On TTH computer        
         public static bool tthDebug = false;
         public static string dlinkError = "." + Program.options.databank_dlink_name + " files and datafiles may not correspond";
+        public static YamlDotNet.Serialization.IDeserializer yamlDeserializer = null; //built once, reused (see YamlReader)
 
         // -------------------------------------
 

@@ -488,7 +488,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                             missingDlinkFiles.Add(dLinkFileWithPath);
                             continue;
                         }
-                        DlinkFile dlinkFileData = G.YamlReader<DlinkFile>(dLinkFileWithPath);
+                        DlinkFile dlinkFileData = G.YamlReader<DlinkFile>(dLinkFileWithPath, loopErrors);
                         EDlinkVersion dlinkVersion = DlinkCommon.ParseDiskVersion(dlinkFileData.version, loopErrors);
                         if (!DlinkCommon.IsVersionSupported(dlinkVersion)) DlinkLoopErrors.Error("Dlink file '" + dlinkFile2 + "' has dlink version " + dlinkFileData.version + ", which is unsupported in this Gekko version", loopErrors);
                         string dataFile = DlinkCommon.Dlink_FromDlinkFileToDataFile(dLinkFileWithPath, true, loopErrors);
