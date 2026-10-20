@@ -458,6 +458,9 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             List<string> putFiles = new List<string>();
             List<string> missingDlinkFiles = new List<string>();
             List<string> loopErrors = new List<string>(); //Errors inside the loop are collected here, and reported together after the loop
+            //Sizes/timestamps/existence via one directory listing per folder, instead of one disk request per file.
+            //Not for pre-commit: only a few files there, and listing their whole folders could cost more than it saves.
+            FolderListing listing = G.Equal(type, "pre-commit") ? null : new FolderListing();
             
             WindowDlinkGitHook progressWindow = new WindowDlinkGitHook("Data file sync (" + type + ")");
 
@@ -474,7 +477,8 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     try
                     {
                         string dLinkFileWithPath = Path.Combine(G.CleanupFolderName(gitFolder, false), G.CleanupFolderName(dlinkFile2, false));
-                        if (!File.Exists(dLinkFileWithPath))
+                        bool dlinkExists = listing != null ? listing.Get(dLinkFileWithPath).Exists : File.Exists(dLinkFileWithPath);
+                        if (!dlinkExists)
                         {
                             if (G.Equal(type, "pre-commit"))
                             {
@@ -496,7 +500,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                         {
                             DlinkLoopErrors.Error("Failed getting from .dlink file '" + dLinkFileWithPath + "' to data file name", loopErrors);
                         }
-                        FileInfo fi1 = new FileInfo(dataFile); //File may not exist                
+                        FileInfo fi1 = listing != null ? listing.Get(dataFile) : new FileInfo(dataFile); //File may not exist                
                         bool exists = fi1.Exists;
                         RealFile realFile = new RealFile(
                             fi1.FullName,
@@ -569,6 +573,39 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
             DlinkLoopErrors.Report("Dlink sync failed for " + loopErrors.Count + " file" + G.S(loopErrors.Count) + " (" + Globals.dlinkError + ")", loopErrors);
         }        
+
+        /// <summary>
+        /// Gets size and timestamp of files with one directory listing per folder, instead of one request per file:
+        /// a folder listing returns size and timestamps for all its files, so the FileInfo objects it gives back need no
+        /// further disk access for Exists, Length and LastWriteTimeUtc. A folder is listed the first time a file in it
+        /// is asked for. Lives only for one sync run (no caching between runs).
+        /// </summary>
+        private class FolderListing
+        {
+            private readonly Dictionary<string, Dictionary<string, FileInfo>> _folders = new Dictionary<string, Dictionary<string, FileInfo>>(StringComparer.OrdinalIgnoreCase);
+
+            /// <summary>Returns a FileInfo for the file; Exists, Length and LastWriteTimeUtc need no extra disk access.</summary>
+            public FileInfo Get(string fileNameAndPath)
+            {
+                fileNameAndPath = fileNameAndPath.Replace('/', '\\'); //paths from Git use '/', so the same folder always gets the same key
+                string folder = Path.GetDirectoryName(fileNameAndPath);
+                Dictionary<string, FileInfo> files;
+                if (!_folders.TryGetValue(folder, out files))
+                {
+                    files = new Dictionary<string, FileInfo>(StringComparer.OrdinalIgnoreCase);
+                    try
+                    {
+                        foreach (FileInfo fi in new DirectoryInfo(folder).EnumerateFiles()) files[fi.Name] = fi;
+                    }
+                    catch (DirectoryNotFoundException) { } //no folder --> no files in it
+                    catch { files = null; }                //access denied etc. --> ask per file, as before
+                    _folders[folder] = files;
+                }
+                FileInfo hit;
+                if (files != null && files.TryGetValue(Path.GetFileName(fileNameAndPath), out hit)) return hit;
+                return new FileInfo(fileNameAndPath); //not in the listing (rare): ask the disk directly, to be sure
+            }
+        }
 
         /// <summary>
         /// Returns true if .dlink and data files correspond: else data file must be fetched from blobs
