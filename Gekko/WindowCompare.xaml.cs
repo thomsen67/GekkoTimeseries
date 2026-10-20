@@ -4202,4 +4202,62 @@ namespace Gekko
             Children.Add(element);
         }
     }
+
+    // =========================== ADORNER =========================================
+
+    public sealed class InsertionLineAdorner : Adorner
+    {
+        static readonly Brush LineBrush = BankColors.FromRgb(0x1F, 0x4E, 0x79);
+        static readonly Pen LinePen = CreatePen();
+
+        bool visible;
+        double y, x1, x2;
+
+        public InsertionLineAdorner(UIElement adornedElement) : base(adornedElement)
+        {
+            IsHitTestVisible = false;
+        }
+
+        public void ShowLine(double lineY, double left, double right)
+        {
+            y = lineY;
+            x1 = left;
+            x2 = right;
+            visible = true;
+            InvalidateVisual();
+        }
+
+        public void HideLine()
+        {
+            if (!visible) return;
+            visible = false;
+            InvalidateVisual();
+        }
+
+        protected override void OnRender(DrawingContext dc)
+        {
+            if (!visible || x2 - x1 < 16) return;
+            dc.DrawLine(LinePen, new Point(x1, y), new Point(x2, y));
+
+            var arrows = new StreamGeometry();
+            using (StreamGeometryContext ctx = arrows.Open())
+            {
+                ctx.BeginFigure(new Point(x1, y - 5), true, true);
+                ctx.LineTo(new Point(x1 + 6, y), true, false);
+                ctx.LineTo(new Point(x1, y + 5), true, false);
+                ctx.BeginFigure(new Point(x2, y - 5), true, true);
+                ctx.LineTo(new Point(x2 - 6, y), true, false);
+                ctx.LineTo(new Point(x2, y + 5), true, false);
+            }
+            arrows.Freeze();
+            dc.DrawGeometry(LineBrush, null, arrows);
+        }
+
+        static Pen CreatePen()
+        {
+            var pen = new Pen(LineBrush, 2.5);
+            pen.Freeze();
+            return pen;
+        }
+    }
 }
