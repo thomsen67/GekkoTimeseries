@@ -3079,7 +3079,7 @@ namespace Gekko
         {
             if (text.ToLower().Contains("wcompare"))
             {
-                WindowBankCompare xx = new WindowBankCompare();
+                WindowCompare xx = new WindowCompare();
                 xx.ShowDialog();
                 return;
             }

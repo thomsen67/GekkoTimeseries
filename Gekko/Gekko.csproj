@@ -566,8 +566,8 @@
     <Compile Include="Translate_2_4_to_3_0.cs" />
     <Compile Include="VennView.cs" />
     <Compile Include="WarningPool.cs" />
-    <Compile Include="WindowBankCompare.xaml.cs">
-      <DependentUpon>WindowBankCompare.xaml</DependentUpon>
+    <Compile Include="WindowCompare.xaml.cs">
+      <DependentUpon>WindowCompare.xaml</DependentUpon>
     </Compile>
     <Compile Include="WindowDlink.xaml.cs">
       <DependentUpon>WindowDlink.xaml</DependentUpon>
@@ -766,7 +766,7 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="WindowBankCompare.xaml">
+    <Page Include="WindowCompare.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

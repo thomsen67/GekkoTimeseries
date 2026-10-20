@@ -198,7 +198,7 @@ namespace Gekko
     /// its own list, comparison and selection, so switching back and forth loses nothing. Clicking a file found in
     /// several folders opens those files in the Datafiles state.
     /// </summary>
-    public partial class WindowBankCompare : Window
+    public partial class WindowCompare : Window
     {
         enum CompareState { Datafiles, Folders }
 
@@ -336,7 +336,7 @@ namespace Gekko
         BankItem dragCandidate;
         InsertionLineAdorner insertionLine;
 
-        public WindowBankCompare()
+        public WindowCompare()
         {
             InitializeComponent();
             bankListSource = new CompositeCollection
@@ -2528,7 +2528,7 @@ namespace Gekko
         void Plot(List<string> names, string from, string to, CompareFreq? freq)
         {
             string list = string.Join(", ", names.Take(10)) + (names.Count > 10 ? ", ... (" + names.Count + " in all)" : "");
-            SetStatus("Plot " + list + " " + (from ?? "?") + "–" + (to ?? "?") + ": not wired up yet (WindowBankCompare.Plot).");
+            SetStatus("Plot " + list + " " + (from ?? "?") + "–" + (to ?? "?") + ": not wired up yet (WindowCompare.Plot).");
         }
 
         /// <summary>
