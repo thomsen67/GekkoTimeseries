@@ -532,7 +532,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                             //blob the .dlink points to exists in storage.
                             if (ResolveExistingBlob(storageFolder, dlinkFileData.hash, realFile.name) == null)
                             {
-                                new Error("For '" + realFile.name + "', could not find a storage file for hash '" + dlinkFileData.hash + "' under '" + storageFolder + "'. " + Globals.dlinkError + ".");
+                                new Error("For '" + realFile.name + "', a storage file with hash '" + dlinkFileData.hash + "' was not found under '" + storageFolder + "'. " + Globals.dlinkError + ". A possible issue may be versioned ." + Program.options.databank_dlink_name + " files that have changed but are not committed (or reverted) before pushing");
                             }
                         }
                         else
@@ -974,8 +974,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                         ZipArchiveEntry entry = archive.GetEntry("storage");
                         if (entry == null)
                         {                            
-                            new Error("File '" + storageFile + "' is a zip archive but has no 'storage' entry which was expected -- the file may be corrupt.");
-                            new Error();
+                            new Error("File '" + storageFile + "' is a zip archive but has no 'storage' entry which was expected -- the file may be corrupt.");                            
                         }
                         entry.ExtractToFile(tempPath, true);
                     }
