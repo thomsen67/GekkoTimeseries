@@ -219,7 +219,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// Handles blobs, for .dlink. p==null signals "always dlink".    
         /// </summary>
         /// <param name="dataFile"></param>
-        public static void HandleDlink(string dataFile, bool force, P p)
+        public static void HandleDlink(string dataFile, bool force, P p, List<string> loopErrors = null)
         {
             string hash = null;
             long? bytes = null;
@@ -252,11 +252,11 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     {
                         if (File.Exists(dataFile))
                         {
-                            hash = DlinkHooks.GetFileHash(dataFile);
+                            hash = DlinkHooks.GetFileHash(dataFile, DlinkCommon.CurrentVersion, loopErrors);
                         }
                         else
                         {
-                            new Error("The file '" + dataFile + "' does not exist for .dlink file construction");
+                            DlinkLoopErrors.Error("The file '" + dataFile + "' does not exist for .dlink file construction", loopErrors);
                         }
 
                         bytes = (new FileInfo(dataFile)).Length;
@@ -307,22 +307,24 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 new Error(s2);
             }
 
+            List<string> loopErrors = new List<string>(); //Errors inside the loop are collected here, and reported together after the loop
             try
             {
                 foreach (string dlinkFile2 in dlinkFiles) //Could probably be parallelized
                 {
-                    DlinkAutoDlinkFiles.HandleDlink(dlinkFile2, true, null);
+                    try
+                    {
+                        DlinkAutoDlinkFiles.HandleDlink(dlinkFile2, true, null, loopErrors);
+                    }
+                    catch (DlinkLoopErrorException) { } //Already in loopErrors
+                    catch (Exception ex) { loopErrors.Add(dlinkFile2 + ": " + ex.Message); }
                 }
-            }
-            catch
-            {
-                string s2 = "Producing " + dlinkFiles.Count + " dlink file" + G.S(dlinkFiles.Count) + " failed";
-                new Error(s2);
             }
             finally
             {
                 DlinkHashCache.Save(); //Persist any hashes computed above, even if the batch failed partway through
             }
+            DlinkLoopErrors.Report("Producing " + dlinkFiles.Count + " dlink file" + G.S(dlinkFiles.Count) + " failed for " + loopErrors.Count + " file" + G.S(loopErrors.Count), loopErrors);
             string s3 = "Producing " + dlinkFiles.Count + " dlink file" + G.S(dlinkFiles.Count) + " succeeded";
             if (function) new Writeln(s3);
             else Console.WriteLine(s3); //This will probably not show in output, but never mind
@@ -455,7 +457,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             List<string> getFilesOverwrite = new List<string>();
             List<string> putFiles = new List<string>();
             List<string> missingDlinkFiles = new List<string>();
-            List<string> errors = new List<string>();
+            List<string> loopErrors = new List<string>(); //Errors inside the loop are collected here, and reported together after the loop
             
             WindowDlinkGitHook progressWindow = new WindowDlinkGitHook("Data file sync (" + type + ")");
 
@@ -478,7 +480,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                             {
                                 //The list comes from the staged .dlink files. A staged .dlink that is missing on disk
                                 //cannot be checked here, and its data file may never have been stored: keep this an error.
-                                new Error("This ." + Program.options.databank_dlink_name + " file does not exist: '" + dLinkFileWithPath + "'");
+                                DlinkLoopErrors.Error("This ." + Program.options.databank_dlink_name + " file does not exist: '" + dLinkFileWithPath + "'", loopErrors);
                             }
                             //Tracked in the index but not in the working tree: a local deletion, or a file mid-restore
                             //(e.g. a TortoiseGit revert fires post-checkout once per file, and the .dlink file may not
@@ -487,12 +489,12 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                             continue;
                         }
                         DlinkFile dlinkFileData = G.YamlReader<DlinkFile>(dLinkFileWithPath);
-                        EDlinkVersion dlinkVersion = DlinkCommon.ParseDiskVersion(dlinkFileData.version);
-                        if (!DlinkCommon.IsVersionSupported(dlinkVersion)) new Error("Dlink file '" + dlinkFile2 + "' has dlink version " + dlinkFileData.version + ", which is unsupported in this Gekko version");
-                        string dataFile = DlinkCommon.Dlink_FromDlinkFileToDataFile(dLinkFileWithPath, true);
+                        EDlinkVersion dlinkVersion = DlinkCommon.ParseDiskVersion(dlinkFileData.version, loopErrors);
+                        if (!DlinkCommon.IsVersionSupported(dlinkVersion)) DlinkLoopErrors.Error("Dlink file '" + dlinkFile2 + "' has dlink version " + dlinkFileData.version + ", which is unsupported in this Gekko version", loopErrors);
+                        string dataFile = DlinkCommon.Dlink_FromDlinkFileToDataFile(dLinkFileWithPath, true, loopErrors);
                         if (G.NullOrBlanks(dataFile))
                         {
-                            new Error("Failed getting from .dlink file '" + dLinkFileWithPath + "' to data file name");
+                            DlinkLoopErrors.Error("Failed getting from .dlink file '" + dLinkFileWithPath + "' to data file name", loopErrors);
                         }
                         FileInfo fi1 = new FileInfo(dataFile); //File may not exist                
                         bool exists = fi1.Exists;
@@ -519,11 +521,11 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                         // --------------------------------------------------------------------------------------------------                                
 
                         //After this method call, realFile may change regarding .hash and .exists fields (and only those)
-                        bool doDlinkFileAndDataFileCorrespond = DoDlinkFileAndDataFileCorrespond(realFile.name, dlinkFileData, ref realFile); //regarding last two args: either both non-null or both null
+                        bool doDlinkFileAndDataFileCorrespond = DoDlinkFileAndDataFileCorrespond(realFile.name, dlinkFileData, ref realFile, loopErrors); //regarding last two args: either both non-null or both null
                         if (doDlinkFileAndDataFileCorrespond)
                         {
                             //Check that we have the file in blobs folder, else add it there. This happens when making a brand new datafile
-                            SyncStorage(false, realFile.name, dlinkFileData.hash, storageFolder, getFilesNew, getFilesOverwrite, putFiles, dlinkVersion);
+                            SyncStorage(false, realFile.name, dlinkFileData.hash, storageFolder, getFilesNew, getFilesOverwrite, putFiles, dlinkVersion, loopErrors);
                         }
                         else if (realFile.exists && G.Equal(type, "pre-push"))
                         {
@@ -532,13 +534,13 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                             //blob the .dlink points to exists in storage.
                             if (ResolveExistingBlob(storageFolder, dlinkFileData.hash, realFile.name) == null)
                             {
-                                new Error("For '" + realFile.name + "', a storage file with hash '" + dlinkFileData.hash + "' was not found under '" + storageFolder + "'. " + Globals.dlinkError + ". A possible issue may be versioned ." + Program.options.databank_dlink_name + " files that have changed but are not committed (or reverted) before pushing");
+                                DlinkLoopErrors.Error("For '" + realFile.name + "', a storage file with hash '" + dlinkFileData.hash + "' was not found under '" + storageFolder + ". A possible issue may be versioned ." + Program.options.databank_dlink_name + " files that have changed but are not committed (or reverted) before pushing", loopErrors);
                             }
                         }
                         else
                         {
                             //Get it from blobs (A or B)
-                            SyncStorage(true, realFile.name, dlinkFileData.hash, storageFolder, getFilesNew, getFilesOverwrite, putFiles, dlinkVersion);
+                            SyncStorage(true, realFile.name, dlinkFileData.hash, storageFolder, getFilesNew, getFilesOverwrite, putFiles, dlinkVersion, loopErrors);
                             FileInfo fi2 = new FileInfo(realFile.name);
                             //We update the realFile, because its contents have changed
                             realFile = new RealFile(realFile.name, dlinkFileData.hash, fi2.Length, fi2.LastWriteTimeUtc, true);
@@ -552,14 +554,12 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                             progressStopwatch.Restart();
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        errors.Add(dlinkFile2);
-                    }                    
+                    catch (DlinkLoopErrorException) { } //Already in loopErrors
+                    catch (Exception ex) { loopErrors.Add(dlinkFile2 + ": " + ex.Message); }                    
                 }
                 DlinkHashCache.Save(); //Persist any hashes computed while checking this batch of .dlink files
 
-                string report = BuildSyncReportText(type, getFilesNew, getFilesOverwrite, putFiles, missingDlinkFiles);
+                string report = (loopErrors.Count > 0 ? "ERROR: " + loopErrors.Count + " file" + G.S(loopErrors.Count) + " could not be synchronized, details are shown after you click OK." + G.NL + G.NL : "") + BuildSyncReportText(type, getFilesNew, getFilesOverwrite, putFiles, missingDlinkFiles);
                 progressWindow.Finish(report); //fills the report in, enables OK, and lets ShowDialog() below return once the user dismisses it
             });
             worker.IsBackground = true;            
@@ -567,10 +567,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             worker.Start();            
             progressWindow.ShowDialog();
 
-            if (errors.Count > 0)
-            {
-                new Error("Dlink sync failed for " + errors.Count + " file" + G.S(errors.Count) + " (" + Globals.dlinkError + "):" + G.NL + string.Join(G.NL, errors));
-            }
+            DlinkLoopErrors.Report("Dlink sync failed for " + loopErrors.Count + " file" + G.S(loopErrors.Count) + " (" + Globals.dlinkError + ")", loopErrors);
         }        
 
         /// <summary>
@@ -581,7 +578,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// <param name="dlinkFileData"></param>
         /// <param name="fi"></param>
         /// <returns></returns>
-        public static bool DoDlinkFileAndDataFileCorrespond(string dataFile, DlinkFile dlinkFileData, ref RealFile realFile)
+        public static bool DoDlinkFileAndDataFileCorrespond(string dataFile, DlinkFile dlinkFileData, ref RealFile realFile, List<string> loopErrors = null)
         {
             //When this method is called, dataFile does not have a hash code because it is costly to compute
             //We try to take the hash code from cache
@@ -597,10 +594,10 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             //Hash the live file under THIS .dlink record's OWN version, not whatever is current --
             //an old v1.1 file must keep being checked by v1.1's rules even once a newer Gekko build's
             //CurrentVersion has moved on to v1.2/v1.3/etc.
-            EDlinkVersion dlinkVersion = DlinkCommon.ParseDiskVersion(dlinkFileData.version);
+            EDlinkVersion dlinkVersion = DlinkCommon.ParseDiskVersion(dlinkFileData.version, loopErrors);
             //We now need to calc the sha256 physically (or for newer .gbk files: fetch data hash).
             //The hash may be gotten from cache file though.
-            string realHash = GetFileHash(dataFile, realFile.bytes.Value, realFile.stamp.Value, dlinkVersion);
+            string realHash = GetFileHash(dataFile, realFile.bytes.Value, realFile.stamp.Value, dlinkVersion, loopErrors);
             realFile = new RealFile(realFile.name, realHash, realFile.bytes, realFile.stamp, true);
             if (dlinkFileData.hash != realHash)
             {                
@@ -703,10 +700,10 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             return GetFileHash(filePath, DlinkCommon.CurrentVersion);
         }
 
-        public static string GetFileHash(string filePath, EDlinkVersion dlinkVersion)
+        public static string GetFileHash(string filePath, EDlinkVersion dlinkVersion, List<string> loopErrors = null)
         {
             FileInfo fi = new FileInfo(filePath);
-            return GetFileHash(filePath, fi.Length, fi.LastWriteTimeUtc, dlinkVersion);
+            return GetFileHash(filePath, fi.Length, fi.LastWriteTimeUtc, dlinkVersion, loopErrors);
         }
 
         public static string GetFileHash(string filePath, long knownSize, DateTime knownLastWriteUtc)
@@ -728,7 +725,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             return filePath + "|dlinkVersion=" + dlinkVersion;
         }
 
-        public static string GetFileHash(string filePath, long knownSize, DateTime knownLastWriteUtc, EDlinkVersion dlinkVersion)
+        public static string GetFileHash(string filePath, long knownSize, DateTime knownLastWriteUtc, EDlinkVersion dlinkVersion, List<string> loopErrors = null)
         {
             if (G.DlinkDebug()) MessageBox.Show("Getting hash from " + filePath);
 
@@ -742,7 +739,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 return cachedHash;
             }            
 
-            string hash = ComputeHashUncached(filePath, dlinkVersion);
+            string hash = ComputeHashUncached(filePath, dlinkVersion, null, loopErrors);
 
             // ---- Remember this result for next time -----------------------------------------            
             DlinkHashCache.Set(cacheKey, knownSize, knownLastWriteUtc, hash);
@@ -751,14 +748,14 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             return hash;
         }        
 
-        private static string ComputeHashUncached(string filePath, EDlinkVersion dlinkVersion, string forceFileType = null)
+        private static string ComputeHashUncached(string filePath, EDlinkVersion dlinkVersion, string forceFileType = null, List<string> loopErrors = null)
         {
             // Every ".px"/".gbk" special case -- including .gbk's data-hash-from-zip extraction, and
             // the "which extension is even valid as a forceFileType" check -- lives in exactly one
             // place: DlinkCommon.GetSha256FromFileWithDlink's VersionRegistry. This method doesn't need
             // to know either extension string, branch on EDlinkHashKind, or decide which version is
             // "current" itself -- the caller (GetFileHash / VerifyFetchedBlobHash) decides that.
-            return DlinkCommon.GetSha256FromFileWithDlink(filePath, dlinkVersion, forceFileType);
+            return DlinkCommon.GetSha256FromFileWithDlink(filePath, dlinkVersion, forceFileType, loopErrors);
         }
 
         /// <summary>
@@ -818,7 +815,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             return null;
         }
 
-        public static void SyncStorage(bool isGet, string fileNameAndPath, string sha256, string storageFolder, List<string> getFilesNew, List<string> getFilesOverwrite, List<string> putFiles, EDlinkVersion dlinkVersion = DlinkCommon.CurrentVersion)
+        public static void SyncStorage(bool isGet, string fileNameAndPath, string sha256, string storageFolder, List<string> getFilesNew, List<string> getFilesOverwrite, List<string> putFiles, EDlinkVersion dlinkVersion = DlinkCommon.CurrentVersion, List<string> loopErrors = null)
         {
             // This uses atomic writes.
 
@@ -830,7 +827,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 BlobLocation location = ResolveExistingBlob(storageFolder, sha256, fileNameAndPath);
                 if (location == null)
                 {
-                    new Error("For '" + fileNameAndPath + "', could not find a storage file for hash '" + sha256 + "' under '" + storageFolder + "'. " + Globals.dlinkError + ".");
+                    DlinkLoopErrors.Error("For '" + fileNameAndPath + "', could not find a storage file for hash '" + sha256 + "' under '" + storageFolder + "'.", loopErrors);
                 }
                 else
                 {
@@ -839,7 +836,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     //dlinkVersion passed through so the re-fetched content is verified under the SAME
                     //version's hash rules this .dlink record was written with (defaults to
                     //DlinkCommon.CurrentVersion for any caller that doesn't know a specific version).
-                    StorageFileGet(fileNameAndPath, location.path, location.zipped, sha256, dlinkVersion); //New: sha256 passed through so StorageFileGet can verify the fetched content
+                    StorageFileGet(fileNameAndPath, location.path, location.zipped, sha256, dlinkVersion, loopErrors); //New: sha256 passed through so StorageFileGet can verify the fetched content
                 }
             }
             else
@@ -865,7 +862,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     string level2 = sha256.Substring(2, 2);
                     string storageFile = Path.Combine(storageFolder, level1, level2, sha256 + (storageZipped ? "_z" : "_r"));
                     Directory.CreateDirectory(Path.Combine(storageFolder, level1, level2));
-                    StorageFilePut(fileNameAndPath, storageFile, storageZipped);
+                    StorageFilePut(fileNameAndPath, storageFile, storageZipped, loopErrors);
                     putFiles.Add(fileNameAndPath);
                 }
                 DlinkHashCache.SetStorageFileConfirmed(HashCacheKey(fileNameAndPath, dlinkVersion), sha256);
@@ -880,7 +877,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// only ever appears under its real name once writeAction has fully finished -- a crash or
         /// exception mid-write leaves only an orphaned temp file behind, never a corrupt finalPath.        
         /// </summary>
-        private static void AtomicWrite(string finalPath, bool ifAbsentOnly, Action<string> writeAction)
+        private static void AtomicWrite(string finalPath, bool ifAbsentOnly, Action<string> writeAction, List<string> loopErrors = null)
         {
             string folder = Path.GetDirectoryName(finalPath);
             Directory.CreateDirectory(folder);
@@ -918,7 +915,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     {                        
                         if (!File.Exists(finalPath))
                         {
-                            new Error("Failed to write '" + finalPath + "' from temp file '" + tempPath + "': " + ex.Message);                            
+                            DlinkLoopErrors.Error("Failed to write '" + finalPath + "' from temp file '" + tempPath + "': " + ex.Message, loopErrors);                            
                         }
                     }
                 }
@@ -956,7 +953,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             }
         }
 
-        private static void StorageFileGet(string fileNameAndPath, string storageFile, bool blobZipped, string expectedHash, EDlinkVersion dlinkVersion)
+        private static void StorageFileGet(string fileNameAndPath, string storageFile, bool blobZipped, string expectedHash, EDlinkVersion dlinkVersion, List<string> loopErrors = null)
         {
             //We always create the folder in case it does not already exist. For cloning this is obviously important.
             Directory.CreateDirectory(Path.GetDirectoryName(fileNameAndPath));
@@ -974,7 +971,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                         ZipArchiveEntry entry = archive.GetEntry("storage");
                         if (entry == null)
                         {                            
-                            new Error("File '" + storageFile + "' is a zip archive but has no 'storage' entry which was expected -- the file may be corrupt.");                            
+                            DlinkLoopErrors.Error("File '" + storageFile + "' is a zip archive but has no 'storage' entry which was expected -- the file may be corrupt.", loopErrors);                            
                         }
                         entry.ExtractToFile(tempPath, true);
                     }
@@ -982,8 +979,8 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
                 //Verify the just-fetched content actually hashes to what the .dlink file
                 //expects, BEFORE AtomicWrite (running next). 
-                VerifyFetchedBlobHash(tempPath, fileNameAndPath, expectedHash, dlinkVersion);
-            });
+                VerifyFetchedBlobHash(tempPath, fileNameAndPath, expectedHash, dlinkVersion, loopErrors);
+            }, loopErrors);
             G.ReadOnlyRemove(fileNameAndPath);
             //Like Git on checkout: a file fetched from storage gets the current time as its timestamp, not the
             //timestamp carried along from storage (File.Copy and ExtractToFile both keep the stored file's time).
@@ -992,18 +989,18 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             File.SetLastWriteTimeUtc(fileNameAndPath, DateTime.UtcNow);
         }
 
-        private static void VerifyFetchedBlobHash(string tempPath, string originalFileNameAndPath, string expectedHash, EDlinkVersion dlinkVersion)
+        private static void VerifyFetchedBlobHash(string tempPath, string originalFileNameAndPath, string expectedHash, EDlinkVersion dlinkVersion, List<string> loopErrors = null)
         {
             string extension = Path.GetExtension(originalFileNameAndPath);            
             string forceFileType = DlinkCommon.IsRecognizedForceFileType(dlinkVersion, extension) ? extension : null;
-            string actualHash = ComputeHashUncached(tempPath, dlinkVersion, forceFileType);
+            string actualHash = ComputeHashUncached(tempPath, dlinkVersion, forceFileType, loopErrors);
             if (!G.Equal(actualHash, expectedHash))
             {
-                new Error("Fetched storage file for '" + originalFileNameAndPath + "' does not match its expected hash (expected '" + expectedHash + "', got '" + actualHash + "') -- the stored file may be missing, corrupted, or have been replaced.");
+                DlinkLoopErrors.Error("Fetched storage file for '" + originalFileNameAndPath + "' does not match its expected hash (expected '" + expectedHash + "', got '" + actualHash + "') -- the stored file may be missing, corrupted, or have been replaced.", loopErrors);
             }
         }
 
-        private static void StorageFilePut(string fileName, string storageFile, bool blobZipped)
+        private static void StorageFilePut(string fileName, string storageFile, bool blobZipped, List<string> loopErrors = null)
         {            
             AtomicWrite(storageFile, true, tempPath =>
             {
@@ -1026,7 +1023,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                         }
                     }
                 }
-            });
+            }, loopErrors);
             G.ReadOnlySet(storageFile);
         }
     }    
@@ -1352,9 +1349,9 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         {
             public readonly string Extension;
             public readonly EDlinkHashKind HashKind;            
-            public readonly Func<string, string> Hasher;
+            public readonly Func<string, List<string>, string> Hasher; //2nd arg: loopErrors
 
-            public ExtensionRule(string extension, EDlinkHashKind hashKind, Func<string, string> hasher)
+            public ExtensionRule(string extension, EDlinkHashKind hashKind, Func<string, List<string>, string> hasher)
             {
                 Extension = extension;
                 HashKind = hashKind;
@@ -1389,7 +1386,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// hashing the .gbk's raw bytes. Returns null if that fails or isn't present, in which case
         /// the caller falls back to a plain physical-file hash of the .gbk itself.
         /// </summary>
-        private static string ExtractGbkDataHashV1_1(string filePath)
+        private static string ExtractGbkDataHashV1_1(string filePath, List<string> loopErrors)
         {
             string hash = null;
             using (ZipArchive archive = ZipFile.OpenRead(filePath))
@@ -1409,7 +1406,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                         }
                         catch
                         {
-                            new Error("Could not extract data hash from inside .gbk file (" + Globals.databankInfoName + ").\nFile: " + filePath);
+                            DlinkLoopErrors.Error("Could not extract data hash from inside .gbk file (" + Globals.databankInfoName + ").\nFile: " + filePath, loopErrors);
                         }
                     }
                 }
@@ -1436,7 +1433,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             [EDlinkVersion.v1_1] = new VersionSpec("1.1", isSupported: true, extensionRules: new[]
             {
                 new ExtensionRule(".px", EDlinkHashKind.PxContentHash,
-                    hasher: filePath => G.FileHasher.GetSha256ExcludingLine(filePath, CreationDatePrefixV1_1)),
+                    hasher: (filePath, loopErrors) => G.FileHasher.GetSha256ExcludingLine(filePath, CreationDatePrefixV1_1)),
                 new ExtensionRule(".gbk", EDlinkHashKind.GbkDataHash,
                     hasher: ExtractGbkDataHashV1_1),
             }),
@@ -1510,13 +1507,13 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// EDlinkVersion.None) for a version string this build has never heard of -- e.g. a file
         /// written by a newer Gekko than the one reading it.
         /// </summary>
-        public static EDlinkVersion ParseDiskVersion(string diskVersion)
+        public static EDlinkVersion ParseDiskVersion(string diskVersion, List<string> loopErrors = null)
         {
             foreach (KeyValuePair<EDlinkVersion, VersionSpec> kv in VersionRegistry)
             {
                 if (G.Equal(diskVersion, kv.Value.DiskVersionString)) return kv.Key;
             }
-            new Error("Dlink file has version '" + diskVersion + "', which is not recognized in this Gekko version.");
+            DlinkLoopErrors.Error("Dlink file has version '" + diskVersion + "', which is not recognized in this Gekko version.", loopErrors);
             return EDlinkVersion.None;
         }
 
@@ -1531,7 +1528,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             return FindRule(dlinkVersion, extension)?.HashKind ?? EDlinkHashKind.PhysicalFileHash;
         }
 
-        public static string Dlink_FromDlinkFileToDataFile(string dlinkFile, bool reportError)
+        public static string Dlink_FromDlinkFileToDataFile(string dlinkFile, bool reportError, List<string> loopErrors = null)
         {
             //m1                 K:\MAKROBK\tth\test\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink
             //m2                 tth\test\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink
@@ -1544,19 +1541,19 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
 
             if (!Path.IsPathRooted(Program.options.databank_dlink_folder_progs))
             {
-                if (reportError) new Error("Expected path '" + Program.options.databank_dlink_folder_progs + "' to be absolute (option databank dlink folder progs)");
+                if (reportError) DlinkLoopErrors.Error("Expected path '" + Program.options.databank_dlink_folder_progs + "' to be absolute (option databank dlink folder progs)", loopErrors);
                 else return null;
             }
             List<string> dataStart1 = Stringlist.Path_FromStringToList(Program.options.databank_dlink_folder_progs);
             if (!Path.IsPathRooted(Program.options.databank_dlink_folder_data))
             {
-                if (reportError) new Error("Expected path '" + Program.options.databank_dlink_folder_data + "' to be absolute (option databank dlink folder data)");
+                if (reportError) DlinkLoopErrors.Error("Expected path '" + Program.options.databank_dlink_folder_data + "' to be absolute (option databank dlink folder data)", loopErrors);
                 else return null;
             }
             List<string> dataStart2 = Stringlist.Path_FromStringToList(Program.options.databank_dlink_folder_data);
             if (!Path.IsPathRooted(dlinkFile))
             {
-                if (reportError) new Error("Expected path '" + dlinkFile + "' to be absolute (.dlink file)");
+                if (reportError) DlinkLoopErrors.Error("Expected path '" + dlinkFile + "' to be absolute (.dlink file)", loopErrors);
                 else return null;
             }
             List<string> m1 = Stringlist.Path_FromStringToList(dlinkFile);
@@ -1628,11 +1625,11 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// only right for a brand-new file that has no existing version to respect).</param>
         /// <param name="forceFileType">null (default) to use filePath's own extension; otherwise an extension dlinkVersion treats specially (".px"/".gbk" for v1_1).</param>
         /// <returns></returns>
-        public static string GetSha256FromFileWithDlink(string filePath, EDlinkVersion dlinkVersion, string forceFileType = null)
+        public static string GetSha256FromFileWithDlink(string filePath, EDlinkVersion dlinkVersion, string forceFileType = null, List<string> loopErrors = null)
         {
             if (forceFileType != null && !IsRecognizedForceFileType(dlinkVersion, forceFileType))
             {
-                new Error("forceFileType must be null, or an extension '" + dlinkVersion + "' treats specially -- got '" + forceFileType + "'.");
+                DlinkLoopErrors.Error("forceFileType must be null, or an extension '" + dlinkVersion + "' treats specially -- got '" + forceFileType + "'.", loopErrors);
             }
 
             if (!IsVersionSupported(dlinkVersion))
@@ -1641,7 +1638,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 // marked IsSupported == true -- a genuinely unregistered enum member can't reach this
                 // line at all, since DlinkCommon's static constructor already refused to let the
                 // program start in that case.
-                new Error("Dlink version '" + dlinkVersion + "' is not supported for hashing.");
+                DlinkLoopErrors.Error("Dlink version '" + dlinkVersion + "' is not supported for hashing.", loopErrors);
             }
             else
             {
@@ -1649,7 +1646,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 ExtensionRule rule = FindRule(dlinkVersion, effectiveExtension);
                 if (rule != null)
                 {
-                    string specialHash = rule.Hasher(filePath);
+                    string specialHash = rule.Hasher(filePath, loopErrors);
                     if (specialHash != null)
                     {
                         if (G.DlinkDebug()) MessageBox.Show(rule.HashKind == EDlinkHashKind.GbkDataHash ? "Getting hash from xml" : "Getting hash from content hash");
@@ -1663,5 +1660,53 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             string hash = G.FileHasher.GetSha256FromFile(filePath);
             return hash;
         }
+    }
+
+    // ================================================================================================
+    // Errors inside file loops.
+    //
+    // Methods that may be called from a file loop take an optional "List<string> loopErrors = null" argument and
+    // call DlinkLoopErrors.Error(text, loopErrors) instead of new Error(text):
+    //   - loopErrors == null: exactly as before, new Error(text) (popup or output window, then GekkoException).
+    //   - loopErrors != null: the text is added to loopErrors, and a DlinkLoopErrorException is thrown (no popup).
+    //     The loop catches it and goes on with the next file. After the loop, DlinkLoopErrors.Report() shows
+    //     all the collected errors together.
+    // ================================================================================================
+    public static class DlinkLoopErrors
+    {
+        public static void Error(string text, List<string> loopErrors)
+        {
+            if (loopErrors == null)
+            {
+                new Gekko.Error(text); //as before
+                return;
+            }
+            lock (loopErrors) loopErrors.Add(text);
+            throw new DlinkLoopErrorException(); //stops the current file, like Error() would, but without a popup
+        }
+
+        /// <summary>
+        /// After a file loop: does nothing if loopErrors is empty. Else ONE error with all the collected texts.
+        /// From a Git hook (popups), it is a WindowDlinkErrors window, followed by a GekkoException, so Gekko.exe returns
+        /// an error code and Git stops. Inside Gekko, it is a normal Error() in the output window.
+        /// </summary>
+        public static void Report(string headline, List<string> loopErrors)
+        {
+            if (loopErrors == null || loopErrors.Count == 0) return;
+            string text = string.Join(G.NL + G.NL, loopErrors);
+            if (Globals.showErrorsAsMessageBox)
+            {
+                WindowDlinkErrors.ShowErrors("Data file errors", headline, text);
+                throw new GekkoException();
+            }
+            new Error(headline + ":" + G.NL + G.NL + text);
+        }
+    }
+
+    /// <summary>
+    /// Thrown by DlinkLoopErrors.Error() when the error text has been put into loopErrors. Caught in the file loop.
+    /// </summary>
+    public class DlinkLoopErrorException : Exception
+    {
     }
 }

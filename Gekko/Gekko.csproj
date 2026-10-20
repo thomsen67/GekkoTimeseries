@@ -572,6 +572,9 @@
     <Compile Include="WindowDlink.xaml.cs">
       <DependentUpon>WindowDlink.xaml</DependentUpon>
     </Compile>
+    <Compile Include="WindowDlinkErrors.xaml.cs">
+      <DependentUpon>WindowDlinkErrors.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WindowDlinkGitHook.xaml.cs">
       <DependentUpon>WindowDlinkGitHook.xaml</DependentUpon>
     </Compile>
@@ -782,6 +785,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="WindowDlink.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WindowDlinkErrors.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
