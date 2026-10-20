@@ -487,7 +487,6 @@
       <DependentUpon>GuiDialogMakeBatfile.cs</DependentUpon>
     </Compile>
     <Compile Include="Hashing.cs" />
-    <Compile Include="HistogramView.cs" />
     <Compile Include="IBank.cs" />
     <Compile Include="GuiInputBox.cs" />
     <Compile Include="InsertionLineAdorner.cs" />
