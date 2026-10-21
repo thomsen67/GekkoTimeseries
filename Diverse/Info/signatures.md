@@ -1,7 +1,7 @@
 [🏠 Home](../../README.md)
 # Signatures/checksums
 
-At the moment, Gekko uses SHA1 checksums. You may download a Gekko version and drag & drop the downloaded file onto [this online SHA1 page](https://emn178.github.io/online-tools/sha1_checksum.html). You may alternatively use the Microsoft command line tools [Sigcheck](https://docs.microsoft.com/en-us/sysinternals/downloads/sigcheck) (with `-h` option) or [fciv](https://www.microsoft.com/en-us/download/details.aspx?id=11533) (with `-sha1` option). If you get the same checksum, the file has not been tampered with since it was compiled.
+At the moment, Gekko uses SHA1 checksums. You may download a Gekko version and drag & drop the downloaded file onto [this online SHA1 page](https://emn178.github.io/online-tools/sha1_checksum.html). You may alternatively use the Microsoft command line tool [Sigcheck](https://docs.microsoft.com/en-us/sysinternals/downloads/sigcheck) (with `-h` option). If you get the same checksum, the file has not been tampered with since it was compiled.
 
 **Gekko 3.3.4**
 

@@ -5,7 +5,7 @@ On this page, you will find development versions, i.e. versions with an uneven n
 
 The Gekko installers are very easy to use on Windows with these three steps: (1) close any open Gekko’s, (2) uninstall Gekko, and (3) download and install InstallerForGekko.msi. In step (3), you may have to skip a Windows warning. Regarding installation of the **Gekcel** add-in for Excel, read more [here](https://t-t.dk/gekko/docs/user-manual/index.html?gekcel_guided_tour.htm). Regarding installation of the **PyGekko** package for Python, read more [here](https://t-t.dk/gekko/docs/user-manual/index.html?pygekko_basics.htm). Regarding text editors, you may get syntax coloring in VS Code or Cursor: just search for “Gekko” under extensions.
 
-When downloading files from here, please check the digital signatures afterwards.
+When downloading files from the links below, please check the digital signatures afterwards.
 
 ---
 

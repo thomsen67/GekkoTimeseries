@@ -4,7 +4,7 @@ Gekko is for timeseries handling, and solving of large-scale economic models.
 <span style="color: red">**NOTE**</span>: Due to recent security vulnerabilities regarding PHP and WordPress, the Gekko editor has decided to replace the Gekko [website](https://t-t.dk/gekko) with a simple HTML page. The plan is to transform the old site to more simple static HTML pages, and to only offer downloads of Gekko via a GitHub page. So for now (Oct. 22, 2026), you may use the following
 links to download the latest Gekko development versions and access the online Gekko help system:
 
-* [Download Gekko versions](/Diverse/Info/downloads.md)
+* [Download Gekko versions](/Diverse/Info/downloads-dev.md)
 * [Online Gekko help system](https://t-t.dk/gekko/docs/user-manual/index.html?introduction.htm)
 
 ---
