@@ -1,6 +1,14 @@
 # Gekko Timeseries And Modeling Software
 Gekko is for timeseries handling, and solving of large-scale economic models.
 
+<span style="color: red">**NOTE**</span>: Due to recent security vulnerabilities regarding PHP and WordPress, the Gekko editor has decided to replace the Gekko [website](https://t-t.dk/gekko) with a simple HTML page. The plan is to transform the old site to more simple static HTML pages, and to only offer downloads of Gekko via a GitHub page. So for now (Oct. 22, 2026), you may use the following
+links to download the latest Gekko development versions and access the online Gekko help system:
+
+* [Download Gekko versions](/Diverse/Info/downloads.md)
+* [Online Gekko help system](https://t-t.dk/gekko/docs/user-manual/index.html?introduction.htm)
+
+---
+
 Gekko is an open-source time-series oriented software package for handling and analyzing timeseries data, and for solving and analyzing large-scale economic models. Since 2009, Gekko is being used by Danish ministeries, banks, interest groups and universities, for the simulation of economic and energy-related models. It is also used to show and analyze GAMS models. The software runs under Windows (.NET), and is licenced under GNU GPL.
 
 [![Main window](Diverse/gekko_windows2.png "Main window")](Diverse/gekko_windows1.png "Main window")
@@ -25,13 +33,13 @@ Some features:
 * Open source. No licenses to compilers etc. -- everything used is C#/.NET (+ gnuplot and x12a). So everything is open-source, and therefore free of charge.
 
 ## More Gekko info:
-* [Gekko main homepage](http://www.t-t.dk/gekko)
-* [New features (3.2)](http://t-t.dk/gekko/docs/user-manual/index.html?i_new_features.htm)
+* [Gekko main homepage](https://t-t.dk/gekko)
+* [New features (3.2)](https://t-t.dk/gekko/docs/user-manual/index.html?i_new_features.htm)
 * [Releases on GitHub](https://github.com/thomsen67/GekkoTimeseries/releases)
 
 ## Contributing + source code
 * You may fork and clone the source code from here, or simply download it as a zip file. You may consider working on a stable release like 3.2, but a development version 3.3.x is also fine as a starting point.
-* [Source code documentation](http://t-t.dk/gekko/source-code-doc)
+* [Source code documentation](https://t-t.dk/gekko/source-code-doc)
 * Advice on running the code in Visual Studion 2017 (or later): open the solution file (GekkoCS.sln) with Visual Studio. Make sure that the solution configuration is set to "Debug" and the solution platform is set to "Any CPU". Also make sure that the Gekko project is chosen as "StartUp Project". Next, it should be possible to start the Gekko application under Visual Studio by simply pressing F5. If you change the ANTLR .g syntax definition files, use the .bat files to transform to C# (this demands Java and ANTLR 3.1.3).
 * Please note that the software is open source (GNU GPL). That is, it is free of charge, but the source code cannot be used in commercial applications. The source code can only be used and modified in other open source projects.
 
