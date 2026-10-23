@@ -171,12 +171,23 @@ namespace Gekko
 
         public GekkoDictionary<string, IVariable> StorageFlattenedArrayTimeseries()
         {
+            return StorageFlattenedArrayTimeseries(null, false);
+        }
+
+        /// <summary>
+        /// May filter with freq if != null or get only series if true.
+        /// </summary>
+        /// <param name="freq"></param>
+        /// <returns></returns>
+        public GekkoDictionary<string, IVariable> StorageFlattenedArrayTimeseries(EFreq? freq, bool onlySeries)
+        {
             GekkoDictionary<string, IVariable> rv = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
             foreach (KeyValuePair<string, IVariable> kvp in this.storage)
             {
                 if (kvp.Value.Type() == EVariableType.Series)
                 {
                     Series ts = kvp.Value as Series;
+                    if (freq != null && ts.freq != freq) continue;
                     if (ts.type == ESeriesType.ArraySuper)
                     {
                         foreach (KeyValuePair<MultidimElement, IVariable> kvp2 in ts.dimensionsStorage.storage)
@@ -192,8 +203,33 @@ namespace Gekko
                 }
                 else
                 {
+                    if (onlySeries) continue;
                     rv.Add(kvp.Key, kvp.Value);
                 }
+            }
+            return rv;
+        }
+
+        /// <summary>
+        /// Gets list of frequencies for all series in the databank (starts with a, then q, ... but follows enum order so is a bit bad after M freq)
+        /// </summary>
+        /// <returns></returns>
+        public List<EFreq> Frequencies()
+        {
+            List<EFreq> rv = new List<EFreq>();
+            int n = 1000; //should be more than enough...            
+            bool[] freqs = new bool[n]; 
+            foreach (KeyValuePair<string, IVariable> kvp in this.storage)
+            {
+                if (kvp.Value.Type() == EVariableType.Series)
+                {
+                    Series ts = kvp.Value as Series;
+                    freqs[(int)ts.freq] = true;
+                }                
+            }
+            for (int i = 0; i < n; i++)
+            {
+                if (freqs[i]) rv.Add((EFreq)i);
             }
             return rv;
         }
@@ -203,7 +239,7 @@ namespace Gekko
         /// as anything.
         /// </summary>
         /// <returns></returns>
-        public int CountFlattenedArrayTimeseries()
+        public int CountFlattenedArrayTimeseries(EFreq? freq)
         {
             int n = 0;
             foreach (KeyValuePair<string, IVariable> kvp in this.storage)
@@ -211,6 +247,7 @@ namespace Gekko
                 if (kvp.Value.Type() == EVariableType.Series)
                 {
                     Series ts = kvp.Value as Series;
+                    if (freq != null && ts.freq != freq) continue;
                     if (ts.type == ESeriesType.ArraySuper)
                     {
                         n += ts.dimensionsStorage.storage.Count;
@@ -222,6 +259,16 @@ namespace Gekko
                 }
             }
             return n;
+        }
+
+        /// <summary>
+        /// This will correspond to the count seen in COMPARE. Note: an empty array-superseries will not count
+        /// as anything. This is by freq.
+        /// </summary>
+        /// <returns></returns>
+        public int CountFlattenedArrayTimeseries()
+        {
+            return CountFlattenedArrayTimeseries(null);            
         }
 
         public void Clear()
@@ -528,6 +575,12 @@ namespace Gekko
         public string GetFileNameWithPath()
         {            
             return this.fileNameWithPathPretty;  //has no filename
+        }
+
+        public string GetFileNameWithoutPath()
+        {
+            if (this.fileNameWithPathPretty == null) return null;
+            return System.IO.Path.GetFileName(this.fileNameWithPathPretty);
         }
 
         public string GetStamp()

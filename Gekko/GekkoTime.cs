@@ -1595,7 +1595,7 @@ namespace Gekko
             else return f2;
         }
 
-        private static double FreqNumber(EFreq f)
+        public static double FreqNumber(EFreq f)
         {
             if (f == EFreq.A)
             {

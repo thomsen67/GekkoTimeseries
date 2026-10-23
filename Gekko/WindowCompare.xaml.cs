@@ -32,7 +32,7 @@ namespace Gekko
         bool isDragging;
         string contents;
 
-        public BankItem(CompareBank bank)
+        public BankItem(Databank bank)
         {
             Bank = bank;
         }
@@ -40,24 +40,24 @@ namespace Gekko
         /// <summary>A row for a folder (Folders state).</summary>
         public static BankItem ForFolder(string path)
         {
-            return new BankItem((CompareBank)null) { FolderPath = path, IsFolderRow = true };
+            return new BankItem((Databank)null) { FolderPath = path, IsFolderRow = true };
         }
 
         /// <summary>The empty row always at the end of the list (no bank or folder). Its [Recent] button adds one.</summary>
         public static BankItem CreatePlaceholder(bool folderList)
         {
-            return new BankItem((CompareBank)null) { IsFolderRow = folderList };
+            return new BankItem((Databank)null) { IsFolderRow = folderList };
         }
 
-        public CompareBank Bank { get; }
+        public Databank Bank { get; }
         public string FolderPath { get; private set; }
         public bool IsFolderRow { get; private set; }
         public bool IsPlaceholder => Bank == null && FolderPath == null;
 
         /// <summary>The file or folder path that identifies the row (null for artificial data and the empty row).</summary>
-        public string SourcePath => FolderPath ?? Bank?.FilePath;
+        public string SourcePath => FolderPath ?? Bank?.GetFileNameWithPath();
 
-        public string Name => Bank != null ? Bank.Name : FolderPath != null ? FolderResult.FolderName(FolderPath) : "";
+        public string Name => Bank != null ? Bank.GetFileNameWithoutPath() : FolderPath != null ? FolderResult.FolderName(FolderPath) : "";
 
         public string PathText
         {
@@ -75,7 +75,7 @@ namespace Gekko
             {
                 if (IsPlaceholder) return "";
                 if (Bank == null) return contents ?? "";
-                return string.Join(", ", Bank.Frequencies.Select(f => f.ToString().Substring(0, 1) + " " + Bank.Count(f)));
+                return string.Join(", ", Bank.Frequencies().Select(f => f.ToString().Substring(0, 1) + " " + Bank.Count(f)));
             }
         }
 
@@ -273,7 +273,7 @@ namespace Gekko
         // makes sure only one file is read at a time, in case the loader uses shared state.
         static readonly object loaderLock = new object();
 
-        static CompareBank LoadBank(string path)
+        static Databank LoadBank(string path)
         {
             lock (loaderLock) return DatabankLoader.Load(path);
         }
@@ -300,7 +300,7 @@ namespace Gekko
         string fromText;
         string toText;
         int? periodAnchor;  // the first bar clicked, for Shift+click ranges (a period of the selected frequency)
-        CompareFreq? selectedFreq;  // Datafiles: the frequency button that is pressed
+        EFreq? selectedFreq;  // Datafiles: the frequency button that is pressed
 
         Selection selection;                                              // Datafiles: the area filter, resolved
         List<SeriesComparison> shown = new List<SeriesComparison>();      // Datafiles: series passing all filters
@@ -373,9 +373,9 @@ namespace Gekko
             bankItems.CollectionChanged += (s, e) => UpdateAutoPeriod();
 
             // Artificial demo banks. Dropped files also get artificial data, see DatabankLoader.
-            bankItems.Add(new BankItem(ArtificialData.CreateBank("base_2024.gbk", null)));
-            bankItems.Add(new BankItem(ArtificialData.CreateBank("base_2025.gbk", null)));
-            bankItems.Add(new BankItem(ArtificialData.CreateBank("forecast_2025.gbk", null)));
+            //bankItems.Add(new BankItem(ArtificialData.CreateBank("base_2024.gbk", null)));
+            //bankItems.Add(new BankItem(ArtificialData.CreateBank("base_2025.gbk", null)));
+            //bankItems.Add(new BankItem(ArtificialData.CreateBank("forecast_2025.gbk", null)));
 
             ready = true;
             UpdateStateControls();
@@ -385,7 +385,7 @@ namespace Gekko
 
         int SlotCount => Compare3Radio.IsChecked == true && banks.Count >= 3 ? 3 : 2;
 
-        CompareFreq? SelectedFreq => selectedFreq;
+        EFreq? SelectedFreq => selectedFreq;
 
         /// <summary>The period filter of the From/To boxes, for any frequency.</summary>
         PeriodRange period = PeriodRange.All;
@@ -963,7 +963,7 @@ namespace Gekko
         /// <summary>A frequency button and its period text (updated when banks are hidden or focused).</summary>
         sealed class FreqButton
         {
-            public CompareFreq Freq;
+            public EFreq Freq;
             public string Name;
             public RadioButton Button;
             public TextBlock SpanText;
@@ -978,7 +978,7 @@ namespace Gekko
         bool[] DatafilesActive => (state == CompareState.Datafiles ? active : datafilesView.Active) ?? new[] { true, true, true };
 
         /// <summary>The compared datafiles that are shown in the diagram.</summary>
-        List<CompareBank> ShownDatafiles()
+        List<Databank> ShownDatafiles()
         {
             bool[] shown = DatafilesActive;
             return bankItems.Take(DatafilesSlotCount)
@@ -998,18 +998,18 @@ namespace Gekko
         {
             FreqPanel.Children.Clear();
             freqButtons.Clear();
-            List<CompareBank> compared = bankItems.Count >= 2 ? bankItems.Take(DatafilesSlotCount).Select(b => b.Bank).ToList() : new List<CompareBank>();
-            List<CompareFreq> freqs = compared.SelectMany(b => b.Frequencies).Distinct().OrderBy(f => f).ToList();
+            List<Databank> compared = bankItems.Count >= 2 ? bankItems.Take(DatafilesSlotCount).Select(b => b.Bank).ToList() : new List<Databank>();
+            List<EFreq> freqs = compared.SelectMany(b => b.Frequencies).Distinct().OrderBy(f => f).ToList();
             if (!selectedFreq.HasValue || !freqs.Contains(selectedFreq.Value))
             {
-                selectedFreq = freqs.Count > 0 ? freqs[0] : (CompareFreq?)null;
+                selectedFreq = freqs.Count > 0 ? freqs[0] : (EFreq?)null;
                 periodAnchor = null;
             }
 
             const double r = 3;
             for (int i = 0; i < freqs.Count; i++)
             {
-                CompareFreq f = freqs[i];
+                EFreq f = freqs[i];
                 string name = PeriodConvert.FrequencyName(f);
                 var spanText = new TextBlock
                 {
@@ -1034,7 +1034,7 @@ namespace Gekko
                     Margin = new Thickness(i == 0 ? 0 : -1, 0, 0, 0),
                     IsChecked = selectedFreq.HasValue && f.Equals(selectedFreq.Value)
                 };
-                CompareFreq chosen = f;
+                EFreq chosen = f;
                 button.Checked += (o, e) => FreqButton_Checked(chosen);
                 FreqPanel.Children.Add(button);
                 freqButtons.Add(new FreqButton { Freq = f, Name = name, Button = button, SpanText = spanText });
@@ -1050,7 +1050,7 @@ namespace Gekko
         void UpdateFrequencySpans()
         {
             if (freqButtons.Count == 0) return;
-            List<CompareBank> compared = bankItems.Take(DatafilesSlotCount).Select(b => b.Bank).ToList();
+            List<Databank> compared = bankItems.Take(DatafilesSlotCount).Select(b => b.Bank).ToList();
             bool[] shown = DatafilesActive;
             foreach (FreqButton fb in freqButtons)
             {
@@ -1062,7 +1062,7 @@ namespace Gekko
                     int count = compared[s] == null ? 0 : compared[s].Count(fb.Freq);
                     if (on && count > 0)
                     {
-                        foreach (CompareSeries ts in compared[s].Get(fb.Freq).Values)
+                        foreach (Series ts in compared[s].Get(fb.Freq).Values)
                         {
                             if (ts.Data.Length == 0) continue;
                             start = Math.Min(start, ts.Start);
@@ -1080,7 +1080,7 @@ namespace Gekko
         }
 
         /// <summary>"A", "Q", "M", ... for the frequency buttons (the tooltip has the full name).</summary>
-        static string ShortFrequencyName(CompareFreq freq)
+        static string ShortFrequencyName(EFreq freq)
         {
             string name = PeriodConvert.FrequencyName(freq);
             return name.Length > 0 ? name.Substring(0, 1).ToUpperInvariant() : name;
@@ -1092,7 +1092,7 @@ namespace Gekko
             FreqPanel.Visibility = state == CompareState.Datafiles && FreqPanel.Children.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        void FreqButton_Checked(CompareFreq freq)
+        void FreqButton_Checked(EFreq freq)
         {
             if (!ready || busy) return;
             if (selectedFreq.HasValue && selectedFreq.Value.Equals(freq)) return;
@@ -1142,7 +1142,7 @@ namespace Gekko
             UpdateFrequencySpans();
             UpdateAutoPeriod();
 
-            CompareFreq? freq = SelectedFreq;
+            EFreq? freq = SelectedFreq;
             if (bankItems.Count < 2 || !freq.HasValue)
             {
                 current = null;
@@ -1163,7 +1163,7 @@ namespace Gekko
 
             // The period boxes need no conversion here: each frequency gets its own periods from the texts.
             Func<string, bool> filter = ReadFilter();
-            List<CompareBank> compared = bankItems.Take(SlotCount).Select(b => b.Bank).ToList();
+            List<Databank> compared = bankItems.Take(SlotCount).Select(b => b.Bank).ToList();
             current = CompareEngine.Compute(compared, active, freq.Value, filter, settings);
             Refresh();
         }
@@ -1406,7 +1406,7 @@ namespace Gekko
                     .ToList();
                 return new Selection
                 {
-                    Description = "All of bank " + (selectedBank + 1) + " (" + current.Banks[selectedBank].Name + ", "
+                    Description = "All of bank " + (selectedBank + 1) + " (" + current.Banks[selectedBank].GetFileNameWithoutPath + ", "
                                   + series.Count + " series)",
                     Series = series,
                     SlotMask = 1 << selectedBank,
@@ -1820,12 +1820,12 @@ namespace Gekko
         void UpdateAutoPeriod()
         {
             int first = int.MaxValue, last = int.MinValue;
-            foreach (CompareBank bank in ShownDatafiles())
+            foreach (Databank bank in ShownDatafiles())
             {
-                foreach (CompareFreq f in bank.Frequencies)
+                foreach (EFreq f in bank.Frequencies)
                 {
                     if (!PeriodConvert.IsDated(f)) continue;  // undated series have no years
-                    foreach (CompareSeries ts in bank.Get(f).Values)
+                    foreach (Series ts in bank.Get(f).Values)
                     {
                         if (ts.Data.Length == 0) continue;
                         first = Math.Min(first, PeriodText.Year(f, ts.Start));
@@ -2526,7 +2526,7 @@ namespace Gekko
         ///   freq: the selected frequency (the names are series of this frequency).
         /// The compared banks are current.Banks (slot order), and current.Active says which are shown.
         /// </summary>
-        void Plot(List<string> names, string from, string to, CompareFreq? freq)
+        void Plot(List<string> names, string from, string to, EFreq? freq)
         {
             string list = string.Join(", ", names.Take(10)) + (names.Count > 10 ? ", ... (" + names.Count + " in all)" : "");
             SetStatus("Plot " + list + " " + (from ?? "?") + "–" + (to ?? "?") + ": not wired up yet (WindowCompare.Plot).");
@@ -3972,7 +3972,7 @@ namespace Gekko
         static readonly Brush MutedBrush = BankColors.FromRgb(0x88, 0x88, 0x88);
 
         string title = "";
-        CompareFreq freq;
+        EFreq freq;
         int start;
         int[] counts;
         string itemPhrase = "series";
@@ -3992,7 +3992,7 @@ namespace Gekko
         /// counts start at firstPeriod. phrase: what a bar counts, e.g. "series with missing values" (for tooltips).
         /// tip (may be null) adds a line to a bar's tooltip. highlightFrom/To: the selected periods, or null.
         /// </summary>
-        public void SetData(string newTitle, CompareFreq newFreq, int firstPeriod, int[] newCounts, string phrase,
+        public void SetData(string newTitle, EFreq newFreq, int firstPeriod, int[] newCounts, string phrase,
                             Func<int, string> tip, int? from, int? to)
         {
             itemPhrase = phrase ?? "series";
