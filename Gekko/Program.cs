@@ -84,9 +84,9 @@ namespace Gekko
 
             G.Writeln("new double[5]:");
             G.Writeln("  Time:        ms" + sw.Elapsed.TotalMilliseconds);
-            G.Writeln("  GC Gen 0:   "+  (GC.CollectionCount(0) - gc0Before));
-            G.Writeln("  GC Gen 1:   "+ (GC.CollectionCount(1) - gc1Before));
-            G.Writeln("  GC Gen 2:   "+ (GC.CollectionCount(2) - gc2Before));
+            G.Writeln("  GC Gen 0:   " + (GC.CollectionCount(0) - gc0Before));
+            G.Writeln("  GC Gen 1:   " + (GC.CollectionCount(1) - gc1Before));
+            G.Writeln("  GC Gen 2:   " + (GC.CollectionCount(2) - gc2Before));
             G.Writeln("  Result:     " + result1);
 
             GC.Collect();
@@ -103,10 +103,10 @@ namespace Gekko
 
             G.Writeln();
             G.Writeln("ArrayPool<double>:");
-            G.Writeln("  Time:       ms"+ sw.Elapsed.TotalMilliseconds);
-            G.Writeln("  GC Gen 0:   "+ (GC.CollectionCount(0) - gc0Before));
-            G.Writeln("  GC Gen 1:   "+ (GC.CollectionCount(1) - gc1Before));
-            G.Writeln("  GC Gen 2:   "+ (GC.CollectionCount(2) - gc2Before));
+            G.Writeln("  Time:       ms" + sw.Elapsed.TotalMilliseconds);
+            G.Writeln("  GC Gen 0:   " + (GC.CollectionCount(0) - gc0Before));
+            G.Writeln("  GC Gen 1:   " + (GC.CollectionCount(1) - gc1Before));
+            G.Writeln("  GC Gen 2:   " + (GC.CollectionCount(2) - gc2Before));
             G.Writeln("  Result:     " + result2);
         }
 
@@ -161,7 +161,7 @@ namespace Gekko
         Pause
     }
 
-    public enum ERhsStarType 
+    public enum ERhsStarType
     {
         None,
         OneNaked,
@@ -176,11 +176,11 @@ namespace Gekko
         ExcludeProcFuncIgnoreExistence //false, false        
     }
 
-    public enum EBatchType     
+    public enum EBatchType
     {
         None, //default
         Hide, //do not show output
-        Gekcel,        
+        Gekcel,
         PyGekko
     }
 
@@ -414,9 +414,9 @@ namespace Gekko
                 {
                     p.ba.Length = G.RoundUpToNearest32(offset + 1);  //with offset == 32, we then get 64
                 }
-                p.ba.Set(offset, true);                
+                p.ba.Set(offset, true);
             }
-        }        
+        }
 
         /// <summary>
         /// Tries to find an array of active periods
@@ -442,10 +442,10 @@ namespace Gekko
             Array.Copy(originalArray, 0, newArrayData, newSize - original.Length, original.Length);
             // Convert back to BitArray
             return new BitArray(newArrayData);
-        }       
+        }
     }
 
-    public class MaskPeriods 
+    public class MaskPeriods
     {
         public GekkoTime t0 = GekkoTime.tNull;
         public BitArray ba = null;
@@ -461,7 +461,7 @@ namespace Gekko
         }
     }
 
-    public class EquationHelper2 
+    public class EquationHelper2
     {
         public DName eqName = null;
         public string eqMathScalar = null;
@@ -513,7 +513,7 @@ namespace Gekko
         public List<DName> eqsList = new List<DName>();
     }
 
-    public class IdentityHelper 
+    public class IdentityHelper
     {
         public DName eqName = null;
         public List<DName> children = new List<DName>();
@@ -522,9 +522,9 @@ namespace Gekko
     /// <summary>
     /// Contains for instance the "a", "b" in x[a, b].
     /// </summary>
-    public class Dims 
+    public class Dims
     {
-        public List<string>storage = new List<string>();
+        public List<string> storage = new List<string>();
         public string ToString()
         {
             return "[" + Stringlist.GetListWithCommas(this.storage) + "]";
@@ -541,7 +541,7 @@ namespace Gekko
         {
             string s = null;
             foreach (Dims dims in this.storage)
-            {                
+            {
                 s += "x" + dims.ToString() + ", ";
             }
             return s.Substring(0, s.Length - ", ".Length);
@@ -702,8 +702,8 @@ namespace Gekko
     }
 
     public class TraceBankHelpler
-    {        
-        public List<TraceBankHelpler2> elements = new List<TraceBankHelpler2>();        
+    {
+        public List<TraceBankHelpler2> elements = new List<TraceBankHelpler2>();
     }
 
     public class TraceBankHelpler2
@@ -1067,7 +1067,7 @@ namespace Gekko
         public List<DecompFind> children = new List<DecompFind>();
         public Model model = null;
         public bool closed = false;
-        public bool hasException = false;        
+        public bool hasException = false;
 
         public DecompFind(EDecompFindNavigation type, int depth, DecompOptions2 decompOptions2, object window, Model model)
         {
@@ -1353,7 +1353,7 @@ namespace Gekko
         }
     }
 
-    public class PlotTablePoints 
+    public class PlotTablePoints
     {
         public double dateDouble = double.NaN;
         public GekkoTime dateGekkoTime = GekkoTime.tNull;
@@ -1517,9 +1517,9 @@ namespace Gekko
         /// <param name="s"></param>
         /// <returns></returns>
         public Series this[DName s]
-        {            
+        {
             get
-            {                
+            {
                 Series ts = null; storage.TryGetValue(s, out ts);
                 if (ts == null)
                 {
@@ -1617,7 +1617,7 @@ namespace Gekko
         }
 
         public GekkoSmpl(GekkoTime t1, GekkoTime t2)
-        {            
+        {
             this.t0 = t1;
             this.t1 = t1;
             this.t2 = t2;
@@ -1738,7 +1738,7 @@ namespace Gekko
         {
             //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
             ws.Cells[rowcounter, colcounter].Formula = null;
-            ws.Cells[rowcounter, colcounter].Value = stamp;            
+            ws.Cells[rowcounter, colcounter].Value = stamp;
         }
 
         public static void WorkBookSetData_2(string heading, ExcelWorksheet ws, int rowcounter, int colcounter)
@@ -1790,7 +1790,7 @@ namespace Gekko
         {
             //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
             ws.Cells[d1 - 1, d2, d1 - 1 + labels.GetLength(0) - 1, d2 + labels.GetLength(1) - 1].Formula = null;
-            ws.Cells[d1 - 1, d2, d1 - 1 + labels.GetLength(0) - 1, d2 + labels.GetLength(1) - 1].LoadFromArrays(Program.ToJaggedArray(labels));            
+            ws.Cells[d1 - 1, d2, d1 - 1 + labels.GetLength(0) - 1, d2 + labels.GetLength(1) - 1].LoadFromArrays(Program.ToJaggedArray(labels));
         }
 
         public static void WorkBookSetData_9(ExcelWorksheet ws, int d1, int d2, string[,] labels)
@@ -1798,7 +1798,7 @@ namespace Gekko
             //See #087923584975: Strange null setting, but otherwise formulas are kept, including na() values
             ws.Cells[d1, d2 - 1, d1 + labels.GetLength(0) - 1, d2 - 1 + labels.GetLength(1) - 1].Formula = null;
             ws.Cells[d1, d2 - 1, d1 + labels.GetLength(0) - 1, d2 - 1 + labels.GetLength(1) - 1].LoadFromArrays(Program.ToJaggedArray(labels));
-                        
+
             //ws.Cells[d1, d2 - 1, d1 + labels.GetLength(0) - 1, d2 - 1 + labels.GetLength(1) - 1].AddComment("This is a comment", "Gekko");
         }
     }
@@ -2093,7 +2093,7 @@ namespace Gekko
         public string s1 = null;
         public string s2 = null;
         public bool b1Explicit = false;
-        
+
         /// <summary>
         /// See note regarding ToFrom class.
         /// </summary>
@@ -2119,8 +2119,8 @@ namespace Gekko
         {
             EqInfoSimple clone = new EqInfoSimple();
             clone.eqName = this.eqName;
-            clone.eqNameWithLag= this.eqNameWithLag;
-            clone.eqNumber= this.eqNumber;
+            clone.eqNameWithLag = this.eqNameWithLag;
+            clone.eqNumber = this.eqNumber;
             return clone;
         }
     }
@@ -2246,7 +2246,7 @@ namespace Gekko
         {
             this.s1 = s1;
             this.s2 = s2;
-        }        
+        }
     }
 
     public class StackHelper
@@ -2720,7 +2720,7 @@ namespace Gekko
                 if (FindException(e2, "GekkoException"))
                 {
                     if (!p.stopCommandEncountered)
-                    {                        
+                    {
                         G.Write("*** ERROR: The statement failed");  //do not show this after STOP command.
                     }
                 }
@@ -2882,7 +2882,7 @@ namespace Gekko
         /// <param name="modelGams"></param>
         /// <returns></returns>
         public static List<DName> BeforeEqualSign(DName eqName, ModelGams modelGams)
-        {            
+        {
             List<DName> rv = new List<DName>();
             if (modelGams == null)
             {
@@ -2893,7 +2893,7 @@ namespace Gekko
             }
             else
             {
-                List<ModelGamsEquation> x = null;  modelGams.equationsByEqname.TryGetValue(eqName, out x);
+                List<ModelGamsEquation> x = null; modelGams.equationsByEqname.TryGetValue(eqName, out x);
                 if (x != null)
                 {
                     foreach (ModelGamsEquation equation in x)  //Actually only 1 in these lists!
@@ -3045,7 +3045,7 @@ namespace Gekko
         /// <param name="s1"></param>
         /// <returns></returns>
         public static DName DName_HACK1NOLAG(string s1)
-        {            
+        {
             string s2 = s1.Replace("][", ",").Replace("] [", ","); //From x[a,b][-1] to x[a,b,-1].
 
             DName dname = Program.DName_HACK1(s2);
@@ -3086,7 +3086,7 @@ namespace Gekko
 
             if (Globals.runningOnTTComputer)
             {
-                
+
                 if (text.ToLower().Contains("eqs"))
                 {
                     GamsModel.PrintScalarEquations();
@@ -3096,7 +3096,7 @@ namespace Gekko
                 {
                     Pool.Test();
                 }
-                
+
 
                 if (false)
                 {
@@ -3211,7 +3211,7 @@ namespace Gekko
                     new Writeln(G.Seconds(dt));
                     return;
                 }
-                
+
 
                 if (Globals.runningOnTTComputer && (text == "b"))
                 {
@@ -3646,314 +3646,13 @@ namespace Gekko
             }
 
             if (G.Equal(text, "roslyn"))
-            {                
-                Gekko.Parser.Gek.ParserGekCompileAndRunAST.Roslyn();                
+            {
+                Gekko.Parser.Gek.ParserGekCompileAndRunAST.Roslyn();
             }
 
             if (nocr) G.Write(text);
             else G.Writeln(text);
-        }
-
-        private static void RelevantDatopGek24()
-        {
-            List<string> temp = new List<string>()
-                    {
-                    "BAFD", "bivbp", "bivbp0", "bivbpw", "bivbu", "bivmp", "bivmp0", "bivmp1",
-"bivmu", "BKS", "BOIL", "BSPZAB_XA", "BSPZAB_XB", "BSPZAB_XE", "BSPZAB_XH",
-"BSPZAB_XNE", "BSPZAB_XNF", "BSPZAB_XNG", "BSPZAB_XNZ", "BSPZAB_XO", "BSPZAB_XQF",
-"BSPZAB_XQS", "BSPZAM_XA", "BSPZAM_XB", "BSPZAM_XE", "BSPZAM_XH", "BSPZAM_XNE",
-"BSPZAM_XNF", "BSPZAM_XNG", "BSPZAM_XNZ", "BSPZAM_XO", "BSPZAM_XQF", "BSPZAM_XQS",
-"BSPZAUD_XA", "BSPZAUD_XB", "BSPZAUD_XE", "BSPZAUD_XH", "BSPZAUD_XNE", "BSPZAUD_XNF",
-"BSPZAUD_XNG", "BSPZAUD_XNZ", "BSPZAUD_XO", "BSPZAUD_XQF", "BSPZAUD_XQS", "BSPZCO2_XA",
-"BSPZCO2_XB", "BSPZCO2_XE", "BSPZCO2_XH", "BSPZCO2_XNE", "BSPZCO2_XNF", "BSPZCO2_XNG",
-"BSPZCO2_XNZ", "BSPZCO2_XO", "BSPZCO2_XQF", "BSPZCO2_XQS", "BSPZEJ_XA", "BSPZEJ_XB",
-"BSPZEJ_XE", "BSPZEJ_XH", "BSPZEJ_XNE", "BSPZEJ_XNF", "BSPZEJ_XNG", "BSPZEJ_XNZ",
-"BSPZEJ_XO", "BSPZEJ_XQF", "BSPZEJ_XQS", "BSPZUL_XA", "BSPZUL_XB", "BSPZUL_XE",
-"BSPZUL_XH", "BSPZUL_XNE", "BSPZUL_XNF", "BSPZUL_XNG", "BSPZUL_XNZ", "BSPZUL_XO",
-"BSPZUL_XQF", "BSPZUL_XQS", "BSPZV_XA", "BSPZV_XB", "BSPZV_XE", "BSPZV_XH",
-"BSPZV_XNE", "BSPZV_XNF", "BSPZV_XNG", "BSPZV_XNZ", "BSPZV_XO", "BSPZV_XQF",
-"BSPZV_XQS", "btpatpo", "buakbi", "buakbr", "buaki", "buakly", "buakry", "buaks",
-"bulaku", "BYRHH", "cb", "ce", "cf", "cg", "ch", "co", "COI", "CP", "cs",
-"ct", "cv", "D8291", "E", "e01", "e2", "e3", "e59", "e7y", "ENL", "esq",
-"ess", "Est", "et", "Ev", "ewdk", "EWEU", "EWUS", "fcb", "fce", "fcf", "fcg",
-"fch", "fco", "FCOGL", "fCoz", "fCozgl", "fcp", "fcs", "fct", "fcv", "fe",
-"fE01", "fE2", "fE3", "fE59", "fE7y", "FESQ", "fess", "fest", "fEt", "fev",
-"fi", "fIb", "FIBA", "FIBB", "FIBE", "FIBH", "FIBNE", "FIBNF", "FIBNG", "FIBNZ",
-"FIBO", "FIBP1", "FIBQF", "FIBQS", "FIBQZ", "FIFO1", "FIFO1NY", "FIFP1XH",
-"fIfro1ny", "fIkn", "fIl", "FILO1", "fIm", "FIMA", "FIMB", "FIME", "FIMNE",
-"FIMNF", "FIMNG", "FIMNZ", "FIMO", "FIMQF", "FIMQS", "FIMQZ", "FINVBA", "FINVBB",
-"FINVBE", "FINVBH", "FINVBNE", "FINVBNF", "FINVBNG", "FINVBNZ", "FINVBO", "FINVBQF",
-"FINVBQS", "FINVBQZ", "fIt", "FKNBA", "FKNBB", "FKNBE", "FKNBH", "FKNBHE",
-"FKNBHL", "FKNBNE", "FKNBNF", "FKNBNG", "FKNBNZ", "FKNBO", "FKNBO1", "FKNBQF",
-"FKNBQS", "FKNBQZ", "fKncb", "FKNMA", "FKNMB", "FKNME", "FKNMNE", "FKNMNF",
-"FKNMNG", "FKNMNZ", "FKNMO", "FKNMO1", "FKNMQF", "FKNMQS", "FKNMQZ", "FM", "fM01",
-"fM2", "fM3", "fM3K", "fM3Q", "fM3R", "fM59", "fM7B", "fM7Y", "fMS", "fmst",
-"fMT", "fmv", "FSPZ_XO1", "FVEA", "FVEB", "FVEE", "FVEH", "FVENE", "FVENF",
-"FVENG", "FVENZ", "FVEO", "FVEQF", "FVEQS", "FVEQZ", "FVMA", "FVMB", "FVME",
-"FVMH", "FVMNE", "FVMNF", "FVMNG", "FVMNZ", "FVMO", "FVMQF", "FVMQS", "FVMQZ",
-"FVO1", "fxa", "fxb", "fxe", "fxh", "fxne", "fxnf", "fxng", "fxnz", "fxo",
-"FXO1", "FXO1GL", "FXO1I", "fxqf", "fxqs", "fxqz", "fye", "fYst", "fytr",
-"fYtrxil", "fYwo1gl", "HA", "HGA", "HGB", "HGE", "HGH", "HGNE", "HGNF", "HGNG",
-"HGNZ", "HGO", "HGQF", "HGQS", "HGQZ", "HGWA", "HGWB", "HGWE", "HGWH", "HGWNE",
-"HGWNF", "HGWNG", "HGWNZ", "HGWO", "HGWQF", "HGWQS", "HGWQZ", "HQ", "HQA",
-"HQB", "HQE", "HQH", "HQNE", "HQNF", "HQNG", "HQNZ", "HQO", "HQO1", "HQQF",
-"HQQS", "HQQZ", "I", "ib", "IBO1", "IBP1", "IFO1NY", "IFP1XH", "Ifro1ny",
-"IF_H", "ikn", "IKN_H", "Il", "ILO1", "IL_H", "im", "IMDP1", "IMO1", "impxd1",
-"INVBA", "INVBB", "INVBE", "INVBH", "INVBNE", "INVBNF", "INVBNG", "INVBNZ",
-"INVBO", "INVBO1", "INVBQF", "INVBQS", "INVBQZ", "INVMO1", "INVO1", "IO1",
-"IO__M01_CB", "IO__M01_CE", "IO__M01_CF", "IO__M01_CG", "IO__M01_CH", "IO__M01_CO",
-"IO__M01_CS", "IO__M01_CT", "IO__M01_CV", "IO__M01_E01", "IO__M01_E2", "IO__M01_E3",
-"IO__M01_E59", "IO__M01_E7Y", "IO__M01_esq", "IO__M01_ess", "IO__M01_ET", "IO__M01_IB",
-"IO__M01_IKN", "IO__M01_IL", "IO__M01_IM", "IO__M01_IT", "IO__m01_vma", "IO__m01_vmb",
-"IO__m01_vme", "IO__m01_vmh", "IO__m01_vmne", "IO__m01_vmnf", "IO__m01_vmng",
-"IO__m01_vmnz", "IO__m01_vmo", "IO__m01_vmqf", "IO__m01_vmqs", "IO__m01_vmqz",
-"IO__M2_CB", "IO__M2_CE", "IO__M2_CF", "IO__M2_CG", "IO__M2_CH", "IO__M2_CO",
-"IO__M2_CS", "IO__M2_CT", "IO__M2_CV", "IO__M2_E01", "IO__M2_E2", "IO__M2_E3",
-"IO__M2_E59", "IO__M2_E7Y", "IO__M2_esq", "IO__M2_ess", "IO__M2_ET", "IO__M2_IB",
-"IO__M2_IKN", "IO__M2_IL", "IO__M2_IM", "IO__M2_IT", "IO__m2_vma", "IO__m2_vmb",
-"IO__m2_vme", "IO__m2_vmh", "IO__m2_vmne", "IO__m2_vmnf", "IO__m2_vmng", "IO__m2_vmnz",
-"IO__m2_vmo", "IO__m2_vmqf", "IO__m2_vmqs", "IO__m2_vmqz", "IO__M3K_CB", "IO__M3K_CE",
-"IO__M3K_CF", "IO__M3K_CG", "IO__M3K_CH", "IO__M3K_CO", "IO__M3K_CS", "IO__M3K_CT",
-"IO__M3K_CV", "IO__M3K_E01", "IO__M3K_E2", "IO__M3K_E3", "IO__M3K_E59", "IO__M3K_E7Y",
-"IO__M3K_esq", "IO__M3K_ess", "IO__M3K_ET", "IO__M3K_IB", "IO__M3K_IKN", "IO__M3K_IL",
-"IO__M3K_IM", "IO__M3K_IT", "IO__m3k_vea", "IO__m3k_veb", "IO__m3k_vee", "IO__m3k_veh",
-"IO__m3k_vene", "IO__m3k_venf", "IO__m3k_veng", "IO__m3k_venz", "IO__m3k_veo",
-"IO__m3k_veqf", "IO__m3k_veqs", "IO__m3k_veqz", "IO__M3Q_CB", "IO__M3Q_CE",
-"IO__M3Q_CF", "IO__M3Q_CG", "IO__M3Q_CH", "IO__M3Q_CO", "IO__M3Q_CS", "IO__M3Q_CT",
-"IO__M3Q_CV", "IO__M3Q_E01", "IO__M3Q_E2", "IO__M3Q_E3", "IO__M3Q_E59", "IO__M3Q_E7Y",
-"IO__M3Q_esq", "IO__M3Q_ess", "IO__M3Q_ET", "IO__M3Q_IB", "IO__M3Q_IKN", "IO__M3Q_IL",
-"IO__M3Q_IM", "IO__M3Q_IT", "IO__m3q_vea", "IO__m3q_veb", "IO__m3q_vee", "IO__m3q_veh",
-"IO__m3q_vene", "IO__m3q_venf", "IO__m3q_veng", "IO__m3q_venz", "IO__m3q_veo",
-"IO__m3q_veqf", "IO__m3q_veqs", "IO__m3q_veqz", "IO__M3R_CB", "IO__M3R_CE",
-"IO__M3R_CF", "IO__M3R_CG", "IO__M3R_CH", "IO__M3R_CO", "IO__M3R_CS", "IO__M3R_CT",
-"IO__M3R_CV", "IO__M3R_E01", "IO__M3R_E2", "IO__M3R_E3", "IO__M3R_E59", "IO__M3R_E7Y",
-"IO__M3R_esq", "IO__M3R_ess", "IO__M3R_ET", "IO__M3R_IB", "IO__M3R_IKN", "IO__M3R_IL",
-"IO__M3R_IM", "IO__M3R_IT", "IO__m3r_vea", "IO__m3r_veb", "IO__m3r_vee", "IO__m3r_veh",
-"IO__m3r_vene", "IO__m3r_venf", "IO__m3r_veng", "IO__m3r_venz", "IO__m3r_veo",
-"IO__m3r_veqf", "IO__m3r_veqs", "IO__m3r_veqz", "IO__M59_CB", "IO__M59_CE",
-"IO__M59_CF", "IO__M59_CG", "IO__M59_CH", "IO__M59_CO", "IO__M59_CS", "IO__M59_CT",
-"IO__M59_CV", "IO__M59_E01", "IO__M59_E2", "IO__M59_E3", "IO__M59_E59", "IO__M59_E7Y",
-"IO__M59_esq", "IO__M59_ess", "IO__M59_ET", "IO__M59_IB", "IO__M59_IKN", "IO__M59_IL",
-"IO__M59_IM", "IO__M59_IT", "IO__m59_vma", "IO__m59_vmb", "IO__m59_vme", "IO__m59_vmh",
-"IO__m59_vmne", "IO__m59_vmnf", "IO__m59_vmng", "IO__m59_vmnz", "IO__m59_vmo",
-"IO__m59_vmqf", "IO__m59_vmqs", "IO__m59_vmqz", "IO__M7B_CB", "IO__M7B_CE",
-"IO__M7B_CF", "IO__M7B_CG", "IO__M7B_CH", "IO__M7B_CO", "IO__M7B_CS", "IO__M7B_CT",
-"IO__M7B_CV", "IO__M7B_E01", "IO__M7B_E2", "IO__M7B_E3", "IO__M7B_E59", "IO__M7B_E7Y",
-"IO__M7B_esq", "IO__M7B_ess", "IO__M7B_ET", "IO__M7B_IB", "IO__M7B_IKN", "IO__M7B_IL",
-"IO__M7B_IM", "IO__M7B_IT", "IO__m7b_vma", "IO__m7b_vmb", "IO__m7b_vme", "IO__m7b_vmh",
-"IO__m7b_vmne", "IO__m7b_vmnf", "IO__m7b_vmng", "IO__m7b_vmnz", "IO__m7b_vmo",
-"IO__m7b_vmqf", "IO__m7b_vmqs", "IO__m7b_vmqz", "IO__M7Y_CB", "IO__M7Y_CE",
-"IO__M7Y_CF", "IO__M7Y_CG", "IO__M7Y_CH", "IO__M7Y_CO", "IO__M7Y_CS", "IO__M7Y_CT",
-"IO__M7Y_CV", "IO__M7Y_E01", "IO__M7Y_E2", "IO__M7Y_E3", "IO__M7Y_E59", "IO__M7Y_E7Y",
-"IO__M7Y_esq", "IO__M7Y_ess", "IO__M7Y_ET", "IO__M7Y_IB", "IO__M7Y_IKN", "IO__M7Y_IL",
-"IO__M7Y_IT", "IO__m7y_vma", "IO__m7y_vmb", "IO__m7y_vme", "IO__m7y_vmh",
-"IO__m7y_vmne", "IO__m7y_vmnf", "IO__m7y_vmng", "IO__m7y_vmnz", "IO__m7y_vmo",
-"IO__m7y_vmqf", "IO__m7y_vmqs", "IO__m7y_vmqz", "IO__MS_CB", "IO__MS_CE", "IO__MS_CF",
-"IO__MS_CG", "IO__MS_CH", "IO__MS_CO", "IO__MS_CS", "IO__MS_CT", "IO__MS_CV",
-"IO__MS_E01", "IO__MS_E2", "IO__MS_E3", "IO__MS_E59", "IO__MS_E7Y", "IO__Ms_esq",
-"IO__Ms_ess", "IO__MS_ET", "IO__MS_IB", "IO__MS_IKN", "IO__MS_IL", "IO__MS_IM",
-"IO__MS_IT", "IO__ms_vma", "IO__ms_vmb", "IO__ms_vme", "IO__ms_vmh", "IO__ms_vmne",
-"IO__ms_vmnf", "IO__ms_vmng", "IO__ms_vmnz", "IO__ms_vmo", "IO__ms_vmqf", "IO__ms_vmqs",
-"IO__ms_vmqz", "IO__MT_CB", "IO__MT_CE", "IO__MT_CF", "IO__MT_CG", "IO__MT_CH",
-"IO__MT_CO", "IO__MT_CS", "IO__MT_CT", "IO__MT_CV", "IO__MT_E01", "IO__MT_E2",
-"IO__MT_E3", "IO__MT_E59", "IO__MT_E7Y", "IO__MT_esq", "IO__MT_ess", "IO__MT_ET",
-"IO__MT_IB", "IO__MT_IKN", "IO__MT_IL", "IO__MT_IT", "IO__mt_vma", "IO__mt_vmb",
-"IO__mt_vme", "IO__mt_vmh", "IO__mt_vmne", "IO__mt_vmnf", "IO__mt_vmng", "IO__mt_vmnz",
-"IO__mt_vmo", "IO__mt_vmqf", "IO__mt_vmqs", "IO__mt_vmqz", "IO__SPG_CB", "IO__SPG_CE",
-"IO__SPG_CF", "IO__SPG_CG", "IO__SPG_CH", "IO__SPG_CO", "IO__SPG_CS", "IO__SPG_CT",
-"IO__SPG_CV", "IO__SPG_E01", "IO__SPG_E2", "IO__SPG_E3", "IO__SPG_E59", "IO__SPG_E7Y",
-"IO__SPG_ET", "IO__SPG_IB", "IO__SPG_IKN", "IO__SPG_IL", "IO__SPG_IM", "IO__SPG_IT",
-"IO__SPM_CB", "IO__SPM_CE", "IO__SPM_CF", "IO__SPM_CG", "IO__SPM_CH", "IO__SPM_CO",
-"IO__SPM_CS", "IO__SPM_CT", "IO__SPM_CV", "IO__SPM_E01", "IO__SPM_E2", "IO__SPM_E3",
-"IO__SPM_E59", "IO__SPM_E7Y", "IO__SPM_ES", "IO__SPM_ET", "IO__SPM_IB", "IO__SPM_IKN",
-"IO__SPM_IL", "IO__SPM_IM", "IO__SPM_IT", "IO__SPP_CB", "IO__SPP_CE", "IO__SPP_CF",
-"IO__SPP_CG", "IO__SPP_CH", "IO__SPP_CO", "IO__SPP_CS", "IO__SPP_CT", "IO__SPP_CV",
-"IO__SPP_E01", "IO__SPP_E2", "IO__SPP_E3", "IO__SPP_E59", "IO__SPP_E7Y", "IO__SPP_ES",
-"IO__SPP_ET", "IO__SPP_IB", "IO__SPP_IKN", "IO__SPP_IL", "IO__SPP_IM", "IO__SPP_IT",
-"IO__SPZ_IL", "IO__SPZ_XA", "IO__SPZ_XB", "IO__SPZ_XE", "IO__SPZ_XH", "IO__SPZ_XNE",
-"IO__SPZ_XNF", "IO__SPZ_XNG", "IO__SPZ_XNZ", "IO__SPZ_XO", "IO__SPZ_XQF", "IO__SPZ_XQS",
-"IO__SPZ_XQZ", "IO__XA_CB", "IO__XA_CE", "IO__XA_CF", "IO__XA_CG", "IO__XA_CH",
-"IO__XA_CO", "IO__XA_CS", "IO__XA_CT", "IO__XA_CV", "IO__XA_E01", "IO__XA_E2",
-"IO__XA_E3", "IO__XA_E59", "IO__XA_E7Y", "IO__XA_esq", "IO__XA_ess", "IO__XA_ET",
-"IO__XA_IB", "IO__XA_IKN", "IO__XA_IL", "IO__XA_IM", "IO__XA_IT", "IO__xa_vma",
-"IO__xa_vmb", "IO__xa_vme", "IO__xa_vmh", "IO__xa_vmne", "IO__xa_vmnf", "IO__xa_vmng",
-"IO__xa_vmnz", "IO__xa_vmo", "IO__xa_vmqf", "IO__xa_vmqs", "IO__xa_vmqz", "IO__XB_CB",
-"IO__XB_CE", "IO__XB_CF", "IO__XB_CG", "IO__XB_CH", "IO__XB_CO", "IO__XB_CS",
-"IO__XB_CT", "IO__XB_CV", "IO__XB_E01", "IO__XB_E2", "IO__XB_E3", "IO__XB_E59",
-"IO__XB_E7Y", "IO__XB_esq", "IO__XB_ess", "IO__XB_ET", "IO__XB_IB", "IO__XB_IKN",
-"IO__XB_IL", "IO__XB_IM", "IO__XB_IT", "IO__xb_vma", "IO__xb_vmb", "IO__xb_vme",
-"IO__xb_vmh", "IO__xb_vmne", "IO__xb_vmnf", "IO__xb_vmng", "IO__xb_vmnz", "IO__xb_vmo",
-"IO__xb_vmqf", "IO__xb_vmqs", "IO__xb_vmqz", "IO__XE_CB", "IO__XE_CE", "IO__XE_CF",
-"IO__XE_CG", "IO__XE_CH", "IO__XE_CS", "IO__XE_CT", "IO__XE_CV", "IO__XE_E01",
-"IO__XE_E2", "IO__XE_E3", "IO__XE_E59", "IO__XE_E7Y", "IO__XE_esq", "IO__XE_ess",
-"IO__XE_ET", "IO__XE_IB", "IO__XE_IKN", "IO__XE_IL", "IO__XE_IM", "IO__XE_IT",
-"IO__xe_vea", "IO__xe_veb", "IO__xe_vee", "IO__xe_veh", "IO__xe_vene", "IO__xe_venf",
-"IO__xe_veng", "IO__xe_venz", "IO__xe_veo", "IO__xe_veqf", "IO__xe_veqs", "IO__xe_veqz",
-"IO__XH_CB", "IO__XH_CE", "IO__XH_CF", "IO__XH_CG", "IO__XH_CH", "IO__XH_CO",
-"IO__XH_CS", "IO__XH_CT", "IO__XH_CV", "IO__XH_E01", "IO__XH_E2", "IO__XH_E3",
-"IO__XH_E59", "IO__XH_E7Y", "IO__XH_esq", "IO__XH_ess", "IO__XH_ET", "IO__XH_IB",
-"IO__XH_IKN", "IO__XH_IL", "IO__XH_IM", "IO__XH_IT", "IO__xh_vma", "IO__xh_vmb",
-"IO__xh_vme", "IO__xh_vmh", "IO__xh_vmne", "IO__xh_vmnf", "IO__xh_vmng", "IO__xh_vmnz",
-"IO__xh_vmo", "IO__xh_vmqf", "IO__xh_vmqs", "IO__xh_vmqz", "IO__XNE_CB", "IO__XNE_CE",
-"IO__XNE_CF", "IO__XNE_CG", "IO__XNE_CH", "IO__XNE_CO", "IO__XNE_CS", "IO__XNE_CT",
-"IO__XNE_CV", "IO__XNE_E01", "IO__XNE_E2", "IO__XNE_E3", "IO__XNE_E59", "IO__XNE_E7Y",
-"IO__XNE_esq", "IO__XNE_ess", "IO__XNE_ET", "IO__XNE_IB", "IO__XNE_IKN", "IO__XNE_IL",
-"IO__XNE_IM", "IO__XNE_IT", "IO__xne_vea", "IO__xne_veb", "IO__xne_vee", "IO__xne_veh",
-"IO__xne_vene", "IO__xne_venf", "IO__xne_veng", "IO__xne_venz", "IO__xne_veo",
-"IO__xne_veqf", "IO__xne_veqs", "IO__xne_veqz", "IO__XNF_CB", "IO__XNF_CE",
-"IO__XNF_CF", "IO__XNF_CG", "IO__XNF_CH", "IO__XNF_CO", "IO__XNF_CS", "IO__XNF_CT",
-"IO__XNF_CV", "IO__XNF_E01", "IO__XNF_E2", "IO__XNF_E3", "IO__XNF_E59", "IO__XNF_E7Y",
-"IO__XNF_esq", "IO__XNF_ess", "IO__XNF_ET", "IO__XNF_IB", "IO__XNF_IKN", "IO__XNF_IL",
-"IO__XNF_IM", "IO__XNF_IT", "IO__xnf_vma", "IO__xnf_vmb", "IO__xnf_vme", "IO__xnf_vmh",
-"IO__xnf_vmne", "IO__xnf_vmnf", "IO__xnf_vmng", "IO__xnf_vmnz", "IO__xnf_vmo",
-"IO__xnf_vmqf", "IO__xnf_vmqs", "IO__xnf_vmqz", "IO__XNG_CB", "IO__XNG_CE",
-"IO__XNG_CF", "IO__XNG_CG", "IO__XNG_CH", "IO__XNG_CO", "IO__XNG_CS", "IO__XNG_CT",
-"IO__XNG_CV", "IO__XNG_E01", "IO__XNG_E2", "IO__XNG_E3", "IO__XNG_E59", "IO__XNG_E7Y",
-"IO__XNG_esq", "IO__XNG_ess", "IO__XNG_ET", "IO__XNG_IB", "IO__XNG_IKN", "IO__XNG_IL",
-"IO__XNG_IM", "IO__XNG_IT", "IO__xng_vea", "IO__xng_veb", "IO__xng_vee", "IO__xng_veh",
-"IO__xng_vene", "IO__xng_venf", "IO__xng_veng", "IO__xng_venz", "IO__xng_veo",
-"IO__xng_veqf", "IO__xng_veqs", "IO__xng_veqz", "IO__XNZ_CB", "IO__XNZ_CE",
-"IO__XNZ_CF", "IO__XNZ_CG", "IO__XNZ_CH", "IO__XNZ_CO", "IO__XNZ_CS", "IO__XNZ_CT",
-"IO__XNZ_CV", "IO__XNZ_E01", "IO__XNZ_E2", "IO__XNZ_E3", "IO__XNZ_E59", "IO__XNZ_E7Y",
-"IO__XNZ_esq", "IO__XNZ_ess", "IO__XNZ_ET", "IO__XNZ_IB", "IO__XNZ_IKN", "IO__XNZ_IL",
-"IO__XNZ_IM", "IO__XNZ_IT", "IO__xnz_vma", "IO__xnz_vmb", "IO__xnz_vme", "IO__xnz_vmh",
-"IO__xnz_vmne", "IO__xnz_vmnf", "IO__xnz_vmng", "IO__xnz_vmnz", "IO__xnz_vmo",
-"IO__xnz_vmqf", "IO__xnz_vmqs", "IO__xnz_vmqz", "IO__XO_CB", "IO__XO_CE", "IO__XO_CF",
-"IO__XO_CG", "IO__XO_CH", "IO__XO_CO", "IO__XO_CS", "IO__XO_CT", "IO__XO_CV",
-"IO__XO_E01", "IO__XO_E2", "IO__XO_E3", "IO__XO_E59", "IO__XO_E7Y", "IO__XO_esq",
-"IO__XO_ess", "IO__XO_ET", "IO__XO_IB", "IO__XO_IKN", "IO__XO_IL", "IO__XO_IM",
-"IO__XO_IT", "IO__xo_vma", "IO__xo_vmb", "IO__xo_vme", "IO__xo_vmh", "IO__xo_vmne",
-"IO__xo_vmnf", "IO__xo_vmng", "IO__xo_vmnz", "IO__xo_vmo", "IO__xo_vmqf", "IO__xo_vmqs",
-"IO__xo_vmqz", "IO__XQF_CB", "IO__XQF_CE", "IO__XQF_CF", "IO__XQF_CG", "IO__XQF_CH",
-"IO__XQF_CO", "IO__XQF_CS", "IO__XQF_CT", "IO__XQF_CV", "IO__XQF_E01", "IO__XQF_E2",
-"IO__XQF_E3", "IO__XQF_E59", "IO__XQF_E7Y", "IO__XQF_esq", "IO__XQF_ess", "IO__XQF_ET",
-"IO__XQF_IB", "IO__XQF_IKN", "IO__XQF_IL", "IO__XQF_IM", "IO__XQF_IT", "IO__xqf_vma",
-"IO__xqf_vmb", "IO__xqf_vme", "IO__xqf_vmh", "IO__xqf_vmne", "IO__xqf_vmnf",
-"IO__xqf_vmng", "IO__xqf_vmnz", "IO__xqf_vmo", "IO__xqf_vmqf", "IO__xqf_vmqs",
-"IO__xqf_vmqz", "IO__XQS_CB", "IO__XQS_CE", "IO__XQS_CF", "IO__XQS_CG", "IO__XQS_CH",
-"IO__XQS_CO", "IO__XQS_CS", "IO__XQS_CT", "IO__XQS_CV", "IO__XQS_E01", "IO__XQS_E2",
-"IO__XQS_E3", "IO__XQS_E59", "IO__XQS_E7Y", "IO__Xqs_esq", "IO__Xqs_ess", "IO__XQS_ET",
-"IO__XQS_IB", "IO__XQS_IKN", "IO__XQS_IL", "IO__XQS_IM", "IO__XQS_IT", "IO__xqs_vma",
-"IO__xqs_vmb", "IO__xqs_vme", "IO__xqs_vmh", "IO__xqs_vmne", "IO__xqs_vmnf",
-"IO__xqs_vmng", "IO__xqs_vmnz", "IO__xqs_vmo", "IO__xqs_vmqf", "IO__xqs_vmqs",
-"IO__xqs_vmqz", "IO__XQZ_CB", "IO__XQZ_CE", "IO__XQZ_CF", "IO__XQZ_CG", "IO__XQZ_CH",
-"IO__XQZ_CO", "IO__XQZ_CS", "IO__XQZ_CT", "IO__XQZ_CV", "IO__XQZ_E01", "IO__XQZ_E2",
-"IO__XQZ_E3", "IO__XQZ_E59", "IO__XQZ_E7Y", "IO__Xqz_esq", "IO__Xqz_ess", "IO__XQZ_ET",
-"IO__XQZ_IB", "IO__XQZ_IKN", "IO__XQZ_IL", "IO__XQZ_IM", "IO__XQZ_IT", "IO__xqz_vma",
-"IO__xqz_vmb", "IO__xqz_vme", "IO__xqz_vmh", "IO__xqz_vmne", "IO__xqz_vmnf",
-"IO__xqz_vmng", "IO__xqz_vmnz", "IO__xqz_vmo", "IO__xqz_vmqf", "IO__xqz_vmqs",
-"IO__xqz_vmqz", "IO__YR_IL", "IO__YW_IL", "it", "iuwse", "Ivbps", "Ivmps", "iw3m",
-"IWB30", "IWBEU", "IWBFLX", "iwbid", "IWBOS", "IWBOSU", "iwbus", "IWBZ", "IWDE",
-"IWDI", "IWEU", "IWLO", "IWMM", "IZN_H", "IZN_O", "JTyrkr", "KNBA", "KNBB",
-"KNBE", "KNBH", "KNBHK_H", "KNBNE", "KNBNF", "KNBNG", "KNBNZ", "KNBO", "KNBO1",
-"KNBQF", "KNBQS", "KNBQZ", "KNMA", "KNMB", "KNME", "KNMNE", "KNMNF", "KNMNG",
-"KNMNZ", "KNMO", "KNMO1", "KNMQF", "KNMQS", "KNMQZ", "KTPC_F", "LNA", "lnda",
-"M", "m01", "m2", "M3", "m3k", "m3q", "m3r", "m59", "m7b", "m7y", "m7y_im",
-"ms", "Mst", "mt", "MV", "NBS", "owbcp_z_cf", "OWbd_os_z", "OWbe_os_z",
-"owbm_cf_z", "owbp_z_cf", "owbp_z_h", "owB_Z_OS", "owcp_cf_e", "Owcp_cf_h",
-"OWG_E_CF", "ownbr_cf", "ownbr_h", "owNB_CR", "owNB_E", "owNB_OK", "ownb_oo",
-"owNQ_E", "OWN_E", "OWN_H", "OWN_O", "OWPCO1_BF", "owpco1_LD", "OWPCO2_BF",
-"owpco2_LD", "OWPCR_ATP", "OWPCR_BF", "OWPCR_DMP", "OWPCR_SP", "OWPIO1_BF",
-"OWPIO2_BF", "OWPIR_BF", "owP_CF_E", "owP_CF_H", "owscp_d_cf", "owscp_e_cf",
-"owsp_d_cf", "owsp_d_h", "owsp_e_cf", "owsp_e_h", "owsr_d_cf", "owsr_d_h",
-"owsr_e_cf", "owsr_e_h", "owS_CF_Z", "owS_CR_Z", "Ows_d_cr", "OWS_D_OK", "OWS_D_OO",
-"OWS_D_OS", "Ows_e_cr", "Ows_e_ok", "OWS_E_OO", "OWS_E_OS", "owS_E_Z", "owS_Z_E",
-"pcb", "pce", "pcf", "pcg", "pch", "pco", "pcp", "PCRS", "pcs", "pct", "pcv",
-"pe", "pE01", "pE2", "pE3", "pE59", "pE7y", "PEE3R", "PEET", "PESQ", "pess",
-"pest", "pEt", "pev", "PFP", "PFPB", "PFPE", "PFPF", "PFPG", "PFPH", "PFPS",
-"PFPV", "PHK", "PHP", "PHV", "pi", "pIb", "PIBA", "PIBB", "PIBE", "PIBH",
-"PIBNE", "PIBNF", "PIBNG", "PIBNZ", "PIBO", "PIBO1", "PIBP1", "PIBQF", "PIBQS",
-"PIBQZ", "PIFO1", "PIFO1NY", "PIFP1XH", "pifro1ny", "pIkn", "pIl", "PILO", "pIm",
-"PIMA", "PIMB", "PIME", "PIMNE", "PIMNF", "PIMNG", "PIMNZ", "PIMO", "PIMO1",
-"PIMQF", "PIMQS", "PIMQZ", "PINVBO1", "PINVMO1", "PINVO1", "pIt", "PKNBA",
-"PKNBB", "PKNBE", "PKNBH", "PKNBNE", "PKNBNF", "PKNBNG", "PKNBNZ", "PKNBO",
-"PKNBO1", "PKNBQF", "PKNBQS", "PKNBQZ", "PKNMA", "PKNMB", "PKNME", "PKNMNE",
-"PKNMNF", "PKNMNG", "PKNMNZ", "PKNMO", "PKNMO1", "PKNMQF", "PKNMQS", "PKNMQZ",
-"PM", "pM01", "pM2", "pM3", "pM3K", "pM3Q", "pM3R", "pM59", "pM7B", "pM7Y",
-"pMS", "pmst", "pMT", "pmv", "PNP", "PNPB", "PNPE", "PNPF", "PNPG", "PNPH",
-"PNPS", "PNPV", "PSPZ_XO1", "PTTYL", "pttyo", "PTTYP", "PVEA", "PVEB", "PVEE",
-"PVEH", "PVENE", "PVENF", "PVENG", "PVENZ", "PVEO", "PVEQF", "PVEQS", "PVEQZ",
-"PVMA", "PVMB", "PVME", "PVMH", "PVMNE", "PVMNF", "PVMNG", "PVMNZ", "PVMO",
-"PVMQF", "PVMQS", "PVMQZ", "PVO1", "pxa", "pxb", "pxe", "pxh", "pxne", "pxnf",
-"pxng", "pxnz", "pxo", "PXO1", "PXO1GL", "pxo1i", "pxqf", "pxqs", "pxqz",
-"pYst", "pytr", "pYtrxil", "pywo1gl", "Q", "QA", "QB", "QE", "QH", "QLTF",
-"Qltf2", "QLTJD", "QLTJK", "Qltjki", "QLTR", "QLTS", "QM", "QMB", "QMS", "QMXA",
-"QMXB", "QMXE", "QMXH", "QMXNE", "QMXNF", "QMXNG", "QMXNZ", "QMXO", "QMXO1",
-"QMXQF", "QMXQS", "QMXQZ", "QNE", "QNF", "QNG", "QNZ", "QO", "QO1", "QPFO",
-"QPFP", "QPSP", "QPTP", "QQF", "QQS", "QQZ", "QWA", "QWB", "QWE", "QWH",
-"QWNE", "QWNF", "QWNG", "QWNZ", "QWO", "QWQF", "QWQS", "QWQZ", "SAQW", "SASR",
-"SK_H_O", "spg", "Spg_CB", "Spg_CE", "Spg_CF", "Spg_CG", "Spg_CH", "Spg_CO",
-"Spg_CS", "Spg_CV", "Spg_IB", "SPG_IBH", "Spg_ibo1", "Spg_ibp1", "Spg_IKN",
-"Spg_IL", "Spg_im", "Spg_imo1", "Spg_imp1", "Spg_Xa", "Spg_Xb", "Spg_Xe", "Spg_Xh",
-"Spg_Xne", "Spg_Xnf", "Spg_Xng", "Spg_Xnz", "Spg_Xo", "Spg_Xqf", "Spg_Xqs",
-"Spg_Xqz", "spm", "spm_xa", "spm_xb", "spm_xe", "spm_xh", "spm_xne", "spm_xnf",
-"spm_xng", "spm_xnz", "spm_xo", "spm_xqf", "spm_xqs", "spm_xqz", "SPP", "SPPTEU",
-"SPPU", "SPPUPSO", "SPP_IBH", "Spp_ibo1", "Spp_ibp1", "Spp_imo1", "Spp_imp1",
-"SPP_VMA", "SPP_VMNF", "SPR", "SPR_CB", "SPR_CO", "spr_imp1", "SPTEU", "SPT_O",
-"SPUEU", "SPU_O", "spz", "SPZAB", "SPZAM", "SPZAUD", "SPZCO2", "SPZEJH",
-"SPZEJXH", "SPZU", "SPZUL", "SPZUPSO", "SPZU_XO1", "SPZV", "Spz_Xa", "Spz_Xb",
-"Spz_Xe", "Spz_Xh", "Spz_Xne", "Spz_Xnf", "Spz_Xng", "Spz_Xnz", "Spz_Xo", "SPZ_XO1",
-"Spz_Xqf", "Spz_Xqs", "Spz_Xqz", "SSY", "SSYA", "SSYD", "SSYEJ", "SSYS1", "SSYS2",
-"SSYS3", "SSYSP1", "SSYSP2", "SSYSP3", "SSYV", "STPT", "STP_O", "SYA", "SYC",
-"Syc_e", "SYC_H", "SYK", "SYM", "SYN_E", "SYP", "SYPR", "SYV", "SYWP",
-"SYWPCO1_BF", "sywpco1_LD", "SYWPCO2_BF", "sywpco2_LD", "SYWPCR_ATP", "SYWPCR_BF",
-"SYWPCR_DMP", "SYWPCR_SP", "SYWPIO1_BF", "SYWPIO2_BF", "SYWPIR_BF", "SY_O",
-"TFLM_CF_CF", "TFLM_CR_CF", "TFLM_E_CF", "TFLM_H_CF", "tflm_ok_cf", "tfnq_cf",
-"tfnq_cr", "tfnq_h", "tfnq_ok", "tfnq_oo", "tfnq_os", "TFN_CF", "TFN_CR", "TFN_E",
-"TFN_H", "TFN_O", "tfs_cf_z", "tfs_cr_z", "TF_O_Z", "TF_Z_O", "TG", "TIID_OS_Z",
-"TIIE_OS_Z", "tiim_cf_x", "TIIN_CF", "TIIN_CR", "tiin_e", "tiin_h", "TIIN_OK",
-"TIIN_OO", "TII_Z_OS", "TIN_E", "TIN_H", "TIN_O", "TIOII", "TIPCO1_BF", "tipco1_LD",
-"TIPCO2_BF", "tipco2_LD", "TIPCR_ATP", "TIPCR_BF", "TIPCR_DMP", "TIPCR_SP",
-"TIPIO1_BF", "TIPIO2_BF", "TIPIR_BF", "tipppsu", "Tip_cf_h", "TIP_CF_Z", "TIRE_O",
-"TIRK", "TIRN_O", "TIRO", "Tiue_z_os", "TIUO_Z_O", "TIU_CF_Z", "TIU_CR_Z",
-"TIU_E_Z", "TIU_Z_CF", "TIU_Z_CR", "TIU_Z_E", "TIU_Z_H", "TIU_Z_OK", "TIU_Z_OO",
-"TIU_Z_OS", "TI_OK_Z", "TI_OO_Z", "TI_O_Z", "TI_Z_O", "TKNR_H", "TKS", "TK_E_O",
-"TK_HC_O", "TK_O_C", "TK_O_E", "TK_O_H", "TPAF", "tpatpo", "TPCO1_BF", "tpco1_LD",
-"TPCO2_BF", "tpco2_LD", "TPCR_ATP", "TPCR_BF", "TPCR_DMP", "TPCR_SP", "TPC_E_Z",
-"TPC_FATP", "TPC_H_CF", "TPC_H_E", "TPEF", "TPIO1_BF", "TPIO2_BF", "TPIR_BF", "TPR",
-"TPT_O", "TP_H_O", "TRG_O_EU", "TRKS", "TRN_H", "TRR_HC_O", "TRR_O_E", "TRR_O_EU",
-"Trr_o_h", "TRY_O_EU", "TR_ER_O", "TR_EU_O", "TR_O_E", "TR_O_EF", "TR_O_EG",
-"tr_o_h", "tr_o_hnpis", "TSDL", "TSPZEJ", "TSSYEJ", "TSUIH", "TSYA", "TSYC",
-"TSYP", "TSYS1", "TSYS2", "TSYSP1", "TSYSP2", "TSYSP3", "TSYWP", "TVEA", "TVEB",
-"TVEE", "TVEH", "TVENE", "TVENF", "TVENG", "TVENZ", "TVEO", "TVEQF", "TVEQS",
-"TVEQZ", "TVMB", "TVME", "TVMH", "TVMNE", "TVMNG", "TVMNZ", "TVMO", "TVMQF",
-"TVMQS", "TVMQZ", "TYD", "TYMB", "TYMLF", "TYMO", "TYMR", "TYMS", "TYPCO1_BF",
-"typco1_LD", "TYPCO2_BF", "typco2_LD", "TYPCR_ATP", "TYPCR_BF", "TYPCR_DMP",
-"TYPCR_SP", "TYPC_CF_E", "TYPC_CF_H", "TYPC_E_H", "TYPEF", "TYPFO", "TYPFO_E",
-"TYPFP", "TYPFP_E", "TYPFY", "TYPI", "TYPIO1_BF", "TYPIO2_BF", "TYPIR_BF", "TYPOV",
-"TYPPT", "TYPQ", "Typsp", "Typsp_e", "TYPT", "Typtp", "Typtp_e", "TYRBF", "TYRGC",
-"TYRHS", "TYRHY", "Tyrkf", "TYRKI", "TYRKK", "TYRKRR", "TYRKRS", "TYRKU", "TYRMC",
-"TYRRE", "TYRRR", "TYRRS", "TYUADA", "Tyuadj", "TYUADR", "TYUAK", "TYULY",
-"TYURY", "TYUSU", "TY_O", "TY_O_H", "U", "UA", "UAD", "Uaki", "UAKK", "Uakly",
-"Uakr", "Uakry", "Uaks", "UAKU", "UKI", "Ukiy", "UKR", "UL", "ULB", "ULD",
-"ULF", "ULK", "ULKI", "ULY", "Ulyy", "UMBXA", "UMO", "UMR", "UMSXA", "Umsy",
-"UPEF", "UPFO", "UPFOU", "UPFP", "UPFPU", "UPFY", "UPOV", "UPSP", "UPSPU",
-"UPT", "UPTP", "UPTPU", "URY", "Uryy", "USU", "VEA", "VEB", "VEE", "VEH",
-"VENE", "VENF", "VENG", "VENZ", "VEO", "Veo1", "VEQF", "VEQS", "VEQZ", "VMA",
-"VMB", "VME", "VMH", "VMNE", "VMNF", "VMNG", "VMNZ", "VMO", "Vmo1", "VMQF",
-"VMQS", "VMQZ", "VO1", "wbcp_z_cf", "wbd_os_z", "Wbe_os_z", "wbm_cf_z", "wbp_z_cf",
-"wbp_z_h", "wb_o_x", "wb_x_o", "wcp_cf_e", "wcp_cf_h", "wFPB", "wFPE", "wFPF",
-"wFPG", "wFPH", "wFPS", "wFPV", "wg_e_cf", "wHPB", "wHPE", "wHPF", "wHPG",
-"wHPH", "wHPS", "wHPV", "wlm_cf_cf", "wlm_cr_cf", "wlm_e_cf", "wlm_h_cf",
-"wlm_ok_cf", "wnbr_cf", "wnbr_h", "wnb_cf", "wnb_cr", "wnb_e", "wnb_h", "wnb_ok",
-"wnb_oo", "wnb_os", "wNPB", "wNPE", "wNPF", "wNPG", "wNPH", "wNPS", "wNPV",
-"wnq_cf", "wnq_cr", "wnq_e", "wnq_h", "wnq_ok", "wnq_oo", "wnq_os", "wn_cf",
-"wn_cr", "wn_e", "wn_h", "wn_o", "Wn_osslog", "WP", "WPCO1_BF", "wpco1_LD",
-"WPCO2_BF", "Wpco2_LD", "WPCR_ATP", "WPCR_BF", "WPCR_DMP", "WPCR_SP", "wpc_bf",
-"WPIO1_BF", "WPIO2_BF", "WPIR_BF", "wp_cf_e", "wp_cf_h", "wq_z_h", "wscp_d_cf",
-"wscp_e_cf", "wsp_d_cf", "wsp_d_h", "wsp_e_cf", "wsp_e_h", "wsr_d_cf", "wsr_d_h",
-"Wsr_e_cf", "wsr_e_h", "ws_cf_z", "ws_cr_z", "ws_d_cr", "ws_d_o", "ws_d_ok",
-"WS_D_OO", "WS_D_OS", "ws_e_cr", "ws_e_o", "ws_e_ok", "WS_E_OO", "WS_E_OS",
-"ws_e_z", "ws_z_e", "WZZOMUXA", "w_O_X", "w_X_O", "xa", "xb", "xe", "xh", "xne",
-"xnf", "xng", "xnz", "xo", "XO1", "XO1I", "XO1_P", "xqf", "xqs", "xqz",
-"YD_H", "YI", "Yk", "Yl", "Ylwas", "Ylwqs", "yr", "Yra", "Yrb", "Yre", "Yrh",
-"Yrne", "Yrnf", "Yrng", "Yrnz", "Yro", "Yrqf", "Yrqs", "Yrqz", "YR_H", "YS",
-"YSP", "Yst", "Ytr", "Ytrxil", "yw", "Ywa", "Ywb", "Ywe", "Ywh", "Ywne",
-"Ywnf", "Ywng", "Ywnz", "YWN_E", "Ywo", "YWO1", "Ywqf", "Ywqs", "Ywqz"
-                };
-            Globals.traceChunksRelevant = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-            foreach (string s in temp) Globals.traceChunksRelevant.Add(s, false);
-        }
+        }        
 
         private static List<TraceFrame> TraceAnalyzeUsers(TraceFrame traceFrame, bool onlyObk, long big)
         {
@@ -4158,7 +3857,7 @@ namespace Gekko
             return pp;
         }
 
-        
+
 
         /// <summary>
         /// From the variable pv, flood the adjacent variables with color color.
@@ -4446,7 +4145,7 @@ namespace Gekko
         /// <param name="model"></param>
         /// <returns></returns>
         public static List<object> ProtobufModelGamsScalar5a(int k, Model model)
-        {            
+        {
             if (k != 5) new Error("Hov");
 
             List<ModelGamsScalar> m = new List<ModelGamsScalar>();
@@ -5252,7 +4951,7 @@ namespace Gekko
         public static string GetExceptionDetails(Exception ex)
         {
             StringBuilder sb = new StringBuilder();
-                        
+
             sb.AppendLine("--- Exception Details ---");
 
             // Start with the current/outer exception
@@ -6170,7 +5869,7 @@ namespace Gekko
 
             return ts;
         }
-        
+
         /// <summary>
         /// Helper method
         /// </summary>
@@ -6800,7 +6499,7 @@ namespace Gekko
                                     if (tsExisting != null && tsExisting.type == ESeriesType.ArraySuper) new Error("When merging data, a normal series " + tsImported.name + " tries to add data to an existing " + tsExisting.dimensions + "-dimensional array-series with the same name.");
                                     bool shouldOverwriteLaterOn = false;
                                     MergeTwoTimeseriesWithDateWindow(tsExisting, tsImported, dates, ref maxYearInProtobufFile, ref minYearInProtobufFile, ref shouldOverwriteLaterOn);
-                                    MergeTwoTimeseriesWithDateWindowHelper(dates, databank, name, tsImported, shouldOverwriteLaterOn);                                    
+                                    MergeTwoTimeseriesWithDateWindowHelper(dates, databank, name, tsImported, shouldOverwriteLaterOn);
                                     HandleTraceForReadOrImport(name, tsExisting, tsImported, dates, ffh.realPathAndFileName, isGbk, oRead.gekkocode, p);
                                 }
                             }
@@ -6943,7 +6642,7 @@ namespace Gekko
                 {
                     //READ. We cannot handle OPEN here, because an OPENed databank may be edited before CLOSE.
                     //      So CLOSE handles this.
-                    DlinkAutoDlinkFiles.HandleDlink(blob, false, p);                    
+                    DlinkAutoDlinkFiles.HandleDlink(blob, false, p);
                 }
             }  //for each bank in list
 
@@ -6955,25 +6654,25 @@ namespace Gekko
             if (Program.options.databank_trace)
             {
                 try
-                {                    
+                {
                     //DateTime traceTime = DateTime.UtcNow;  //remember to compute Globals.traceTime at the of this try-catch
-                                                           //When arriving here, it is a READ/IMPORT, not OPEN.
-                                                           //There are these combinations:
-                                                           //
-                                                           // gbk or non-gbk
-                                                           // no period or <...>-period
-                                                           // series x already exists
-                                                           //
-                                                           // If non-gbk, we always do a "PARENT"
-                                                           // Also for the below B, C and D.
-                                                           // Only A is a raw copy, like in OPEN<edit>.
-                                                           // ---------------------------------------------
-                                                           //           |    no period           period
-                                                           // ---------------------------------------------
-                                                           // no exist  |      A                   B
-                                                           // exist     |      C                   D             (only for gbk read<merge> or import)
-                                                           // ---------------------------------------------                                        
-                                                           // 
+                    //When arriving here, it is a READ/IMPORT, not OPEN.
+                    //There are these combinations:
+                    //
+                    // gbk or non-gbk
+                    // no period or <...>-period
+                    // series x already exists
+                    //
+                    // If non-gbk, we always do a "PARENT"
+                    // Also for the below B, C and D.
+                    // Only A is a raw copy, like in OPEN<edit>.
+                    // ---------------------------------------------
+                    //           |    no period           period
+                    // ---------------------------------------------
+                    // no exist  |      A                   B
+                    // exist     |      C                   D             (only for gbk read<merge> or import)
+                    // ---------------------------------------------                                        
+                    // 
 
                     GekkoSmplSimple periods = dates?.GetPeriods(tsImported.freq);  //dates is == null for READ or IMPORT<all>. In that case, periods becomes == null too.
 
@@ -7269,12 +6968,12 @@ namespace Gekko
                     else if (oRead.Type == EDataFormat.Parquet)
                     {
                         List<string> errors = new List<string>();
-                        try 
-                        { 
-                            Arrow.ReadParquetDatabank(databankTemp, readInfo, file, errors, bankName); 
+                        try
+                        {
+                            Arrow.ReadParquetDatabank(databankTemp, readInfo, file, errors, bankName);
                         }
                         catch
-                        {                            
+                        {
                             if (errors.Count > 0) new Error(string.Join(". ", errors));
                             else new Error("The parquet data reader failed");
                         }
@@ -7401,7 +7100,7 @@ namespace Gekko
         /// <param name="db"></param>
         /// <param name="merge"></param>
         public static void HandleCleanAndParentForTimeseries(Databank db, bool merge)
-        {            
+        {
             foreach (IVariable iv in db.storage.Values)
             {
                 Series ts = iv as Series;
@@ -7884,7 +7583,7 @@ namespace Gekko
             //We can presume that DatabankInfo.xml is in UTF-8, since it is typically written by Gekko
             //So no need to use GetTextFromFile()
             string databankVersion = null;
-            string traceVersion = null;            
+            string traceVersion = null;
             GetDatabankInfo(readInfo, tempTsdxPath + "\\" + Globals.databankInfoName, out databankVersion, out traceVersion);
 
             Databank deserializedDatabank = null;
@@ -8106,7 +7805,7 @@ namespace Gekko
                 {
                     readInfo.dataHashFull = dataHash.InnerText.Trim();
                     if (G.NullOrBlanks(readInfo.dataHash)) readInfo.dataHash = null; //Used in Dlink.cs, should be null rather than "".
-                    readInfo.dataHash = readInfo.dataHashFull;                    
+                    readInfo.dataHash = readInfo.dataHashFull;
                     if (!G.NullOrBlanks(readInfo.dataHash)) readInfo.dataHash = readInfo.dataHash.Length > 8 ? readInfo.dataHash.Substring(0, 8) : readInfo.dataHash;
                 }
 
@@ -8970,7 +8669,7 @@ namespace Gekko
                     if (obs != obs2 && obs2 > 1)  //for obs2 = 1, any timeperiod is ok.
                     {
                         new Error("IMPORT<flat>: Expected " + obs + " observations for for series '" + varname + "', got " + obs2 + " (line " + n + ")");
-                    }                    
+                    }
 
                     Series ts = databank.GetIVariableMayCreateSeries(G.Chop_AddFreq(varname, gt1.freq)) as Series;
                     if (ts == null) new Error("Expected timeseries name, not '" + varname + "'");
@@ -11046,7 +10745,7 @@ namespace Gekko
             Globals.suggestions.Clear();  //to not fill out ram too much
 
             if (Globals.batchType == EBatchType.Gekcel || Globals.batchType == EBatchType.PyGekko || Globals.batchType == EBatchType.Hide)
-            {                
+            {
                 if (!Globals.nolog)
                 {
                     //if the below object is null, nothing is printed/written to it afterwards
@@ -11148,7 +10847,7 @@ namespace Gekko
                         }
                         else
                         {
-                            new Error("Strange error in gcm file -- please report this to the developer");                            
+                            new Error("Strange error in gcm file -- please report this to the developer");
                         }
                     }
                     else
@@ -11371,7 +11070,7 @@ namespace Gekko
                 {
                     banks1 = Path.GetFileName(banks1);
                 }
-                catch { }                
+                catch { }
                 //if (banks1.EndsWith("." + Globals.extensionDatabank, StringComparison.OrdinalIgnoreCase)) banks1 = banks1.Substring(0, banks1.Length - Globals.extensionDatabank.Length - 1);
                 //TODO: make a smart trim procedure
 
@@ -11386,7 +11085,7 @@ namespace Gekko
                 {
                     banks2 = Path.GetFileName(banks2);
                 }
-                catch { }                
+                catch { }
                 //if (banks2.EndsWith("." + Globals.extensionDatabank, StringComparison.OrdinalIgnoreCase)) banks2 = banks2.Substring(0, banks2.Length - Globals.extensionDatabank.Length - 1);
                 if (banks2.Length > 30)
                 {
@@ -11419,10 +11118,10 @@ namespace Gekko
             //========================================================================================================
             string sw = GetDatabankFileNameWithPath(Program.databanks.GetFirst());
             string sr = GetDatabankFileNameWithPath(Program.databanks.GetRef());
-            string ss = "Period: " + f + " " + start + "-" + end + G.NL;            
+            string ss = "Period: " + f + " " + start + "-" + end + G.NL;
             if (!G.NullOrBlanks(sw)) ss += "First: " + sw + G.NL;
             if (!G.NullOrBlanks(sr)) ss += Globals.Ref + ": " + sr + G.NL;
-            ss += "Working folder: " + Program.options.folder_working + G.NL;            
+            ss += "Working folder: " + Program.options.folder_working + G.NL;
 
             if (ss != Gui.gui.toolStripStatusLabel1.ToolTipText) Gui.gui.toolStripStatusLabel1.ToolTipText = ss;
 
@@ -11435,8 +11134,8 @@ namespace Gekko
                 {
                     Globals.workerThread.gekkoGui.Invoke(Globals.workerThread.gekkoGui.threadDelegateSetTitle, wh);
                 }
-                catch 
-                { 
+                catch
+                {
                 } //This may for instance fail with an illegal copy-paste
             }
 
@@ -11632,7 +11331,7 @@ namespace Gekko
                     foreach (Trace2 trace in th1.traces.Keys)
                     {
                         TraceGetPrecedentsHelper(trace, bankname, found, helper);
-                    }                    
+                    }
                 }
             }
             else
@@ -11677,7 +11376,7 @@ namespace Gekko
         {
             List<string> precedentsNames = trace.traceContents.precedentsNames;
             if (precedentsNames != null)
-            {                
+            {
                 List<string> names = new List<string>();
                 if (helper != null)
                 {
@@ -11711,8 +11410,8 @@ namespace Gekko
                         //skip
                     }
                     else
-                    {                        
-                        helper.elements.Add(tb);                        
+                    {
+                        helper.elements.Add(tb);
                     }
                 }
                 else
@@ -11755,7 +11454,7 @@ namespace Gekko
         /// <returns></returns>
         public static GekkoDictionary<string, bool> TraceGetDependents(IVariable ivName, string bankname, int direct)
         {
-            GekkoDictionary<string, bool> found = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);            
+            GekkoDictionary<string, bool> found = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
             if (ivName == null)
             {
@@ -11770,7 +11469,7 @@ namespace Gekko
                     TraceHelper th1 = new TraceHelper();
                     th1.type = ETraceHelper.GetAllMetasAndTraces;
                     if (direct == 1) th1.depthLimit = 1;
-                    ts.DeepTrace(th1);                    
+                    ts.DeepTrace(th1);
 
                     foreach (Trace2 trace in th1.traces.Keys)
                     {
@@ -11783,7 +11482,7 @@ namespace Gekko
                 string nameWithFreq = null;
                 if (ivName.Type() == EVariableType.String)
                 {
-                    nameWithFreq = G.Chop_AddFreq(G.Chop_GetName(O.ConvertToString(ivName)), Program.options.freq);                    
+                    nameWithFreq = G.Chop_AddFreq(G.Chop_GetName(O.ConvertToString(ivName)), Program.options.freq);
                 }
                 else if (ivName.Type() == EVariableType.Series)
                 {
@@ -11929,7 +11628,7 @@ namespace Gekko
                 {
                     version = version.Substring(0, version.Length - 2);
                 }
-                Globals.gekkoVersion = version;                
+                Globals.gekkoVersion = version;
             }
             catch (Exception e) { };
         }
@@ -12775,7 +12474,7 @@ namespace Gekko
             DNameNoTimeOrLag two = new DNameNoTimeOrLag(db.name + ":" + s.GetName(), s.GetFreq(), s.GetIndexesExceptTime().Select(x => (StringOrTime)x).ToArray()); //s has no time anyway
             if (!Globals.precedentsContainer.ContainsKey(two))
             {
-                Globals.precedentsContainer.Add(two, 0);                
+                Globals.precedentsContainer.Add(two, 0);
             }
         }
 
@@ -13234,7 +12933,7 @@ namespace Gekko
             Series ts = null;
             if (iv != null) ts = iv as Series;
             if (printName)
-            {                
+            {
                 string sDomains = null;
                 if (ts?.mmi != null)
                 {
@@ -13253,9 +12952,9 @@ namespace Gekko
                 }
                 GekkoTimeSpans fixList = null;
                 try
-                {                    
+                {
                     if (Program.model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar)
-                    {                        
+                    {
                         fixList = GekkoTimeSpans.GetTimeSpansFromGekkoTimeArray(Program.model.modelGamsScalar.GetFixedPeriods(varname));
                     }
                 }
@@ -13345,7 +13044,7 @@ namespace Gekko
             //List<string> ss2 = Program.GetVariableExplanation(G.Chop_RemoveFreq(var2), var2, true, false, GekkoTime.tNull, GekkoTime.tNull, htmlBrowserSettings);
             List<string> ss2 = Program.GetVariableExplanation(varname.RemoveTime(), true, false, GekkoTime.tNull, GekkoTime.tNull, htmlBrowserSettings, mayGiveExceptionError);
             return ss2;
-        }        
+        }
 
         /// <summary>
         /// Some unit tests.
@@ -14030,7 +13729,7 @@ namespace Gekko
 
         public static System.Reflection.Assembly CompileAssembly(StringBuilder code, out bool hasErrors)
         {
-            hasErrors = false;            
+            hasErrors = false;
             //Parse C# source string into Roslyn Syntax Tree
             string s = code.ToString();
             SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(code.ToString());
@@ -14042,8 +13741,8 @@ namespace Gekko
             };
 
             if (G.IsUnitTestingOrNotShowingGUI()) references.Add(MetadataReference.CreateFromFile(G.GekkoExePath()));
-            else references.Add(MetadataReference.CreateFromFile(Application.ExecutablePath));            
-            
+            else references.Add(MetadataReference.CreateFromFile(Application.ExecutablePath));
+
             CSharpCompilationOptions compilationOptions = new CSharpCompilationOptions(
                 OutputKind.DynamicallyLinkedLibrary,
                 optimizationLevel: OptimizationLevel.Release,
@@ -14055,7 +13754,7 @@ namespace Gekko
                 syntaxTrees: new[] { syntaxTree },
                 references: references,
                 options: compilationOptions
-            );            
+            );
 
             //Emit assembly bytecode directly to an in-memory stream --> 0 disk usage
             using (MemoryStream ms = new MemoryStream())
@@ -14093,7 +13792,7 @@ namespace Gekko
         public static void ReferencedAssembliesGekko(CompilerParameters compilerParams)
         {
             if (G.IsUnitTestingOrNotShowingGUI())
-            {                
+            {
                 compilerParams.ReferencedAssemblies.Add(G.GekkoExePath());
             }
             else
@@ -14136,7 +13835,7 @@ namespace Gekko
             }
             Object[] args = new Object[0];
             assembly.GetType("Gekko.TranslatedCode").InvokeMember("PredictActions", BindingFlags.InvokeMethod, null, null, args);
-        }        
+        }
 
         /// <summary>
         /// For Gekko model files (.frm), takes care of normal equations (FRML), variable list, and runbefore$ or runafter$ code.
@@ -14516,7 +14215,7 @@ namespace Gekko
                         //not intended for "normal" Gekko users.
                         MakeBatFileForAremos();
                     }
-                    break;                
+                    break;
                 case "--lex":
                     {
                         //show raw tokens
@@ -14547,7 +14246,7 @@ namespace Gekko
                     {
                         Program.TestRam(false);
                     }
-                    break;                
+                    break;
                 case "--nopause":
                     {
                         if (Globals.pausePopup)
@@ -14656,7 +14355,7 @@ namespace Gekko
                         else Globals.printGrayLinesForDebugging = true;
                         G.Writeln("Gray printing (debug) is set to: " + Globals.printGrayLinesForDebugging);
                     }
-                    break;                
+                    break;
                 case "--killexcel":
                     {
                         DialogResult result = MessageBox.Show("Delete all processes with 'excel' in their names? CLOSE EXCEL SHEETS BEFOREHAND!!", "Gekko helper", MessageBoxButtons.YesNo, MessageBoxIcon.None, MessageBoxDefaultButton.Button2, MessageBoxOptions.DefaultDesktopOnly);
@@ -15334,7 +15033,7 @@ namespace Gekko
         /// <param name="start"></param>
         /// <returns></returns>
         private static bool Has2IdentsFollowing(string lineNewVersion, int start)
-        {            
+        {
             //The method looks for two idents like "a1 b2 " or "a1 b2>". Any spaces before, in middle or after are ok.
             //A '=' right after the second token is ok too.
             int j = G.SkipSpaces(lineNewVersion, start);
@@ -15400,7 +15099,7 @@ namespace Gekko
             {
                 lineCounter++;
                 string lineNewVersion = line;
-                
+
                 try
                 {
                     if (lineNewVersion == Globals.iniFileSecretName)  //this strange name is made in GuiAutoExecStuff()
@@ -15723,7 +15422,7 @@ namespace Gekko
                     int remember = Program.options.print_width;
                     Program.options.print_width = int.MaxValue;
                     try
-                    {                        
+                    {
                         G.Writeln("Internal syntax error triggered by line " + lineCounter + ": " + lineNewVersion, Color.DarkOrange);  //Would be rare
                     }
                     finally
@@ -16888,7 +16587,7 @@ namespace Gekko
         }
 
         public static void TraceCommand2(O.TraceCommand2 o)
-        {            
+        {
             List<string> names = null;
             List<IVariable> m = new List<IVariable>();
             //See also #87582903573829
@@ -16933,7 +16632,7 @@ namespace Gekko
                     new Writeln("As seen above, '" + ts.GetNameAndParentDatabank() + "' is an array-series. Please choose one of its elements (sub-series) for data-tracing.");
                 }
                 else
-                {                    
+                {
                     Trace2 trace = ts.meta.trace2;
                     if (trace == null)
                     {
@@ -16960,7 +16659,7 @@ namespace Gekko
                     Trace2.CallTraceViewer(trace, int.MaxValue, info);
                 }
             }
-        }        
+        }
 
         private static void DispHelper(GekkoTime tStart, GekkoTime tEnd, List<IVariable> m, List<string> list, List<string> names, List originalList, bool showDetailed, bool showAllPeriods, bool clickedLink, ref int nonSeries, ref int seriesCounter)
         {
@@ -17110,7 +16809,7 @@ namespace Gekko
 
                 GekkoTime first = ts.GetRealDataPeriodFirst();
                 GekkoTime last = ts.GetRealDataPeriodLast();
-                                
+
                 G.Write(type3);
                 string stamp = null;
                 if (ts.meta.stamp != null && ts.meta.stamp != "") stamp = " (updated: " + ts.meta.stamp + ")";
@@ -17152,7 +16851,7 @@ namespace Gekko
                             //then it is a sub-series
                             Series parent = ts.mmi.parent;
                             if (parent != null)
-                            {                                
+                            {
                                 if (parent.meta.fix == EFixedType.Parameter)
                                 {
                                     G.Writeln("Fixed (parameter)");
@@ -17267,7 +16966,7 @@ namespace Gekko
                     {
                         d4.Add(d3);
                     }
-                }                
+                }
                 d4 = d4.OrderBy(x => x, new MultidimSortComparer(true)).ToList();
             }
 
@@ -17405,7 +17104,7 @@ namespace Gekko
         /// <param name="eqsPrinted"></param>
         /// <returns></returns>
         private static bool DispHelperShowGamsEquations(GekkoTime tStart, GekkoTime tEnd, bool showDetailed, bool showAllPeriods, bool clickedLink, Series ts, bool gamsToGekko, string var, string varnameWithoutFreq, bool eqsPrinted, string bank, bool isGams)
-        {            
+        {
             if (model.modelCommon.GetModelSourceType() == EModelType.GAMSScalar && G.Equal(Program.options.print_disp_model_gams_scalar, "modern"))
             {
                 eqsPrinted = DispHelperShowGamsEquationsModern(tStart, tEnd, showDetailed, showAllPeriods, clickedLink, varnameWithoutFreq, eqsPrinted, bank, isGams);
@@ -17559,10 +17258,10 @@ namespace Gekko
                 }
 
                 //Gets the equation text (raw)
-                EquationTextHelper helperA = new EquationTextHelper();                
+                EquationTextHelper helperA = new EquationTextHelper();
                 GetEquationTextHelper helperA1 = Program.model.GetEquationText(new List<DName>() { bestEq.eqName }, helperA, tUsedHere);
 
-                string eqTextA = helperA1.s_gekkoSyntax;                
+                string eqTextA = helperA1.s_gekkoSyntax;
 
                 if (true)
                 {
@@ -17673,7 +17372,7 @@ namespace Gekko
                     }
                 }
                 else
-                {                                        
+                {
                     string vars = null;
                     List<string> dependentVarsList = FindDependentVars(varnameWithoutFreq, model, modelGams, modelGamsScalar, eqsContainingVariable);
                     //
@@ -17831,7 +17530,7 @@ namespace Gekko
             }
             varname2 = "x_" + i2;
             return varname2;
-        }        
+        }
 
         private static void ListWithLinks(GekkoTime tStart, GekkoTime tEnd, bool showDetailed, bool showAllPeriods, bool clickedLink, string bank, bool isGams, List<string> precedents, List<string> precedents2)
         {
@@ -17855,13 +17554,13 @@ namespace Gekko
                 }
             }
         }
-        
+
         public static void CallPrtViewer(DataTable dt)
         {
             Thread thread = new Thread(new ParameterizedThreadStart(Program.CallPrtViewer2));
             thread.Name = "Gekko viewer";
             thread.SetApartmentState(ApartmentState.STA);
-            thread.CurrentCulture = CultureInfo.InvariantCulture;            
+            thread.CurrentCulture = CultureInfo.InvariantCulture;
             thread.Start(dt);
         }
 
@@ -18108,7 +17807,7 @@ namespace Gekko
                             G.Writeln(")");
                         }
                         else
-                        {                            
+                        {
                             string xname = ts.GetParentDatabank().name; //Otherwise BAD memory leak!!
                             string yname = ts.GetName();
                             // ---------                
@@ -18236,7 +17935,7 @@ namespace Gekko
             foreach (TokenHelper token in tokens.storage)
             {
                 if (token.type == ETokenType.Word)
-                {                    
+                {
                     List<ModelGamsEquation> e3 = GamsModel.GetGamsEquationsByVarname(new DNameSimplest(token.s), model);
                     if (e3 != null)
                     {
@@ -18534,7 +18233,7 @@ namespace Gekko
                 }
 
                 IVariable existing = existing = O.GetIVariableFromString(output.s2, O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries);
-                                
+
                 bool injectingToExistingSeries = false;
 
                 GekkoSmplSimple truncateTemp = null;
@@ -18581,7 +18280,7 @@ namespace Gekko
                                     Trace2 trace = new Trace2(ETraceType.Normal, truncateTemp.t1, truncateTemp.t2, true);
                                     trace.GetContents().text = o.gekkocode + ";";
                                     trace.GetContents().name = existing_series.GetNameAndParentDatabank();
-                                    trace.GetContents().commandFileAndLine = o.p?.GetExecutingGcmFile(ERunningGcm.IncludeProcFunc);                                    
+                                    trace.GetContents().commandFileAndLine = o.p?.GetExecutingGcmFile(ERunningGcm.IncludeProcFunc);
                                     trace.AddRangeFromSeries2(existing_series, iv_series);
                                     Gekko.Trace2.PushIntoSeries(existing_series, trace, ETracePushType.Sibling, false);
                                     //Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
@@ -18624,7 +18323,7 @@ namespace Gekko
                             {
                                 if (newTrace.GetContents().precedentsNames == null) newTrace.GetContents().precedentsNames = new List<string>();
                                 newTrace.GetContents().precedentsNames.Add(Trace2.TraceGetNameDecorated(iv as Series, (iv as Series)?.meta?.trace2 != null));
-                            }                            
+                            }
                             Gekko.Trace2.PushIntoSeries(ts_clone, newTrace, ETracePushType.NewParent, Globals.traceUsesOrMayUseRealDataPeriod);
                             //Globals.traceTime += (DateTime.UtcNow - traceTime).TotalMilliseconds; //remember to define traceTime at the start of this try-catch
                         }
@@ -18866,7 +18565,7 @@ namespace Gekko
             string command3 = null;
 
             if (type == EWildcardSearchType.Copy)
-            {                
+            {
                 command = "COPY";
                 command2 = "copy";
                 command3 = "copied";
@@ -19028,7 +18727,7 @@ namespace Gekko
                 //calling this part, even though it actually may work for more cases than for instance x[a,*] etc.
                 bool searchInIndexes = false;
                 if (!lhsBankOrNameHasStarOrQuestion && indexLhs != null)
-                {                    
+                {
                     if (type == EWildcardSearchType.Search)
                     {
                         searchInIndexes = true;
@@ -19054,7 +18753,7 @@ namespace Gekko
                     }
                     IVariable iv = O.GetIVariableFromString(wildCardLhs2, O.ECreatePossibilities.NoneReturnNullButErrorForParentArraySeries);
                     if (iv != null)
-                    {                        
+                    {
                         if (!G.Chop_GetName(wildCardLhs).StartsWith(Globals.symbolCollection.ToString()) && iv.Type() == EVariableType.List)
                         {
                             //DISP x[*], DISP x[?] etc., but not DISP #i.
@@ -19067,7 +18766,7 @@ namespace Gekko
                                 if (freq != Program.options.freq)
                                 {
                                     name = G.Chop_SetFreq(name, freq);
-                                }                                
+                                }
                                 name = G.Chop_SetBank(name, db);
                                 lhsUnfolded.Add(name);
                                 lhsUnfoldedExplicit.Add(hasExplicitBank);
@@ -19211,7 +18910,7 @@ namespace Gekko
                         else rhsType = ERhsStarType.OneNonNaked;
                     }
                     else rhsType = ERhsStarType.TwoOrMore;
-                                        
+
                     if (IndexHasStars(indexRhs)) new Error("Indexes containing '*' not allowed in TO/AS part of " + command + "");
 
                     if (rhsType == ERhsStarType.TwoOrMore)
@@ -19850,7 +19549,7 @@ namespace Gekko
                 List<DName> temp1 = new List<DName>();
                 foreach (DName s in Program.model.modelGekko.exogenized.Keys) temp1.Add(s);
                 temp1 = temp1.OrderBy(x => x, new MultidimSortComparer(true)).ToList();
-                G.Writeln(Stringlist.GetListWithCommas(temp1));                
+                G.Writeln(Stringlist.GetListWithCommas(temp1));
             }
             G.Writeln();
             return;
@@ -20337,7 +20036,7 @@ namespace Gekko
                 else if (modelType == EModelType.GAMSScalar)
                 {
                     Model model = null;
-                    model = GamsModel.ReadGAMSScalarModel(o, folders, ffh.realPathAndFileName);                        
+                    model = GamsModel.ReadGAMSScalarModel(o, folders, ffh.realPathAndFileName);
                     Program.model = model;
                 }
                 else new Error("No model defined");
@@ -20345,7 +20044,7 @@ namespace Gekko
                 model.modelCommon.cacheParameters = cacheParameters; //a cache hit must also match this object
 
                 DateTime dt00 = DateTime.Now;
-                try 
+                try
                 {
                     //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
                     if (modelType != EModelType.GAMSRaw)
@@ -20766,9 +20465,9 @@ namespace Gekko
                 }
             }
         }
-        
 
-        
+
+
         /// <summary>
         /// Will detect x[#i][-1] + y = ...  . Used in GetLhsVariable().
         /// </summary>
@@ -20946,15 +20645,15 @@ namespace Gekko
                     Globals.pipeFileHelper.pipeFile = null;
                     Globals.pipeFileHelper.pipeFileFileWithPath = "";
                     if (!mute) G.Writeln2("Directing output to main window");
-                    if (G.Equal(fileName, "con")) G.Warning("w18.1", "Please use PIPE<stop> instead of PIPE con");                    
+                    if (G.Equal(fileName, "con")) G.Warning("w18.1", "Please use PIPE<stop> instead of PIPE con");
                 }
             }
             else if (pause)
-            {                
+            {
                 Globals.pipe.isPiping = false;  //remember .mustPrintOnScreen
             }
             else if (continue2)
-            {                
+            {
                 Globals.pipe.isPiping = true;  //use existing .mustPrintOnScreen
             }
             else
@@ -21006,7 +20705,7 @@ namespace Gekko
         private static void StartPipingToFile(string fileName, bool append, bool html, bool mute, bool echo)
         {
             Globals.dependencyTracking.Add(2, "Pipe", false, fileName);
-            if (!mute && !Globals.pipe.isPiping) G.Writeln2("Directing output to file: '" + fileName + "'");            
+            if (!mute && !Globals.pipe.isPiping) G.Writeln2("Directing output to file: '" + fileName + "'");
             Globals.pipe = new PipeFileOptions(true, echo);
             GekkoFileReadOrWrite option = GekkoFileReadOrWrite.Write;
 
@@ -21640,7 +21339,7 @@ namespace Gekko
                 CrossThreadStuff.CloseDecomp2(windowsDecompTemp2[i]);  //fails silently
             }
             Globals.windowsDecomp2 = new List<WindowDecomp>();
-        }        
+        }
 
         public static void CutPlot()
         {
@@ -21899,7 +21598,7 @@ namespace Gekko
                     if (G.IsNumericalError(value))
                     {
                         if (G.Equal(o.opt_ref, "yes"))
-                        {                            
+                        {
                             if (r[i] == null) continue; //x[%t] being missing is not worse than @x not existing                            
                             if (G.IsNumericalError(r[i].GetDataSimple(t))) continue; //x[%t] being missing is not worse than @x[%t] being missing
                         }
@@ -22162,9 +21861,9 @@ namespace Gekko
             Zipper zipper2 = new Zipper("comparefolders2.zip");
             GekkoDictionary<string, bool> missingFolders1 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             GekkoDictionary<string, bool> missingFolders2 = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-            
+
             if (true)
-            {                
+            {
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine("// ========== From folder2 to folder1: copy files that are missing in folder1 ==========");
                 foreach (string s in e21)
@@ -22205,7 +21904,7 @@ namespace Gekko
             }
 
             if (true)
-            {                 
+            {
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine("// ========== From folder1 to folder2: copy files that are missing in folder2 ==========");
                 foreach (string s in e12)
@@ -22968,7 +22667,7 @@ namespace Gekko
             }
 
             GekkoDictionary<string, bool> defined = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-            
+
             using (FileStream fs = WaitForFileStream(pathAndFilename, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))
             {
@@ -23206,7 +22905,7 @@ namespace Gekko
             string s = O.ConvertToString(Functions.runfolder(null, null, null, new ScalarString("rel")));
             if (G.DlinkDebug()) MessageBox.Show("ProgramFolderRunningRelative(): " + s);
             return s;
-        }        
+        }
 
         /// <summary>
         /// Use for Gekko functions laspchain() and laspfixed(), Laspeyres indexes. Call either with a list of strings (list1/list2) or
@@ -24233,7 +23932,7 @@ namespace Gekko
                         if (e.Message.Contains("System.OutOfMemoryException"))
                         {
                             G.Writeln2("Arrow writing ran out of memory. Consult the Gekko editor to get this investigated.");
-                            G.Writeln();                            
+                            G.Writeln();
                         }
                         throw;
                     }
@@ -24261,7 +23960,7 @@ namespace Gekko
                         if (e.Message.Contains("System.OutOfMemoryException"))
                         {
                             G.Writeln2("Parquet writing ran out of memory. Consult the Gekko editor to get this investigated.");
-                            G.Writeln();                            
+                            G.Writeln();
                         }
                         throw;
                     }
@@ -24279,7 +23978,7 @@ namespace Gekko
                         return WriteGbk(o?.p, list, Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, writeOption, writeAllVariables, false, G.Equal(o.opt_trace, "no"));
                     }
                     if (writeType == EDatabankWriteType.Tsd)
-                    {                        
+                    {
                         return WriteTsd(list, Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, writeOption, writeAllVariables, false, o?.p);
                     }
                     else if (writeType == EDatabankWriteType.Flat)
@@ -24441,7 +24140,7 @@ namespace Gekko
                 file.Flush();
             }
             DlinkAutoDlinkFiles.HandleDlink(blob, false, o?.p);
-            G.Writeln2("R export of " + o.list1.Count() + " matrices, " + fullFileName);            
+            G.Writeln2("R export of " + o.list1.Count() + " matrices, " + fullFileName);
         }
 
         /// <summary>
@@ -24518,8 +24217,8 @@ namespace Gekko
         /// <param name="variablesType"></param>
         /// <exception cref="GekkoException"></exception>
         private static void WriteToExcel(string fileName, GekkoTime tStart, GekkoTime tEnd, List<Tuple<string, IVariable>> list2, bool isCols, string dateformat, string datetype, EVariablesForWrite variablesType)
-        {            
-            ExcelOptions eo = new ExcelOptions();            
+        {
+            ExcelOptions eo = new ExcelOptions();
 
             if (variablesType == EVariablesForWrite.Normal)
             {
@@ -24582,7 +24281,7 @@ namespace Gekko
                 }
                 else
                 {
-                    new Error("The variable '" + list2[iHere].Item1 + "' cannot be exported. It is not a series, a list or a matrix");                    
+                    new Error("The variable '" + list2[iHere].Item1 + "' cannot be exported. It is not a series, a list or a matrix");
                 }
             }
 
@@ -24743,7 +24442,7 @@ namespace Gekko
                 //Data hash
                 string dataHash = null;
                 if (Program.options.databank_file_gbk_datahash)
-                {                    
+                {
                     dataHash = DataHash(databank, !noTrace && Trace2.CollectAllTraces(databank, ETraceHelper.SeeIfThereIsAtLeastOneTrace).thereIsAtLeastOneTrace); //if noTrace == true, no traces are kept in gbk, and the method is called with false for the second argument
                 }
 
@@ -24759,7 +24458,7 @@ namespace Gekko
                     catch (Exception e) { traceFail = true; }
                     tracesToWrite = databank.traces;
                     databank.traces = null;
-                }                
+                }
 
                 CreateDatabankXmlInfo(p, databank, tempTsdxPath, databankVersion, traceVersion, isCloseCommand, dataHash);
 
@@ -25115,41 +24814,41 @@ namespace Gekko
             doc.AppendChild(root);
             root.SetAttribute("databankVersion", databankVersion);  //needs to be changed if Databank/Series change
             root.SetAttribute("traceVersion", traceVersion);  //needs to be changed if Databank/Series change
-            root.SetAttribute("gekkoVersion", Globals.gekkoVersion);            
+            root.SetAttribute("gekkoVersion", Globals.gekkoVersion);
             if (Globals.gbkExtraMetadata)
             {
-                try 
-                {                     
-                    XmlElement user = doc.CreateElement("User");                    
+                try
+                {
+                    XmlElement user = doc.CreateElement("User");
                     user.InnerText = (Functions.user(null, null, null, new IVariable[] { }) as ScalarString).string2;
                     if (!G.NullOrBlanks(user.InnerText)) root.AppendChild(user);
-                } 
+                }
                 catch { }
-                
-                try 
-                {                     
+
+                try
+                {
                     XmlElement branch = doc.CreateElement("Branch");
                     branch.InnerText = (Functions.branch(null, null, null, new IVariable[] { }) as ScalarString).string2;
                     if (!G.NullOrBlanks(branch.InnerText)) root.AppendChild(branch);
-                } 
+                }
                 catch { }
-                
-                try 
-                {                    
+
+                try
+                {
                     XmlElement commit = doc.CreateElement("Commit");
                     commit.InnerText = (Functions.commit(null, null, null, new IVariable[] { }) as ScalarString).string2;
                     if (!G.NullOrBlanks(commit.InnerText)) root.AppendChild(commit);
-                } 
+                }
                 catch { }
-                
-                try 
-                {                    
+
+                try
+                {
                     XmlElement gcm = doc.CreateElement("Gcm");
                     gcm.InnerText = p?.GetExecutingGcmFile(ERunningGcm.ExcludeProcFuncIgnoreExistence); //Like for runfolder() and runfile(), we are interested in the executing .gcm file, so do not return a proc/func. This is done for data-traces, though, so there is a minor inconsistency here, but for traces, you often want to see the exact series statement.
                     if (!G.NullOrBlanks(gcm.InnerText)) root.AppendChild(gcm);
-                } 
+                }
                 catch { }
-            }            
+            }
 
             XmlElement comment = doc.CreateElement("Info1");  //HDG
             comment.InnerText = databank.info1;
@@ -25162,7 +24861,7 @@ namespace Gekko
 
             XmlElement dataHash2 = doc.CreateElement("DataHash");
             dataHash2.InnerText = dataHash;
-            if (!G.NullOrBlanks(dataHash2.InnerText)) root.AppendChild(dataHash2);                        
+            if (!G.NullOrBlanks(dataHash2.InnerText)) root.AppendChild(dataHash2);
 
             XmlElement variables = doc.CreateElement("Variables"); //Just a count of databank dictionary keys
             variables.InnerText = databank.storage.Count().ToString();
@@ -25720,7 +25419,7 @@ namespace Gekko
             {
                 new Error("The folder " + dir + " does not exist for file copying");
             }
-            
+
             int gap = Globals.waitFileGap;  //2 second
             int totalTime = Globals.waitFileTotalTime;  //600 seconds
             int repeats = totalTime / gap;
@@ -25768,9 +25467,9 @@ namespace Gekko
                     Thread.Sleep(gap * 1000);
                     continue;
                 }
-                
+
                 if (type == "delete")
-                {                    
+                {
                     Thread.Sleep(10); //0.01s just to prepare for the exists() check
                     if (File.Exists(pathAndFilenameSource))
                     {
@@ -25780,7 +25479,7 @@ namespace Gekko
                         continue;
                     }
                 }
-                
+
                 break;
             }
             if (success == false)
@@ -25798,7 +25497,7 @@ namespace Gekko
         }
 
         private static int CsvPrnWrite(List<Tuple<string, IVariable>> vars, string filename, GekkoTime per1, GekkoTime per2, EdataFormat fileType, bool cols, string dateformat, P p)
-        {           
+        {
             bool isFirst = true;
             string format = SplitDateFormatInTwo(dateformat, ref isFirst);
 
@@ -25893,7 +25592,7 @@ namespace Gekko
                     }
                 }
 
-                i++;                
+                i++;
 
                 foreach (Tuple<string, IVariable> tup in vars)
                 {
@@ -26086,7 +25785,7 @@ namespace Gekko
             G.Writeln("Wrote " + counter + " variables to " + pathAndFilename);
             DlinkAutoDlinkFiles.HandleDlink(blob, false, p);
             return counter;
-        }        
+        }
 
         /// <summary>
         /// From a ToFrom list (where rename of the variable is an option), the "from" part is found as a series, and the "to" part is
@@ -26100,7 +25799,7 @@ namespace Gekko
             foreach (ToFrom var in vars)
             {
                 string s3 = G.Chop_GetName(var.s2);  //If for instance export <csv> fy* file = test; the .s2 will be varnames with first bank glued on (typically work), and this bank is removed here.
-                IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError, true);                
+                IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError, true);
                 vars2.Add(new Tuple<string, IVariable>(s3, iv));
             }
             return vars2;
@@ -26108,7 +25807,7 @@ namespace Gekko
 
 
         private static void GetDatabankPeriodFilteredForFreq(List<Tuple<string, IVariable>> list2, ref GekkoTime per1, ref GekkoTime per2)
-        {            
+        {
             int start = int.MaxValue;
             int end = int.MinValue;
             foreach (Tuple<string, IVariable> tup in list2)
@@ -26116,11 +25815,11 @@ namespace Gekko
                 IVariable iv = tup.Item2; // O.GetIVariableFromString(s.s1, O.ECreatePossibilities.NoneReportError, true);                
                 Series ts = iv as Series;
                 if (ts == null) continue;
-                if (ts.type != ESeriesType.Normal) continue;                
+                if (ts.type != ESeriesType.Normal) continue;
                 start = G.GekkoMin(start, ts.GetRealDataPeriodFirst().super);
-                end = G.GekkoMax(end, ts.GetRealDataPeriodLast().super);                
-            }            
-            GetLowerFreqsFromYears(ref per1, ref per2, start, end);            
+                end = G.GekkoMax(end, ts.GetRealDataPeriodLast().super);
+            }
+            GetLowerFreqsFromYears(ref per1, ref per2, start, end);
         }
 
         private static Databank GetBankFromBankNameVersion(string bankName)
@@ -26176,7 +25875,7 @@ namespace Gekko
 
         private static int GnuplotWrite(List<Tuple<string, IVariable>> list2, string filename, GekkoTime per1, GekkoTime per2, P p)
         {
-            int prnWidth = 18;           
+            int prnWidth = 18;
 
             G.Writeln2("Writing gnuplot file for the period " + G.FromDateToString(per1) + "-" + G.FromDateToString(per2));
             filename = G.AddExtension(filename, ".dat");
@@ -26187,7 +25886,7 @@ namespace Gekko
             int counter = 0;
             using (FileStream fs = WaitForFileStream(pathAndFilename, null, GekkoFileReadOrWrite.Write))
             using (StreamWriter file = G.GekkoStreamWriter(fs))
-            {                
+            {
                 file.Write("# " + G.Blanks(prnWidth));  //comment
                 foreach (Tuple<string, IVariable> tup in list2)
                 {
@@ -26346,7 +26045,7 @@ namespace Gekko
             Series ts = null;
 
             string varName2 = G.Chop_AddFreq(varName, frequency);
-            
+
             if (!databank.ContainsIVariable(varName2))
             {
                 ts = new Series(frequency, varName2);
@@ -26453,12 +26152,12 @@ namespace Gekko
                     G.Writeln2("Databank '" + removed.name + "' closed: changes not written to file");
                 }
                 else if (!removed.editable)
-                {                    
-                    G.Warning("w3.4", "Databank '" + removed.name + "' not written");                 
+                {
+                    G.Warning("w3.4", "Databank '" + removed.name + "' not written");
                 }
                 else
                 {
-                    Program.WriteRemovedDatabank(p, removed, noTrace);                    
+                    Program.WriteRemovedDatabank(p, removed, noTrace);
                 }
             }
         }
@@ -26734,7 +26433,7 @@ namespace Gekko
             Globals.arithmentics1[8] = (x1) => //Math.Tanh(x1), //hyperbolic tangens
             {
                 return G.ArithmeticsTanh(x1);
-            };               
+            };
 
             Globals.timeStrings = new string[Globals.timeStringsEnd - Globals.timeStringsStart + 1];
             for (int i = Globals.timeStringsStart; i <= Globals.timeStringsEnd; i++)
@@ -26768,7 +26467,7 @@ namespace Gekko
                     {
                         try
                         {
-                            return System.Reflection.Assembly.LoadFrom(dllPath);                            
+                            return System.Reflection.Assembly.LoadFrom(dllPath);
                         }
                         catch
                         {
@@ -27217,7 +26916,7 @@ namespace Gekko
             if (fileText != null)
             {
                 commandLines = Stringlist.CreateListOfStringsFromFile(fileText);
-            }            
+            }
         }
 
         /// <summary>
@@ -28474,7 +28173,7 @@ namespace Gekko
                     {
                         ols.expressions = new List<IVariable>() { y, z_collapse };
                         ols.expressionsText = new List<string>() { "Low-freq series", "" + s + "collapsed indicator" };
-                    }                                   
+                    }
                     output = Estimation.Ols(ols);
                 }
                 finally
@@ -29252,8 +28951,8 @@ namespace Gekko
         /// Plotting in Gekko (PLOT statement). Can plot mixed frequencies.
         /// </summary>
         public static PlotTable PlotMixed(GekkoSmpl smpl, EPrintTypes type, List<O.Prt.Element> containerExplode, int n, O.Prt o, EFreq highestFreq)
-        {            
-            PlotTable plotTable = new PlotTable(n);            
+        {
+            PlotTable plotTable = new PlotTable(n);
 
             for (int j = 2; j < n + 2; j++)  //cols/variables starts at j=2. So for 3 variables we have 2, 3, 4.
             {
@@ -29296,7 +28995,7 @@ namespace Gekko
                     if (d > 0) d = Math.Max(d, 1e-200);
                     if (d < 0) d = Math.Min(d, -1e-200);
 
-                    i++;                    
+                    i++;
 
                     //The columns (variables) are counted with j=1 for date column, and variables following for j=2, j=3, ...
                     //We skip the j=1 column, so the following logic applies, if there are n variables
@@ -29309,7 +29008,7 @@ namespace Gekko
                     if (!plotTable.hasAtLeast1RealNumber && PlotMixedRangeOk(d, o))
                     {
                         plotTable.hasAtLeast1RealNumber = true;
-                    }                    
+                    }
                 }
             }
 
@@ -29324,7 +29023,7 @@ namespace Gekko
         }
 
         private static bool PlotMixedRangeOk(double d, O.Prt o)
-        {            
+        {
             //Used to test if at least on point will be shown. If it returns true, it will be so.
             if (G.IsNumericalError(d)) return false;
             double ymax = double.MaxValue;
@@ -29480,10 +29179,10 @@ namespace Gekko
                         int row = 1;
                         tab.SetBorder(row, 1, row, 3, BorderType.Top);
                         tab.Set(row, 1, "name    ");  //blanks to get some spacing
-                        tab.Set(row, 2, "type      ");                        
+                        tab.Set(row, 2, "type      ");
                         tab.Set(row, 3, "value    ");
                         tab.SetBorder(row, 1, row, 3, BorderType.Bottom);
-                        row++;                        
+                        row++;
 
                         foreach (KeyValuePair<string, IVariable> kvp in map.storage.OrderBy(kvp => kvp.Key, StringComparer.OrdinalIgnoreCase))
                         {
@@ -29521,7 +29220,7 @@ namespace Gekko
                                 s5 = "'" + kvp.Value.ConvertToString() + "'";
                             }
                             else if (kvp.Value.Type() == EVariableType.Val)
-                            {                                
+                            {
                                 s5 = ValueAsString(kvp.Value.ConvertToVal());
                             }
                             else if (kvp.Value.Type() == EVariableType.List)
@@ -29540,7 +29239,7 @@ namespace Gekko
                                 s5 = n + " elements";
                             }
                             tab.Set(row, 1, kvp.Key);
-                            tab.Set(row, 2, kvp.Value.Type().ToString().ToLower());                            
+                            tab.Set(row, 2, kvp.Value.Type().ToString().ToLower());
                             tab.Set(row, 3, s5);
                             row++;
                         }
@@ -29863,7 +29562,7 @@ namespace Gekko
             else if (((Series)iv).freq == EFreq.Q) freqs["Q"] = true;
             else if (((Series)iv).freq == EFreq.M) freqs["M"] = true;
         }
-        
+
 
         private static double CalculateAveragesForPrint(string operator2, List<double> filterMemoryValues, EPrtCollapseTypes collapse, int n)
         {
@@ -29935,7 +29634,7 @@ namespace Gekko
             return rv;
         }
 
-        public static void GetElementOperators(O.Prt o, O.Prt.Element ope, out List<string> operators, out List<int>operatorsAll)
+        public static void GetElementOperators(O.Prt o, O.Prt.Element ope, out List<string> operators, out List<int> operatorsAll)
         {
             operators = new List<string>();
             operatorsAll = new List<int>();
@@ -30234,7 +29933,7 @@ namespace Gekko
                         {
                             gdifTest = TestNoDuplicateDisplayCode(gdifTest, "gdif");
                             gdif = false;
-                        }                        
+                        }
                     }
                 }
                 if (isMulprt)
@@ -30290,8 +29989,8 @@ namespace Gekko
                     {
                         if (isGraphOrSheet || !Program.options.print_prt_pch)
                         {
-                            operatorsNew.Add("1¤n");                            
-                            operatorsNew.Add("2¤rn");                            
+                            operatorsNew.Add("1¤n");
+                            operatorsNew.Add("2¤rn");
                         }
                         else
                         {
@@ -30959,8 +30658,8 @@ namespace Gekko
             WindowPlot g = new WindowPlot(graphOptions);
             Globals.windowsPlot.Add(g);
             g.ShowDialog();
-            graphOptions.windowIsShown = true;            
-        }        
+            graphOptions.windowIsShown = true;
+        }
 
         private static void MaybeStartPipe2(string fileName)
         {
@@ -31364,7 +31063,7 @@ namespace Gekko
         public static void ComputeValueForPrintPlotNew(GekkoSmpl smpl, out double var1, out double varPch, string operator2, GekkoTime gt, Series tsWork, Series tsRef, bool isLogTransform, string isYoy, GekkoTime index2, bool isCalledFromTable, EPrtCollapseTypes collapse, int sumOver)
         {
             //TODO: besides tsWork and tsRef, we should have indexWork and indexRef (double).
-                        
+
             string operator3 = operator2.Trim();  //when it comes from for instance a table
 
             if (isCalledFromTable && !G.Equal(Globals.tableOption, "n"))
@@ -31561,7 +31260,7 @@ namespace Gekko
             double xLag2 = double.NaN;
             double y = double.NaN;
             double yLag = double.NaN;
-            double yLag2 = double.NaN;            
+            double yLag2 = double.NaN;
 
             if (tsWork != null)
             {
@@ -31585,7 +31284,7 @@ namespace Gekko
                         xLag2 += tsWork.GetDataSimple(gt.Add(-factor2 * sumOver - i));
                     }
                     else
-                    {                        
+                    {
                         GekkoTime t12 = GekkoTime.Average(GekkoTime.ConvertFreqsFirst(tsWork.freq, index, null), GekkoTime.ConvertFreqsLast(tsWork.freq, index));
                         double ix = tsWork.GetDataSimple(t12);
                         x += tsWork.GetDataSimple(gt.Add(-i)) / ix * Program.options.print_index_value;
@@ -31623,7 +31322,7 @@ namespace Gekko
                         yLag2 += tsRef.GetDataSimple(gt.Add(-factor2 * sumOver - i));
                     }
                     else
-                    {                        
+                    {
                         GekkoTime t12 = GekkoTime.Average(GekkoTime.ConvertFreqsFirst(tsRef.freq, index, null), GekkoTime.ConvertFreqsLast(tsRef.freq, index));
                         double ix = tsRef.GetDataSimple(t12);
                         y += tsRef.GetDataSimple(gt.Add(-i)) / ix * Program.options.print_index_value;
@@ -31754,7 +31453,7 @@ namespace Gekko
             double z = ((x / x0) - 1d) * 100d;
             if (x == x0) z = 0d;    //0 and 0 gives 0%
             return z;
-        }        
+        }
 
         private static void ComputeValueForPrintPlot(out double var1, out double varPch, PrtOptionsHelper po, GekkoTime gt, Series tsWork, Series tsBase)
         {
@@ -32094,7 +31793,7 @@ namespace Gekko
             Blas.Default.Scale(-1d, dx);  //the direction is NEGATIVE!
             //dx is Newton direction
             return true;
-        }        
+        }
 
         private static bool OperatorUsesRef(string code1)
         {
@@ -32102,7 +31801,7 @@ namespace Gekko
         }
 
         public static DName GetDecompResidualName(int counter, int all)
-        {            
+        {
             string s = "";
             if (all > 1) s = (counter + 1).ToString();
             return new DNameLag(Globals.decompResidualName + s, EFreq.None, new StringOrTime[] { new GekkoTime(EFreq.Lag, 0) }, -1);
@@ -36289,7 +35988,7 @@ namespace Gekko
                 tab.CurRow.SetTopBorder(1, 1);
                 //this strange stuff is sometimes read from PCIM databanks
                 string strange = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
-                
+
                 string ext = "";
                 if (fileNameExtensionPretty != null && fileNameExtensionPretty.ToLower() == "bnk") ext = ".bnk";
                 tab.CurRow.SetText(1, "DATABANK " + fileNameWithoutPathPretty);
@@ -36364,7 +36063,7 @@ namespace Gekko
                     tab.CurRow.Next();
                     tab.CurRow.SetText(1, "           " + this.dbName + " databank now contains " + total + " variables (" + this.startPerResultingBank + "-" + this.endPerResultingBank + ")");
                 }
-                
+
                 TraceHelper th = Trace2.CollectAllTraces(this.databank, ETraceHelper.GetAllMetasAndTraces);
                 if (this.nTraces > 0)
                 {
@@ -36373,7 +36072,7 @@ namespace Gekko
                 }
 
                 if (Globals.gbkExtraMetadata)
-                {                    
+                {
                     List<string> m = new List<string>();
                     bool git = false;
                     bool user = false;
@@ -37431,7 +37130,7 @@ namespace Gekko
         /// <param name="stream">Stream to read from.</param>
         /// <returns>True if the whole stream is utf8 encoded.</returns>
         public static bool IsUtf8(Stream stream)
-        {            
+        {
             int count = 4 * 1024;
             byte[] buffer;
             int read;
@@ -37634,7 +37333,7 @@ namespace Gekko
     {
         public bool isPiping = false;
         public bool echo = false;  //PIPE<echo>
-        public PipeFileOptions(bool isPiping, bool echo)        
+        public PipeFileOptions(bool isPiping, bool echo)
         {
             this.isPiping = isPiping;
             this.echo = echo;
@@ -37817,7 +37516,7 @@ namespace Gekko
         }
 
         public CellLight(string input)
-        {            
+        {
             text = input;
             data = double.NaN;
             dateTime = DateTime.MinValue;
@@ -37882,7 +37581,7 @@ namespace Gekko
             {
                 this.storageDimensions.Add(c);
                 frame.frameDimensionNames.Add(s, this.storageDimensions.Count - 1);
-            }            
+            }
         }
 
         public void AddValue(FrameLight frame, string s, CellLight c)
@@ -37934,7 +37633,7 @@ namespace Gekko
         }
 
         public FrameLightRow(FrameLight frame)
-        {            
+        {
             this.storageDimensions = new List<CellLight>();
             this.storageValues = new List<CellLight>();
             for (int i = 0; i < frame.frameDimensionNames.Count; i++) storageDimensions.Add(new CellLight()); //null cell placeholder
@@ -37990,7 +37689,7 @@ namespace Gekko
         public bool active = false;
     }
 
-    public class FrameLight 
+    public class FrameLight
     {
         public List<FrameLightRow> data = new List<FrameLightRow>();
         public GekkoDictionary<string, int> frameDimensionNames = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
@@ -38207,7 +37906,7 @@ namespace Gekko
                 m2.Add(G.HandleBlanksResurrect(s));
             }
             return m2;
-        }        
+        }
 
         /// <summary>
         /// Add something. Beware: case-insensitive keys. The input string may contain blanks,
@@ -38239,7 +37938,7 @@ namespace Gekko
         /// <param name="i"></param>
         /// <param name="willRemoveBlanks"></param>
         public void AddIfNotAlreadyThere(string s, T i, bool willRemoveBlanks)
-        {            
+        {
             string s2 = null;
             if (willRemoveBlanks) s2 = G.HandleBlanksRemove(s);
             else s2 = s;
@@ -38337,7 +38036,7 @@ namespace Gekko
         {
             return this.storage.Count;
         }
-        
+
         /// <summary>
         /// Only intended to be used when iterating!
         /// </summary>
@@ -38455,7 +38154,7 @@ namespace Gekko
 
             var output = new Test[list.Count];
 
-            G.Writeln();                        
+            G.Writeln();
             G.Write("   with Parallel.ForEach (Deserialize): ");
             watch.Restart();
             Parallel.ForEach(list, () => 0, (x, pls, index, s) =>
@@ -38467,7 +38166,7 @@ namespace Gekko
             }, _ => { });
             G.Writeln(watch.ElapsedMilliseconds.ToString() + "ms");
 
-            
+
             G.Write("   with AsParallel (DummyWork): ");
             watch.Restart();
             list.AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select((x, i) =>
@@ -38479,7 +38178,7 @@ namespace Gekko
         }
 
         private static T Deserialize<T>(ReadOnlyMemory<byte> buffer)
-        {            
+        {
             //ReadOnlySpan<byte> xx = (ReadOnlySpan<byte>)buffer;  //Span is on the heap (not good), and is not faster when tested
             return Serializer.Deserialize<T>(buffer);
         }
@@ -38499,5 +38198,87 @@ namespace Gekko
             [ProtoMember(1)]
             public string Value;
         }
-    }    
+    }
+
+
+    public static class JdemetraXmlTransform
+    {
+        // <ts name="..."> ... </ts>
+        static readonly Regex TsBlock = new Regex(
+            @"<ts\b[^>]*?\bname=""(?<name>[^""]*)""[^>]*(?<!/)>(?<body>.*?)</ts>",
+            RegexOptions.Singleline | RegexOptions.Compiled);
+
+        // <property name="@id" value="..."/>
+        static readonly Regex IdProperty = new Regex(
+            @"(?<pre><property\s+name=""@id""\s+value="")(?<val>[^""]*)(?<post>"")",
+            RegexOptions.Compiled);
+
+        // demetra://tsprovider/Txt/20111201/SERIES?...#seriesIndex=N  (after XML-dekodning)
+        static readonly Regex TxtId = new Regex(
+            @"^demetra://tsprovider/Txt/(?<ver>[^/]+)/SERIES\?(?<query>[^#]*)#seriesIndex=\d+$",
+            RegexOptions.Compiled);
+
+        static readonly Regex Extension = new Regex(@"\.[A-Za-z0-9]+$", RegexOptions.Compiled);
+        
+        public static string CsvToXlsx(string xml, string sheetName = "data", string xlsxFile = null)
+        {
+            int replaced;
+            return CsvToXlsx(xml, sheetName, xlsxFile, out replaced);
+        }
+
+        /// <summary>
+        /// xlsxFile only if a given filename should be used, else .csv is replaced by .xlsx.
+        /// </summary>
+        /// <param name="xml"></param>
+        /// <param name="sheetName"></param>
+        /// <param name="xlsxFile"></param>
+        /// <param name="replaced"></param>
+        /// <returns></returns>
+        public static string CsvToXlsx(string xml, string sheetName, string xlsxFile, out int replaced)
+        {
+            int count = 0;
+
+            string result = TsBlock.Replace(xml, ts =>
+            {
+                string name = System.Net.WebUtility.HtmlDecode(ts.Groups["name"].Value);
+                Group body = ts.Groups["body"];
+
+                string newBody = IdProperty.Replace(body.Value, p =>
+                {
+                    string id = System.Net.WebUtility.HtmlDecode(p.Groups["val"].Value); // &amp; -> &
+                    Match m = TxtId.Match(id);
+                    if (!m.Success) return p.Value;                       
+
+                    string encFile = GetQueryParam(m.Groups["query"].Value, "file");
+                    if (encFile == null) return p.Value;
+                                        
+                    string newEncFile = xlsxFile != null
+                        ? Uri.EscapeDataString(xlsxFile)
+                        : Extension.Replace(encFile, ".xlsx");
+
+                    string newId = "demetra://tsprovider/XCLPRVDR/" + m.Groups["ver"].Value
+                                 + "/SERIES?file=" + newEncFile
+                                 + "#seriesName=" + Uri.EscapeDataString(name)
+                                 + "&sheetName=" + Uri.EscapeDataString(sheetName);
+
+                    count++;
+                    return p.Groups["pre"].Value + System.Security.SecurityElement.Escape(newId) + p.Groups["post"].Value; // & -> &amp;
+                });
+
+                int start = body.Index - ts.Index;
+                return ts.Value.Substring(0, start) + newBody + ts.Value.Substring(start + body.Length);
+            });
+
+            replaced = count;
+            return result;
+        }
+
+        static string GetQueryParam(string query, string key)
+        {
+            foreach (string part in query.Split('&'))
+                if (part.StartsWith(key + "=", StringComparison.Ordinal))
+                    return part.Substring(key.Length + 1);
+            return null;
+        }
+    }
 }

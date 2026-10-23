@@ -1834,6 +1834,24 @@ namespace Gekko
             return Optimize.Optimize1(t1, t2, a, rowSums, colSums, rowNames, colNames, other);
         }
 
+        public static void saprocessing(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable file1, IVariable file2)
+        {
+            string xml = null;
+            try
+            {
+                xml = File.ReadAllText(O.ConvertToString(file1));
+            }
+            catch
+            {
+                new Error("Could not read file '" + O.ConvertToString(file1) + "'");
+            }
+            int n;
+            string ny = JdemetraXmlTransform.CsvToXlsx(xml, "data", null, out n);
+            File.WriteAllText(O.ConvertToString(file2), ny);
+            new Writeln("Tranformed " + n + " series in file '" + file1 + "' into file '" + file2 + "'");
+        }
+
+
         public static IVariable rows(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
         {
             Matrix m = O.ConvertToMatrix(x1);
