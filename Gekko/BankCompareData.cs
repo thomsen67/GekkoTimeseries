@@ -174,6 +174,13 @@ namespace Gekko
     /// <summary>Where real databank files are read.</summary>
     public static class DatabankLoader
     {
+        /// <summary>
+        /// Files are read (and .gbk data hashes extracted) both on the UI thread and by the folder comparison's worker
+        /// thread. Everything that goes through Gekko's readers takes this lock, so only one file is handled at a time,
+        /// in case those readers use shared state.
+        /// </summary>
+        public static readonly object Lock = new object();
+
         public static Databank Load(string path)
         {
             CellOffset offset = new CellOffset();
@@ -189,7 +196,7 @@ namespace Gekko
         /// <summary>Reads the file and wraps it for the compare window.</summary>
         public static CompareBank LoadForCompare(string path)
         {
-            return new CompareBank(Load(path), path);
+            lock (Lock) return new CompareBank(Load(path), path);
         }
     }
 }

@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:Gekko"
         Title="Compare databanks"
-        Height="800" Width="1180" MinHeight="640" MinWidth="960"
+        Height="800" Width="1320" MinHeight="640" MinWidth="1100"
         Top="20" Left="20"
         Loaded="Window_Loaded" Closing="Window_Closing"
         PreviewKeyDown="Window_PreviewKeyDown" KeyDown="Window_KeyDown">
@@ -212,50 +212,59 @@
 
     <Grid Margin="10" Name="RootGrid">
         <Grid.RowDefinitions>
-            <!-- Its height is saved as CompareWindowSplitterDistance1 -->
-            <RowDefinition x:Name="BankListRow" Height="138" MinHeight="76"/>
-            <RowDefinition Height="8"/>
+            <!-- The Folders | Datafiles switch, the busy circle and the frequency buttons -->
+            <RowDefinition Height="Auto"/>
+            <RowDefinition x:Name="BankListGapRow" Height="6"/>
+            <!-- The drop zone and the list. Its height is saved as CompareWindowSplitterDistance1. "Hide controls" hides it. -->
+            <RowDefinition x:Name="BankListRow" Height="106" MinHeight="46"/>
+            <RowDefinition x:Name="BankListSplitterRow" Height="8"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="8"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Top: the Folders | Datafiles switch with the frequency buttons, the drop zone and the numbered,
-             reorderable list. -->
+        <!-- Top line, in the same columns as the drop zone and the list below it: the Folders | Datafiles switch and
+             the busy circle above the drop zone; the frequency buttons (Datafiles only; filled in code with the
+             frequencies of the compared databanks) and a line of information above the list, aligned with it. -->
         <Grid Grid.Row="0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="6"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="220"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <!-- Compare folders (data files inside) or databanks (series inside). Each keeps its own list.
+                 Folders is on the left, but the window starts in the Datafiles state. -->
+            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                <RadioButton Name="FoldersStateButton" Content="Folders" Style="{StaticResource StateButtonStyle}"
+                             Tag="3,0,0,3" Checked="StateButton_Checked"
+                             ToolTip="Look at the data files in a folder, or compare them in 2 or 3 folders (and their subfolders)"/>
+                <RadioButton Name="DatafilesStateButton" Content="Datafiles" Style="{StaticResource StateButtonStyle}"
+                             Tag="0,3,3,0" Margin="-1,0,0,0" IsChecked="True" Checked="StateButton_Checked"
+                             ToolTip="Look at the series in a databank file, or compare them in 2 or 3 databank files"/>
+                <!-- The busy circle (see ShowBusy). It is drawn by a thread of its own, so it keeps turning while the
+                     window is busy reading files or comparing. Empty (and invisible) otherwise. -->
+                <Border Name="BusyHost" Width="16" Height="16" Margin="14,0,0,0" VerticalAlignment="Center"
+                        IsHitTestVisible="False"/>
+            </StackPanel>
+            <DockPanel Grid.Column="2" LastChildFill="True">
+                <StackPanel DockPanel.Dock="Left" Name="FreqPanel" Orientation="Horizontal" VerticalAlignment="Center"
+                            Margin="0,0,16,0"/>
+                <TextBlock Name="StateInfoText" Visibility="Collapsed" VerticalAlignment="Center"
+                           Foreground="#FF1F4E79" TextTrimming="CharacterEllipsis"/>
+            </DockPanel>
+        </Grid>
+
+        <!-- The drop zone and the numbered, reorderable list -->
+        <Grid Grid.Row="2" Name="BankListArea">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="220"/>
                 <ColumnDefinition Width="10"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Compare folders (data files inside) or databanks (series inside). Each keeps its own list.
-                 Folders is on the left, but the window starts in the Datafiles state.
-                 Then, with a gap, the frequency buttons (Datafiles only; filled in code with the frequencies of the
-                 compared databanks), then a line of information. -->
-            <DockPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" LastChildFill="True">
-                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Center">
-                    <RadioButton Name="FoldersStateButton" Content="Folders" Style="{StaticResource StateButtonStyle}"
-                                 Tag="3,0,0,3" Checked="StateButton_Checked"
-                                 ToolTip="Compare the data files in 2 or 3 folders (and their subfolders)"/>
-                    <RadioButton Name="DatafilesStateButton" Content="Datafiles" Style="{StaticResource StateButtonStyle}"
-                                 Tag="0,3,3,0" Margin="-1,0,0,0" IsChecked="True" Checked="StateButton_Checked"
-                                 ToolTip="Compare the series in 2 or 3 databank files"/>
-                </StackPanel>
-                <StackPanel DockPanel.Dock="Left" Name="FreqPanel" Orientation="Horizontal" VerticalAlignment="Center"
-                            Margin="40,0,0,0"/>
-                <TextBlock Name="StateInfoText" Visibility="Collapsed" VerticalAlignment="Center" Margin="24,0,0,0"
-                           Foreground="#FF1F4E79" TextTrimming="CharacterEllipsis"/>
-            </DockPanel>
-
             <!-- "Drag datafiles here" (Datafiles) or "Drag folders here" (Folders). While folders are selected, the
                  Datafiles state only shows files opened from the Folders state, and this field is switched off there. -->
-            <Grid Grid.Row="2" Grid.Column="0" Name="DropZone" AllowDrop="True"
+            <Grid Grid.Column="0" Name="DropZone" AllowDrop="True"
                   Drop="DropZone_Drop" DragEnter="DropZone_DragEnter" DragOver="DropZone_DragOver" DragLeave="DropZone_DragLeave">
                 <Rectangle Name="DropZoneBorder" Fill="#FFF4F4F4" Stroke="#FF999999" StrokeThickness="2"
                            StrokeDashArray="4 2" RadiusX="4" RadiusY="4"/>
@@ -264,7 +273,7 @@
                            FontSize="14" Foreground="#FF555555" TextWrapping="Wrap" TextAlignment="Center" Margin="10"/>
             </Grid>
 
-            <ListView Grid.Row="2" Grid.Column="2" Name="BankList" SelectionMode="Single" AllowDrop="True"
+            <ListView Grid.Column="2" Name="BankList" SelectionMode="Single" AllowDrop="True"
                       FontFamily="Calibri" FontSize="13" BorderBrush="#FFACACAC"
                       ItemContainerStyle="{StaticResource BankRowStyle}"
                       PreviewMouseLeftButtonDown="BankList_PreviewMouseLeftButtonDown"
@@ -298,8 +307,8 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <!-- "Series" for databanks, "Data files" for folders (set in code) -->
-                        <GridViewColumn x:Name="ContentsColumn" Width="170" Header="Series" DisplayMemberBinding="{Binding SeriesText}"/>
+                        <!-- "Series" for databanks (in the selected frequency, as in the diagram), "Files" for folders (set in code) -->
+                        <GridViewColumn x:Name="ContentsColumn" Width="70" Header="Series" DisplayMemberBinding="{Binding SeriesText}"/>
                         <GridViewColumn Width="330" Header="Full path">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
@@ -342,11 +351,11 @@
             </ListView>
         </Grid>
 
-        <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+        <GridSplitter Grid.Row="3" Name="BankListSplitter" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                       ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" Background="Transparent"
                       ToolTip="Drag to resize the list"/>
 
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="4">
             <Grid.RowDefinitions>
                 <RowDefinition x:Name="VennRow" Height="1.25*" MinHeight="200"/>
                 <RowDefinition x:Name="VennSplitterRow" Height="6"/>
@@ -354,7 +363,7 @@
                 <RowDefinition x:Name="DetailsRow" Height="*" MinHeight="150"/>
             </Grid.RowDefinitions>
 
-            <!-- Venn diagram on the left, controls on the right. "Hide controls" hides both. -->
+            <!-- Venn diagram on the left, controls on the right. "Hide controls" hides both (and the list above). -->
             <Grid Grid.Row="0" Name="DiagramArea">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -367,17 +376,23 @@
                     <local:VennView x:Name="Venn" Margin="8"/>
                 </Border>
 
-                <!-- Scrolls when the controls do not fit -->
+                <!-- Two columns: compare mode, period and filter on the left, the check on the right. Scrolls when the
+                     controls do not fit. -->
                 <Border Grid.Column="2" Name="ControlsPanel" BorderBrush="#FFD5D5D5" BorderThickness="1" CornerRadius="4"
-                        Background="#FFFAFAFA" Width="290">
+                        Background="#FFFAFAFA" Width="580">
                     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
-                    <Grid Name="ControlsContent" Margin="10,8" VerticalAlignment="Top" Grid.IsSharedSizeScope="True">
+                    <Grid Margin="10,8" VerticalAlignment="Top">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="14"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0" Name="ControlsContent" VerticalAlignment="Top" Grid.IsSharedSizeScope="True">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" SharedSizeGroup="PanelLabel"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
@@ -404,10 +419,9 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" Text="Period" Style="{StaticResource PanelLabelStyle}"
+                            <TextBlock Grid.Row="0" Name="PeriodLabel" Text="Period" Style="{StaticResource PanelLabelStyle}"
                                        ToolTip="The period filter, in any frequency (e.g. 2010, 2010q3 or 2010m7). It applies to all frequencies, for databanks and folders. Clicking a histogram bar sets it too."/>
                             <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
                                 <Grid Name="FromSpinner" Width="80" Height="18">
@@ -457,10 +471,9 @@
                                 </Grid>
                             </StackPanel>
 
-                            <TextBlock Grid.Row="1" Grid.Column="1" Name="SpanText" Style="{StaticResource HintStyle}" Margin="0,3,0,3"/>
-                            <Button Grid.Row="2" Grid.Column="1" Name="WholePeriodButton" Content="Whole period"
+                            <Button Grid.Row="1" Grid.Column="1" Name="WholePeriodButton" Content="Whole period"
                                     Style="{StaticResource RoundedSmallButtonStyle}" HorizontalAlignment="Left"
-                                    Margin="0,0,0,10" Click="WholePeriod_Click"
+                                    Margin="0,6,0,10" Click="WholePeriod_Click"
                                     ToolTip="Remove the period filter: all periods"/>
                         </Grid>
 
@@ -473,10 +486,12 @@
                         <TextBlock Grid.Row="5" Grid.Column="1" Name="FilterHint" Style="{StaticResource HintStyle}"
                                    Text="Wildcards * and ?, several patterns separated by spaces" Margin="0,4,0,8"/>
 
+                    </Grid>
+
                         <!-- The check, shared by both states. The red numbers, the histogram, the red names/files and the *
                              in Values follow it. In the Folders state it is applied to the series inside each data file. -->
-                        <TabControl Grid.Row="6" Grid.ColumnSpan="2" Name="CheckTabs" SelectionChanged="CheckTabs_SelectionChanged"
-                                    Background="White">
+                        <TabControl Grid.Column="2" Name="CheckTabs" SelectionChanged="CheckTabs_SelectionChanged"
+                                    Background="White" VerticalAlignment="Top">
                             <TabItem Header="Differences" Name="DifferencesCheckTab" Style="{StaticResource CheckTabStyle}"
                                      ToolTip="Find series whose values differ between the banks">
                                 <StackPanel Margin="4,5,4,4">
@@ -541,6 +556,7 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Name="NamesHeader" Foreground="#FF444444" VerticalAlignment="Center"
                                            TextTrimming="CharacterEllipsis"/>
@@ -548,13 +564,18 @@
                                           VerticalAlignment="Center" Margin="10,0,12,0"
                                           ToolTip="List x[a,b] and x[a,c] as just x"
                                           Checked="IgnoreDims_Changed" Unchecked="IgnoreDims_Changed"/>
-                                <Button Grid.Column="2" Content="Copy" Style="{StaticResource RoundedSmallButtonStyle}"
+                                <CheckBox Grid.Column="2" Name="RedNamesCheck" Content="Red names"
+                                          VerticalAlignment="Center" Margin="0,0,12,0"
+                                          Checked="RedNames_Changed" Unchecked="RedNames_Changed"
+                                          ToolTip="Show in dark red the names (or files) that the current check finds in the selected periods: the series that differ (Differences), have missing values (Missings) or have zeroes (Zeroes). The numbers in red in the diagram count them. Off: all names are black."/>
+                                <Button Grid.Column="3" Content="Copy" Style="{StaticResource RoundedSmallButtonStyle}"
                                         Click="CopyNames_Click"/>
                             </Grid>
-                            <!-- Datafiles: the names, comma-separated; found ones in dark red, the commas black. A name under
-                                 the mouse is underlined like a link; click it: its values. A selection always covers whole
-                                 names; right-click: Plot (the context menu is made in code). -->
-                            <RichTextBox Grid.Row="2" Name="NamesText" IsReadOnly="True" IsReadOnlyCaretVisible="False"
+                            <!-- Datafiles: the names, comma-separated, without the frequency (Freqpretty); with "Red names"
+                                 the found ones in dark red. A name under the mouse is underlined like a link; click it: its
+                                 values (and it keeps a grey background until the next click or selection). A selection
+                                 always covers whole names; right-click: Plot (the context menu is made in code). -->
+                            <RichTextBox Grid.Row="2" Name="NamesText" IsReadOnly="True" IsReadOnlyCaretVisible="False" IsUndoEnabled="False"
                                          FontFamily="Consolas" FontSize="12.5" BorderBrush="#FFACACAC" Padding="4,2"
                                          VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                                          IsInactiveSelectionHighlightEnabled="True"
@@ -564,7 +585,7 @@
                                          PreviewMouseLeftButtonUp="NamesText_PreviewMouseLeftButtonUp"
                                          PreviewMouseRightButtonDown="NamesText_PreviewMouseRightButtonDown"
                                          ContextMenuOpening="NamesText_ContextMenuOpening"/>
-                            <!-- New, Folders: one file per line; differing ones in dark red; click a file to compare its series -->
+                            <!-- Folders: one file per line; with "Red names" the found ones in dark red; click a file to compare its series -->
                             <ListBox Grid.Row="2" Name="FilesList" Visibility="Collapsed" BorderBrush="#FFACACAC"
                                      FontFamily="Consolas" FontSize="12.5"
                                      VirtualizingStackPanel.IsVirtualizing="True"
@@ -578,12 +599,6 @@
                                 </ListBox.ItemTemplate>
                             </ListBox>
                         </Grid>
-                    </TabItem>
-
-                    <!-- Per period, the number of series found by the current check (Datafiles) -->
-                    <TabItem Header="Histogram" Name="HistogramTab"
-                             ToolTip="Per period, for the selected area: the series found by the check. Click a bar to filter on that period; double-click to list the names.">
-                        <local:HistogramView x:Name="Histogram" Margin="4"/>
                     </TabItem>
 
                     <!-- "Values" (Datafiles): all series of the Names list in one text; Previous/Next jump between them.
@@ -623,15 +638,22 @@
                                      ScrollViewer.ScrollChanged="DevText_ScrollChanged" IsVisibleChanged="DevText_IsVisibleChanged"/>
                         </Grid>
                     </TabItem>
+
+                    <!-- Per period, the number of series found by the current check (Datafiles) -->
+                    <TabItem Header="Histogram" Name="HistogramTab"
+                             ToolTip="Per period, for the selected area: the series found by the check. Click a bar to filter on that period; double-click to list the names.">
+                        <local:HistogramView x:Name="Histogram" Margin="4"/>
+                    </TabItem>
                 </TabControl>
-                <Button Name="DiagramToggle" Content="&#x25B4; Hide controls" Style="{StaticResource RoundedSmallButtonStyle}"
-                        HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,2,2,0" Click="DiagramToggle_Click"
-                        ToolTip="Hide the diagram and controls to give the tabs more room (Ctrl+D)"/>
+                <!-- Expand / collapse: the icon (two diagonal arrows) and the tooltip are set in code (UpdateDiagramToggle) -->
+                <Button Name="DiagramToggle" Style="{StaticResource RoundedSmallButtonStyle}" Padding="0"
+                        Width="26" Height="20" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,1,2,0"
+                        Click="DiagramToggle_Click"/>
             </Grid>
         </Grid>
 
         <!-- Status -->
-        <Grid Grid.Row="4">
+        <Grid Grid.Row="6">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>

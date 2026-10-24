@@ -1565,6 +1565,33 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             return FindRule(dlinkVersion, extension)?.HashKind ?? EDlinkHashKind.PhysicalFileHash;
         }
 
+        /// <summary>
+        /// For comparing data files (the compare window's Folders view): the hash Dlink would store for the file under
+        /// CurrentVersion, computed fresh every time (DlinkHashCache is not used). Two files with the same hash hold the
+        /// same data: the same data hash inside a .gbk, the same .px content apart from the creation date, else the same
+        /// bytes. usedKind says which it was. Returns null (and error says why) if the file cannot be hashed; never shows
+        /// a popup or throws a Gekko error.
+        /// </summary>
+        public static string GetContentHashUncached(string filePath, out EDlinkHashKind usedKind, out string error)
+        {
+            usedKind = EDlinkHashKind.PhysicalFileHash;
+            error = null;
+            List<string> loopErrors = new List<string>();
+            try
+            {
+                return GetSha256FromFileWithDlink(filePath, CurrentVersion, null, loopErrors, out usedKind);
+            }
+            catch (DlinkLoopErrorException)
+            {
+                error = loopErrors.Count > 0 ? loopErrors[loopErrors.Count - 1] : "could not be hashed";
+            }
+            catch (Exception ex)
+            {
+                error = ex.Message;
+            }
+            return null;
+        }
+
         public static string Dlink_FromDlinkFileToDataFile(string dlinkFile, bool reportError, List<string> loopErrors = null)
         {
             //m1                 K:\MAKROBK\tth\test\makrobk_grunddata\biver\_uddata_dlink\x.csv.dlink
@@ -1664,6 +1691,17 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// <returns></returns>
         public static string GetSha256FromFileWithDlink(string filePath, EDlinkVersion dlinkVersion, string forceFileType = null, List<string> loopErrors = null)
         {
+            EDlinkHashKind usedKind;
+            return GetSha256FromFileWithDlink(filePath, dlinkVersion, forceFileType, loopErrors, out usedKind);
+        }
+
+        /// <summary>
+        /// As the overload above, and also tells which kind of hash the result is. That is not always the kind the
+        /// extension asks for: a .gbk file without a data hash inside gets a PhysicalFileHash (of its bytes).
+        /// </summary>
+        public static string GetSha256FromFileWithDlink(string filePath, EDlinkVersion dlinkVersion, string forceFileType, List<string> loopErrors, out EDlinkHashKind usedKind)
+        {
+            usedKind = EDlinkHashKind.PhysicalFileHash;
             if (forceFileType != null && !IsRecognizedForceFileType(dlinkVersion, forceFileType))
             {
                 DlinkLoopErrors.Error("forceFileType must be null, or an extension '" + dlinkVersion + "' treats specially -- got '" + forceFileType + "'.", loopErrors);
@@ -1687,6 +1725,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     if (specialHash != null)
                     {
                         if (G.DlinkDebug()) MessageBox.Show(rule.HashKind == EDlinkHashKind.GbkDataHash ? "Getting hash from xml" : "Getting hash from content hash");
+                        usedKind = rule.HashKind;
                         return specialHash;
                     }
                     //else: e.g. a .gbk with no extractable data hash inside it -- fall through below,

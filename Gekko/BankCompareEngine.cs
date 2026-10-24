@@ -718,6 +718,22 @@ namespace Gekko
             return name => patterns.Any(rx => rx.IsMatch(name));
         }
 
+        /// <summary>
+        /// The name as the Names and Values tabs show it. Gekko series names carry their frequency, e.g. "x!q" or
+        /// "x!q[a, b]"; since the tabs show one frequency at a time, it is left out: "x" and "x[a, b]". Replace the body
+        /// with Gekko's own pretty-printing if wanted. Must not change the order of names (they are listed sorted).
+        /// </summary>
+        public static string Freqpretty(string name)
+        {
+            if (string.IsNullOrEmpty(name)) return name;
+            int bang = name.IndexOf('!');
+            if (bang < 0) return name;
+            int bracket = name.IndexOf('[');
+            if (bracket >= 0 && bracket < bang) return name;  // a '!' inside the dimensions is left alone
+            int end = bracket >= 0 ? bracket : name.Length;
+            return name.Remove(bang, end - bang);
+        }
+
         public static string StripDimensions(string name)
         {
             int i = name.IndexOf('[');
@@ -781,16 +797,16 @@ namespace Gekko
         /// <summary>
         /// Text listing of one series for the offsets lo..hi on its axis. Two banks: period, x(1), x(2), abs dev., rel. dev.
         /// One or three banks: period and the values. Periods found by the check end with " *".
-        /// onlyFound: only those periods.
+        /// onlyFound: only those periods. displayName (may be null: c.Name) is the name used in the column heads.
         /// </summary>
         public static DeviationListing FormatComparison(SeriesComparison c, int lo, int hi,
-                                                        CheckKind check, int slotMask, bool onlyFound)
+                                                        CheckKind check, int slotMask, bool onlyFound, string displayName = null)
         {
             var listing = new DeviationListing();
             int n = c.Series.Length;
             bool pair = n == 2;
             var heads = new string[n];
-            for (int i = 0; i < n; i++) heads[i] = c.Name + "(" + (c.Slots[i] + 1).ToString(Inv) + ")";
+            for (int i = 0; i < n; i++) heads[i] = (displayName ?? c.Name) + "(" + (c.Slots[i] + 1).ToString(Inv) + ")";
 
             const int periodWidth = 12, absWidth = 14, relWidth = 12;  // 12: room for daily periods like 2020m12d31
             int valueWidth = Math.Max(13, heads.Max(h => h.Length) + 3);

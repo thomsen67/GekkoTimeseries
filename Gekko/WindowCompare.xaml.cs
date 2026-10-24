@@ -68,16 +68,11 @@ namespace Gekko
             }
         }
 
-        /// <summary>Banks: e.g. "A 380, Q 200, M 70". Folders: e.g. "812 data files" (set when compared).</summary>
-        public string SeriesText
-        {
-            get
-            {
-                if (IsPlaceholder) return "";
-                if (Bank == null) return contents ?? "";
-                return string.Join(", ", Bank.Frequencies.Select(f => f.ToString() + " " + Bank.Count(f)));
-            }
-        }
+        /// <summary>
+        /// The Series/Files column, a plain number set by the window: banks, the number of series in the selected
+        /// frequency that pass the filter (as in the diagram's boxes); folders, the number of files (when compared).
+        /// </summary>
+        public string SeriesText => IsPlaceholder ? "" : contents ?? "";
 
         public void SetContents(string text)
         {
@@ -226,6 +221,9 @@ namespace Gekko
         // Found names/files in the Names/Files tab, same dark red as the red numbers in the diagram.
         static readonly Brush DeviatingNameBrush = BankColors.DeviationText;
         static readonly Brush RecentPathBrush = BankColors.FromRgb(0x88, 0x88, 0x88);
+        static readonly Brush ToggleIconBrush = BankColors.FromRgb(0x44, 0x44, 0x44);
+        // The background of the bookmarked name in the Names tab (the one last clicked to see its values).
+        static readonly Brush BookmarkBrush = BankColors.FromRgb(0xE0, 0xE0, 0xE0);
         static readonly CultureInfo Inv = CultureInfo.InvariantCulture;
 
         // Length of the "Recent" lists (LRU, stored in the user settings).
@@ -269,16 +267,15 @@ namespace Gekko
         bool folderComputing;
         string folderStatus;   // the last folder comparison's summary (or error), shown again with the Folders state
         bool folderFailed;     // the last folder comparison failed: do not start it again just by showing the state
-        // DatabankLoader.Load is called both here (UI thread) and by the folder comparison (worker thread); this lock
-        // makes sure only one file is read at a time, in case the loader uses shared state.
-        static readonly object loaderLock = new object();
-
+        // Files are read both here (UI thread) and by the folder comparison (worker thread); LoadForCompare takes
+        // DatabankLoader.Lock, so only one file is read at a time.
         static CompareBank LoadBank(string path)
         {
-            lock (loaderLock) return DatabankLoader.LoadForCompare(path);
+            return DatabankLoader.LoadForCompare(path);
         }
 
-        // Summaries of data files and byte comparisons from earlier folder comparisons (keyed by path, size, time, filter).
+        // Summaries of data files from earlier folder comparisons (keyed by path, size, time, filter). Content hashes
+        // are not cached.
         readonly ConcurrentDictionary<string, object> folderCache = new ConcurrentDictionary<string, object>();
         FileComparison openedFrom;   // the folder file the datafiles were opened from, if any
 
@@ -329,6 +326,7 @@ namespace Gekko
         string namesPlainText = "";
 
         bool diagramHidden;
+        GridLength savedBankListHeight = new GridLength(106);
         // The number of circles (2 or 3) the diagram row height is currently fitted to. See FitVennRow.
         int layoutSlots = 3;
         GridLength savedVennHeight = new GridLength(1.25, GridUnitType.Star);
@@ -366,8 +364,11 @@ namespace Gekko
             // The RichTextBox sets (and handles) its own I-beam cursor in QueryCursor, and there is no Preview version
             // of that event; so listen to handled events too: this runs after the box and can put the hand there.
             NamesText.AddHandler(Mouse.QueryCursorEvent, new QueryCursorEventHandler(NamesText_QueryCursor), true);
+            // Selecting names (mouse or keyboard) ends the bookmark, like a click does.
+            NamesText.SelectionChanged += (o, e) => { if (NamesText.Selection != null && !NamesText.Selection.IsEmpty) ClearBookmark(); };
 
             ReadThresholds();
+            UpdateDiagramToggle();
 
             // The grey years in the period boxes follow the datafiles in the list (see UpdateAutoPeriod).
             bankItems.CollectionChanged += (s, e) => UpdateAutoPeriod();
@@ -378,7 +379,8 @@ namespace Gekko
             SetStatus("Drop databank files to compare them (or click Folders to compare folders), drag rows to reorder.");
         }
 
-        int SlotCount => Compare3Radio.IsChecked == true && banks.Count >= 3 ? 3 : 2;
+        /// <summary>The number of banks/folders in the diagram: 1 when the list has only one, else "first 2" or "first 3".</summary>
+        int SlotCount => banks.Count <= 1 ? 1 : Compare3Radio.IsChecked == true && banks.Count >= 3 ? 3 : 2;
 
         EFreq? SelectedFreq => selectedFreq;
 
@@ -468,6 +470,7 @@ namespace Gekko
         /// </summary>
         void FitVennRow(int slots)
         {
+            slots = slots == 3 ? 3 : 2;  // one circle takes the same height as two
             if (slots == layoutSlots || diagramHidden) return;
             if (Venn.ActualWidth <= 0 || Venn.ActualHeight <= 0) return;  // not laid out yet, Window_Loaded does it
 
@@ -488,6 +491,7 @@ namespace Gekko
         void Window_Closing(object sender, CancelEventArgs e)
         {
             folderCts?.Cancel();
+            busyCircle?.Shutdown();
             try
             {
                 UserSettings s = Settings;
@@ -499,7 +503,7 @@ namespace Gekko
                     s.CompareWindowWidth = r.Width;
                     s.CompareWindowHeight = r.Height;
                 }
-                s.CompareWindowSplitterDistance1 = BankListRow.ActualHeight;
+                s.CompareWindowSplitterDistance1 = diagramHidden ? savedBankListHeight.Value : BankListRow.ActualHeight;
                 // Only when the controls are shown; otherwise keep the height from when they were.
                 // Always saved as the height for 3 circles (Window_Loaded shrinks it again for 2).
                 if (!diagramHidden)
@@ -549,6 +553,7 @@ namespace Gekko
             {
                 DatafilesStateButton.IsChecked = state == CompareState.Datafiles;
                 FoldersStateButton.IsChecked = state == CompareState.Folders;
+                Compare2Radio.IsEnabled = banks.Count >= 2;
                 Compare3Radio.IsEnabled = banks.Count >= 3;
                 bool three = compare3Choice && banks.Count >= 3;
                 Compare3Radio.IsChecked = three;
@@ -565,7 +570,7 @@ namespace Gekko
             else if (dirty == DirtyRecompute) Recompute();
             else if (state == CompareState.Folders)
             {
-                if (folderResult == null && folderItems.Count >= 2 && !folderComputing && !folderFailed) Recompute();
+                if (folderResult == null && folderItems.Count >= 1 && !folderComputing && !folderFailed) Recompute();
                 else
                 {
                     Refresh();
@@ -664,7 +669,7 @@ namespace Gekko
             IgnoreDimsCheck.Visibility = folders ? Visibility.Collapsed : Visibility.Visible;
             ValuesTab.Header = folders ? "Details" : "Values";
             OnlyFoundCheck.Visibility = folders ? Visibility.Collapsed : Visibility.Visible;
-            ContentsColumn.Header = folders ? "Data files" : "Series";
+            ContentsColumn.Header = folders ? "Files" : "Series";
             UpdateDropAndList();
             UpdateOpenedFromText();
             UpdatePeriodBoxes();
@@ -743,16 +748,23 @@ namespace Gekko
         }
 
         /// <summary>
-        /// A file in the Files tab (Folders state) was clicked: compare its 2 or 3 copies as databanks.
-        /// They replace the list of the Datafiles state, which starts with a fresh selection.
+        /// A file in the Files tab (Folders state) was clicked: compare its 2 or 3 copies as databanks (or look at the
+        /// one copy, if it is in one folder only). They replace the list of the Datafiles state, which starts with a
+        /// fresh selection.
         /// </summary>
         void OpenFileInDatafiles(FileComparison fc)
         {
-            if (!fc.IsComparison)
+            if (!fc.IsReadable)
             {
-                SetStatus(fc.RelativePath + " is only in folder " + (fc.Slots[0] + 1) + ", so there is nothing to compare it with.");
+                SetStatus(fc.RelativePath + " cannot be opened: only the series of "
+                          + string.Join(", ", FolderCompareEngine.ReadableExtensions) + " files are read for now.");
                 return;
             }
+            using (ShowBusy()) OpenFileInDatafilesBusy(fc);
+        }
+
+        void OpenFileInDatafilesBusy(FileComparison fc)
+        {
             var loaded = new List<BankItem>();
             for (int i = 0; i < fc.FullPaths.Length; i++)
             {
@@ -786,7 +798,8 @@ namespace Gekko
                 SwitchState(CompareState.Datafiles);  // dirty: recomputes the new list
             }
             UpdateOpenedFromText();
-            SetStatus("Comparing the series of " + fc.RelativePath + " in folders "
+            SetStatus((fc.IsComparison ? "Comparing the series of " + fc.RelativePath + " in folders "
+                                       : "The series of " + fc.RelativePath + " in folder ")
                       + string.Join(" and ", fc.Slots.Select(s => (s + 1).ToString(Inv))) + ". Click Folders (top left) to go back.");
         }
 
@@ -897,14 +910,17 @@ namespace Gekko
             }
             try
             {
-                BankItem item = folders ? BankItem.ForFolder(path) : new BankItem(LoadBank(path));
-                banks[index] = item;
-                TouchRecent(folders, path);
-                if (folders) ResetDatafiles();
-                else openedFrom = null;
-                BanksChanged();
-                UpdateOpenedFromText();
-                SetStatus(target.Name + " replaced by " + item.Name + ".");
+                using (ShowBusy())
+                {
+                    BankItem item = folders ? BankItem.ForFolder(path) : new BankItem(LoadBank(path));
+                    banks[index] = item;
+                    TouchRecent(folders, path);
+                    if (folders) ResetDatafiles();
+                    else openedFrom = null;
+                    BanksChanged();
+                    UpdateOpenedFromText();
+                    SetStatus(target.Name + " replaced by " + item.Name + ".");
+                }
             }
             catch (Exception ex)
             {
@@ -925,6 +941,7 @@ namespace Gekko
             {
                 // "first 3" whenever the user chose it and there are 3 or more (also after the list was shorter).
                 bool three = compare3Choice && banks.Count >= 3;
+                Compare2Radio.IsEnabled = banks.Count >= 2;
                 Compare3Radio.IsEnabled = banks.Count >= 3;
                 Compare3Radio.IsChecked = three;
                 Compare2Radio.IsChecked = !three;
@@ -967,7 +984,7 @@ namespace Gekko
         readonly List<FreqButton> freqButtons = new List<FreqButton>();
 
         /// <summary>Datafiles: the number of banks compared (2 or 3), also while the Folders state is shown.</summary>
-        int DatafilesSlotCount => compare3Choice && bankItems.Count >= 3 ? 3 : 2;
+        int DatafilesSlotCount => bankItems.Count <= 1 ? 1 : compare3Choice && bankItems.Count >= 3 ? 3 : 2;
 
         /// <summary>Datafiles: which compared banks are shown (not hidden, not greyed out by a focus), in either state.</summary>
         bool[] DatafilesActive => (state == CompareState.Datafiles ? active : datafilesView.Active) ?? new[] { true, true, true };
@@ -993,7 +1010,7 @@ namespace Gekko
         {
             FreqPanel.Children.Clear();
             freqButtons.Clear();
-            List<CompareBank> compared = bankItems.Count >= 2 ? bankItems.Take(DatafilesSlotCount).Select(b => b.Bank).ToList() : new List<CompareBank>();
+            List<CompareBank> compared = bankItems.Take(DatafilesSlotCount).Select(b => b.Bank).ToList();
             List<EFreq> freqs = CompareBank.AllFreqs.Where(f => compared.Any(b => b != null && b.Count(f) > 0)).ToList();
             if (!selectedFreq.HasValue || !freqs.Contains(selectedFreq.Value))
             {
@@ -1015,6 +1032,13 @@ namespace Gekko
                 };
                 var content = new StackPanel { Orientation = Orientation.Horizontal };
                 content.Children.Add(new TextBlock { Text = ShortFrequencyName(f), FontWeight = FontWeights.SemiBold });
+                // A thin vertical line between the frequency and its period, in the button's text color (white when pressed).
+                var line = new Border { Width = 1, Margin = new Thickness(6, 1, 0, 1), Opacity = 0.6 };
+                line.SetBinding(Border.BackgroundProperty, new Binding("Foreground")
+                {
+                    RelativeSource = new RelativeSource(RelativeSourceMode.FindAncestor, typeof(RadioButton), 1)
+                });
+                content.Children.Add(line);
                 content.Children.Add(spanText);
                 // CornerRadius(topLeft, topRight, bottomRight, bottomLeft): round the outer ends of the row.
                 CornerRadius corners = freqs.Count == 1 ? new CornerRadius(r)
@@ -1134,18 +1158,18 @@ namespace Gekko
             UpdateAutoPeriod();
 
             EFreq? freq = SelectedFreq;
-            if (bankItems.Count < 2 || !freq.HasValue)
+            if (bankItems.Count == 0 || !freq.HasValue)
             {
                 current = null;
                 selectedMask = 0;
                 selectedBank = -1;
                 string message = bankItems.Count == 0 && DatafilesLocked
                                      ? "Folders are selected. Click a data file in the Files tab of the Folders view (top left) to compare its copies here."
-                               : bankItems.Count == 0 ? "Drag databank files into the drop field to begin."
-                               : bankItems.Count == 1 ? "Add one more databank to compare."
-                               : "The compared databanks contain no series.";
+                               : bankItems.Count == 0 ? "Drag databank files into the drop field to begin: one to look at its series, 2 or 3 to compare them."
+                               : "The databanks contain no series.";
                 Venn.SetState(null, message, 0, -1, FlagFilter.Any, -1);
                 selection = null;
+                UpdateSeriesCounts(null);
                 ShowDetails();
                 UpdatePeriodBoxes();
                 UpdateListBadges();
@@ -1154,9 +1178,30 @@ namespace Gekko
 
             // The period boxes need no conversion here: each frequency gets its own periods from the texts.
             Func<string, bool> filter = ReadFilter();
+            UpdateSeriesCounts(filter);
             List<CompareBank> compared = bankItems.Take(SlotCount).Select(b => b.Bank).ToList();
-            current = CompareEngine.Compute(compared, active, freq.Value, filter, settings);
+            using (ShowBusy()) current = CompareEngine.Compute(compared, active, freq.Value, filter, settings);
             Refresh();
+        }
+
+        /// <summary>
+        /// The Series column of the Datafiles list: per databank the number of series in the selected frequency that pass
+        /// the filter, as in the diagram's boxes. Empty when no frequency is selected.
+        /// </summary>
+        void UpdateSeriesCounts(Func<string, bool> filter)
+        {
+            EFreq? freq = selectedFreq;
+            foreach (BankItem item in bankItems)
+            {
+                if (item.Bank == null) continue;
+                string text = "";
+                if (freq.HasValue)
+                {
+                    IReadOnlyDictionary<string, Series> series = item.Bank.Get(freq.Value);
+                    text = (filter == null ? series.Count : series.Keys.Count(filter)).ToString(Inv);
+                }
+                item.SetContents(text);
+            }
         }
 
         /// <summary>
@@ -1170,7 +1215,7 @@ namespace Gekko
             folderResult = null;
             folderFailed = false;
             folderStatus = null;
-            if (folderItems.Count < 2)
+            if (folderItems.Count == 0)
             {
                 folderComputing = false;
                 folderCts = null;
@@ -1194,6 +1239,7 @@ namespace Gekko
 
             FolderResult result = null;
             string error = null;
+            IDisposable busyToken = ShowBusy();
             try
             {
                 // The files are read on a worker thread, one at a time (see LoadBank).
@@ -1208,6 +1254,10 @@ namespace Gekko
             {
                 error = ex.Message;
             }
+            finally
+            {
+                busyToken.Dispose();  // also when cancelled by a newer comparison (which shows its own)
+            }
             if (generation != folderGeneration) return;  // a newer comparison has started
 
             folderComputing = false;
@@ -1216,7 +1266,7 @@ namespace Gekko
             if (result != null)
             {
                 for (int i = 0; i < folderItems.Count; i++)
-                    folderItems[i].SetContents(i < result.SlotCount ? result.FileCount[i] + " data files" : "");
+                    folderItems[i].SetContents(i < result.SlotCount ? result.FileCount[i].ToString(Inv) : "");
             }
             if (error != null)
             {
@@ -1225,10 +1275,13 @@ namespace Gekko
             }
             else
             {
-                int files = result.Areas.Values.Sum(a => a.Files.Count);
-                int errors = result.Areas.Values.Sum(a => a.Files.Count(f => f.Error != null));
-                folderStatus = "Folders compared: " + files + " data files read"
-                               + (errors > 0 ? ", " + errors + " could not be read" : "") + "."
+                List<FileComparison> all = result.Areas.Values.SelectMany(a => a.Files).ToList();
+                int read = all.Count(f => f.IsReadable);
+                int errors = all.Count(f => f.Error != null);
+                folderStatus = (result.SlotCount == 1 ? "Folder read: " : "Folders compared: ") + all.Count + " files"
+                               + (read == all.Count ? "" : ", of which the series of the " + read + " "
+                                  + string.Join(", ", FolderCompareEngine.ReadableExtensions) + " files were read")
+                               + (errors > 0 ? "; " + errors + " could not be read" : "") + "."
                                + (result.Cancelled ? " (Stopped before all files were read.)" : "");
             }
             if (state != CompareState.Folders) return;  // the result and its status are shown when the Folders state is shown again
@@ -1299,8 +1352,7 @@ namespace Gekko
             {
                 // Keep the selection: while the folders are compared again (e.g. after hiding one) it is restored.
                 string message = folderComputing ? "Comparing the folders ..."
-                               : folderItems.Count == 0 ? "Drag 2 or 3 folders into the drop field to compare their data files."
-                               : folderItems.Count == 1 ? "Add one more folder to compare."
+                               : folderItems.Count == 0 ? "Drag folders into the drop field: one to look at its data files, 2 or 3 to compare them."
                                : "The folders could not be compared. " + (folderStatus ?? "");
                 Venn.SetState(null, message, 0, -1, FlagFilter.Any, -1);
             }
@@ -1709,8 +1761,9 @@ namespace Gekko
             }
             if (check == CheckKind.Differences && !selection.IsComparison)
             {
-                Histogram.ShowMessage("Series that exist in only one bank have nothing to be compared with. "
-                                      + "Choose an overlap, or the Missings or Zeroes check.");
+                Histogram.ShowMessage(current.SlotCount == 1
+                    ? "With one databank there is nothing to compare. Choose the Missings or Zeroes check."
+                    : "Series that exist in only one bank have nothing to be compared with. Choose an overlap, or the Missings or Zeroes check.");
                 return;
             }
             if (!current.HasSpan)
@@ -1754,8 +1807,8 @@ namespace Gekko
             string header = fileSelection.Description + ": " + shownFiles.Count
                             + (shownFiles.Count == fileSelection.Files.Count ? "" : " of " + fileSelection.Files.Count) + " files"
                             + (foundFilter == FlagFilter.Yes ? " " + phrase : "");
-            if (found > 0 && foundFilter != FlagFilter.Yes) header += " (" + found + " " + phrase + ", in dark red)";
-            header += ". Click a file to compare its series.";
+            if (found > 0 && foundFilter != FlagFilter.Yes) header += " (" + found + " " + phrase + (RedNames ? ", in dark red" : "") + ")";
+            header += folderResult.SlotCount == 1 ? ". Click a .gbk file to look at its series." : ". Click a .gbk file to compare its series.";
             NamesHeader.Text = header;
             NamesHeader.ToolTip = header;
             NamesTab.Header = "Files (" + shownFiles.Count + ")";
@@ -1778,14 +1831,16 @@ namespace Gekko
             string where = (f.Slots.Length == 1 ? "Only in folder " : "In folders ")
                            + string.Join(" and ", f.Slots.Select(s => (s + 1).ToString(Inv)));
             string tip = where + (found && f.Why.Length > 0 ? ": " + f.Why : "") + ".";
-            tip += f.IsComparison ? "\nClick to compare its series." : "\nIn one folder only: nothing to compare it with.";
+            tip += !f.IsReadable ? "\nOnly the series of " + string.Join(", ", FolderCompareEngine.ReadableExtensions) + " files are read for now."
+                 : f.IsComparison ? "\nClick to compare its series."
+                 : "\nClick to look at its series.";
             return new FileRow
             {
                 File = f,
                 Text = f.RelativePath,
-                Foreground = found ? DeviatingNameBrush : Brushes.Black,
+                Foreground = found && RedNames ? DeviatingNameBrush : Brushes.Black,
                 Tip = tip,
-                Cursor = f.IsComparison ? Cursors.Hand : Cursors.Arrow
+                Cursor = f.IsReadable ? Cursors.Hand : Cursors.Arrow
             };
         }
 
@@ -1863,11 +1918,12 @@ namespace Gekko
         /// </summary>
         void UpdatePeriodBoxes()
         {
-            string text = "Used in every frequency (e.g. 2010 is 2010q1–2010q4 for quarterly series), for datafiles and folders.";
-            if (autoFromText.Length > 0) text = "Grey: the whole span of the shown datafiles. " + text;
+            string text = "The period filter, in any frequency (e.g. 2010, 2010q3 or 2010m7). It is used in every frequency "
+                          + "(e.g. 2010 is 2010q1–2010q4 for quarterly series), for datafiles and folders. Clicking a histogram bar sets it too.";
+            if (autoFromText.Length > 0) text += " Grey: the whole span of the shown datafiles.";
             if (state == CompareState.Datafiles && current != null && !PeriodConvert.IsDated(current.Freq))
                 text += " It does not apply to undated series.";
-            SpanText.Text = text;
+            PeriodLabel.ToolTip = text;
             ShowPeriod(FromBox, fromText, autoFromText);
             ShowPeriod(ToBox, toText, autoToText);
             WholePeriodButton.IsEnabled = fromText != null || toText != null;
@@ -2073,43 +2129,60 @@ namespace Gekko
 
         // ---------------------------------------------------------------- names tab (Datafiles)
 
-        /// <summary>The series passing all filters. Those found by the check in the selected periods are dark red.</summary>
-        void ShowNames()
+        /// <summary>Whether found names/files are shown in dark red (the "Red names" box). Off: all black.</summary>
+        bool RedNames => RedNamesCheck.IsChecked == true;
+
+        void RedNames_Changed(object sender, RoutedEventArgs e)
+        {
+            if (!ready) return;
+            if (state == CompareState.Datafiles) ShowNames(true);
+            else ShowFileDetails();
+        }
+
+        /// <summary>
+        /// The series passing all filters, by their names as Freqpretty shows them. With "Red names", those found by the
+        /// check in the selected periods are dark red. keepScroll: rebuilt in place (e.g. "Red names" ticked), so the
+        /// text stays where it was scrolled to.
+        /// </summary>
+        void ShowNames(bool keepScroll = false)
         {
             if (selection == null || current == null)
             {
                 NamesTab.Header = "Names";
                 NamesHeader.Text = "Click a number, an area or a bank's box in the diagram to list its series.";
                 NamesHeader.ToolTip = null;
-                SetNamesText(new List<string>(), new HashSet<string>());
+                SetNamesText(new List<string>(), new HashSet<string>(), false);
                 return;
             }
             int from = PeriodFrom, to = PeriodTo;
             bool ignore = IgnoreDimsCheck.IsChecked == true;
-            List<string> names = CompareEngine.NamesForDisplay(shown.Select(s => s.Name), ignore);
-            List<string> found = shown.Where(s => s.FoundIn(check, from, to, selection.SlotMask)).Select(s => s.Name).ToList();
-            var red = new HashSet<string>(CompareEngine.NamesForDisplay(found, ignore), StringComparer.OrdinalIgnoreCase);
+            List<string> names = CompareEngine.NamesForDisplay(shown.Select(s => CompareEngine.Freqpretty(s.Name)), ignore);
+            List<string> found = shown.Where(s => s.FoundIn(check, from, to, selection.SlotMask)).Select(s => CompareEngine.Freqpretty(s.Name)).ToList();
+            var red = new HashSet<string>(RedNames ? CompareEngine.NamesForDisplay(found, ignore) : new List<string>(), StringComparer.OrdinalIgnoreCase);
             string phrase = CheckText.Phrase(check);
 
             string header = selection.Description + current.CountPeriodText + ": " + shown.Count
                             + (shown.Count == selection.Series.Count ? "" : " of " + selection.Series.Count) + " series"
                             + (foundFilter == FlagFilter.Yes ? " " + phrase : "");
             if (ignore) header += ", " + names.Count + " names without dimensions";
-            if (found.Count > 0 && foundFilter != FlagFilter.Yes) header += " (" + found.Count + " " + phrase + ", in dark red)";
+            if (found.Count > 0 && foundFilter != FlagFilter.Yes) header += " (" + found.Count + " " + phrase + (RedNames ? ", in dark red" : "") + ")";
             NamesHeader.Text = header;
             NamesHeader.ToolTip = header;
             NamesTab.Header = "Names (" + shown.Count + ")";
-            SetNamesText(names, red);
+            SetNamesText(names, red, keepScroll);
         }
 
         /// <summary>
-        /// Comma-separated names. Found names are dark red, one Run each; everything else (other names and all the
-        /// separating commas) is black, in as few Runs as possible. Remembers where each name is, for clicking,
-        /// hovering, selecting whole names and the context menu.
+        /// Comma-separated names. Names in red are dark red, one Run each, and so is the bookmarked name (grey
+        /// background); everything else (other names and all the separating commas) is black, in as few Runs as
+        /// possible. Remembers where each name is, for clicking, hovering, selecting whole names and the context menu.
+        /// keepScroll: stay where the text was scrolled to, else start at the top.
         /// </summary>
-        void SetNamesText(List<string> names, HashSet<string> red)
+        void SetNamesText(List<string> names, HashSet<string> red, bool keepScroll)
         {
             HideNameHover();
+            double offset = NamesText.VerticalOffset;
+            bookmarkRun = null;
             namesShown = names;
             nameStarts = new int[names.Count];
             nameEnds = new int[names.Count];
@@ -2139,11 +2212,17 @@ namespace Gekko
                 nameStarts[j] = pos;
                 nameEnds[j] = pos + names[j].Length;
                 nameIsRed[j] = red.Contains(names[j]);
-                if (nameIsRed[j])
+                bool marked = bookmarkName != null && string.Equals(names[j], bookmarkName, StringComparison.OrdinalIgnoreCase);
+                if (nameIsRed[j] || marked)
                 {
                     if (black.Length > 0) addRun(black.ToString(), null, blackStart);
                     black.Clear();
-                    addRun(names[j], DeviatingNameBrush, pos);
+                    addRun(names[j], nameIsRed[j] ? DeviatingNameBrush : null, pos);
+                    if (marked)
+                    {
+                        bookmarkRun = nameRuns[nameRuns.Count - 1];
+                        bookmarkRun.Background = BookmarkBrush;
+                    }
                     blackStart = nameEnds[j];
                 }
                 else
@@ -2160,8 +2239,80 @@ namespace Gekko
                 FontSize = NamesText.FontSize
             };
             NamesText.Document = document;
-            NamesText.ScrollToHome();
+            if (keepScroll) NamesText.ScrollToVerticalOffset(offset);
+            else NamesText.ScrollToHome();
             namesPlainText = string.Join(", ", names);
+        }
+
+        // ---- The bookmark: the name last clicked (to see its values) gets a grey background, so it is easy to find when
+        // coming back to the Names tab. It stays (also when the list is built again) until the next click or selection.
+
+        string bookmarkName;  // as shown (Freqpretty, maybe without dimensions), or null
+        Run bookmarkRun;      // the Run that holds exactly that name in the current text, or null
+
+        void SetBookmark(int k)
+        {
+            ClearBookmark();
+            bookmarkName = namesShown[k];
+            bookmarkRun = IsolateName(k);
+            if (bookmarkRun != null) bookmarkRun.Background = BookmarkBrush;
+        }
+
+        void ClearBookmark()
+        {
+            bookmarkName = null;
+            if (bookmarkRun != null) bookmarkRun.ClearValue(TextElement.BackgroundProperty);
+            bookmarkRun = null;
+        }
+
+        /// <summary>
+        /// The Run that holds exactly name k. A Run with more in it (black names and commas) is split in place into the
+        /// text before, the name and the text after, so the text, its layout and the scroll position stay the same.
+        /// </summary>
+        Run IsolateName(int k)
+        {
+            int i = nameRunStarts.BinarySearch(nameStarts[k]);
+            if (i < 0) i = ~i - 1;
+            if (i < 0 || i >= nameRuns.Count) return null;
+            Run run = nameRuns[i];
+            int runStart = nameRunStarts[i];
+            string text = run.Text;
+            int a = nameStarts[k] - runStart, b = nameEnds[k] - runStart;
+            if (a == 0 && b == text.Length) return run;
+            var paragraph = run.Parent as Paragraph;
+            if (paragraph == null || a < 0 || b > text.Length) return null;
+
+            var starts = new List<int>();
+            var texts = new List<string>();
+            if (a > 0)
+            {
+                starts.Add(runStart);
+                texts.Add(text.Substring(0, a));
+            }
+            starts.Add(runStart + a);
+            texts.Add(text.Substring(a, b - a));
+            if (b < text.Length)
+            {
+                starts.Add(runStart + b);
+                texts.Add(text.Substring(b));
+            }
+
+            nameRuns.RemoveAt(i);
+            nameRunStarts.RemoveAt(i);
+            nameRunStartOf.Remove(run);
+            Run nameRun = null;
+            for (int p = 0; p < texts.Count; p++)
+            {
+                var piece = new Run(texts[p]);
+                if (run.ReadLocalValue(TextElement.ForegroundProperty) != DependencyProperty.UnsetValue) piece.Foreground = run.Foreground;
+                paragraph.Inlines.InsertBefore(run, piece);
+                nameRuns.Insert(i + p, piece);
+                nameRunStarts.Insert(i + p, starts[p]);
+                nameRunStartOf[piece] = starts[p];
+                if (starts[p] == nameStarts[k]) nameRun = piece;
+            }
+            paragraph.Inlines.Remove(run);
+            return nameRun;
         }
 
         void IgnoreDims_Changed(object sender, RoutedEventArgs e)
@@ -2327,6 +2478,7 @@ namespace Gekko
             namesDownClicks = e.ClickCount;
             namesDownHadSelection = NamesText.Selection != null && !NamesText.Selection.IsEmpty;
             HideNameHover();
+            ClearBookmark();  // a click on a name sets it again (on the button up)
         }
 
         /// <summary>
@@ -2354,6 +2506,7 @@ namespace Gekko
                     int k = NameIndexAtPoint(pt);
                     if (k >= 0)
                     {
+                        SetBookmark(k);
                         JumpToName(namesShown[k]);
                         return;
                     }
@@ -2484,6 +2637,7 @@ namespace Gekko
         void NamesText_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             HideNameHover();
+            ClearBookmark();
             contextFromMouse = true;
             contextNames = null;
             if (state != CompareState.Datafiles || namesShown.Count == 0) return;
@@ -2528,7 +2682,8 @@ namespace Gekko
 
         /// <summary>
         /// TODO (Gekko): plot the series. Called from the context menu of the Names tab.
-        ///   names: the names as listed in the Names tab (without dimensions when "Ignore dimensions" is ticked).
+        ///   names: the names as listed in the Names tab: without the frequency (see CompareEngine.Freqpretty), and
+        ///          without dimensions when "Ignore dimensions" is ticked.
         ///   from, to: the period as shown in the period boxes, in any frequency (e.g. "1990q3" and "2025"), or null.
         ///   freq: the selected frequency (the names are series of this frequency).
         /// The compared banks are current.Banks (slot order), and current.Active says which are shown.
@@ -2547,8 +2702,11 @@ namespace Gekko
         {
             HideNameHover();
             bool ignore = IgnoreDimsCheck.IsChecked == true;
-            int index = navList.FindIndex(c => string.Equals(ignore ? CompareEngine.StripDimensions(c.Name) : c.Name, name,
-                                                             StringComparison.OrdinalIgnoreCase));
+            int index = navList.FindIndex(c =>
+            {
+                string shownName = CompareEngine.Freqpretty(c.Name);
+                return string.Equals(ignore ? CompareEngine.StripDimensions(shownName) : shownName, name, StringComparison.OrdinalIgnoreCase);
+            });
             if (index < 0) return;
             SeriesComparison target = navList[index];
             valuesTopName = target.Name;  // a Values text built now keeps it at the top
@@ -2557,7 +2715,7 @@ namespace Gekko
             int block = blockSeries.FindIndex(c => ReferenceEquals(c, target));
             if (block < 0)
             {
-                SetStatus(target.Name + " is left out of the Values text (too many series). Narrow the selection to see it.");
+                SetStatus(CompareEngine.Freqpretty(target.Name) + " is left out of the Values text (too many series). Narrow the selection to see it.");
                 return;
             }
             ScrollValuesToBlock(block);
@@ -2620,10 +2778,10 @@ namespace Gekko
                 int found = c.FoundPeriods(check, from, to, selection.SlotMask);
                 blockStarts.Add(line);
                 blockSeries.Add(c);
-                sb.Append(c.Name + "   (" + blockSeries.Count + " of " + navList.Count + ": " + found
+                sb.Append(CompareEngine.Freqpretty(c.Name) + "   (" + blockSeries.Count + " of " + navList.Count + ": " + found
                           + (found == 1 ? " period" : " periods") + what + current.CountPeriodText + ")\r\n");
                 line++;
-                DeviationListing listing = CompareEngine.FormatComparison(c, from, to, check, selection.SlotMask, onlyFound);
+                DeviationListing listing = CompareEngine.FormatComparison(c, from, to, check, selection.SlotMask, onlyFound, CompareEngine.Freqpretty(c.Name));
                 foreach (string l in listing.Lines)
                 {
                     sb.Append(l).Append("\r\n");
@@ -2751,7 +2909,7 @@ namespace Gekko
             if (valuesBlock < 0 || valuesBlock >= blockStarts.Count) return;
             SeriesComparison c = blockSeries[valuesBlock];
             valuesTopName = c.Name;
-            NavText.Text = c.Name + "   (" + (valuesBlock + 1) + " of " + navList.Count + ")";
+            NavText.Text = CompareEngine.Freqpretty(c.Name) + "   (" + (valuesBlock + 1) + " of " + navList.Count + ")";
             PrevButton.IsEnabled = valuesBlock > 0 || ValuesTopLine() > blockStarts[valuesBlock];
             NextButton.IsEnabled = valuesBlock < blockStarts.Count - 1;
         }
@@ -2790,7 +2948,9 @@ namespace Gekko
 
             FileComparison f = fileNav[fileNavIndex];
             NavText.Text = f.RelativePath + "   (" + (fileNavIndex + 1) + " of " + fileNav.Count + ")";
-            LegendText.Text = f.IsComparison ? "Click the file in the Files tab to compare its series" : "In one folder only";
+            LegendText.Text = !f.IsReadable ? "The series of this file type are not read"
+                            : f.IsComparison ? "Click the file in the Files tab to compare its series"
+                            : "In one folder only. Click the file in the Files tab to look at its series";
             string foundWord = check == CheckKind.Missings ? "has M" : check == CheckKind.Zeroes ? "has zero" : "";
             var lines = new List<string>
             {
@@ -2807,12 +2967,13 @@ namespace Gekko
                     continue;
                 }
                 CopyStats c = f.Copies[i];
-                string series = c == null || c.Error != null ? "?" : c.SeriesCount.ToString(Inv);
+                string series = c == null || c.Error != null ? "?" : c.NotRead ? "-" : c.SeriesCount.ToString(Inv);
                 string flag = foundWord.Length == 0 ? "" : ((f.FoundInCopy != null && f.FoundInCopy[i]) ? "yes" : "no").PadRight(9) + "   ";
                 lines.Add(label + f.Sizes[i].ToString("N0", Inv).PadLeft(14) + "   "
                           + f.Modified[i].ToString("yyyy-MM-dd HH:mm:ss", Inv).PadRight(21) + series.PadLeft(8) + "   "
                           + flag + f.FullPaths[i]
-                          + (f.SameAs[i] != i ? "   (identical to folder " + (f.Slots[f.SameAs[i]] + 1) + ")" : ""));
+                          + (f.SameAs[i] != i ? "   (same data as folder " + (f.Slots[f.SameAs[i]] + 1) + ": "
+                                                + FileComparison.SameText(f.HashKinds[i]) + ")" : ""));
             }
             if (f.IsComparison)
             {
@@ -2828,6 +2989,11 @@ namespace Gekko
                             lines.Add(pair + "could not be read: " + p.Error);
                             continue;
                         }
+                        if (p.ContentDiffers)
+                        {
+                            lines.Add(pair + "?".PadRight(13) + "?".PadLeft(20) + "?".PadLeft(20) + "   yes (the contents differ; the series are not read)");
+                            continue;
+                        }
                         double abs, rel;
                         p.Largest(period, out abs, out rel);
                         lines.Add(pair + (p.StructureDiffers ? "no" : "yes").PadRight(13)
@@ -2836,6 +3002,15 @@ namespace Gekko
                     }
             }
             lines.Add("");
+            if (f.IsComparison)
+            {
+                // How the copies were compared (the content hash, as Dlink computes it, not cached).
+                EDlinkHashKind? kind = f.HashKinds.FirstOrDefault(h => h.HasValue);
+                lines.Add(kind == EDlinkHashKind.GbkDataHash ? "Copies compared by the data hash inside the .gbk file; copies that differ are compared series by series."
+                        : kind == EDlinkHashKind.PxContentHash ? "Copies compared by their .px content (apart from the creation date)."
+                        : f.IsReadable ? "Copies compared by their bytes (no data hash inside); copies that differ are compared series by series."
+                        : "Copies compared by their bytes.");
+            }
             string error = f.Error;
             if (error != null) lines.Add("Could not be read: " + error);
             else if (f.Found) lines.Add("Found by the " + check.ToString().ToLowerInvariant() + " check: " + f.Why + ".");
@@ -2942,6 +3117,10 @@ namespace Gekko
             ToggleDiagram();
         }
 
+        /// <summary>
+        /// Hides (or shows again) the drop zone and list, the diagram and the controls, so the tabs get the room. The top
+        /// line (the Folders | Datafiles switch and the frequency buttons) stays.
+        /// </summary>
         void ToggleDiagram()
         {
             diagramHidden = !diagramHidden;
@@ -2953,20 +3132,57 @@ namespace Gekko
                 VennSplitterRow.Height = new GridLength(0);
                 DiagramArea.Visibility = Visibility.Collapsed;
                 VennSplitter.Visibility = Visibility.Collapsed;
-                DiagramToggle.Content = "▾ Show controls";
+
+                savedBankListHeight = new GridLength(BankListRow.ActualHeight);
+                BankListRow.MinHeight = 0;
+                BankListRow.Height = new GridLength(0);
+                BankListSplitterRow.Height = new GridLength(0);
+                BankListArea.Visibility = Visibility.Collapsed;
+                BankListSplitter.Visibility = Visibility.Collapsed;
             }
             else
             {
+                BankListArea.Visibility = Visibility.Visible;
+                BankListSplitter.Visibility = Visibility.Visible;
+                BankListRow.Height = savedBankListHeight;
+                BankListRow.MinHeight = 46;
+                BankListSplitterRow.Height = new GridLength(8);
+
                 DiagramArea.Visibility = Visibility.Visible;
                 VennSplitter.Visibility = Visibility.Visible;
                 VennRow.Height = savedVennHeight;
                 VennRow.MinHeight = 200;
                 VennSplitterRow.Height = new GridLength(6);
-                DiagramToggle.Content = "▴ Hide controls";
                 // "first 2" / "first 3" may have changed while the diagram was hidden.
                 UpdateLayout();
                 if (Model != null) FitVennRow(Model.SlotCount);
             }
+            UpdateDiagramToggle();
+        }
+
+        /// <summary>
+        /// The expand/collapse button to the right of the tabs: two diagonal arrows pointing out (expand the tabs: hide
+        /// the list, diagram and controls) or pointing in (collapse the tabs again: show them).
+        /// </summary>
+        void UpdateDiagramToggle()
+        {
+            string data = diagramHidden
+                ? "M11,1 L7,5 M7,1.5 L7,5 L10.5,5 M1,11 L5,7 M5,10.5 L5,7 L1.5,7"      // pointing in
+                : "M7,5 L11,1 M7.5,1 L11,1 L11,4.5 M5,7 L1,11 M1,7.5 L1,11 L4.5,11";   // pointing out
+            DiagramToggle.Content = new System.Windows.Shapes.Path
+            {
+                Data = Geometry.Parse(data),
+                Stroke = ToggleIconBrush,
+                StrokeThickness = 1.4,
+                StrokeStartLineCap = PenLineCap.Round,
+                StrokeEndLineCap = PenLineCap.Round,
+                StrokeLineJoin = PenLineJoin.Round,
+                Width = 12,
+                Height = 12
+            };
+            DiagramToggle.ToolTip = diagramHidden
+                ? "Show the list, the diagram and the controls again (Ctrl+D)"
+                : "Hide the list, the diagram and the controls to give the tabs more room (Ctrl+D)";
         }
 
         // ---------------------------------------------------------------- controls
@@ -3005,6 +3221,220 @@ namespace Gekko
         void SetStatus(string text)
         {
             StatusText.Text = text;
+        }
+
+        // ---------------------------------------------------------------- the busy circle
+
+        BusyCircle busyCircle;
+        bool busyCircleFailed;
+        int busyCount;
+
+        /// <summary>
+        /// Shows the busy circle (right of the Folders | Datafiles switch) until the returned object is disposed:
+        ///     using (ShowBusy()) { ... }
+        /// Meant for the work that keeps the window busy for a while: reading databank files, comparing databanks,
+        /// comparing folders. Not for quick refreshes (e.g. listing names). The circle is drawn by a thread of its own, so
+        /// it keeps turning while this window's thread is busy; it only appears after a short delay, so quick work does
+        /// not make it flash. Calls may be nested; the circle goes when the last one ends.
+        /// </summary>
+        IDisposable ShowBusy()
+        {
+            if (busyCount++ == 0)
+            {
+                if (busyCircle == null && !busyCircleFailed)
+                {
+                    try
+                    {
+                        busyCircle = new BusyCircle(BusyHost);
+                    }
+                    catch (Exception)
+                    {
+                        busyCircleFailed = true;  // the circle is only a nicety: never fail the work because of it
+                    }
+                }
+                busyCircle?.Show();
+            }
+            return new BusyToken(this);
+        }
+
+        void EndBusy()
+        {
+            if (busyCount > 0 && --busyCount == 0) busyCircle?.Hide();
+        }
+
+        sealed class BusyToken : IDisposable
+        {
+            WindowCompare window;
+
+            public BusyToken(WindowCompare w)
+            {
+                window = w;
+            }
+
+            public void Dispose()
+            {
+                WindowCompare w = window;
+                window = null;  // ends the busy period once only
+                w?.EndBusy();
+            }
+        }
+
+        /// <summary>
+        /// A small open circle with an arrowhead, turning clockwise. It lives on a thread of its own (HostVisual on this
+        /// window's thread, VisualTarget on the circle's), so it is drawn and turns even while the window's thread is
+        /// blocked. Show and Hide may be called from the window's thread; the rest runs on the circle's thread.
+        /// </summary>
+        sealed class BusyCircle
+        {
+            const int DelayMs = 150;   // shown only when the work takes longer than this
+            const double Diameter = 16;
+            readonly Dispatcher dispatcher;
+
+            // Only touched on the circle's thread:
+            FrameworkElement root;
+            RotateTransform rotation;
+            DispatcherTimer delay;
+            bool wanted;   // Show has been called and Hide not yet
+            bool turning;
+
+            public BusyCircle(Border host)
+            {
+                var hostVisual = new HostVisual();
+                host.Child = new VisualHostElement(hostVisual);
+                Dispatcher started = null;
+                Exception failure = null;
+                using (var ready = new ManualResetEventSlim())
+                {
+                    var thread = new Thread(() =>
+                    {
+                        VisualTarget target = null;
+                        try
+                        {
+                            target = new VisualTarget(hostVisual);
+                            root = Build(out rotation);
+                            root.Measure(new Size(Diameter, Diameter));
+                            root.Arrange(new Rect(0, 0, Diameter, Diameter));
+                            target.RootVisual = root;
+                            delay = new DispatcherTimer(DispatcherPriority.Normal, Dispatcher.CurrentDispatcher)
+                            {
+                                Interval = TimeSpan.FromMilliseconds(DelayMs)
+                            };
+                            delay.Tick += (o, e) =>
+                            {
+                                delay.Stop();
+                                if (wanted) Start();
+                            };
+                            started = Dispatcher.CurrentDispatcher;
+                        }
+                        catch (Exception ex)
+                        {
+                            failure = ex;
+                        }
+                        finally
+                        {
+                            ready.Set();
+                        }
+                        if (started == null) return;
+                        Dispatcher.Run();  // until Shutdown
+                        target.Dispose();
+                    });
+                    thread.SetApartmentState(ApartmentState.STA);
+                    thread.IsBackground = true;
+                    thread.Name = "Compare window busy circle";
+                    thread.Start();
+                    ready.Wait();
+                }
+                if (started == null) throw failure ?? new InvalidOperationException("The busy circle could not be started.");
+                dispatcher = started;
+            }
+
+            public void Show()
+            {
+                dispatcher.BeginInvoke(new Action(() =>
+                {
+                    wanted = true;
+                    if (!turning) delay.Start();
+                }));
+            }
+
+            public void Hide()
+            {
+                dispatcher.BeginInvoke(new Action(() =>
+                {
+                    wanted = false;
+                    delay.Stop();
+                    Stop();
+                }));
+            }
+
+            public void Shutdown()
+            {
+                dispatcher.BeginInvokeShutdown(DispatcherPriority.Normal);
+            }
+
+            void Start()
+            {
+                turning = true;
+                root.Opacity = 1;
+                var spin = new System.Windows.Media.Animation.DoubleAnimation(0, 360, TimeSpan.FromSeconds(1))
+                {
+                    RepeatBehavior = System.Windows.Media.Animation.RepeatBehavior.Forever
+                };
+                rotation.BeginAnimation(RotateTransform.AngleProperty, spin);
+            }
+
+            void Stop()
+            {
+                turning = false;
+                rotation.BeginAnimation(RotateTransform.AngleProperty, null);
+                root.Opacity = 0;  // Opacity, not Visibility: no layout is needed on the circle's thread
+            }
+
+            /// <summary>
+            /// 300 degrees of a circle (radius 6 around 8,8), clockwise from the top, with an arrowhead at its end
+            /// pointing on clockwise. Invisible until Start.
+            /// </summary>
+            static FrameworkElement Build(out RotateTransform rotation)
+            {
+                var brush = new SolidColorBrush(Color.FromRgb(0x2E, 0x6D, 0xB4));
+                brush.Freeze();
+                var arc = new System.Windows.Shapes.Path
+                {
+                    Data = Geometry.Parse("M8,2 A6,6 0 1 1 2.8,5"),
+                    Stroke = brush,
+                    StrokeThickness = 1.7,
+                    StrokeStartLineCap = PenLineCap.Round
+                };
+                var head = new System.Windows.Shapes.Path
+                {
+                    Data = Geometry.Parse("M4,2.9 L4.2,6.5 L0.8,4.5 Z"),
+                    Fill = brush
+                };
+                rotation = new RotateTransform(0, Diameter / 2, Diameter / 2);
+                var grid = new Grid { Width = Diameter, Height = Diameter, Opacity = 0, RenderTransform = rotation };
+                grid.Children.Add(arc);
+                grid.Children.Add(head);
+                return grid;
+            }
+        }
+
+        /// <summary>Puts a visual (here the busy circle's HostVisual) into this window's element tree.</summary>
+        sealed class VisualHostElement : FrameworkElement
+        {
+            readonly Visual child;
+
+            public VisualHostElement(Visual child)
+            {
+                this.child = child;
+                AddVisualChild(child);
+            }
+
+            protected override int VisualChildrenCount => 1;
+
+            protected override Visual GetVisualChild(int index)
+            {
+                return child;
+            }
         }
 
         // ---------------------------------------------------------------- dropping files and folders
@@ -3107,30 +3537,33 @@ namespace Gekko
             int added = 0;
             var skipped = new List<string>();
             string failure = null;
-            foreach (string path in paths)
+            using (ShowBusy())
             {
-                if (Directory.Exists(path) || IsIn(bankItems, path))
+                foreach (string path in paths)
                 {
-                    skipped.Add(System.IO.Path.GetFileName(path));
-                    continue;
+                    if (Directory.Exists(path) || IsIn(bankItems, path))
+                    {
+                        skipped.Add(System.IO.Path.GetFileName(path));
+                        continue;
+                    }
+                    try
+                    {
+                        bankItems.Insert(at++, new BankItem(LoadBank(path)));
+                        TouchRecent(false, path);
+                        added++;
+                    }
+                    catch (Exception ex)
+                    {
+                        failure = "Could not read " + System.IO.Path.GetFileName(path) + ": " + ex.Message;
+                    }
                 }
-                try
+                if (added > 0)
                 {
-                    bankItems.Insert(at++, new BankItem(LoadBank(path)));
-                    TouchRecent(false, path);
-                    added++;
+                    openedFrom = null;
+                    if (state == CompareState.Datafiles) BanksChanged();
+                    else MarkDirty(CompareState.Datafiles, DirtyList);
+                    UpdateOpenedFromText();
                 }
-                catch (Exception ex)
-                {
-                    failure = "Could not read " + System.IO.Path.GetFileName(path) + ": " + ex.Message;
-                }
-            }
-            if (added > 0)
-            {
-                openedFrom = null;
-                if (state == CompareState.Datafiles) BanksChanged();
-                else MarkDirty(CompareState.Datafiles, DirtyList);
-                UpdateOpenedFromText();
             }
 
             string status = added == 1 ? "1 databank added." : added + " databanks added.";
@@ -3381,10 +3814,10 @@ namespace Gekko
     public enum AreaClickKind { Area, Total, Deviating }
 
     /// <summary>
-    /// Venn diagram for 2 or 3 banks or folders (anything implementing IVennModel). Slot 1 is top-left,
+    /// Venn diagram for 1, 2 or 3 banks or folders (anything implementing IVennModel). Slot 1 is top-left,
     /// slot 2 top-right, slot 3 at the bottom. The 2-slot diagram is the 3-slot diagram without the bottom
     /// circle: same positions, same size, but without the vertical room the bottom circle needs (the window
-    /// gives that room to the tabs).
+    /// gives that room to the tabs). A single bank or folder is one circle in the middle, as high as two.
     ///
     /// Each area shows two numbers:
     ///   black: all items (series or files) in the area,
@@ -3526,8 +3959,6 @@ namespace Gekko
                 return;
             }
 
-            bool three = model.SlotCount == 3;
-
             // The boxes first: the widest one decides how much room the circles leave at the sides.
             var tags = new Border[model.SlotCount];
             double widest = 0;
@@ -3541,7 +3972,7 @@ namespace Gekko
 
             // Horizontally the layout is always the 3-circle layout, so circles keep their size and place in 2-bank mode.
             Point[] unit3 = { new Point(-0.5, -H3), new Point(0.5, -H3), new Point(0, T3) };
-            Point[] unit = unit3.Take(model.SlotCount).ToArray();
+            Point[] unit = model.SlotCount == 1 ? new[] { new Point(0, -H3) } : unit3.Take(model.SlotCount).ToArray();
             double yMax = YMax(model.SlotCount);
 
             double r = RadiusFor(width, height, model.SlotCount);
@@ -3597,7 +4028,7 @@ namespace Gekko
             // Numbers
             foreach (int mask in model.AreaMasks)
             {
-                Point p = toPixel(LabelPoint(three, mask));
+                Point p = toPixel(LabelPoint(model.SlotCount, mask));
                 FrameworkElement label = BuildAreaLabel(mask);
                 label.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
                 Add(label, p.X - label.DesiredSize.Width / 2, p.Y - label.DesiredSize.Height / 2);
@@ -3648,9 +4079,10 @@ namespace Gekko
         /// Label position of each area, in radius units relative to the centroid.
         /// Mask bits: 1 = bank 1 (top left), 2 = bank 2 (top right), 4 = bank 3 (bottom).
         /// </summary>
-        static Point LabelPoint(bool three, int mask)
+        static Point LabelPoint(int slotCount, int mask)
         {
-            if (!three)
+            if (slotCount == 1) return new Point(0, -H3);
+            if (slotCount == 2)
             {
                 switch (mask)
                 {
