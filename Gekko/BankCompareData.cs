@@ -3,207 +3,179 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace Gekko
 {
     /// <summary>
-    /// Frequencies that can be compared. Series of different frequencies are never compared with each other.
+    /// A Gekko Databank as the compare window sees it: its series per frequency, looked up by name (case-insensitive),
+    /// plus the first and last period with data per frequency. Built once when the file is read, so the window does not
+    /// have to ask the Databank again. This is the only place that talks to the Databank, so if Gekko's API differs,
+    /// only this class needs changing.
     /// </summary>
-    //public enum CompareFreq { Annual, Quarterly, Monthly }
-
-    /// <summary>
-    /// Periods are plain integers: year * periodsPerYear + (subperiod - 1).
-    /// So consecutive periods are consecutive integers, which keeps all loops trivial.
-    /// </summary>
-    public static class PeriodText
+    public sealed class CompareBank
     {
-        public static int PeriodsPerYear(EFreq freq)
-        {            
-            //Approximate!
-            return (int)GekkoTime.FreqNumber(freq); //approximate
-        }
+        /// <summary>The frequencies looked for, in the order the frequency buttons show them.</summary>
+        public static readonly EFreq[] AllFreqs = { EFreq.A, EFreq.Q, EFreq.M, EFreq.W, EFreq.D, EFreq.U };
 
-        public static int ToIndex(EFreq freq, int year, int subPeriod)
+        static readonly Dictionary<string, Series> Empty = new Dictionary<string, Series>();
+
+        readonly Dictionary<EFreq, Dictionary<string, Series>> byFreq = new Dictionary<EFreq, Dictionary<string, Series>>();
+        readonly Dictionary<EFreq, GekkoTime[]> spans = new Dictionary<EFreq, GekkoTime[]>();
+
+        public CompareBank(Databank databank, string filePath)
         {
-            return year * PeriodsPerYear(freq) + (subPeriod - 1);
-        }
-
-        public static int Year(EFreq freq, int index)
-        {
-            return index / PeriodsPerYear(freq);
-        }
-
-        public static int SubPeriod(EFreq freq, int index)
-        {
-            return index % PeriodsPerYear(freq) + 1;
-        }
-
-        static readonly Regex PeriodPattern = new Regex(@"^\s*(\d{4})\s*(?:([aAqQmM])\s*(\d{1,2}))?\s*$");
-
-        /// <summary>
-        /// Parses 2010, 2010q3 or 2010m7 (case-insensitive). A plain year means the first subperiod,
-        /// or the last one when isEnd is true, so "2010" as last quarterly period means 2010q4.
-        /// </summary>
-        public static bool TryParse(string text, EFreq freq, bool isEnd, out int index)
-        {
-            index = 0;
-            var m = PeriodPattern.Match(text ?? "");  // var: avoids a clash if Gekko has its own Match type
-            if (!m.Success) return false;
-            int year = int.Parse(m.Groups[1].Value, CultureInfo.InvariantCulture);
-            int periodsPerYear = PeriodsPerYear(freq);
-            int sub;
-            if (!m.Groups[2].Success)
+            Databank = databank;
+            FilePath = filePath;
+            Name = filePath == null ? "" : Path.GetFileName(filePath);
+            foreach (EFreq freq in AllFreqs)
             {
-                sub = isEnd ? periodsPerYear : 1;
+                var dict = new Dictionary<string, Series>(StringComparer.OrdinalIgnoreCase);
+                GekkoTime first = GekkoTime.tNull, last = GekkoTime.tNull;
+                foreach (IVariable iv in databank.StorageFlattenedArrayTimeseries(freq, true).Values)
+                {
+                    Series ts = iv as Series;
+                    if (ts == null) continue;
+                    dict[ts.GetName()] = ts;
+                    ComparePeriods.Widen(ref first, ref last, ts.GetRealDataPeriodFirst(), ts.GetRealDataPeriodLast());
+                }
+                if (dict.Count == 0) continue;
+                byFreq[freq] = dict;
+                spans[freq] = new[] { first, last };
+            }
+        }
+
+        public Databank Databank { get; }
+        public string FilePath { get; }
+        public string Name { get; }
+
+        /// <summary>The series of one frequency, by name. Empty if the bank has none.</summary>
+        public IReadOnlyDictionary<string, Series> Get(EFreq freq)
+        {
+            Dictionary<string, Series> dict;
+            return byFreq.TryGetValue(freq, out dict) ? dict : Empty;
+        }
+
+        public int Count(EFreq freq)
+        {
+            return Get(freq).Count;
+        }
+
+        /// <summary>The frequencies that have series, in the order of AllFreqs.</summary>
+        public IEnumerable<EFreq> Frequencies
+        {
+            get { return AllFreqs.Where(f => byFreq.ContainsKey(f)); }
+        }
+
+        /// <summary>First and last period with data over all series of the frequency (tNull when there is none).</summary>
+        public void Span(EFreq freq, out GekkoTime first, out GekkoTime last)
+        {
+            GekkoTime[] s;
+            if (spans.TryGetValue(freq, out s))
+            {
+                first = s[0];
+                last = s[1];
             }
             else
             {
-                char letter = char.ToLowerInvariant(m.Groups[2].Value[0]);
-                char expected = freq == EFreq.Q ? 'q' : freq == EFreq.M ? 'm' : 'a';
-                if (letter != expected) return false;
-                sub = int.Parse(m.Groups[3].Value, CultureInfo.InvariantCulture);
-                if (sub < 1 || sub > periodsPerYear) return false;
+                first = GekkoTime.tNull;
+                last = GekkoTime.tNull;
             }
-            index = ToIndex(freq, year, sub);
-            return true;
+        }
+    }
+
+    /// <summary>
+    /// The periods of one comparison, in one frequency: Start and the following Length - 1 periods. The flag arrays of
+    /// the comparison are indexed by the offset k = 0..Length-1 from Start. GekkoTime is used wherever a period means
+    /// something (labels, the period filter, reading values); offsets are only used to index arrays, and the two are only
+    /// converted here, so frequencies never get mixed up.
+    /// </summary>
+    public sealed class PeriodAxis
+    {
+        readonly GekkoTime[] times;
+
+        /// <summary>first..last inclusive, same frequency, both not null and first &lt;= last.</summary>
+        public PeriodAxis(GekkoTime first, GekkoTime last)
+        {
+            Freq = first.freq;
+            Start = first;
+            int n = Math.Max(0, GekkoTime.Observations(first, last));
+            times = new GekkoTime[n];
+            GekkoTime t = first;
+            for (int k = 0; k < n; k++)
+            {
+                times[k] = t;
+                t = t.Add(1);
+            }
+        }
+
+        public EFreq Freq { get; }
+        public GekkoTime Start { get; }
+        public int Length => times.Length;
+        public GekkoTime End => times.Length > 0 ? times[times.Length - 1] : GekkoTime.tNull;
+
+        /// <summary>The period at offset k (0..Length-1).</summary>
+        public GekkoTime At(int k)
+        {
+            return times[k];
+        }
+
+        /// <summary>The offset of t, which may be &lt; 0 or &gt;= Length (outside the axis). t must have the axis' frequency.</summary>
+        public int OffsetOf(GekkoTime t)
+        {
+            return GekkoTime.Observations(Start, t) - 1;
         }
 
         /// <summary>
-        /// The same point in time in another frequency. A start period maps to the period containing its
-        /// start (2010q3 -> 2010m7), an end period to the period containing its end (2010q3 -> 2010m9).
+        /// The period filter from..to as offsets, cut to the axis. A null end is open. False (and lo &gt; hi) if nothing
+        /// of the axis is left.
         /// </summary>
-        public static int ChangeFrequency(int index, EFreq from, EFreq to, bool isEnd)
+        public bool Clamp(GekkoTime from, GekkoTime to, out int lo, out int hi)
         {
-            int fromPpy = PeriodsPerYear(from), toPpy = PeriodsPerYear(to);
-            int year = Year(from, index), sub = SubPeriod(from, index);
-            int newSub = isEnd
-                ? (int)Math.Ceiling(sub * (double)toPpy / fromPpy)
-                : (int)Math.Floor((sub - 1) * (double)toPpy / fromPpy) + 1;
-            return ToIndex(to, year, newSub);
-        }
-
-        public static string Format(EFreq freq, int index)
-        {
-            string year = Year(freq, index).ToString(CultureInfo.InvariantCulture);
-            string sub = SubPeriod(freq, index).ToString(CultureInfo.InvariantCulture);
-            switch (freq)
-            {
-                case EFreq.Q: return year + "q" + sub;
-                case EFreq.M: return year + "m" + sub;
-                default: return year;
-            }
+            lo = from.IsNull() ? 0 : Math.Max(0, OffsetOf(from));
+            hi = to.IsNull() ? Length - 1 : Math.Min(Length - 1, OffsetOf(to));
+            return lo <= hi;  // when false, loops over lo..hi do nothing
         }
     }
 
-    ///// <summary>One timeseries. Data[0] belongs to period Start.</summary>
-    //public sealed class CompareSeries
-    //{
-    //    public CompareSeries(string name, EFreq freq, int start, double[] data)
-    //    {
-    //        Name = name;
-    //        Freq = freq;
-    //        Start = start;
-    //        Data = data ?? new double[0];
-    //    }
-
-    //    public string Name { get; }
-    //    public EFreq Freq { get; }
-    //    public int Start { get; }
-    //    public double[] Data { get; }
-    //    public int End => Start + Data.Length - 1;
-
-    //    /// <summary>Returns null when the series has no observation in the period. NaN values are returned as NaN.</summary>
-    //    public double? Get(int period)
-    //    {
-    //        int i = period - Start;
-    //        if (i < 0 || i >= Data.Length) return null;
-    //        return Data[i];
-    //    }
-    //}
-
-    ///// <summary>A databank: series per frequency, looked up by name (case-insensitive).</summary>
-    //public sealed class CompareBank
-    //{
-    //    static readonly Dictionary<string, CompareSeries> Empty = new Dictionary<string, CompareSeries>();
-    //    readonly Dictionary<CompareFreq, Dictionary<string, CompareSeries>> byFreq = new Dictionary<CompareFreq, Dictionary<string, CompareSeries>>();
-
-    //    public CompareBank(string name, string filePath)
-    //    {
-    //        Name = name;
-    //        FilePath = filePath;
-    //    }
-
-    //    public string Name { get; }
-
-    //    /// <summary>Null for banks with artificial data.</summary>
-    //    public string FilePath { get; }
-
-    //    public void Add(CompareSeries series)
-    //    {
-    //        Dictionary<string, CompareSeries> dict;
-    //        if (!byFreq.TryGetValue(series.Freq, out dict))
-    //        {
-    //            dict = new Dictionary<string, CompareSeries>(StringComparer.OrdinalIgnoreCase);
-    //            byFreq[series.Freq] = dict;
-    //        }
-    //        dict[series.Name] = series;
-    //    }
-
-    //    public IReadOnlyDictionary<string, CompareSeries> Get(CompareFreq freq)
-    //    {
-    //        Dictionary<string, CompareSeries> dict;
-    //        return byFreq.TryGetValue(freq, out dict) ? dict : Empty;
-    //    }
-
-    //    public int Count(CompareFreq freq)
-    //    {
-    //        return Get(freq).Count;
-    //    }
-
-    //    public IEnumerable<CompareFreq> Frequencies
-    //    {
-    //        get { return byFreq.Where(kv => kv.Value.Count > 0).Select(kv => kv.Key).OrderBy(f => f); }
-    //    }
-    //}
-
-    /// <summary>
-    /// Decides whether two observations are equal. a or b is null when there is no observation
-    /// in that period, and NaN when the observation is NaN. Plug your own criterion in here.
-    /// </summary>
-    public interface IEqualityCriterion
+    /// <summary>GekkoTime helpers where tNull means "open" (no limit).</summary>
+    public static class ComparePeriods
     {
-        bool AreEqual(double? a, double? b);
-    }
-
-    /// <summary>Placeholder criterion: absolute or relative tolerance, missing only equals missing, NaN only equals NaN.</summary>
-    public sealed class SimpleEqualityCriterion : IEqualityCriterion
-    {
-        public double AbsoluteTolerance { get; set; } = 1e-9;
-        public double RelativeTolerance { get; set; } = 1e-6;
-
-        public bool AreEqual(double? a, double? b)
+        /// <summary>The later of two periods (same frequency). A null one is ignored.</summary>
+        public static GekkoTime Later(GekkoTime a, GekkoTime b)
         {
-            if (!a.HasValue || !b.HasValue) return !a.HasValue && !b.HasValue;
-            double x = a.Value, y = b.Value;
-            bool xNaN = double.IsNaN(x), yNaN = double.IsNaN(y);
-            if (xNaN || yNaN) return xNaN && yNaN;
-            if (x == y) return true;
-            double diff = Math.Abs(x - y);
-            if (double.IsInfinity(diff) || double.IsNaN(diff)) return false;
-            return diff <= AbsoluteTolerance || diff <= RelativeTolerance * Math.Max(Math.Abs(x), Math.Abs(y));
+            if (a.IsNull()) return b;
+            if (b.IsNull()) return a;
+            return a.StrictlyLargerThan(b) ? a : b;
+        }
+
+        /// <summary>The earlier of two periods (same frequency). A null one is ignored.</summary>
+        public static GekkoTime Earlier(GekkoTime a, GekkoTime b)
+        {
+            if (a.IsNull()) return b;
+            if (b.IsNull()) return a;
+            return a.StrictlySmallerThan(b) ? a : b;
+        }
+
+        /// <summary>Widens first..last (tNull: nothing yet) to include t1..t2 (ignored if null).</summary>
+        public static void Widen(ref GekkoTime first, ref GekkoTime last, GekkoTime t1, GekkoTime t2)
+        {
+            if (t1.IsNull() || t2.IsNull()) return;
+            first = Earlier(first, t1);
+            last = Later(last, t2);
+        }
+
+        /// <summary>a..b holds at least one period (both not null).</summary>
+        public static bool IsRange(GekkoTime a, GekkoTime b)
+        {
+            return !a.IsNull() && !b.IsNull() && a.SmallerThanOrEqual(b);
         }
     }
 
-    /// <summary>Where real databank files are read. Replace the body with your own reader.</summary>
+    /// <summary>Where real databank files are read.</summary>
     public static class DatabankLoader
     {
         public static Databank Load(string path)
         {
-            // TODO: read the real databank file here and return all its series (all frequencies).
-            // For now every dropped file gets artificial data, seeded by its file name.
-            //return Program.databanks. ArtificialData.CreateBank(Path.GetFileName(path), path);
-
             CellOffset offset = new CellOffset();
             ReadOpenMulbkHelper oRead = new ReadOpenMulbkHelper();
             Program.ReadInfo readInfo = new Program.ReadInfo();
@@ -213,124 +185,11 @@ namespace Gekko
             Databank databank = Program.GetDatabankFromFile(offset, oRead, readInfo, path, path, path, oRead.dateformat, oRead.datetype, oRead.bankName, p, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
             return databank;
         }
+
+        /// <summary>Reads the file and wraps it for the compare window.</summary>
+        public static CompareBank LoadForCompare(string path)
+        {
+            return new CompareBank(Load(path), path);
+        }
     }
-
-    ///// <summary>
-    ///// Deterministic artificial data. All banks share the same underlying series, so most common
-    ///// series are equal. Each bank leaves out some series, revises some from a point onwards,
-    ///// has one-period glitches, NaNs and ragged ends, which gives realistic deviations.
-    ///// </summary>
-    //public static class ArtificialData
-    //{
-    //    static readonly string[] Stems = { "gdp", "cp", "cg", "ip", "e", "m", "pcp", "pe", "pm", "lna", "q", "ul", "tw", "ys", "yd", "wcp", "bf", "fy", "fe", "fm" };
-    //    static readonly string[] Sectors = { "agr", "man", "con", "ser", "pub" };
-    //    static readonly string[] Countries = { "dk", "de", "se" };
-
-    //    public static CompareBank CreateBank(string name, string filePath)
-    //    {
-    //        var bank = new CompareBank(name, filePath);
-    //        int bankSeed = StableHash(name);
-    //        AddSeries(bank, CompareFreq.Annual, PeriodText.ToIndex(CompareFreq.Annual, 1990, 1), PeriodText.ToIndex(CompareFreq.Annual, 2025, 1), bankSeed);
-    //        AddSeries(bank, CompareFreq.Quarterly, PeriodText.ToIndex(CompareFreq.Quarterly, 2000, 1), PeriodText.ToIndex(CompareFreq.Quarterly, 2025, 4), bankSeed);
-    //        AddSeries(bank, CompareFreq.Monthly, PeriodText.ToIndex(CompareFreq.Monthly, 2010, 1), PeriodText.ToIndex(CompareFreq.Monthly, 2025, 12), bankSeed);
-    //        return bank;
-    //    }
-
-    //    //static void AddSeries(CompareBank bank, CompareFreq freq, int start, int end, int bankSeed)
-    //    //{
-    //    //    int periodsPerYear = PeriodText.PeriodsPerYear(freq);
-    //    //    foreach (string name in MakeNames(freq))
-    //    //    {
-    //    //        int nameHash = StableHash(name + "!" + freq);
-    //    //        var pick = new Random((nameHash ^ bankSeed) & 0x7FFFFFFF);
-    //    //        if (pick.NextDouble() > 0.82) continue;  // this bank does not have the series
-
-    //    //        double[] full = BaseValues(nameHash, end - start + 1, periodsPerYear);
-    //    //        int length = full.Length;
-    //    //        if (pick.NextDouble() < 0.02) length = Math.Max(1, length - 1 - pick.Next(4));  // ragged end
-    //    //        var values = new double[length];
-    //    //        Array.Copy(full, values, length);
-
-    //    //        double u = pick.NextDouble();
-    //    //        if (u < 0.06)
-    //    //        {
-    //    //            // Revision from some period onwards
-    //    //            int from = pick.Next(length / 2, length);
-    //    //            double factor = 1 + (pick.NextDouble() - 0.5) * 0.04;
-    //    //            for (int i = from; i < length; i++) values[i] = Math.Round(values[i] * factor, 4);
-    //    //        }
-    //    //        else if (u < 0.075)
-    //    //        {
-    //    //            // One-period glitch
-    //    //            int k = pick.Next(length);
-    //    //            values[k] = Math.Round(values[k] * (1 + 0.01 * (1 + pick.Next(10))), 2);
-    //    //        }
-    //    //        if (pick.NextDouble() < 0.01) values[pick.Next(length)] = double.NaN;
-
-    //    //        bank.Add(new CompareSeries(name, freq, start, values));
-    //    //    }
-    //    //}
-
-    //    //static double[] BaseValues(int nameHash, int count, int periodsPerYear)
-    //    //{
-    //    //    var rnd = new Random(nameHash & 0x7FFFFFFF);
-    //    //    double level = Math.Round(10 + rnd.NextDouble() * 990, 0);
-    //    //    double growth = (rnd.NextDouble() - 0.3) * 0.04 / periodsPerYear;
-    //    //    double noise = rnd.NextDouble() * 0.03 / Math.Sqrt(periodsPerYear);
-    //    //    var values = new double[count];
-    //    //    double x = level;
-    //    //    for (int i = 0; i < count; i++)
-    //    //    {
-    //    //        x *= 1 + growth + (rnd.NextDouble() - 0.5) * noise;
-    //    //        values[i] = Math.Round(x, 2);
-    //    //    }
-    //    //    return values;
-    //    //}
-
-    //    //static List<string> MakeNames(CompareFreq freq)
-    //    //{
-    //    //    var names = new List<string>();
-    //    //    int plain = freq == CompareFreq.Annual ? 260 : freq == CompareFreq.Quarterly ? 160 : 60;
-    //    //    for (int i = 0; i < plain; i++)
-    //    //    {
-    //    //        int k = i / Stems.Length;
-    //    //        names.Add(Stems[i % Stems.Length] + (k == 0 ? "" : k.ToString(CultureInfo.InvariantCulture)));
-    //    //    }
-    //    //    int xCount = freq == CompareFreq.Annual ? 40 : freq == CompareFreq.Quarterly ? 20 : 10;
-    //    //    for (int i = 1; i <= xCount; i++) names.Add("x" + i.ToString(CultureInfo.InvariantCulture));
-
-    //    //    if (freq != CompareFreq.Monthly)
-    //    //    {
-    //    //        foreach (string s in Sectors) names.Add("emp[" + s + "]");
-    //    //        foreach (string s in Sectors)
-    //    //            foreach (string c in Countries) names.Add("prod[" + s + "," + c + "]");
-    //    //    }
-    //    //    if (freq == CompareFreq.Annual)
-    //    //    {
-    //    //        for (int age = 0; age <= 90; age += 10)
-    //    //            foreach (string sex in new[] { "m", "f" }) names.Add("pop[a" + age.ToString("00", CultureInfo.InvariantCulture) + "," + sex + "]");
-    //    //    }
-    //    //    if (freq == CompareFreq.Monthly)
-    //    //    {
-    //    //        foreach (string c in Countries)
-    //    //            foreach (string t in new[] { "3m", "1y", "5y", "10y" }) names.Add("rate[" + c + "," + t + "]");
-    //    //    }
-    //    //    return names;
-    //    //}
-
-    //    /// <summary>FNV-1a hash, stable across runs and machines (unlike string.GetHashCode on newer runtimes).</summary>
-    //    public static int StableHash(string s)
-    //    {
-    //        unchecked
-    //        {
-    //            uint h = 2166136261;
-    //            foreach (char c in s)
-    //            {
-    //                h ^= c;
-    //                h *= 16777619;
-    //            }
-    //            return (int)h;
-    //        }
-    //    }
-    //}
 }

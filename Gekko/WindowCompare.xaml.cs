@@ -32,7 +32,7 @@ namespace Gekko
         bool isDragging;
         string contents;
 
-        public BankItem(Databank bank)
+        public BankItem(CompareBank bank)
         {
             Bank = bank;
         }
@@ -40,24 +40,24 @@ namespace Gekko
         /// <summary>A row for a folder (Folders state).</summary>
         public static BankItem ForFolder(string path)
         {
-            return new BankItem((Databank)null) { FolderPath = path, IsFolderRow = true };
+            return new BankItem((CompareBank)null) { FolderPath = path, IsFolderRow = true };
         }
 
         /// <summary>The empty row always at the end of the list (no bank or folder). Its [Recent] button adds one.</summary>
         public static BankItem CreatePlaceholder(bool folderList)
         {
-            return new BankItem((Databank)null) { IsFolderRow = folderList };
+            return new BankItem((CompareBank)null) { IsFolderRow = folderList };
         }
 
-        public Databank Bank { get; }
+        public CompareBank Bank { get; }
         public string FolderPath { get; private set; }
         public bool IsFolderRow { get; private set; }
         public bool IsPlaceholder => Bank == null && FolderPath == null;
 
         /// <summary>The file or folder path that identifies the row (null for artificial data and the empty row).</summary>
-        public string SourcePath => FolderPath ?? Bank?.GetFileNameWithPath();
+        public string SourcePath => FolderPath ?? Bank?.FilePath;
 
-        public string Name => Bank != null ? Bank.GetFileNameWithoutPath() : FolderPath != null ? FolderResult.FolderName(FolderPath) : "";
+        public string Name => Bank != null ? Bank.Name : FolderPath != null ? FolderResult.FolderName(FolderPath) : "";
 
         public string PathText
         {
@@ -75,7 +75,7 @@ namespace Gekko
             {
                 if (IsPlaceholder) return "";
                 if (Bank == null) return contents ?? "";
-                return string.Join(", ", Bank.Frequencies().Select(f => f.ToString().Substring(0, 1) + " " + Bank.Count(f)));
+                return string.Join(", ", Bank.Frequencies.Select(f => f.ToString() + " " + Bank.Count(f)));
             }
         }
 
@@ -273,9 +273,9 @@ namespace Gekko
         // makes sure only one file is read at a time, in case the loader uses shared state.
         static readonly object loaderLock = new object();
 
-        static Databank LoadBank(string path)
+        static CompareBank LoadBank(string path)
         {
-            lock (loaderLock) return DatabankLoader.Load(path);
+            lock (loaderLock) return DatabankLoader.LoadForCompare(path);
         }
 
         // Summaries of data files and byte comparisons from earlier folder comparisons (keyed by path, size, time, filter).
@@ -299,7 +299,7 @@ namespace Gekko
         FlagFilter foundFilter = FlagFilter.Any;
         string fromText;
         string toText;
-        int? periodAnchor;  // the first bar clicked, for Shift+click ranges (a period of the selected frequency)
+        GekkoTime? periodAnchor;  // the first bar clicked, for Shift+click ranges (a period of the selected frequency)
         EFreq? selectedFreq;  // Datafiles: the frequency button that is pressed
 
         Selection selection;                                              // Datafiles: the area filter, resolved
@@ -372,15 +372,10 @@ namespace Gekko
             // The grey years in the period boxes follow the datafiles in the list (see UpdateAutoPeriod).
             bankItems.CollectionChanged += (s, e) => UpdateAutoPeriod();
 
-            // Artificial demo banks. Dropped files also get artificial data, see DatabankLoader.
-            //bankItems.Add(new BankItem(ArtificialData.CreateBank("base_2024.gbk", null)));
-            //bankItems.Add(new BankItem(ArtificialData.CreateBank("base_2025.gbk", null)));
-            //bankItems.Add(new BankItem(ArtificialData.CreateBank("forecast_2025.gbk", null)));
-
             ready = true;
             UpdateStateControls();
             BanksChanged();
-            SetStatus("Three databanks with artificial data are loaded. Drop databank files to compare them (or click Folders to compare folders), drag rows to reorder.");
+            SetStatus("Drop databank files to compare them (or click Folders to compare folders), drag rows to reorder.");
         }
 
         int SlotCount => Compare3Radio.IsChecked == true && banks.Count >= 3 ? 3 : 2;
@@ -978,7 +973,7 @@ namespace Gekko
         bool[] DatafilesActive => (state == CompareState.Datafiles ? active : datafilesView.Active) ?? new[] { true, true, true };
 
         /// <summary>The compared datafiles that are shown in the diagram.</summary>
-        List<Databank> ShownDatafiles()
+        List<CompareBank> ShownDatafiles()
         {
             bool[] shown = DatafilesActive;
             return bankItems.Take(DatafilesSlotCount)
@@ -998,8 +993,8 @@ namespace Gekko
         {
             FreqPanel.Children.Clear();
             freqButtons.Clear();
-            List<Databank> compared = bankItems.Count >= 2 ? bankItems.Take(DatafilesSlotCount).Select(b => b.Bank).ToList() : new List<Databank>();
-            List<EFreq> freqs = compared.SelectMany(b => b.Frequencies).Distinct().OrderBy(f => f).ToList();
+            List<CompareBank> compared = bankItems.Count >= 2 ? bankItems.Take(DatafilesSlotCount).Select(b => b.Bank).ToList() : new List<CompareBank>();
+            List<EFreq> freqs = CompareBank.AllFreqs.Where(f => compared.Any(b => b != null && b.Count(f) > 0)).ToList();
             if (!selectedFreq.HasValue || !freqs.Contains(selectedFreq.Value))
             {
                 selectedFreq = freqs.Count > 0 ? freqs[0] : (EFreq?)null;
@@ -1050,11 +1045,11 @@ namespace Gekko
         void UpdateFrequencySpans()
         {
             if (freqButtons.Count == 0) return;
-            List<Databank> compared = bankItems.Take(DatafilesSlotCount).Select(b => b.Bank).ToList();
+            List<CompareBank> compared = bankItems.Take(DatafilesSlotCount).Select(b => b.Bank).ToList();
             bool[] shown = DatafilesActive;
             foreach (FreqButton fb in freqButtons)
             {
-                int start = int.MaxValue, end = int.MinValue;
+                GekkoTime start = GekkoTime.tNull, end = GekkoTime.tNull;
                 var counts = new List<string>();
                 for (int s = 0; s < compared.Count; s++)
                 {
@@ -1062,17 +1057,13 @@ namespace Gekko
                     int count = compared[s] == null ? 0 : compared[s].Count(fb.Freq);
                     if (on && count > 0)
                     {
-                        foreach (Series ts in compared[s].Get(fb.Freq).Values)
-                        {
-                            if (ts.Data.Length == 0) continue;
-                            start = Math.Min(start, ts.Start);
-                            end = Math.Max(end, ts.End);
-                        }
+                        GekkoTime first, last;
+                        compared[s].Span(fb.Freq, out first, out last);
+                        ComparePeriods.Widen(ref start, ref end, first, last);
                     }
                     counts.Add("bank " + (s + 1) + ": " + count + " series" + (on ? "" : " (not shown)"));
                 }
-                string span = start <= end ? PeriodText.Format(fb.Freq, start) + "–" + PeriodText.Format(fb.Freq, end)
-                                           : "no data shown";
+                string span = ComparePeriods.IsRange(start, end) ? start + "–" + end : "no data shown";
                 fb.SpanText.Text = span;
                 fb.Button.ToolTip = "Compare the " + fb.Name.ToLowerInvariant() + " series. Shown banks: " + span
                                     + " (" + string.Join(", ", counts) + ")";
@@ -1163,7 +1154,7 @@ namespace Gekko
 
             // The period boxes need no conversion here: each frequency gets its own periods from the texts.
             Func<string, bool> filter = ReadFilter();
-            List<Databank> compared = bankItems.Take(SlotCount).Select(b => b.Bank).ToList();
+            List<CompareBank> compared = bankItems.Take(SlotCount).Select(b => b.Bank).ToList();
             current = CompareEngine.Compute(compared, active, freq.Value, filter, settings);
             Refresh();
         }
@@ -1245,9 +1236,37 @@ namespace Gekko
             SetStatus(folderStatus);
         }
 
-        /// <summary>Datafiles: the period filter in the selected frequency, inside the universal period.</summary>
-        int PeriodFrom => current != null && current.HasSpan ? Math.Max(current.SpanStart, period.From(current.Freq)) : 0;
-        int PeriodTo => current != null && current.HasSpan ? Math.Min(current.SpanEnd, period.To(current.Freq)) : -1;
+        /// <summary>
+        /// Datafiles: the period filter in the selected frequency, as offsets on the comparison's axis (cut to it).
+        /// PeriodFrom &gt; PeriodTo when no period is left.
+        /// </summary>
+        int PeriodFrom
+        {
+            get
+            {
+                int lo, hi;
+                PeriodOffsets(out lo, out hi);
+                return lo;
+            }
+        }
+
+        int PeriodTo
+        {
+            get
+            {
+                int lo, hi;
+                PeriodOffsets(out lo, out hi);
+                return hi;
+            }
+        }
+
+        void PeriodOffsets(out int lo, out int hi)
+        {
+            lo = 0;
+            hi = -1;
+            if (current == null || !current.HasSpan) return;
+            current.Axis.Clamp(period.From(current.Freq), period.To(current.Freq), out lo, out hi);
+        }
 
         /// <summary>Applies the check and the drill-down filters to the current comparison and updates every view.</summary>
         void Refresh()
@@ -1406,7 +1425,7 @@ namespace Gekko
                     .ToList();
                 return new Selection
                 {
-                    Description = "All of bank " + (selectedBank + 1) + " (" + current.Banks[selectedBank].GetFileNameWithoutPath + ", "
+                    Description = "All of bank " + (selectedBank + 1) + " (" + current.Banks[selectedBank].Name + ", "
                                   + series.Count + " series)",
                     Series = series,
                     SlotMask = 1 << selectedBank,
@@ -1486,23 +1505,25 @@ namespace Gekko
         /// A histogram bar: sets the period (Shift: from the first clicked bar to this one) and shows only what the
         /// check finds. Keeps the area.
         /// </summary>
-        void Bar_Clicked(int period, ModifierKeys keys)
+        void Bar_Clicked(int k, ModifierKeys keys)
         {
             if (state != CompareState.Datafiles || current == null || !current.HasSpan) return;
-            int from = period, to = period;
-            if ((keys & ModifierKeys.Shift) != 0 && periodAnchor.HasValue)
+            if (k < 0 || k >= current.Axis.Length) return;
+            GekkoTime t = current.Axis.At(k);
+            GekkoTime from = t, to = t;
+            if ((keys & ModifierKeys.Shift) != 0 && periodAnchor.HasValue && periodAnchor.Value.freq == t.freq)
             {
-                from = Math.Min(periodAnchor.Value, period);
-                to = Math.Max(periodAnchor.Value, period);
+                from = ComparePeriods.Earlier(periodAnchor.Value, t);
+                to = ComparePeriods.Later(periodAnchor.Value, t);
             }
             else
             {
-                periodAnchor = period;
+                periodAnchor = t;
             }
             // Written in the bar's frequency; the other frequencies (and the Folders state) convert it. Undated periods
             // have no calendar, so for undated series a bar only filters on what the check finds.
             if (PeriodConvert.IsDated(current.Freq))
-                SetPeriodTexts(PeriodText.Format(current.Freq, from), PeriodText.Format(current.Freq, to));
+                SetPeriodTexts(from.ToString(), to.ToString());
             foundFilter = FlagFilter.Yes;
             committingPeriod = true;  // also replace text typed (and not committed) in a period box
             try
@@ -1697,12 +1718,11 @@ namespace Gekko
                 Histogram.ShowMessage("No periods to show.");
                 return;
             }
-            int start = current.SpanStart, end = current.SpanEnd;
             int? hiFrom = current.IsPeriodRestricted ? PeriodFrom : (int?)null;
             int? hiTo = current.IsPeriodRestricted ? PeriodTo : (int?)null;
             string phrase = "series " + CheckText.Phrase(check);
             Histogram.SetData(selection.Description + ": number of " + phrase + ", per period",
-                              current.Freq, start, CompareEngine.FoundCounts(selection.Series, check, selection.SlotMask, start, end),
+                              current.Axis, CompareEngine.FoundCounts(selection.Series, check, selection.SlotMask, current.Axis.Length),
                               phrase, null, hiFrom, hiTo);
         }
 
@@ -1820,17 +1840,16 @@ namespace Gekko
         void UpdateAutoPeriod()
         {
             int first = int.MaxValue, last = int.MinValue;
-            foreach (Databank bank in ShownDatafiles())
+            foreach (CompareBank bank in ShownDatafiles())
             {
                 foreach (EFreq f in bank.Frequencies)
                 {
                     if (!PeriodConvert.IsDated(f)) continue;  // undated series have no years
-                    foreach (Series ts in bank.Get(f).Values)
-                    {
-                        if (ts.Data.Length == 0) continue;
-                        first = Math.Min(first, PeriodText.Year(f, ts.Start));
-                        last = Math.Max(last, PeriodText.Year(f, ts.End));
-                    }
+                    GekkoTime t1, t2;
+                    bank.Span(f, out t1, out t2);
+                    if (!ComparePeriods.IsRange(t1, t2)) continue;
+                    first = Math.Min(first, t1.super);
+                    last = Math.Max(last, t2.super);
                 }
             }
             if (first > last) return;
@@ -1866,24 +1885,17 @@ namespace Gekko
             box.ClearValue(Control.BackgroundProperty);
         }
 
-        /// <summary>A period text: "2010", "2010q3", "2010m7", or what Gekko reads in the selected frequency.</summary>
-        bool IsPeriodText(string text, bool isEnd)
+        /// <summary>A period text that Gekko reads: "2010", "2010q3", "2010m7", "2010w12", "2010m7d15".</summary>
+        bool IsPeriodText(string text)
         {
-            int year, sub, p;
-            char letter;
-            if (PeriodConvert.TrySplit(text, out year, out letter, out sub)) return true;
-            return selectedFreq.HasValue && PeriodText.TryParse(text, selectedFreq.Value, isEnd, out p);
+            GekkoTime t;
+            return PeriodConvert.TryParse(text, out t);
         }
 
-        /// <summary>From must not be after To (compared in months, or in the selected frequency).</summary>
+        /// <summary>From must not start after To ends (in any frequencies).</summary>
         bool PeriodOrderOk(string from, string to)
         {
-            if (from == null || to == null) return true;
-            int a, b;
-            if (PeriodConvert.TryMonth(from, false, out a) && PeriodConvert.TryMonth(to, true, out b)) return a <= b;
-            if (selectedFreq.HasValue && PeriodConvert.TryConvert(from, selectedFreq.Value, false, out a)
-                && PeriodConvert.TryConvert(to, selectedFreq.Value, true, out b)) return a <= b;
-            return true;
+            return PeriodConvert.IsOrdered(from, to);
         }
 
         /// <summary>Reads the typed period. Returns false (and marks the box) if it is not valid.</summary>
@@ -1896,7 +1908,7 @@ namespace Gekko
 
             // Empty, or the grey text left as it was: an open end.
             string value = text.Length == 0 || (old == null && string.Equals(text, auto, StringComparison.OrdinalIgnoreCase)) ? null : text;
-            if (value != null && !IsPeriodText(value, !isFrom))
+            if (value != null && !IsPeriodText(value))
             {
                 box.Background = InvalidBack;
                 SetStatus("\"" + value + "\" is not a period. Type for example 2010, 2010q3 or 2010m7 (any frequency).");
@@ -1945,12 +1957,7 @@ namespace Gekko
             TextBox box = isFrom ? FromBox : ToBox;
             string text = (isFrom ? fromText : toText) ?? box.Text.Trim();
             string stepped;
-            if (!PeriodConvert.TryStep(text, delta, out stepped))
-            {
-                int p;
-                if (!selectedFreq.HasValue || !PeriodText.TryParse(text, selectedFreq.Value, !isFrom, out p)) return;
-                stepped = PeriodText.Format(selectedFreq.Value, p + delta);
-            }
+            if (!PeriodConvert.TryStep(text, delta, out stepped)) return;
             string from = isFrom ? stepped : fromText;
             string to = isFrom ? toText : stepped;
             if (!PeriodOrderOk(from, to)) return;  // would pass the other end
@@ -2616,7 +2623,7 @@ namespace Gekko
                 sb.Append(c.Name + "   (" + blockSeries.Count + " of " + navList.Count + ": " + found
                           + (found == 1 ? " period" : " periods") + what + current.CountPeriodText + ")\r\n");
                 line++;
-                DeviationListing listing = CompareEngine.FormatComparison(c, current.Freq, from, to, check, selection.SlotMask, onlyFound);
+                DeviationListing listing = CompareEngine.FormatComparison(c, from, to, check, selection.SlotMask, onlyFound);
                 foreach (string l in listing.Lines)
                 {
                     sb.Append(l).Append("\r\n");
@@ -3953,9 +3960,9 @@ namespace Gekko
 
     /// <summary>
     /// Bar chart per period over the whole universal period: the number of series found by the current check
-    /// (series that differ, with missing values, or with zeroes).
+    /// (series that differ, with missing values, or with zeroes). Bar k is the period axis.At(k).
     /// The selected periods (the period filter) are highlighted; bars outside them are paler.
-    /// Click a bar: BarClicked(period, modifiers). Double-click: BarDoubleClicked(period).
+    /// Click a bar: BarClicked(k, modifiers). Double-click: BarDoubleClicked(k). k is the offset on the axis.
     /// </summary>
     public sealed class HistogramView : Canvas
     {
@@ -3972,8 +3979,7 @@ namespace Gekko
         static readonly Brush MutedBrush = BankColors.FromRgb(0x88, 0x88, 0x88);
 
         string title = "";
-        EFreq freq;
-        int start;
+        PeriodAxis axis;
         int[] counts;
         string itemPhrase = "series";
         Func<int, string> extraTip;
@@ -3989,16 +3995,16 @@ namespace Gekko
         }
 
         /// <summary>
-        /// counts start at firstPeriod. phrase: what a bar counts, e.g. "series with missing values" (for tooltips).
-        /// tip (may be null) adds a line to a bar's tooltip. highlightFrom/To: the selected periods, or null.
+        /// counts[k] belongs to the period periods.At(k). phrase: what a bar counts, e.g. "series with missing values"
+        /// (for tooltips). tip (may be null) adds a line to a bar's tooltip, given k. highlightFrom/To: the selected
+        /// periods as offsets, or null.
         /// </summary>
-        public void SetData(string newTitle, EFreq newFreq, int firstPeriod, int[] newCounts, string phrase,
+        public void SetData(string newTitle, PeriodAxis periods, int[] newCounts, string phrase,
                             Func<int, string> tip, int? from, int? to)
         {
             itemPhrase = phrase ?? "series";
             title = newTitle ?? "";
-            freq = newFreq;
-            start = firstPeriod;
+            axis = periods;
             counts = newCounts;
             extraTip = tip;
             highlightFrom = from;
@@ -4013,9 +4019,9 @@ namespace Gekko
             Rebuild();
         }
 
-        bool IsHighlighted(int period)
+        bool IsHighlighted(int k)
         {
-            return !highlightFrom.HasValue || (period >= highlightFrom.Value && period <= highlightTo.Value);
+            return !highlightFrom.HasValue || (k >= highlightFrom.Value && k <= highlightTo.Value);
         }
 
         void Rebuild()
@@ -4024,7 +4030,7 @@ namespace Gekko
             double width = ActualWidth, height = ActualHeight;
             if (width < 100 || height < 80) return;
 
-            if (counts == null || counts.Length == 0)
+            if (counts == null || counts.Length == 0 || axis == null || axis.Length != counts.Length)
             {
                 AddCenteredText(message, 13, 20, width - 40, height / 2);
                 return;
@@ -4050,7 +4056,7 @@ namespace Gekko
             // The selected periods as a light band behind the bars.
             if (highlightFrom.HasValue)
             {
-                int a = Math.Max(0, highlightFrom.Value - start), b = Math.Min(n - 1, highlightTo.Value - start);
+                int a = Math.Max(0, highlightFrom.Value), b = Math.Min(n - 1, highlightTo.Value);
                 if (a <= b)
                     Add(new Rectangle { Width = (b - a + 1) * slot, Height = ph, Fill = SelectionBand, IsHitTestVisible = false },
                         left + a * slot, top);
@@ -4089,8 +4095,8 @@ namespace Gekko
             Brush hover = DevHoverBrush;
             for (int i = 0; i < n; i++)
             {
-                int period = start + i;
-                Brush normal = IsHighlighted(period) ? DevBrush : DevPaleBrush;
+                int k = i;
+                Brush normal = IsHighlighted(k) ? DevBrush : DevPaleBrush;
                 Rectangle bar = null;
                 if (counts[i] > 0)
                 {
@@ -4099,8 +4105,8 @@ namespace Gekko
                     Add(bar, left + i * slot + (slot - barWidth) / 2, top + ph - h);
                 }
 
-                string tip = PeriodText.Format(freq, period) + ": " + counts[i] + " " + itemPhrase;
-                string more = extraTip?.Invoke(period);
+                string tip = axis.At(k) + ": " + counts[i] + " " + itemPhrase;
+                string more = extraTip?.Invoke(k);
                 if (!string.IsNullOrEmpty(more)) tip += "\n" + more;
                 tip += "\nClick: select this period (Shift: extend, Ctrl: add to the filter). Double-click: list the names.";
 
@@ -4122,28 +4128,34 @@ namespace Gekko
                 {
                     if (e.ClickCount != 2) return;
                     e.Handled = true;
-                    BarDoubleClicked?.Invoke(period);
+                    BarDoubleClicked?.Invoke(k);
                 };
-                column.MouseLeftButtonUp += (o, e) => { e.Handled = true; BarClicked?.Invoke(period, Keyboard.Modifiers); };
+                column.MouseLeftButtonUp += (o, e) => { e.Handled = true; BarClicked?.Invoke(k, Keyboard.Modifiers); };
                 Add(column, left + i * slot, top);
             }
 
             DrawYears(left, top, ph, slot, n);
         }
 
-        /// <summary>X axis: one label per year, thinned so labels do not overlap.</summary>
+        /// <summary>
+        /// X axis: a tick and label where a new year starts (GekkoTime.super), thinned so labels do not overlap.
+        /// One period per year (annual, undated): the label sits under the middle of the bar.
+        /// </summary>
         void DrawYears(double left, double top, double ph, double slot, int n)
         {
-            int periodsPerYear = PeriodText.PeriodsPerYear(freq);
-            int firstYear = PeriodText.Year(freq, start);
-            int lastYear = PeriodText.Year(freq, start + n - 1);
+            int firstYear = axis.At(0).super, lastYear = axis.At(n - 1).super;
+            double periodsPerYear = Math.Max(1.0, n / (double)Math.Max(1, lastYear - firstYear + 1));
+            bool onePerYear = n == lastYear - firstYear + 1;
             int yearStep = NiceInt((int)Math.Ceiling(44 / (slot * periodsPerYear)));
-            for (int year = firstYear; year <= lastYear; year++)
+            int previous = int.MinValue;
+            for (int k = 0; k < n; k++)
             {
-                if (year % yearStep != 0) continue;
-                int index = PeriodText.ToIndex(freq, year, 1) - start;
-                if (index < 0 || index >= n) continue;
-                double x = Math.Round(left + index * slot + (periodsPerYear == 1 ? slot / 2 : 0)) + 0.5;
+                GekkoTime t = axis.At(k);
+                int year = t.super;
+                bool startsYear = year != previous && (k > 0 || onePerYear || t.sub == 1);
+                previous = year;
+                if (!startsYear || year % yearStep != 0) continue;
+                double x = Math.Round(left + k * slot + (onePerYear ? slot / 2 : 0)) + 0.5;
                 Children.Add(new Line { X1 = x, X2 = x, Y1 = top + ph, Y2 = top + ph + 4, Stroke = AxisBrush, StrokeThickness = 1 });
                 Add(new TextBlock
                 {

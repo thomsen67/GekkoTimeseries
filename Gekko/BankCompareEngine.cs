@@ -78,119 +78,116 @@ namespace Gekko
     }
 
     /// <summary>
-    /// Period texts in any frequency, as typed in the From/To boxes: "1990" (annual), "1990q3", "1990m7", or anything
-    /// PeriodText.TryParse accepts for the frequency at hand. A simple stand-in for Gekko's own conversion between
-    /// frequencies; replace the body of TryConvert with that if wanted:
-    ///   to a lower frequency:  1990q3 becomes 1990, 1990m8 becomes 1990q3;
-    ///   to a higher frequency: 1990 becomes 1990q1 as the first period and 1990q4 as the last,
-    ///                          1990q3 becomes 1990m7 as the first period and 1990m9 as the last.
+    /// Period texts as typed in the From/To boxes ("2010", "2010q3", "2010m7", "2010w12", "2010m7d15"), read with
+    /// Gekko's own parser and converted to other frequencies with Gekko's own conversion:
+    ///   to a lower frequency:  2010q3 becomes 2010, 2010m8 becomes 2010q3;
+    ///   to a higher frequency: 2010 becomes 2010q1 as the first period and 2010q4 as the last.
     /// </summary>
     public static class PeriodConvert
     {
-        static readonly CultureInfo Inv = CultureInfo.InvariantCulture;
-
-        /// <summary>Splits "1990" (letter '\0'), "1990q3" ('q') or "1990m7" ('m'). Case-insensitive.</summary>
-        public static bool TrySplit(string text, out int year, out char letter, out int sub)
+        /// <summary>The text as a GekkoTime in its own frequency. False if it is not a period.</summary>
+        public static bool TryParse(string text, out GekkoTime t)
         {
-            year = 0;
-            letter = '\0';
-            sub = 1;
+            t = GekkoTime.tNull;
             text = (text ?? "").Trim();
-            int i = 0;
-            while (i < text.Length && text[i] >= '0' && text[i] <= '9') i++;
-            if (i == 0 || i > 5) return false;
-            year = int.Parse(text.Substring(0, i), NumberStyles.None, Inv);
-            if (i == text.Length) return true;
-
-            char c = char.ToLowerInvariant(text[i]);
-            if (c != 'q' && c != 'm') return false;
-            string rest = text.Substring(i + 1);
-            if (rest.Length == 0 || rest.Length > 2 || rest.Any(ch => ch < '0' || ch > '9')) return false;
-            int s = int.Parse(rest, NumberStyles.None, Inv);
-            if (s < 1 || s > PerYear(c)) return false;
-            letter = c;
-            sub = s;
-            return true;
-        }
-
-        static int PerYear(char letter)
-        {
-            return letter == 'q' ? 4 : letter == 'm' ? 12 : 1;
-        }
-
-        static string Join(int year, char letter, int sub)
-        {
-            string y = year.ToString(Inv);
-            return letter == '\0' ? y : y + letter + sub.ToString(Inv);
-        }
-
-        /// <summary>The first (isEnd false) or last (isEnd true) period of freq that the text covers.</summary>
-        public static bool TryConvert(string text, EFreq freq, bool isEnd, out int period)
-        {
-            int year, sub;
-            char letter;
-            if (TrySplit(text, out year, out letter, out sub))
+            if (text.Length == 0) return false;
+            try
             {
-                int target = PeriodText.PeriodsPerYear(freq);
-                int source = PerYear(letter);
-                if (target == 1 || target == 4 || target == 12)
-                {
-                    int t = isEnd ? (sub * target + source - 1) / source : (sub - 1) * target / source + 1;
-                    period = PeriodText.ToIndex(freq, year, t);
-                    return true;
-                }
+                t = GekkoTime.FromStringToGekkoTime(text, false, false);  // no error message: tNull if not a period
             }
-            return PeriodText.TryParse((text ?? "").Trim(), freq, isEnd, out period);
+            catch (Exception)
+            {
+                t = GekkoTime.tNull;
+            }
+            return !t.IsNull();
+        }
+
+        /// <summary>The first period of freq that the text covers (tNull if the text is not a period).</summary>
+        public static GekkoTime First(string text, EFreq freq)
+        {
+            GekkoTime t;
+            if (!TryParse(text, out t)) return GekkoTime.tNull;
+            try
+            {
+                return GekkoTime.ConvertFreqsFirst(freq, t, null);
+            }
+            catch (Exception)
+            {
+                return GekkoTime.tNull;
+            }
+        }
+
+        /// <summary>The last period of freq that the text covers (tNull if the text is not a period).</summary>
+        public static GekkoTime Last(string text, EFreq freq)
+        {
+            GekkoTime t;
+            if (!TryParse(text, out t)) return GekkoTime.tNull;
+            try
+            {
+                return GekkoTime.ConvertFreqsLast(freq, t);
+            }
+            catch (Exception)
+            {
+                return GekkoTime.tNull;
+            }
         }
 
         /// <summary>One period later or earlier in the text's own frequency: 1990 -> 1991, 1990q4 -> 1991q1.</summary>
         public static bool TryStep(string text, int delta, out string result)
         {
             result = null;
-            int year, sub;
-            char letter;
-            if (!TrySplit(text, out year, out letter, out sub)) return false;
-            int per = PerYear(letter);
-            int index = year * per + (sub - 1) + delta;
-            if (index < 0) return false;
-            result = Join(index / per, letter, index % per + 1);
-            return true;
+            GekkoTime t;
+            if (!TryParse(text, out t)) return false;
+            try
+            {
+                result = t.Add(delta).ToString();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
-        /// <summary>The text's first (or last) month counted from year 0, to check that From is not after To.</summary>
-        public static bool TryMonth(string text, bool isEnd, out int month)
+        /// <summary>From does not start after To ends (compared in days, so any two frequencies can be compared).</summary>
+        public static bool IsOrdered(string from, string to)
         {
-            month = 0;
-            int year, sub;
-            char letter;
-            if (!TrySplit(text, out year, out letter, out sub)) return false;
-            int per = PerYear(letter);
-            month = year * 12 + (isEnd ? sub * 12 / per - 1 : (sub - 1) * 12 / per);
-            return true;
+            if (from == null || to == null) return true;
+            GekkoTime a, b;
+            if (!TryParse(from, out a) || !TryParse(to, out b)) return true;
+            try
+            {
+                GekkoTime da = GekkoTime.ConvertFreqsFirst(EFreq.D, a, null);
+                GekkoTime db = GekkoTime.ConvertFreqsLast(EFreq.D, b);
+                return da.SmallerThanOrEqual(db);
+            }
+            catch (Exception)
+            {
+                return true;
+            }
         }
 
         /// <summary>
         /// False for undated series: they have no calendar, so the period filter does not apply to them (they keep all
-        /// their periods). Adjust if Gekko names the undated frequency differently.
+        /// their periods).
         /// </summary>
         public static bool IsDated(EFreq freq)
         {
-            return FrequencyName(freq) != "Undated";
+            return freq != EFreq.U;
         }
 
         /// <summary>"Annual", "Quarterly", "Monthly", ... for the frequency buttons.</summary>
         public static string FrequencyName(EFreq freq)
         {
-            string s = freq.ToString();
-            switch (s.ToLowerInvariant())
+            switch (freq)
             {
-                case "a": case "annual": return "Annual";
-                case "q": case "quarterly": return "Quarterly";
-                case "m": case "monthly": return "Monthly";
-                case "w": case "weekly": return "Weekly";
-                case "d": case "daily": return "Daily";
-                case "u": case "undated": return "Undated";
-                default: return s.Length > 0 ? char.ToUpperInvariant(s[0]) + s.Substring(1) : s;
+                case EFreq.A: return "Annual";
+                case EFreq.Q: return "Quarterly";
+                case EFreq.M: return "Monthly";
+                case EFreq.W: return "Weekly";
+                case EFreq.D: return "Daily";
+                case EFreq.U: return "Undated";
+                default: return freq.ToString();
             }
         }
     }
@@ -203,7 +200,7 @@ namespace Gekko
     public sealed class PeriodRange
     {
         public static readonly PeriodRange All = new PeriodRange(null, null);
-        readonly Dictionary<EFreq, int[]> bounds = new Dictionary<EFreq, int[]>();
+        readonly Dictionary<EFreq, GekkoTime[]> bounds = new Dictionary<EFreq, GekkoTime[]>();
 
         public PeriodRange(string fromText, string toText)
         {
@@ -215,27 +212,27 @@ namespace Gekko
         public string ToText { get; }
         public bool IsOpen => FromText == null && ToText == null;
 
-        /// <summary>The first period of freq in the filter (int.MinValue when open, or when the text does not convert).</summary>
-        public int From(EFreq freq)
+        /// <summary>The first period of freq in the filter (tNull when open, or when the text does not convert).</summary>
+        public GekkoTime From(EFreq freq)
         {
             return Bounds(freq)[0];
         }
 
-        /// <summary>The last period of freq in the filter (int.MaxValue when open, or when the text does not convert).</summary>
-        public int To(EFreq freq)
+        /// <summary>The last period of freq in the filter (tNull when open, or when the text does not convert).</summary>
+        public GekkoTime To(EFreq freq)
         {
             return Bounds(freq)[1];
         }
 
-        int[] Bounds(EFreq freq)
+        GekkoTime[] Bounds(EFreq freq)
         {
-            int[] b;
+            GekkoTime[] b;
             if (bounds.TryGetValue(freq, out b)) return b;
-            int from = int.MinValue, to = int.MaxValue;
+            GekkoTime from = GekkoTime.tNull, to = GekkoTime.tNull;
             if (PeriodConvert.IsDated(freq))  // undated series keep all their periods
             {
-                if (FromText == null || !PeriodConvert.TryConvert(FromText, freq, false, out from)) from = int.MinValue;
-                if (ToText == null || !PeriodConvert.TryConvert(ToText, freq, true, out to)) to = int.MaxValue;
+                if (FromText != null) from = PeriodConvert.First(FromText, freq);
+                if (ToText != null) to = PeriodConvert.Last(ToText, freq);
             }
             bounds[freq] = b = new[] { from, to };
             return b;
@@ -287,9 +284,10 @@ namespace Gekko
     }
 
     /// <summary>
-    /// One series in a Venn area, compared across the area's banks over the whole universal period.
+    /// One series in a Venn area, compared across the area's banks over the whole universal period (Axis).
+    /// All arrays are indexed by the offset k = 0..Axis.Length-1; Axis.At(k) is the period.
     ///
-    /// M means double.NaN, nothing else. A period outside a series' stored range is also M.
+    /// M means double.NaN, nothing else. A period outside a series' stored range is also M (Series.GetValue gives NaN).
     ///   Deviates (per period): the area's values are not all equal (CheckSettings.AreEqual).
     ///   Missing  (per bank):   the bank's value in the period is M.
     ///   Zero     (per bank):   the bank's value in the period is zero (CheckSettings.IsZero).
@@ -305,19 +303,19 @@ namespace Gekko
         /// <summary>Parallel to Slots.</summary>
         public Series[] Series { get; set; }
 
-        /// <summary>The universal period. Arrays are indexed by period - Start.</summary>
-        public GekkoTime Start { get; set; }
-        public GekkoTime End { get; set; }
+        /// <summary>The universal period of the comparison (shared by all series of a VennResult).</summary>
+        public PeriodAxis Axis { get; set; }
 
+        /// <summary>[k]: the values differ in period Axis.At(k).</summary>
         public bool[] Deviates { get; set; }
 
-        /// <summary>[index into Slots][period - Start]: true when that bank's value is M.</summary>
+        /// <summary>[index into Slots][k]: true when that bank's value is M.</summary>
         public bool[][] Missing { get; set; }
 
-        /// <summary>[index into Slots][period - Start]: true when that bank's value is zero.</summary>
+        /// <summary>[index into Slots][k]: true when that bank's value is zero.</summary>
         public bool[][] Zero { get; set; }
 
-        // Prefix sums, so that "found anywhere in from..to" is O(1) per bank.
+        // Prefix sums, so that "found anywhere in lo..hi" is O(1) per bank.
         int[] devCum;
         int[][] missCum;
         int[][] zeroCum;
@@ -336,11 +334,12 @@ namespace Gekko
             return cum;
         }
 
-        bool Clamp(int from, int to, out int lo, out int hi)
+        /// <summary>Cuts the offsets lo..hi to the arrays. False if nothing is left.</summary>
+        bool Clamp(int lo, int hi, out int a, out int b)
         {
-            lo = Math.Max(from, Start) - Start;
-            hi = Math.Min(to, End) - Start;
-            return lo <= hi && Deviates.Length > 0;
+            a = Math.Max(lo, 0);
+            b = Math.Min(hi, Deviates.Length - 1);
+            return a <= b;
         }
 
         bool[][] PerBank(CheckKind kind)
@@ -348,49 +347,47 @@ namespace Gekko
             return kind == CheckKind.Zeroes ? Zero : Missing;
         }
 
-        /// <summary>The value of the series in bank Slots[index], M (NaN) outside its stored range.</summary>
-        public double Value(int index, int period)
+        /// <summary>The value of the series in bank Slots[index] at offset k, M (NaN) outside its stored range.</summary>
+        public double Value(int index, int k)
         {
-            double? v = Series[index].Get(period);
-            return v.HasValue ? v.Value : double.NaN;
+            return Series[index].GetDataSimple(Axis.At(k));
         }
 
         /// <summary>
-        /// Found by the check in this period. For Missings and Zeroes only the banks in slotMask count
+        /// Found by the check at offset k. For Missings and Zeroes only the banks in slotMask count
         /// (bit s = slot s): the area's banks, or one bank for "All of bank x".
         /// </summary>
-        public bool FoundAt(CheckKind kind, int period, int slotMask)
+        public bool FoundAt(CheckKind kind, int k, int slotMask)
         {
-            int i = period - Start;
-            if (i < 0 || i >= Deviates.Length) return false;
-            if (kind == CheckKind.Differences) return Deviates[i];
+            if (k < 0 || k >= Deviates.Length) return false;
+            if (kind == CheckKind.Differences) return Deviates[k];
             bool[][] flags = PerBank(kind);
             for (int s = 0; s < Slots.Length; s++)
-                if ((slotMask & (1 << Slots[s])) != 0 && flags[s][i]) return true;
+                if ((slotMask & (1 << Slots[s])) != 0 && flags[s][k]) return true;
             return false;
         }
 
-        /// <summary>Number of periods in from..to where the check finds something.</summary>
-        public int FoundPeriods(CheckKind kind, int from, int to, int slotMask)
+        /// <summary>Number of periods in the offsets lo..hi where the check finds something.</summary>
+        public int FoundPeriods(CheckKind kind, int lo, int hi, int slotMask)
         {
-            int lo, hi;
-            if (!Clamp(from, to, out lo, out hi)) return 0;
-            if (kind == CheckKind.Differences) return devCum[hi + 1] - devCum[lo];
+            int a, b;
+            if (!Clamp(lo, hi, out a, out b)) return 0;
+            if (kind == CheckKind.Differences) return devCum[b + 1] - devCum[a];
             int count = 0;
-            for (int i = lo; i <= hi; i++)
-                if (FoundAt(kind, Start + i, slotMask)) count++;
+            for (int k = a; k <= b; k++)
+                if (FoundAt(kind, k, slotMask)) count++;
             return count;
         }
 
-        /// <summary>Whether the check finds something in at least one period in from..to.</summary>
-        public bool FoundIn(CheckKind kind, int from, int to, int slotMask)
+        /// <summary>Whether the check finds something in at least one period in the offsets lo..hi.</summary>
+        public bool FoundIn(CheckKind kind, int lo, int hi, int slotMask)
         {
-            int lo, hi;
-            if (!Clamp(from, to, out lo, out hi)) return false;
-            if (kind == CheckKind.Differences) return devCum[hi + 1] - devCum[lo] > 0;
+            int a, b;
+            if (!Clamp(lo, hi, out a, out b)) return false;
+            if (kind == CheckKind.Differences) return devCum[b + 1] - devCum[a] > 0;
             int[][] cum = kind == CheckKind.Zeroes ? zeroCum : missCum;
             for (int s = 0; s < Slots.Length; s++)
-                if ((slotMask & (1 << Slots[s])) != 0 && cum[s][hi + 1] - cum[s][lo] > 0) return true;
+                if ((slotMask & (1 << Slots[s])) != 0 && cum[s][b + 1] - cum[s][a] > 0) return true;
             return false;
         }
 
@@ -420,14 +417,14 @@ namespace Gekko
         public bool[] Active { get; set; }
         public int ActiveMask { get; set; }
         public int ActiveCount => Active.Count(a => a);
-        public Databank[] Banks { get; set; }
+        public CompareBank[] Banks { get; set; }
         public Dictionary<int, VennArea> Areas { get; } = new Dictionary<int, VennArea>();
 
-        /// <summary>Universal period: all stored observations of the selected frequency in the shown banks.</summary>
-        public bool HasSpan { get; set; }
-        public GekkoTime SpanStart { get; set; }
-        public GekkoTime SpanEnd { get; set; }
+        /// <summary>Universal period: all observations of the selected frequency in the shown banks. Null when there are none.</summary>
+        public PeriodAxis Axis { get; set; }
+        public bool HasSpan => Axis != null && Axis.Length > 0;
 
+        /// <summary>Per bank: its first and last period with data (tNull when it has none).</summary>
         public GekkoTime[] BankSpanStart { get; set; }
         public GekkoTime[] BankSpanEnd { get; set; }
         public int[] BankSeriesCount { get; set; }
@@ -436,10 +433,12 @@ namespace Gekko
         public CheckKind Check { get; set; }
         public Dictionary<int, AreaCounts> Counts { get; } = new Dictionary<int, AreaCounts>();
         public AreaCounts[] BankCounts { get; set; }
+
+        /// <summary>The period filter as offsets on the Axis (CountFrom &gt; CountTo: no periods).</summary>
         public int CountFrom { get; set; }
         public int CountTo { get; set; }
 
-        public bool IsPeriodRestricted => HasSpan && (CountFrom != SpanStart || CountTo != SpanEnd);
+        public bool IsPeriodRestricted => HasSpan && (CountFrom != 0 || CountTo != Axis.Length - 1);
 
         /// <summary>" in 2000" or " in 2000–2005" when the period filter is set, "" otherwise.</summary>
         public string CountPeriodText
@@ -448,13 +447,13 @@ namespace Gekko
             {
                 if (!IsPeriodRestricted) return "";
                 if (CountFrom > CountTo) return " in the chosen period (no " + PeriodConvert.FrequencyName(Freq).ToLowerInvariant() + " data there)";
-                return " in " + PeriodText.Format(Freq, CountFrom) + (CountFrom == CountTo ? "" : "–" + PeriodText.Format(Freq, CountTo));
+                return " in " + Axis.At(CountFrom) + (CountFrom == CountTo ? "" : "–" + Axis.At(CountTo));
             }
         }
 
         public string SpanText
         {
-            get { return HasSpan ? PeriodText.Format(Freq, SpanStart) + "–" + PeriodText.Format(Freq, SpanEnd) : "no observations"; }
+            get { return HasSpan ? Axis.Start + "–" + Axis.End : "no observations"; }
         }
 
         /// <summary>For the box: the bank's span and its number of series, on two lines ("1990–2025\n260 series").</summary>
@@ -463,8 +462,8 @@ namespace Gekko
             string freq = PeriodConvert.FrequencyName(Freq).ToLowerInvariant();
             if (BankSeriesCount[slot] == 0) return "no " + freq + " series";
             string count = BankSeriesCount[slot].ToString(CultureInfo.InvariantCulture) + " series";
-            if (BankSpanStart[slot] > BankSpanEnd[slot]) return count;
-            return PeriodText.Format(Freq, BankSpanStart[slot]) + "–" + PeriodText.Format(Freq, BankSpanEnd[slot]) + "\n" + count;
+            if (!ComparePeriods.IsRange(BankSpanStart[slot], BankSpanEnd[slot])) return count;
+            return BankSpanStart[slot] + "–" + BankSpanEnd[slot] + "\n" + count;
         }
 
         // ---- IVennModel
@@ -488,9 +487,9 @@ namespace Gekko
         public string SlotWord => "bank";
         public string ItemWord => "series";
         public string FoundPhrase => "series " + CheckText.Phrase(Check);
-        public string SlotName(int slot) => Banks[slot].GetFileNameWithoutPath();
+        public string SlotName(int slot) => Banks[slot].Name;
         public string SlotInfo(int slot) => BankSpanText(slot);
-        public string SlotTip(int slot) => Banks[slot].GetFileNameWithPath() ?? (Banks[slot].GetFileNameWithoutPath());
+        public string SlotTip(int slot) => Banks[slot].FilePath ?? Banks[slot].Name;
 
         public string FoundText(AreaCounts c)
         {
@@ -506,7 +505,7 @@ namespace Gekko
         {
             AreaCounts c = BankCounts != null && BankCounts[slot] != null ? BankCounts[slot] : new AreaCounts { Total = BankSeriesCount[slot] };
             bool shows = Check != CheckKind.Differences || ActiveCount > 1;
-            return "All of bank " + (slot + 1) + " (" + Banks[slot].GetFileNameWithoutPath() + "): " + DescribeCounts(c, shows);
+            return "All of bank " + (slot + 1) + " (" + Banks[slot].Name + "): " + DescribeCounts(c, shows);
         }
 
         /// <summary>E.g. "100 series, 17 that differ in 2000".</summary>
@@ -518,7 +517,7 @@ namespace Gekko
         }
     }
 
-    /// <summary>Text lines for the value listing, plus which line shows which period.</summary>
+    /// <summary>Text lines for the value listing, plus which line shows which period (by offset on the axis).</summary>
     public sealed class DeviationListing
     {
         public List<string> Lines { get; } = new List<string>();
@@ -536,7 +535,7 @@ namespace Gekko
         /// filter are applied later (UpdateCounts and the window), so switching them needs no recomputation.
         /// Changing a threshold does.
         /// </summary>
-        public static VennResult Compute(IList<Databank> banks, bool[] active, EFreq freq, Func<string, bool> filter,
+        public static VennResult Compute(IList<CompareBank> banks, bool[] active, EFreq freq, Func<string, bool> filter,
                                          CheckSettings settings)
         {
             int n = banks.Count;
@@ -553,42 +552,31 @@ namespace Gekko
             };
             for (int s = 0; s < n; s++) if (result.Active[s]) result.ActiveMask |= 1 << s;
 
-            var masks = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);            
-            GekkoTime spanStart = GekkoTime.tNull; GekkoTime spanEnd = GekkoTime.tNull;
+            var masks = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            GekkoTime spanStart = GekkoTime.tNull, spanEnd = GekkoTime.tNull;
 
             for (int s = 0; s < n; s++)
             {
-                GekkoTime start = GekkoTime.tNull; GekkoTime end = GekkoTime.tNull; 
+                GekkoTime start = GekkoTime.tNull, end = GekkoTime.tNull;
                 int count = 0;
-                foreach (IVariable iv in banks[s].StorageFlattenedArrayTimeseries(freq, true).Values)
+                foreach (KeyValuePair<string, Series> kv in banks[s].Get(freq))
                 {
-                    Series ts = (Series)iv;
-                    if (filter != null && !filter(ts.GetName())) continue;
+                    if (filter != null && !filter(kv.Key)) continue;
                     count++;
                     if (result.Active[s])
                     {
                         int m;
-                        masks.TryGetValue(ts.GetName(), out m);
-                        masks[ts.GetName()] = m | (1 << s);
+                        masks.TryGetValue(kv.Key, out m);
+                        masks[kv.Key] = m | (1 << s);
                     }
-                    GekkoTime t1 = ts.GetRealDataPeriodFirst();
-                    GekkoTime t2 = ts.GetRealDataPeriodLast();
-                    if (t1.IsNull()) continue;
-                    if (t1.StrictlySmallerThan(start)) start = t1;
-                    if (t2.StrictlyLargerThan(end)) end = t2;
+                    ComparePeriods.Widen(ref start, ref end, kv.Value.GetRealDataPeriodFirst(), kv.Value.GetRealDataPeriodLast());
                 }
                 result.BankSpanStart[s] = start;
                 result.BankSpanEnd[s] = end;
                 result.BankSeriesCount[s] = count;
-                if (result.Active[s] && start.SmallerThanOrEqual(end))
-                {
-                    spanStart = G.GekkoMin(spanStart, start);
-                    spanEnd = G.GekkoMax(spanEnd, end);
-                }
+                if (result.Active[s]) ComparePeriods.Widen(ref spanStart, ref spanEnd, start, end);
             }
-            result.HasSpan = spanStart.SmallerThanOrEqual(spanEnd);
-            result.SpanStart = result.HasSpan ? spanStart : GekkoTime.tNull;
-            result.SpanEnd = result.HasSpan ? spanEnd : GekkoTime.tNull;
+            result.Axis = ComparePeriods.IsRange(spanStart, spanEnd) ? new PeriodAxis(spanStart, spanEnd) : null;
 
             for (int mask = 1; mask < 8; mask++)
             {
@@ -599,13 +587,13 @@ namespace Gekko
             foreach (KeyValuePair<string, int> kv in masks)
             {
                 VennArea area = result.Areas[kv.Value];
-                area.Series.Add(CompareSeriesInBanks(kv.Key, area.Slots, banks, freq, settings, result.SpanStart, result.SpanEnd));
+                area.Series.Add(CompareSeriesInBanks(kv.Key, area.Slots, banks, freq, settings, result.Axis));
             }
 
             foreach (VennArea area in result.Areas.Values)
                 area.Series.Sort((a, b) => StringComparer.OrdinalIgnoreCase.Compare(a.Name, b.Name));
 
-            UpdateCounts(result, CheckKind.Differences, result.SpanStart, result.SpanEnd);
+            UpdateCounts(result, CheckKind.Differences, 0, result.HasSpan ? result.Axis.Length - 1 : -1);
             return result;
         }
 
@@ -616,20 +604,19 @@ namespace Gekko
             return slots.ToArray();
         }
 
-        static SeriesComparison CompareSeriesInBanks(string name, int[] slots, IList<Databank> banks, EFreq freq,
-                                                     CheckSettings settings, GekkoTime start, GekkoTime end)
+        static SeriesComparison CompareSeriesInBanks(string name, int[] slots, IList<CompareBank> banks, EFreq freq,
+                                                     CheckSettings settings, PeriodAxis axis)
         {
             var series = new Series[slots.Length];
             for (int i = 0; i < slots.Length; i++) series[i] = banks[slots[i]].Get(freq)[name];
 
-            int length = Math.Max(0, GekkoTime.Observations(start, end));
+            int length = axis == null ? 0 : axis.Length;
             var c = new SeriesComparison
             {
-                Name = series[0].Name,
+                Name = name,
                 Slots = slots,
                 Series = series,
-                Start = start,
-                End = end,
+                Axis = axis,
                 Deviates = new bool[length],
                 Missing = new bool[slots.Length][],
                 Zero = new bool[slots.Length][]
@@ -643,10 +630,10 @@ namespace Gekko
             var values = new double[slots.Length];
             for (int k = 0; k < length; k++)
             {
-                GekkoTime p = start.Add(k);
+                GekkoTime t = axis.At(k);
                 for (int i = 0; i < slots.Length; i++)
                 {
-                    values[i] = c.Value(i, p);
+                    values[i] = series[i].GetDataSimple(t);  // NaN outside the series' stored range
                     c.Missing[i][k] = double.IsNaN(values[i]);
                     c.Zero[i][k] = settings.IsZero(values[i]);
                 }
@@ -665,40 +652,40 @@ namespace Gekko
             return true;
         }
 
-        /// <summary>Counts per area and per whole bank, for the check and the period filter from..to.</summary>
-        public static void UpdateCounts(VennResult r, CheckKind check, int from, int to)
+        /// <summary>Counts per area and per whole bank, for the check and the period filter (offsets lo..hi on the axis).</summary>
+        public static void UpdateCounts(VennResult r, CheckKind check, int lo, int hi)
         {
             r.Check = check;
-            r.CountFrom = from;
-            r.CountTo = to;
+            r.CountFrom = lo;
+            r.CountTo = hi;
             r.Counts.Clear();
             foreach (VennArea area in r.Areas.Values)
-                r.Counts[area.Mask] = Count(area.Series, check, area.Mask, from, to);
+                r.Counts[area.Mask] = Count(area.Series, check, area.Mask, lo, hi);
             for (int s = 0; s < r.SlotCount; s++)
             {
                 IEnumerable<SeriesComparison> all = r.Areas.Values.Where(a => (a.Mask & (1 << s)) != 0).SelectMany(a => a.Series);
-                r.BankCounts[s] = r.Active[s] ? Count(all, check, 1 << s, from, to) : new AreaCounts();
+                r.BankCounts[s] = r.Active[s] ? Count(all, check, 1 << s, lo, hi) : new AreaCounts();
             }
         }
 
-        static AreaCounts Count(IEnumerable<SeriesComparison> series, CheckKind check, int slotMask, int from, int to)
+        static AreaCounts Count(IEnumerable<SeriesComparison> series, CheckKind check, int slotMask, int lo, int hi)
         {
             var c = new AreaCounts();
             foreach (SeriesComparison s in series)
             {
                 c.Total++;
-                if (s.FoundIn(check, from, to, slotMask)) c.Found++;
+                if (s.FoundIn(check, lo, hi, slotMask)) c.Found++;
             }
             return c;
         }
 
-        /// <summary>Per period start..end: the number of the series found by the check (in the banks in slotMask).</summary>
-        public static int[] FoundCounts(IEnumerable<SeriesComparison> series, CheckKind check, int slotMask, int start, int end)
+        /// <summary>Per offset 0..length-1: the number of the series found by the check (in the banks in slotMask).</summary>
+        public static int[] FoundCounts(IEnumerable<SeriesComparison> series, CheckKind check, int slotMask, int length)
         {
-            var counts = new int[Math.Max(0, end - start + 1)];
+            var counts = new int[Math.Max(0, length)];
             foreach (SeriesComparison c in series)
-                for (int p = start; p <= end; p++)
-                    if (c.FoundAt(check, p, slotMask)) counts[p - start]++;
+                for (int k = 0; k < counts.Length; k++)
+                    if (c.FoundAt(check, k, slotMask)) counts[k]++;
             return counts;
         }
 
@@ -792,11 +779,11 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Text listing of one series for the periods from..to. Two banks: period, x(1), x(2), abs dev., rel. dev.
+        /// Text listing of one series for the offsets lo..hi on its axis. Two banks: period, x(1), x(2), abs dev., rel. dev.
         /// One or three banks: period and the values. Periods found by the check end with " *".
         /// onlyFound: only those periods.
         /// </summary>
-        public static DeviationListing FormatComparison(SeriesComparison c, EFreq freq, int from, int to,
+        public static DeviationListing FormatComparison(SeriesComparison c, int lo, int hi,
                                                         CheckKind check, int slotMask, bool onlyFound)
         {
             var listing = new DeviationListing();
@@ -805,7 +792,7 @@ namespace Gekko
             var heads = new string[n];
             for (int i = 0; i < n; i++) heads[i] = c.Name + "(" + (c.Slots[i] + 1).ToString(Inv) + ")";
 
-            const int periodWidth = 10, absWidth = 14, relWidth = 12;
+            const int periodWidth = 12, absWidth = 14, relWidth = 12;  // 12: room for daily periods like 2020m12d31
             int valueWidth = Math.Max(13, heads.Max(h => h.Length) + 3);
 
             var sb = new StringBuilder();
@@ -819,14 +806,15 @@ namespace Gekko
             listing.Lines.Add(sb.ToString());
 
             var values = new double[n];
-            for (int p = Math.Max(from, c.Start); p <= Math.Min(to, c.End); p++)
+            int last = Math.Min(hi, c.Deviates.Length - 1);
+            for (int k = Math.Max(lo, 0); k <= last; k++)
             {
-                bool found = c.FoundAt(check, p, slotMask);
+                bool found = c.FoundAt(check, k, slotMask);
                 if (onlyFound && !found) continue;
-                for (int i = 0; i < n; i++) values[i] = c.Value(i, p);
+                for (int i = 0; i < n; i++) values[i] = c.Value(i, k);
 
                 sb.Clear();
-                sb.Append(PeriodText.Format(freq, p).PadRight(periodWidth));
+                sb.Append(c.Axis.At(k).ToString().PadRight(periodWidth));
                 for (int i = 0; i < n; i++) sb.Append(FormatValue(values[i]).PadLeft(valueWidth));
                 if (pair)
                 {
@@ -842,7 +830,7 @@ namespace Gekko
                     }
                 }
                 if (found) sb.Append("  *");
-                listing.LineOfPeriod[p] = listing.Lines.Count;
+                listing.LineOfPeriod[k] = listing.Lines.Count;
                 listing.Lines.Add(sb.ToString());
             }
             return listing;
