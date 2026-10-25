@@ -274,8 +274,8 @@ namespace Gekko
             return DatabankLoader.LoadForCompare(path);
         }
 
-        // Summaries of data files from earlier folder comparisons (keyed by path, size, time, filter). Content hashes
-        // are not cached.
+        // Summaries of data files from earlier folder comparisons in this window (keyed by path, size, time, filter).
+        // Content hashes are cached on disk, between sessions: see CompareHashCache.
         readonly ConcurrentDictionary<string, object> folderCache = new ConcurrentDictionary<string, object>();
         FileComparison openedFrom;   // the folder file the datafiles were opened from, if any
 
@@ -3004,7 +3004,7 @@ namespace Gekko
             lines.Add("");
             if (f.IsComparison)
             {
-                // How the copies were compared (the content hash, as Dlink computes it, not cached).
+                // How the copies were compared (the content hash, as Dlink computes it).
                 EDlinkHashKind? kind = f.HashKinds.FirstOrDefault(h => h.HasValue);
                 lines.Add(kind == EDlinkHashKind.GbkDataHash ? "Copies compared by the data hash inside the .gbk file; copies that differ are compared series by series."
                         : kind == EDlinkHashKind.PxContentHash ? "Copies compared by their .px content (apart from the creation date)."

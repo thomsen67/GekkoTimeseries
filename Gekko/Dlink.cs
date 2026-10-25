@@ -759,30 +759,15 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// </summary>
         private static string HashCacheKey(string filePath, EDlinkVersion dlinkVersion)
         {
-            return filePath + "|dlinkVersion=" + dlinkVersion;
+            return DlinkCommon.HashCacheKey(filePath, dlinkVersion);
         }
 
         public static string GetFileHash(string filePath, long knownSize, DateTime knownLastWriteUtc, EDlinkVersion dlinkVersion, List<string> loopErrors = null)
         {
             if (G.DlinkDebug()) MessageBox.Show("Getting hash from " + filePath);
-
-            string cacheKey = HashCacheKey(filePath, dlinkVersion);
-
-            // ---- LRU cache lookup ---------------------------------------------------------
-            string cachedHash = DlinkHashCache.TryGet(cacheKey, knownSize, knownLastWriteUtc);
-            if (cachedHash != null)
-            {
-                if (G.DlinkDebug()) MessageBox.Show("Getting hash from LRU cache");
-                return cachedHash;
-            }            
-
-            string hash = ComputeHashUncached(filePath, dlinkVersion, null, loopErrors);
-
-            // ---- Remember this result for next time -----------------------------------------            
-            DlinkHashCache.Set(cacheKey, knownSize, knownLastWriteUtc, hash);
-            // ----------------------------------------------------------------------------------------
-
-            return hash;
+            //The same logic (cache lookup, else hash and remember) as the compare window's Folders view, with Dlink's own cache.
+            EDlinkHashKind usedKind;
+            return DlinkCommon.GetFileHashCached(DlinkHashCache.Store, filePath, knownSize, knownLastWriteUtc, dlinkVersion, out usedKind, loopErrors);
         }        
 
         private static string ComputeHashUncached(string filePath, EDlinkVersion dlinkVersion, string forceFileType = null, List<string> loopErrors = null)
@@ -1110,37 +1095,40 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
     // embedded metadata) when a file's size and last-write-time still match what was recorded the
     // last time it was hashed.    
     //
-    // It is a plain static cache: one instance per Gekko.exe run, loaded from disk on first use.
-    // Because each hook invocation is its own process (see the "_common" hook script in DlinkSetup,
-    // which shells out to Gekko.exe), the only way a cache can survive between hook runs is on disk --
-    // that's the whole point of persisting it here rather than just keeping it in memory.
+    // LruHashCache is the cache itself; each instance has its own file on disk and its own capacity.
+    // There are two instances:
+    //   - DlinkHashCache (static facade, below): used by Dlink, file under databank_dlink_folder_storage.
+    //   - CompareHashCache (FolderCompare.cs): used by the compare window's Folders view, file in the
+    //     local folder for temporary files.
+    // Both are filled by the same hashing logic, DlinkCommon.GetFileHashCached().
+    //
+    // Each instance is loaded from disk on first use. Because each hook invocation is its own process (see
+    // the "_common" hook script in DlinkSetup, which shells out to Gekko.exe), the only way a cache can
+    // survive between hook runs (or Gekko sessions) is on disk -- that's the whole point of persisting it.
     //
     // Callers should call Set() per file as usual, then call Save() ONCE after a batch of files, not
     // once per file -- otherwise every hashed file costs a disk write and most of the benefit is lost.
-        
-    public static class DlinkHashCache
+
+    public sealed class LruHashCache
     {
-        public static int countAsk = 0;
-        public static int countHit = 0;
-        
+        public int countAsk = 0;
+        public int countHit = 0;
+
         private static readonly long ToleranceTicks = TimeSpan.FromSeconds(0).Ticks; //Changed from TimeSpan.FromSeconds(2) to TimeSpan.FromSeconds(0).
         private static readonly DateTime TicksEpoch = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-        private static readonly object _lock = new object(); //cheap insurance if the foreach loops above are ever parallelized
-        private static Dictionary<string, LinkedListNode<HashCacheEntry>> _map;
-        private static LinkedList<HashCacheEntry> _lru; //front = most recently used, back = least recently used
-        private static bool _loaded = false;
-        private static bool _dirty = false;
+        private readonly object _lock = new object(); //the compare window uses its instance from a worker thread
+        private readonly Func<string> _cacheFilePath; //asked when loading and saving (it may depend on options)
+        private readonly Func<int> _capacity;         //max number of entries, asked when adding one
+        private Dictionary<string, LinkedListNode<HashCacheEntry>> _map;
+        private LinkedList<HashCacheEntry> _lru; //front = most recently used, back = least recently used
+        private bool _loaded = false;
+        private bool _dirty = false;
 
-        private static string CacheFilePath
+        public LruHashCache(Func<string> cacheFilePath, Func<int> capacity)
         {
-            get
-            {
-                string folder = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_storage, false), "_utilities", "hashcache");
-                //Per-machine file name: this folder is shared/network storage (databank_dlink_folder_storage),
-                //and giving each machine its own cache file avoids two machines racing on the same file.                
-                return Path.Combine(folder, "hashcache_" + Environment.MachineName + ".cache"); //New: was ".yaml" -- now a protobuf-net binary file
-            }
+            _cacheFilePath = cacheFilePath;
+            _capacity = capacity;
         }
 
         private static long ToTicksSinceEpoch(DateTime utc)
@@ -1148,19 +1136,19 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             return (utc - TicksEpoch).Ticks;
         }
 
-        private static void EnsureLoaded()
+        private void EnsureLoaded()
         {
             //Caller must hold _lock
             if (_loaded) return;
-            var sw = System.Diagnostics.Stopwatch.StartNew();
             _map = new Dictionary<string, LinkedListNode<HashCacheEntry>>(StringComparer.OrdinalIgnoreCase);
             _lru = new LinkedList<HashCacheEntry>();
             try
             {
-                if (File.Exists(CacheFilePath))
-                {                    
+                string cacheFilePath = _cacheFilePath();
+                if (File.Exists(cacheFilePath))
+                {
                     HashCacheFile cf;
-                    using (FileStream stream = File.OpenRead(CacheFilePath))
+                    using (FileStream stream = File.OpenRead(cacheFilePath))
                     using (GZipStream gzipStream = new GZipStream(stream, CompressionMode.Decompress))
                     {
                         cf = ProtoBuf.Serializer.Deserialize<HashCacheFile>(gzipStream);
@@ -1179,7 +1167,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
             }
             catch
             {
-                //A corrupt or unreadable cache file should not break the hook -- just start empty.
+                //A corrupt or unreadable cache file should not break anything -- just start empty.
                 _map = new Dictionary<string, LinkedListNode<HashCacheEntry>>(StringComparer.OrdinalIgnoreCase);
                 _lru = new LinkedList<HashCacheEntry>();
             }
@@ -1190,33 +1178,45 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// Returns the cached hash for filePath if it is still fresh (same size, and last-write-time
         /// of what was recorded last time). Returns null on a miss.
         /// </summary>
-        public static string TryGet(string filePath, long size, DateTime lastWriteUtc)
+        public string TryGet(string filePath, long size, DateTime lastWriteUtc)
         {
+            EDlinkHashKind? hashKind;
+            return TryGet(filePath, size, lastWriteUtc, out hashKind);
+        }
+
+        /// <summary>
+        /// As TryGet above, and also the kind of hash recorded with it (null if none was recorded, e.g. entries written
+        /// by Set without a kind, or by older Gekko versions).
+        /// </summary>
+        public string TryGet(string filePath, long size, DateTime lastWriteUtc, out EDlinkHashKind? hashKind)
+        {
+            hashKind = null;
             lock (_lock)
             {
                 countAsk++;
                 EnsureLoaded();
                 LinkedListNode<HashCacheEntry> node;
                 if (!_map.TryGetValue(filePath, out node))
-                {                    
+                {
                     return null;
                 }
 
                 HashCacheEntry e = node.Value;
                 if (e.bytes != size)
-                {                    
+                {
                     return null;
                 }
                 long ticksNow = ToTicksSinceEpoch(lastWriteUtc);
                 if (Math.Abs(ticksNow - e.stamp) > ToleranceTicks)
-                {                    
+                {
                     return null;
                 }
 
                 //Hit: touch it so it counts as recently used
                 countHit++;
                 _lru.Remove(node);
-                _lru.AddFirst(node);                
+                _lru.AddFirst(node);
+                if (e.hashKind > 0) hashKind = (EDlinkHashKind)(e.hashKind - 1);
                 return e.hash;
             }
         }
@@ -1224,33 +1224,38 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// <summary>
         /// Records/refreshes the hash for filePath. Evicts the least-recently-used entry once the
         /// cache is over capacity. Does not touch disk -- call Save() once after a batch of files.
+        /// hashKind (may be null: not recorded) is the kind of hash it is.
         /// </summary>
-        public static void Set(string filePath, long bytes, DateTime lastWriteUtc, string hash)
+        public void Set(string filePath, long bytes, DateTime lastWriteUtc, string hash, EDlinkHashKind? hashKind = null)
         {
             lock (_lock)
             {
                 EnsureLoaded();
                 long stamp = ToTicksSinceEpoch(lastWriteUtc);
+                int kind = hashKind.HasValue ? (int)hashKind.Value + 1 : 0;  //0: not recorded
 
                 LinkedListNode<HashCacheEntry> existing;
                 if (_map.TryGetValue(filePath, out existing))
-                {                    
-                    if (existing.Value.hash != hash)
+                {
+                    bool hashChanged = existing.Value.hash != hash;
+                    if (hashChanged)
                     {
                         existing.Value.storageFileConfirmed = false;
                     }
+                    //A new kind replaces the old one; a changed hash without a kind forgets the old kind.
+                    if (kind > 0 || hashChanged) existing.Value.hashKind = kind;
                     existing.Value.bytes = bytes;
                     existing.Value.stamp = stamp;
-                    existing.Value.hash = hash;                    
+                    existing.Value.hash = hash;
                     _lru.Remove(existing);
                     _lru.AddFirst(existing);
                 }
                 else
                 {
-                    HashCacheEntry entry = new HashCacheEntry { path = filePath, bytes = bytes, stamp = stamp, hash = hash };
+                    HashCacheEntry entry = new HashCacheEntry { path = filePath, bytes = bytes, stamp = stamp, hash = hash, hashKind = kind };
                     LinkedListNode<HashCacheEntry> node = _lru.AddFirst(entry);
                     _map[filePath] = node;
-                    if (_map.Count > Program.options.databank_dlink_cache)
+                    if (_map.Count > _capacity())
                     {
                         LinkedListNode<HashCacheEntry> lruNode = _lru.Last;
                         _lru.RemoveLast();
@@ -1266,7 +1271,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// be read-only (write once). But if files are ever removed from blob storage, the system will crash with
         /// an error.
         /// </summary>
-        public static bool IsBlobConfirmed(string filePath, string hash)
+        public bool IsBlobConfirmed(string filePath, string hash)
         {
             lock (_lock)
             {
@@ -1275,9 +1280,9 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 if (!_map.TryGetValue(filePath, out node)) return false;
                 return node.Value.hash == hash && node.Value.storageFileConfirmed;
             }
-        }        
-        
-        public static void SetStorageFileConfirmed(string filePath, string hash)
+        }
+
+        public void SetStorageFileConfirmed(string filePath, string hash)
         {
             lock (_lock)
             {
@@ -1295,9 +1300,8 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         /// Persists the cache to disk if anything changed since the last Save(). Cheap no-op
         /// otherwise. Call this once after processing a batch of files, not once per file.
         /// </summary>
-        public static void Save()
+        public void Save()
         {
-            var sw = System.Diagnostics.Stopwatch.StartNew();
             lock (_lock)
             {
                 if (!_dirty || _lru == null) return;
@@ -1311,8 +1315,9 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                     {
                         cf.entries.Add(node.Value);
                     }
-                    Directory.CreateDirectory(Path.GetDirectoryName(CacheFilePath));                    
-                    using (FileStream stream = File.Create(CacheFilePath))
+                    string cacheFilePath = _cacheFilePath();
+                    Directory.CreateDirectory(Path.GetDirectoryName(cacheFilePath));
+                    using (FileStream stream = File.Create(cacheFilePath))
                     using (GZipStream gzipStream = new GZipStream(stream, CompressionLevel.Fastest))
                     {
                         ProtoBuf.Serializer.Serialize(gzipStream, cf);
@@ -1323,13 +1328,13 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
                 {
                     //No catastrophe is this happens
                 }
-            }            
+            }
         }
 
         /// <summary>
         /// Returns the current number of cached items.
         /// </summary>
-        public static int Count()
+        public int Count()
         {
             lock (_lock)
             {
@@ -1339,7 +1344,46 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         }
     }
 
-    // Plain data classes backing DlinkHashCache's on-disk file. Kept as simple public fields
+    /// <summary>
+    /// Dlink's hash cache: an LruHashCache with its file under databank_dlink_folder_storage, and capacity from the
+    /// option databank_dlink_cache. Same calls as before it became a facade.
+    /// </summary>
+    public static class DlinkHashCache
+    {
+        public static readonly LruHashCache Store = new LruHashCache(() => CacheFilePath, () => Program.options.databank_dlink_cache);
+
+        public static int countAsk
+        {
+            get { return Store.countAsk; }
+            set { Store.countAsk = value; }
+        }
+
+        public static int countHit
+        {
+            get { return Store.countHit; }
+            set { Store.countHit = value; }
+        }
+
+        private static string CacheFilePath
+        {
+            get
+            {
+                string folder = Path.Combine(G.CleanupFolderName(Program.options.databank_dlink_folder_storage, false), "_utilities", "hashcache");
+                //Per-machine file name: this folder is shared/network storage (databank_dlink_folder_storage),
+                //and giving each machine its own cache file avoids two machines racing on the same file.                
+                return Path.Combine(folder, "hashcache_" + Environment.MachineName + ".cache"); //New: was ".yaml" -- now a protobuf-net binary file
+            }
+        }
+
+        public static string TryGet(string filePath, long size, DateTime lastWriteUtc) { return Store.TryGet(filePath, size, lastWriteUtc); }
+        public static void Set(string filePath, long bytes, DateTime lastWriteUtc, string hash) { Store.Set(filePath, bytes, lastWriteUtc, hash); }
+        public static bool IsBlobConfirmed(string filePath, string hash) { return Store.IsBlobConfirmed(filePath, hash); }
+        public static void SetStorageFileConfirmed(string filePath, string hash) { Store.SetStorageFileConfirmed(filePath, hash); }
+        public static void Save() { Store.Save(); }
+        public static int Count() { return Store.Count(); }
+    }
+
+    // Plain data classes backing LruHashCache's on-disk files. Kept as simple public fields
     // (rather than DlinkFile's private-setter-property style) since DlinkHashCache mutates entries
     // in place on every cache hit/refresh.    
     
@@ -1351,6 +1395,7 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         [ProtoMember(3)] public long stamp; //ticks (100ns units) since DlinkHashCache's fixed epoch 
         [ProtoMember(4)] public string hash;                
         [ProtoMember(7)] public bool storageFileConfirmed; //New
+        [ProtoMember(8)] public int hashKind; //(int)EDlinkHashKind + 1, or 0 when not recorded (older entries, or Set without a kind)
     }
 
     [ProtoContract] 
@@ -1566,20 +1611,59 @@ bash ""$(dirname ""$0"")/_common"" ""pre-push""
         }
 
         /// <summary>
-        /// For comparing data files (the compare window's Folders view): the hash Dlink would store for the file under
-        /// CurrentVersion, computed fresh every time (DlinkHashCache is not used). Two files with the same hash hold the
-        /// same data: the same data hash inside a .gbk, the same .px content apart from the creation date, else the same
-        /// bytes. usedKind says which it was. Returns null (and error says why) if the file cannot be hashed; never shows
-        /// a popup or throws a Gekko error.
+        /// The key a file's hash is cached under: the path plus the .dlink version whose rules hashed it. So hashing the
+        /// same untouched file under two different versions (e.g. right after bumping CurrentVersion from v1.1 to v1.2)
+        /// can never read or write the wrong version's row. "|" is illegal in a real file path, so it can't collide
+        /// with one.
         /// </summary>
-        public static string GetContentHashUncached(string filePath, out EDlinkHashKind usedKind, out string error)
+        public static string HashCacheKey(string filePath, EDlinkVersion dlinkVersion)
+        {
+            return filePath + "|dlinkVersion=" + dlinkVersion;
+        }
+
+        /// <summary>
+        /// THE hashing logic with a cache, used both by Dlink (DlinkHooks.GetFileHash, with DlinkHashCache) and by the
+        /// compare window's Folders view (with CompareHashCache): if the cache has a hash for the file with this size and
+        /// last-write time, that is returned; else the file is hashed under dlinkVersion's rules
+        /// (GetSha256FromFileWithDlink) and the hash is remembered (call cache.Save() once after a batch). usedKind is the
+        /// kind of hash: a data hash inside a .gbk, a .px content hash, or the bytes. For a cache entry without a recorded
+        /// kind (written by older Gekko versions), it is the kind the extension asks for.
+        /// </summary>
+        public static string GetFileHashCached(LruHashCache cache, string filePath, long knownSize, DateTime knownLastWriteUtc, EDlinkVersion dlinkVersion, out EDlinkHashKind usedKind, List<string> loopErrors = null)
+        {
+            string cacheKey = HashCacheKey(filePath, dlinkVersion);
+
+            // ---- LRU cache lookup ---------------------------------------------------------
+            EDlinkHashKind? cachedKind;
+            string cachedHash = cache.TryGet(cacheKey, knownSize, knownLastWriteUtc, out cachedKind);
+            if (cachedHash != null)
+            {
+                if (G.DlinkDebug()) MessageBox.Show("Getting hash from LRU cache");
+                usedKind = cachedKind ?? ClassifyByExtension(dlinkVersion, Path.GetExtension(filePath));
+                return cachedHash;
+            }
+
+            string hash = GetSha256FromFileWithDlink(filePath, dlinkVersion, null, loopErrors, out usedKind);
+
+            // ---- Remember this result for next time -----------------------------------------
+            cache.Set(cacheKey, knownSize, knownLastWriteUtc, hash, usedKind);
+            return hash;
+        }
+
+        /// <summary>
+        /// For comparing data files (the compare window's Folders view): GetFileHashCached under CurrentVersion, but
+        /// never shows a popup or throws a Gekko error. Returns null (and error says why) if the file cannot be hashed.
+        /// Two files with the same hash hold the same data: the same data hash inside a .gbk, the same .px content apart
+        /// from the creation date, else the same bytes.
+        /// </summary>
+        public static string GetContentHash(LruHashCache cache, string filePath, long size, DateTime lastWriteUtc, out EDlinkHashKind usedKind, out string error)
         {
             usedKind = EDlinkHashKind.PhysicalFileHash;
             error = null;
             List<string> loopErrors = new List<string>();
             try
             {
-                return GetSha256FromFileWithDlink(filePath, CurrentVersion, null, loopErrors, out usedKind);
+                return GetFileHashCached(cache, filePath, size, lastWriteUtc, CurrentVersion, out usedKind, loopErrors);
             }
             catch (DlinkLoopErrorException)
             {
