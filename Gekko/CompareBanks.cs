@@ -33,16 +33,13 @@ namespace Gekko
         public double ZeroThreshold { get; set; }
 
         /// <summary>M = M counts as equal; M and a number are not equal; two numbers use the threshold.</summary>
-        public bool AreEqual(double a, double b)
+        public bool AreEqual(double x1, double x0)
         {
-            bool ma = double.IsNaN(a), mb = double.IsNaN(b);
-            if (ma || mb) return ma && mb;
-            if (a == b) return true;  // also equal infinities
-            double d = Math.Abs(a - b);
-            if (double.IsInfinity(d) || double.IsNaN(d)) return false;
-            if (!DiffRelative) return d <= DiffThreshold;
-            double scale = Math.Max(Math.Abs(a), Math.Abs(b));  // > 0, since a != b
-            return d / scale * 100.0 <= DiffThreshold;
+            double varDelta; double varPch;
+            //Note: denominator in 3-way compares...???
+            Program.CompareTwoValues(out varDelta, out varPch, false, x1, x0);
+            if (!DiffRelative) return Math.Abs(varDelta) <= DiffThreshold;            
+            return Math.Abs(varPch) <= DiffThreshold;
         }
 
         public bool IsZero(double v)
@@ -719,19 +716,12 @@ namespace Gekko
         }
 
         /// <summary>
-        /// The name as the Names and Values tabs show it. Gekko series names carry their frequency, e.g. "x!q" or
-        /// "x!q[a, b]"; since the tabs show one frequency at a time, it is left out: "x" and "x[a, b]". Replace the body
-        /// with Gekko's own pretty-printing if wanted. Must not change the order of names (they are listed sorted).
+        /// Turns "x!q" or "x!q[a,b]" into "x" and "x[a,b]", because freqs are selected anyway.
         /// </summary>
         public static string Freqpretty(string name)
         {
             if (string.IsNullOrEmpty(name)) return name;
-            int bang = name.IndexOf('!');
-            if (bang < 0) return name;
-            int bracket = name.IndexOf('[');
-            if (bracket >= 0 && bracket < bang) return name;  // a '!' inside the dimensions is left alone
-            int end = bracket >= 0 ? bracket : name.Length;
-            return name.Remove(bang, end - bang);
+            return G.Chop_RemoveFreq(name);
         }
 
         public static string StripDimensions(string name)
@@ -796,28 +786,28 @@ namespace Gekko
 
         /// <summary>
         /// Text listing of one series for the offsets lo..hi on its axis. Two banks: period, x(1), x(2), abs dev., rel. dev.
-        /// One or three banks: period and the values. Periods found by the check end with " *".
+        /// One or three banks: period and the values. Periods found by the check end with "***".
         /// onlyFound: only those periods. displayName (may be null: c.Name) is the name used in the column heads.
         /// </summary>
-        public static DeviationListing FormatComparison(SeriesComparison c, int lo, int hi,
-                                                        CheckKind check, int slotMask, bool onlyFound, string displayName = null)
+        public static DeviationListing FormatComparison(SeriesComparison c, int lo, int hi, CheckKind check, int slotMask, bool onlyFound, string displayName = null)
         {
             var listing = new DeviationListing();
             int n = c.Series.Length;
             bool pair = n == 2;
-            var heads = new string[n];
-            for (int i = 0; i < n; i++) heads[i] = (displayName ?? c.Name) + "(" + (c.Slots[i] + 1).ToString(Inv) + ")";
+            string[] heads = new string[n];
+            //for (int i = 0; i < n; i++) heads[i] = (displayName ?? c.Name) + "(" + (c.Slots[i] + 1).ToString(Inv) + ")";
+            for (int i = 0; i < n; i++) heads[i] = (displayName ?? "(" + (i + 1) + ")");
 
             const int periodWidth = 12, absWidth = 14, relWidth = 12;  // 12: room for daily periods like 2020m12d31
             int valueWidth = Math.Max(13, heads.Max(h => h.Length) + 3);
 
             var sb = new StringBuilder();
-            sb.Append("period".PadRight(periodWidth));
+            sb.Append("".PadRight(periodWidth));
             foreach (string h in heads) sb.Append(h.PadLeft(valueWidth));
             if (pair)
             {
-                sb.Append("abs dev.".PadLeft(absWidth));
-                sb.Append("rel. dev.".PadLeft(relWidth));
+                sb.Append("ABS DIFF".PadLeft(absWidth));
+                sb.Append("% DIFF".PadLeft(relWidth));
             }
             listing.Lines.Add(sb.ToString());
 
@@ -831,52 +821,23 @@ namespace Gekko
 
                 sb.Clear();
                 sb.Append(c.Axis.At(k).ToString().PadRight(periodWidth));
-                for (int i = 0; i < n; i++) sb.Append(FormatValue(values[i]).PadLeft(valueWidth));
+                for (int i = 0; i < n; i++) sb.Append(G.levelFormatOld(values[i], 14));
                 if (pair)
                 {
-                    if (IsNumber(values[0]) && IsNumber(values[1]))
-                    {
-                        double a = values[0], d = values[1] - a;
-                        sb.Append(FormatNumber(d).PadLeft(absWidth));
-                        sb.Append((a != 0 ? FormatPercent(d / Math.Abs(a) * 100.0) : "").PadLeft(relWidth));
-                    }
-                    else
-                    {
-                        sb.Append(new string(' ', absWidth + relWidth));
-                    }
+                    double x0 = values[0];
+                    double x1 = values[1];
+                    double varDelta; double varPch;
+                    //Note: denominator in 3-way compares...???
+                    Program.CompareTwoValues(out varDelta, out varPch, false, x1, x0);                    
+                    sb.Append(G.levelFormatOld(varDelta, 14));
+                    sb.Append(G.pchFormatOld(varPch, 8));
                 }
-                if (found) sb.Append("  *");
+                if (found) sb.Append("      +++");
                 listing.LineOfPeriod[k] = listing.Lines.Count;
                 listing.Lines.Add(sb.ToString());
             }
             return listing;
-        }
-
-        static bool IsNumber(double x)
-        {
-            return !double.IsNaN(x) && !double.IsInfinity(x);
-        }
-
-        /// <summary>"M" is double.NaN.</summary>
-        public static string FormatValue(double x)
-        {
-            if (double.IsNaN(x)) return "M";
-            if (double.IsInfinity(x)) return x > 0 ? "Inf" : "-Inf";
-            return FormatNumber(x);
-        }
-
-        static string FormatNumber(double x)
-        {
-            double a = Math.Abs(x);
-            if (a != 0 && (a >= 1e12 || a < 1e-4)) return x.ToString("0.#####E+0", Inv);
-            return x.ToString("0.00####", Inv);
-        }
-
-        static string FormatPercent(double pct)
-        {
-            string s = Math.Abs(pct) >= 1e5 ? pct.ToString("0.##E+0", Inv) : pct.ToString("0.0###", Inv);
-            return s + "%";
-        }
+        }     
 
         /// <summary>Parses a threshold typed by the user (invariant or current culture). Must be a number &gt;= 0.</summary>
         public static bool TryParseThreshold(string text, out double value)
@@ -1072,6 +1033,7 @@ namespace Gekko
         {
             CellOffset offset = new CellOffset();
             ReadOpenMulbkHelper oRead = new ReadOpenMulbkHelper();
+            oRead.trace = false; //No need to chew on traces here.
             Program.ReadInfo readInfo = new Program.ReadInfo();
             P p = new P();
             string tsdxFile = null; string tempTsdxPath = null;

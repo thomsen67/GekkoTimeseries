@@ -1677,10 +1677,10 @@ namespace Gekko
         private void comparecheckDatabanksToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try
-            {
-                GuiCompareUtilityDatabanks gui = new GuiCompareUtilityDatabanks();
-                gui.ShowDialog();
-                gui.Close();
+            {                
+                WindowCompare xx = new WindowCompare();
+                xx.Show();
+                return;
             }
             catch
             {

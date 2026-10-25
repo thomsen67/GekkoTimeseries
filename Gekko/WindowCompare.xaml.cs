@@ -63,7 +63,7 @@ namespace Gekko
         {
             get
             {
-                if (IsPlaceholder) return IsFolderRow ? "(empty: use Recent, or drop a folder here)" : "(empty: use Recent, or drop a file here)";
+                if (IsPlaceholder) return IsFolderRow ? "(drag a folder here)" : "(drag a datafile here)";
                 return FolderPath ?? Bank.FilePath ?? "(artificial data)";
             }
         }
@@ -2744,7 +2744,7 @@ namespace Gekko
 
         /// <summary>
         /// All series of the Names list in one text, for the selected periods. Per series: a title line, the column
-        /// header ("period ...") and one line per period (M = missing, * = found by the check), then an empty line.
+        /// header ("period ...") and one line per period, then an empty line.
         /// The series that was at the top stays at the top. Previous/Next jump between the series.
         /// </summary>
         void BuildValuesText()
@@ -2801,8 +2801,7 @@ namespace Gekko
 
             string star = check == CheckKind.Missings ? "M in a bank" : check == CheckKind.Zeroes ? "zero in a bank" : "differs";
             LegendText.Text = string.Join("   ", Enumerable.Range(0, current.SlotCount).Where(s => current.Active[s])
-                                                          .Select(s => "(" + (s + 1) + ") " + current.Banks[s].Name))
-                              + "   M = missing   * = " + star;
+                                                          .Select(s => "(" + (s + 1) + ") " + current.Banks[s].Name));                              
             DevText.Text = sb.ToString();
             DevText.Select(0, 0);
 
@@ -4203,16 +4202,16 @@ namespace Gekko
                 foreach (string line in info.Split('\n'))
                     lines.Children.Add(new TextBlock { Text = line, FontSize = 11, Foreground = MutedBrush });
             }
-            if (!on)
-            {
-                lines.Children.Add(new TextBlock
-                {
-                    Text = anyFocus ? "greyed out by the focus" : "hidden",
-                    FontSize = 11,
-                    FontStyle = FontStyles.Italic,
-                    Foreground = MutedBrush
-                });
-            }
+            //if (!on)
+            //{
+            //    lines.Children.Add(new TextBlock
+            //    {
+            //        Text = anyFocus ? "greyed out by the focus" : "hidden",
+            //        FontSize = 11,
+            //        FontStyle = FontStyles.Italic,
+            //        Foreground = MutedBrush
+            //    });
+            //}
 
             // hide/show this bank; focus on it (grey out the others) or end the focus.
             string hideTip;

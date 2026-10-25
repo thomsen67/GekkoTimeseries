@@ -171,8 +171,8 @@
         </Style>
 
         <Style x:Key="MonoTextStyle" TargetType="TextBox">
-            <Setter Property="FontFamily" Value="Consolas"/>
-            <Setter Property="FontSize" Value="12.5"/>
+            <Setter Property="FontFamily" Value="Courier New"/>
+            <Setter Property="FontSize" Value="11"/>
             <Setter Property="IsReadOnly" Value="True"/>
             <Setter Property="BorderBrush" Value="#FFACACAC"/>
             <Setter Property="Padding" Value="4,2"/>
@@ -576,7 +576,7 @@
                                  values (and it keeps a grey background until the next click or selection). A selection
                                  always covers whole names; right-click: Plot (the context menu is made in code). -->
                             <RichTextBox Grid.Row="2" Name="NamesText" IsReadOnly="True" IsReadOnlyCaretVisible="False" IsUndoEnabled="False"
-                                         FontFamily="Consolas" FontSize="12.5" BorderBrush="#FFACACAC" Padding="4,2"
+                                         FontFamily="Courier New" FontSize="11" BorderBrush="#FFACACAC" Padding="4,2"
                                          VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                                          IsInactiveSelectionHighlightEnabled="True"
                                          PreviewMouseMove="NamesText_PreviewMouseMove" MouseLeave="NamesText_MouseLeave"
@@ -628,7 +628,7 @@
                                            Foreground="#FF1F4E79" VerticalAlignment="Center"/>
                                 <TextBlock Name="LegendText" Grid.Column="3" Margin="16,0,8,0" Foreground="#FF888888"
                                            VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                                <CheckBox Name="OnlyFoundCheck" Grid.Column="4" Content="Only periods marked *"
+                                <CheckBox Name="OnlyFoundCheck" Grid.Column="4" Content="Show +++"
                                           VerticalAlignment="Center" ToolTip="Only the periods found by the current check"
                                           Checked="OnlyFound_Changed" Unchecked="OnlyFound_Changed"/>
                             </Grid>

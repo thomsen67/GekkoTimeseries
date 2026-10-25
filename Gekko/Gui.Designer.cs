@@ -847,14 +847,15 @@ namespace Gekko
             // 
             // utilitiesToolStripMenuItem
             // 
-            this.utilitiesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripMenuItem2,
-            this.makebatFileToolStripMenuItem,
+            this.utilitiesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {            
             this.comparecheckDatabanksToolStripMenuItem,
             this.comparecheckEquationsToolStripMenuItem,
             this.compareModeldatabankvarlistToolStripMenuItem,
             this.convertersToolStripMenuItem,
-            this.dlinkToolStripMenuItem});
+            this.dlinkToolStripMenuItem,
+            this.toolStripMenuItem2,
+            this.makebatFileToolStripMenuItem}
+            );
             this.utilitiesToolStripMenuItem.Name = "utilitiesToolStripMenuItem";
             this.utilitiesToolStripMenuItem.Size = new System.Drawing.Size(58, 20);
             this.utilitiesToolStripMenuItem.Text = "Utilities";
@@ -877,7 +878,7 @@ namespace Gekko
             // 
             this.comparecheckDatabanksToolStripMenuItem.Name = "comparecheckDatabanksToolStripMenuItem";
             this.comparecheckDatabanksToolStripMenuItem.Size = new System.Drawing.Size(331, 22);
-            this.comparecheckDatabanksToolStripMenuItem.Text = "Compare two databanks...";
+            this.comparecheckDatabanksToolStripMenuItem.Text = "Compare databanks...";
             this.comparecheckDatabanksToolStripMenuItem.Click += new System.EventHandler(this.comparecheckDatabanksToolStripMenuItem_Click);
             // 
             // comparecheckEquationsToolStripMenuItem

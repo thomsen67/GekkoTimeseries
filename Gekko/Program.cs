@@ -3076,13 +3076,7 @@ namespace Gekko
         /// <param name="text"></param>
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
-        {
-            if (text.ToLower().Contains("wcompare"))
-            {
-                WindowCompare xx = new WindowCompare();
-                xx.ShowDialog();
-                return;
-            }
+        {           
 
             if (Globals.runningOnTTComputer)
             {
@@ -3652,7 +3646,7 @@ namespace Gekko
 
             if (nocr) G.Write(text);
             else G.Writeln(text);
-        }        
+        }
 
         private static List<TraceFrame> TraceAnalyzeUsers(TraceFrame traceFrame, bool onlyObk, long big)
         {
@@ -35144,47 +35138,11 @@ namespace Gekko
                         double varPch = 0;
 
                         double var1 = ts.GetDataSimple(t);
-                        double var2 = tsGrund.GetDataSimple(t);
-                        double var2_lag1 = tsGrund.GetDataSimple(t.Add(-1));
-                        double var2_lag2 = tsGrund.GetDataSimple(t.Add(-2));
+                        double var0 = tsGrund.GetDataSimple(t);
+                        double var0Lag1 = tsGrund.GetDataSimple(t.Add(-1));
+                        double var0lag2 = tsGrund.GetDataSimple(t.Add(-2));
 
-                        if (missingZero)
-                        {
-                            if (G.IsNumericalError(var1)) var1 = 0d;
-                            if (G.IsNumericalError(var2)) var2 = 0d;
-                            if (G.IsNumericalError(var2_lag1)) var2_lag1 = 0d;
-                            if (G.IsNumericalError(var2_lag2)) var2_lag2 = 0d;
-                        }
-
-                        //we check first both 0, both M, one non-M && one M.
-
-                        if (var1 == 0 && var2 == 0d)
-                        {
-                            varPch = 0d;
-                            varDelta = var1 - var2;
-                        }
-                        else if (G.IsBothNumericalError(var1, var2)) //see also #87342543534
-                        {
-                            //this is considered okay
-                            varPch = 0d;
-                            varDelta = 0d;
-                        }
-                        else if ((G.IsNumericalError(var1) && !G.IsNumericalError(var2)) || (!G.IsNumericalError(var1) && G.IsNumericalError(var2)))
-                        {
-                            //this is considered a problem
-                            varPch = 1e+100d;
-                            varDelta = 1e+100;
-                        }
-                        else if (var2 == 0 && !history)
-                        {
-                            varPch = 1e+100d;
-                            varDelta = var1 - var2;
-                        }
-                        else
-                        {
-                            varPch = ComparePch(history, var1, var2, var2_lag1, var2_lag2);
-                            varDelta = var1 - var2;
-                        }
+                        CompareTwoValues(out varDelta, out varPch, history, missingZero, true, var1, var0, var0Lag1, var0lag2);
 
                         if (compareType == "absolute" || compareType == "alphabetical")
                         {
@@ -35390,7 +35348,7 @@ namespace Gekko
                                     }
                                     lagCounter++;
                                 }
-                                varRelHist = ComparePch(history, var1, var2, var2_lag1, var2_lag2);
+                                varRelHist = ComparePch(history, true, var1, var2, var2_lag1, var2_lag2);
                             }
 
                             samFile.Write(G.levelFormatOld(var1));
@@ -35399,7 +35357,7 @@ namespace Gekko
                             samFile.Write("       ");
                             samFile.Write(G.levelFormatOld(varDelta));
                             samFile.Write("    ");
-                            if (varDelta == 0d) varPch = 0d; //this way, two clean 0's get 0% difference
+                            if (varDelta == 0d) varPch = 0d; //this way, two clean 0's get 0% difference. ??? Is this not already so???
                             samFile.Write(G.pchFormatOld(varPch));
                             if (history)
                             {
@@ -35447,6 +35405,66 @@ namespace Gekko
         }
 
         /// <summary>
+        /// Overload with no history use, and no return of 1e+100.
+        /// </summary>        
+        public static void CompareTwoValues(out double varDelta, out double varPch, bool missingZero, double x1, double x0)
+        {
+            CompareTwoValues(out varDelta, out varPch, false, missingZero, false, x1, x0, double.NaN, double.NaN);
+        }
+
+        /// <summary>
+        /// Returns varDelta and varPch, from x1 (alternative) and x0 (baseline). Could be reworked to use more x0 history. If history==false, x0Lag1 and x0Lag2 are not used.
+        /// Use for COMPARE statement, and for Compare window. Does not take abs() or return values. Seems it returns 0 for varPch if x1==x2==0 (for history==false).
+        /// </summary>        
+        public static void CompareTwoValues(out double varDelta, out double varPch, bool history, bool missingZero, bool mayReturn1e100, double x1, double x0, double x0Lag1, double x0Lag2)
+        {
+            double missingValue = double.NaN;
+            if (mayReturn1e100) missingValue = 1e+100d;
+
+            if (missingZero)
+            {
+                if (G.IsNumericalError(x1)) x1 = 0d;
+                if (G.IsNumericalError(x0)) x0 = 0d;
+                if (history)
+                {
+                    //Not used otherwise
+                    if (G.IsNumericalError(x0Lag1)) x0Lag1 = 0d;
+                    if (G.IsNumericalError(x0Lag2)) x0Lag2 = 0d;
+                }
+            }
+
+            //we check first both 0, both M, one non-M && one M.
+
+            if (x1 == 0 && x0 == 0d)
+            {
+                varPch = 0d;
+                varDelta = x1 - x0;
+            }
+            else if (G.IsBothNumericalError(x1, x0)) //see also #87342543534
+            {
+                //this is considered okay
+                varPch = 0d;
+                varDelta = 0d;
+            }
+            else if ((G.IsNumericalError(x1) && !G.IsNumericalError(x0)) || (!G.IsNumericalError(x1) && G.IsNumericalError(x0)))
+            {
+                //this is considered a problem
+                varPch = missingValue;
+                varDelta = missingValue;
+            }
+            else if (x0 == 0 && !history)
+            {
+                varPch = missingValue;
+                varDelta = x1 - x0;
+            }
+            else
+            {
+                varPch = ComparePch(history, mayReturn1e100, x1, x0, x0Lag1, x0Lag2);
+                varDelta = x1 - x0;
+            }            
+        }
+
+        /// <summary>
         /// Relative difference, where a "standard deviation" of the ref values is used. Note: percent (multiplied by 100), not relative.
         /// </summary>
         /// <param name="history"></param>
@@ -35455,16 +35473,18 @@ namespace Gekko
         /// <param name="var2_lag1"></param>
         /// <param name="var2_lag2"></param>
         /// <returns></returns>
-        private static double ComparePch(bool history, double var1, double var2, double var2_lag1, double var2_lag2)
+        private static double ComparePch(bool history, bool mayReturn1e100, double var1, double var2, double var2_lag1, double var2_lag2)
         {
+            double missingValue = double.NaN;
+            if (mayReturn1e100) missingValue = 1e+100d;
+
             double varPch;
             if (history)
             {
                 //This corresponds perfectly with the way convergence is checked in gauss-seidel SIM (per default)
-                double d = (Math.Abs(var2 - var2_lag1) + Math.Abs(var2_lag1 - var2_lag2)) / 2;
-                //if (G.IsNumericalError(d)) d = 1e+100d;
+                double d = (Math.Abs(var2 - var2_lag1) + Math.Abs(var2_lag1 - var2_lag2)) / 2;                
                 varPch = Math.Abs(var1 - var2) / d * 100d;  //if d provides NaN, varPch = 0 almost, and only abs check is performed.
-                if (G.IsNumericalError(varPch)) varPch = 1e+100d;
+                if (G.IsNumericalError(varPch)) varPch = missingValue;
             }
             else
             {
