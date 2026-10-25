@@ -771,10 +771,7 @@ namespace Gekko
         }
 
         static SeriesComparison CompareSeriesInBanks(string name, int[] slots, IList<CompareBank> banks, EFreq freq, CheckSettings settings, PeriodAxis axis)
-        {
-            if (name != null && name.ToLower().Contains("owbcp_z_cf"))
-            {
-            }
+        {            
             var series = new Series[slots.Length];            
             for (int i = 0; i < slots.Length; i++) series[i] = banks[slots[i]].Get(freq)[name];
 

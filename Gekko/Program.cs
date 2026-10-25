@@ -35144,10 +35144,7 @@ namespace Gekko
                         double var0 = tsGrund.GetDataSimple(t);
                         double var0Lag1 = tsGrund.GetDataSimple(t.Add(-1));
                         double var0lag2 = tsGrund.GetDataSimple(t.Add(-2));
-
-                        if (ts.name.Contains("owbcp_z_cf"))
-                        {
-                        }
+                        
                         CompareTwoValues(out varDelta, out varPch, history, missingZero, true, var1, var0, var0Lag1, var0lag2);
 
                         if (compareType == "absolute" || compareType == "alphabetical")
