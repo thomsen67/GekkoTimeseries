@@ -1212,8 +1212,6 @@ namespace Gekko
             GuiDialogMakeBatfile xx = new GuiDialogMakeBatfile(false);
             xx.ShowDialog();
             xx.Close();
-
-
         }
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1679,8 +1677,7 @@ namespace Gekko
             try
             {                
                 WindowCompare xx = new WindowCompare();
-                xx.ShowDialog();
-                return;
+                xx.ShowDialog(); //TODO: thread, .Show(), and in xaml key="esc" stuff.
             }
             catch
             {
