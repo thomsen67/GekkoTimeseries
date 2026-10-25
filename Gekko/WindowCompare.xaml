@@ -401,7 +401,8 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
-                        <TextBlock Grid.Row="0" Text="Compare" Style="{StaticResource PanelLabelStyle}"/>
+                        <!-- Bottom margin as the radio buttons' row, so the label lines up with them -->
+                        <TextBlock Grid.Row="0" Text="Compare" Style="{StaticResource PanelLabelStyle}" Margin="0,0,8,8"/>
                         <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Margin="0,0,0,8">
                             <RadioButton Name="Compare2Radio" Content="first 2" GroupName="CompareMode" VerticalAlignment="Center"
                                          Margin="0,0,12,0" Checked="CompareMode_Changed"/>
@@ -482,16 +483,17 @@
                         <CheckBox Grid.Row="2" Grid.Column="1" Name="SortByDeviationCheck" Content="largest deviation first (2 banks)"
                                   VerticalAlignment="Center" Margin="0,0,0,10"
                                   Checked="SortByDeviation_Changed" Unchecked="SortByDeviation_Changed"
-                                  ToolTip="Two banks: list the series in the Names and Values tabs by their largest deviation in the period, largest first (absolute, or in % when 'relative (%)' is ticked). Unticked: by name."/>
+                                  ToolTip="Two banks: list the series in the Names and Values tabs by their largest deviation in the period, largest first: in % when 'Relative (%)' is ticked in Differences, else absolute; only differences that count by the thresholds. Unticked: by name."/>
 
                         <TextBlock Grid.Row="3" Text="Filter" Style="{StaticResource PanelLabelStyle}"/>
                         <TextBox Grid.Row="3" Grid.Column="1" Name="FilterBox" Height="22" VerticalContentAlignment="Center"
-                                 TextChanged="FilterBox_TextChanged"
+                                 TextChanged="EditBox_TextChanged" PreviewKeyDown="EditBox_PreviewKeyDown"
+                                 LostKeyboardFocus="EditBox_LostKeyboardFocus"
                                  ToolTip="Datafiles: only these series are compared. Folders: only these data files are compared."/>
                         <CheckBox Grid.Row="4" Grid.Column="1" Name="RegexCheck" Content="Regex" Margin="0,5,0,0"
                                   Checked="RegexCheck_Changed" Unchecked="RegexCheck_Changed"/>
                         <TextBlock Grid.Row="5" Grid.Column="1" Name="FilterHint" Style="{StaticResource HintStyle}"
-                                   Text="Wildcards * and ?, several patterns separated by spaces" Margin="0,4,0,8"/>
+                                   Text="Wildcards * and ?, patterns separated by spaces, - excludes" Margin="0,4,0,8"/>
 
                     </Grid>
 
@@ -502,18 +504,37 @@
                             <TabItem Header="Differences" Name="DifferencesCheckTab" Style="{StaticResource CheckTabStyle}"
                                      ToolTip="Find series whose values differ between the banks">
                                 <StackPanel Margin="4,5,4,4">
+                                    <!-- Two criteria, each with its own threshold. With both ticked, a difference must exceed
+                                         both (CheckSettings.Exceeds). The box of an unticked criterion is greyed out. -->
                                     <StackPanel Name="DiffThresholdPanel">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="Threshold" Style="{StaticResource LabelStyle}"/>
-                                            <TextBox Name="DiffThresholdBox" Width="70" Height="20" Text="0" VerticalContentAlignment="Center"
-                                                     TextChanged="Threshold_Changed"
-                                                     ToolTip="Two values are equal when they differ by at most this much (0: exactly equal)"/>
-                                            <CheckBox Name="DiffRelativeCheck" Content="relative (%)" VerticalAlignment="Center" Margin="10,0,0,0"
-                                                      Checked="Threshold_Changed" Unchecked="Threshold_Changed"
-                                                      ToolTip="The threshold is in percent of the larger of the two values"/>
-                                        </StackPanel>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            <CheckBox Grid.Row="0" Grid.Column="0" Name="DiffAbsCheck" Content="Absolute" IsChecked="True"
+                                                      VerticalAlignment="Center" Margin="0,0,10,0"
+                                                      Checked="ThresholdCheck_Changed" Unchecked="ThresholdCheck_Changed"
+                                                      ToolTip="Count a difference only when its absolute size is more than this threshold"/>
+                                            <TextBox Grid.Row="0" Grid.Column="1" Name="DiffAbsThresholdBox" Width="70" Height="20" Text="0"
+                                                     VerticalContentAlignment="Center" TextChanged="EditBox_TextChanged" PreviewKeyDown="EditBox_PreviewKeyDown" LostKeyboardFocus="EditBox_LostKeyboardFocus"
+                                                     IsEnabled="{Binding IsChecked, ElementName=DiffAbsCheck}"
+                                                     ToolTip="Absolute threshold, e.g. 0.0001 to ignore tiny differences (0: any difference)"/>
+                                            <CheckBox Grid.Row="1" Grid.Column="0" Name="DiffRelCheck" Content="Relative (%)"
+                                                      VerticalAlignment="Center" Margin="0,5,10,0"
+                                                      Checked="ThresholdCheck_Changed" Unchecked="ThresholdCheck_Changed"
+                                                      ToolTip="Count a difference only when it is more than this threshold in percent"/>
+                                            <TextBox Grid.Row="1" Grid.Column="1" Name="DiffRelThresholdBox" Width="70" Height="20" Text="0"
+                                                     VerticalContentAlignment="Center" Margin="0,5,0,0" TextChanged="EditBox_TextChanged" PreviewKeyDown="EditBox_PreviewKeyDown" LostKeyboardFocus="EditBox_LostKeyboardFocus"
+                                                     IsEnabled="{Binding IsChecked, ElementName=DiffRelCheck}"
+                                                     ToolTip="Relative threshold in percent, e.g. 0.1 (0: any difference)"/>
+                                        </Grid>
                                         <TextBlock Style="{StaticResource HintStyle}" Margin="0,5,0,0"
-                                                   Text="Values differing by more than the threshold, or a value against M, differ. M against M is equal."/>
+                                                   Text="A difference counts when it exceeds the ticked threshold; with both ticked, it must exceed both. A value against M differs; M against M is equal."/>
                                     </StackPanel>
                                     <TextBlock Style="{StaticResource HintStyle}" Margin="0,4,0,0"
                                                Text="Folders: a file differs when, in some frequency, its copies do not have the same series, or a series differs in the period."/>
@@ -530,7 +551,7 @@
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Text="Threshold" Style="{StaticResource LabelStyle}"/>
                                         <TextBox Name="ZeroThresholdBox" Width="70" Height="20" Text="0" VerticalContentAlignment="Center"
-                                                 TextChanged="Threshold_Changed"
+                                                 TextChanged="EditBox_TextChanged" PreviewKeyDown="EditBox_PreviewKeyDown" LostKeyboardFocus="EditBox_LostKeyboardFocus"
                                                  ToolTip="A value counts as zero when its absolute value is at most this (0: exactly zero)"/>
                                     </StackPanel>
                                     <TextBlock Style="{StaticResource HintStyle}" Margin="0,5,0,0"

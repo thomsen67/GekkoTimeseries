@@ -1679,7 +1679,7 @@ namespace Gekko
             try
             {                
                 WindowCompare xx = new WindowCompare();
-                xx.Show();
+                xx.ShowDialog();
                 return;
             }
             catch

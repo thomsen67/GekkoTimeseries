@@ -20,26 +20,72 @@ namespace Gekko
     /// </summary>
     public enum CheckKind { Differences, Missings, Zeroes }
 
-    /// <summary>The thresholds of the checks.</summary>
+    /// <summary>
+    /// The thresholds of the checks.
+    ///
+    /// Differences has two criteria, each with its own box: an absolute and a relative (%) threshold. Two values differ
+    /// when their difference exceeds the threshold of each criterion that is on: with both on, it must exceed both
+    /// (so e.g. absolute 0.0001 ignores tiny differences that are large in percent, while relative still applies).
+    /// With neither on, any difference counts. A value against M always differs; M against M is equal.
+    /// </summary>
     public sealed class CheckSettings
     {
-        /// <summary>Differences: two numbers are equal when they differ by at most this much.</summary>
-        public double DiffThreshold { get; set; }
+        /// <summary>Differences, the absolute criterion: on/off and its threshold.</summary>
+        public bool DiffAbsOn { get; set; } = true;
+        public double DiffAbsThreshold { get; set; }
 
-        /// <summary>Differences: the threshold is in percent of the larger absolute value instead of absolute.</summary>
-        public bool DiffRelative { get; set; }
+        /// <summary>Differences, the relative criterion: on/off and its threshold in percent.</summary>
+        public bool DiffRelOn { get; set; }
+        public double DiffRelThreshold { get; set; }
 
         /// <summary>Zeroes: a value counts as zero when its absolute value is at most this.</summary>
         public double ZeroThreshold { get; set; }
 
-        /// <summary>M = M counts as equal; M and a number are not equal; two numbers use the threshold.</summary>
+        /// <summary>
+        /// The difference between x1 and x0 as the absolute and the relative (%) difference, signs dropped, by
+        /// Program.CompareTwoValues (x1 compared to x0). This is the one rule used everywhere (both states, sorting):
+        ///   M against M, or equal values: 0 and 0.
+        ///   M against a number: +infinity and +infinity.
+        ///   A difference that cannot be computed (e.g. % against 0): +infinity.
+        /// </summary>
+        public static void Measure(double x1, double x0, out double abs, out double rel)
+        {
+            //abs = 0;
+            //rel = 0;
+            //bool m1 = double.IsNaN(x1), m0 = double.IsNaN(x0);
+            //if (m1 && m0) return;
+            //if (m1 || m0)
+            //{
+            //    abs = rel = double.PositiveInfinity;
+            //    return;
+            //}
+            //if (x1 == x0) return;  // also equal infinities
+            double varDelta, varPch;
+            Program.CompareTwoValues(out varDelta, out varPch, false, x1, x0);
+            abs = Math.Abs(varDelta);
+            rel = Math.Abs(varPch);
+            if (double.IsNaN(abs)) abs = double.PositiveInfinity;
+            if (double.IsNaN(rel)) rel = double.PositiveInfinity;
+        }
+
+        /// <summary>Whether a difference (as Measure gives it) counts, by the criteria that are on (see the class).</summary>
+        public bool Exceeds(double abs, double rel)
+        {
+            bool a = abs > DiffAbsThreshold;
+            bool r = rel > DiffRelThreshold;
+            if (DiffAbsOn && DiffRelOn) return a && r;
+            if (DiffAbsOn) return a;
+            if (DiffRelOn) return r;
+            return abs > 0 || rel > 0;  // no criterion: any difference
+        }
+
+        /// <summary>Equal for the Differences check: the difference does not count (see the class).</summary>
         public bool AreEqual(double x1, double x0)
         {
-            double varDelta; double varPch;
-            //Note: denominator in 3-way compares...???
-            Program.CompareTwoValues(out varDelta, out varPch, false, x1, x0);
-            if (!DiffRelative) return Math.Abs(varDelta) <= DiffThreshold;            
-            return Math.Abs(varPch) <= DiffThreshold;
+            double abs, rel;
+            Measure(x1, x0, out abs, out rel);
+            if (abs == 0 && rel == 0) return true;
+            return !Exceeds(abs, rel);
         }
 
         public bool IsZero(double v)
@@ -585,6 +631,65 @@ namespace Gekko
         }
     }
 
+    /// <summary>
+    /// The filter box, for series names or data files.
+    ///   Wildcard mode: patterns separated by spaces (or ;), * and ? as usual, the whole name must match. A pattern
+    ///   starting with - excludes. A name passes when it matches one of the other patterns (or there are none) and
+    ///   none of the excluding ones: "p* q* -pa* -pd*" is all p... and q... names except pa... and pd...; "-x*" is all
+    ///   names except x....
+    ///   Regex mode: case-insensitive, matches anywhere unless anchored with ^ and $.
+    /// </summary>
+    public sealed class NameFilter
+    {
+        Regex regex;
+        readonly List<Regex> include = new List<Regex>();
+        readonly List<Regex> exclude = new List<Regex>();
+
+        /// <summary>Null when the text is empty (no filter) or invalid (then error is set).</summary>
+        public static NameFilter Parse(string text, bool isRegex, out string error)
+        {
+            error = null;
+            if (string.IsNullOrWhiteSpace(text)) return null;
+            const RegexOptions options = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant;
+            var f = new NameFilter();
+            if (isRegex)
+            {
+                try
+                {
+                    f.regex = new Regex(text.Trim(), options);
+                    return f;
+                }
+                catch (ArgumentException ex)
+                {
+                    error = "Invalid regular expression: " + ex.Message;
+                    return null;
+                }
+            }
+            foreach (string part in text.Split(new[] { ' ', '\t', ';' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                bool negative = part.StartsWith("-", StringComparison.Ordinal);
+                string pattern = negative ? part.Substring(1) : part;
+                if (pattern.Length == 0) continue;  // a lone "-"
+                var rx = new Regex("^" + Regex.Escape(pattern).Replace(@"\*", ".*").Replace(@"\?", ".") + "$", options);
+                (negative ? f.exclude : f.include).Add(rx);
+            }
+            if (f.include.Count == 0 && f.exclude.Count == 0) return null;
+            return f;
+        }
+
+        /// <summary>
+        /// Whether one of the candidates (e.g. a file name and its relative path) matches an including pattern (or
+        /// there are none), and none of them matches an excluding one. Regex mode: one of them matches.
+        /// </summary>
+        public bool Matches(params string[] candidates)
+        {
+            if (regex != null) return candidates.Any(c => c != null && regex.IsMatch(c));
+            bool included = include.Count == 0 || candidates.Any(c => c != null && include.Any(rx => rx.IsMatch(c)));
+            if (!included) return false;
+            return !candidates.Any(c => c != null && exclude.Any(rx => rx.IsMatch(c)));
+        }
+    }
+
     public static class CompareEngine
     {
         static readonly CultureInfo Inv = CultureInfo.InvariantCulture;
@@ -665,10 +770,12 @@ namespace Gekko
             return slots.ToArray();
         }
 
-        static SeriesComparison CompareSeriesInBanks(string name, int[] slots, IList<CompareBank> banks, EFreq freq,
-                                                     CheckSettings settings, PeriodAxis axis)
+        static SeriesComparison CompareSeriesInBanks(string name, int[] slots, IList<CompareBank> banks, EFreq freq, CheckSettings settings, PeriodAxis axis)
         {
-            var series = new Series[slots.Length];
+            if (name != null && name.ToLower().Contains("owbcp_z_cf"))
+            {
+            }
+            var series = new Series[slots.Length];            
             for (int i = 0; i < slots.Length; i++) series[i] = banks[slots[i]].Get(freq)[name];
 
             int length = axis == null ? 0 : axis.Length;
@@ -751,32 +858,30 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Wildcard mode: patterns separated by spaces, * and ? as usual, whole name must match, any pattern may match.
-        /// Regex mode: case-insensitive, matches anywhere unless anchored with ^ and $.
-        /// Returns null when there is no filter (or it is invalid, then error is set).
+        /// The series filter (Datafiles): the name must match (see NameFilter). Null when there is no filter (or it is
+        /// invalid, then error is set).
         /// </summary>
         public static Func<string, bool> BuildFilter(string text, bool isRegex, out string error)
         {
-            error = null;
-            if (string.IsNullOrWhiteSpace(text)) return null;
-            const RegexOptions options = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant;
-            if (isRegex)
+            NameFilter f = NameFilter.Parse(text, isRegex, out error);
+            if (f == null) return null;
+            return name => f.Matches(name);
+        }
+
+        /// <summary>
+        /// The data file filter (Folders): tried on the file name and on the path relative to the folder (without the
+        /// leading separator), so both "*.gbk" and "sub\*.gbk" work; "-old\*" leaves out a subfolder. The returned
+        /// function takes the relative path. Null when there is no filter (or it is invalid, then error is set).
+        /// </summary>
+        public static Func<string, bool> BuildFileFilter(string text, bool isRegex, out string error)
+        {
+            NameFilter f = NameFilter.Parse(text, isRegex, out error);
+            if (f == null) return null;
+            return relativePath =>
             {
-                try
-                {
-                    var rx = new Regex(text.Trim(), options);
-                    return name => rx.IsMatch(name);
-                }
-                catch (ArgumentException ex)
-                {
-                    error = "Invalid regular expression: " + ex.Message;
-                    return null;
-                }
-            }
-            List<Regex> patterns = text.Split(new[] { ' ', '\t', ';' }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(p => new Regex("^" + Regex.Escape(p).Replace(@"\*", ".*").Replace(@"\?", ".") + "$", options))
-                .ToList();
-            return name => patterns.Any(rx => rx.IsMatch(name));
+                string rel = (relativePath ?? "").TrimStart(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar);
+                return f.Matches(System.IO.Path.GetFileName(rel), rel);
+            };
         }
 
         /// <summary>
@@ -859,7 +964,7 @@ namespace Gekko
         ///     2003         6.0000         5.0000               1.0000       20.00         +++
         ///
         /// A column per bank of the series ((1), (2), (3): the bank numbers); with two banks also ABS DIFF and % DIFF
-        /// ((1) compared to (2), see Deviation). Periods found by the check end with ValuesLayout.Mark.
+        /// ((1) compared to (2), as CheckSettings.Measure does it). Periods found by the check end with ValuesLayout.Mark.
         /// onlyFound: only those periods. displayName (may be null: c.Name) heads the first column, which is
         /// firstColumnWidth wide (ValuesLayout.FirstColumnWidth) so that all series of the text line up.
         /// </summary>
@@ -914,34 +1019,23 @@ namespace Gekko
         }
 
         /// <summary>
-        /// The size of a difference between two values, for sorting by deviation: |ABS DIFF| or |% DIFF| as the Values
-        /// tab shows them (relative: the % DIFF), by Program.CompareTwoValues with x1 compared to x0. M against M and
-        /// equal values: 0. M against a number, or a % DIFF that cannot be computed (against 0): +infinity.
+        /// The largest deviation of a series in two banks over the offsets lo..hi, (1) compared to (2), for sorting:
+        /// the % difference when the relative criterion is on, else the absolute difference (CheckSettings.Measure).
+        /// Only periods that count as differences (Deviates, by the current thresholds) are looked at, so differences
+        /// that the thresholds ignore do not move a series up. 0 when there are none; -1 for a series that is not in
+        /// exactly two banks (nothing to compare: sorted last).
         /// </summary>
-        public static double Deviation(double x1, double x0, bool relative)
-        {
-            bool m1 = double.IsNaN(x1), m0 = double.IsNaN(x0);
-            if (m1 && m0) return 0;
-            if (m1 || m0) return double.PositiveInfinity;
-            if (x1 == x0) return 0;
-            double varDelta, varPch;
-            Program.CompareTwoValues(out varDelta, out varPch, false, x1, x0);
-            double d = Math.Abs(relative ? varPch : varDelta);
-            return double.IsNaN(d) ? double.PositiveInfinity : d;
-        }
-
-        /// <summary>
-        /// The largest Deviation of a series in two banks over the offsets lo..hi, (1) compared to (2). -1 for a series
-        /// that is not in exactly two banks (nothing to compare: sorted last).
-        /// </summary>
-        public static double MaxDeviation(SeriesComparison c, int lo, int hi, bool relative)
+        public static double MaxDeviation(SeriesComparison c, int lo, int hi, CheckSettings settings)
         {
             if (c.Series.Length != 2) return -1;
             double max = 0;
             int last = Math.Min(hi, c.Deviates.Length - 1);
             for (int k = Math.Max(lo, 0); k <= last; k++)
             {
-                double d = Deviation(c.Value(0, k), c.Value(1, k), relative);
+                if (!c.Deviates[k]) continue;
+                double abs, rel;
+                CheckSettings.Measure(c.Value(0, k), c.Value(1, k), out abs, out rel);
+                double d = settings.DiffRelOn ? rel : abs;
                 if (d > max) max = d;
                 if (double.IsPositiveInfinity(max)) break;
             }
@@ -952,9 +1046,9 @@ namespace Gekko
         /// The series sorted by MaxDeviation in lo..hi, largest first. The sort is stable, so equal deviations keep
         /// their order (by name).
         /// </summary>
-        public static List<SeriesComparison> SortByMaxDeviation(IEnumerable<SeriesComparison> series, int lo, int hi, bool relative)
+        public static List<SeriesComparison> SortByMaxDeviation(IEnumerable<SeriesComparison> series, int lo, int hi, CheckSettings settings)
         {
-            return series.Select(c => new { c, d = MaxDeviation(c, lo, hi, relative) })
+            return series.Select(c => new { c, d = MaxDeviation(c, lo, hi, settings) })
                          .OrderByDescending(x => x.d)
                          .Select(x => x.c)
                          .ToList();

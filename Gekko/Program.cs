@@ -3076,7 +3076,7 @@ namespace Gekko
         /// <param name="text"></param>
         /// <param name="nocr"></param>
         public static void Tell(string text, bool nocr)
-        {           
+        {
 
             if (Globals.runningOnTTComputer)
             {
@@ -35129,8 +35129,11 @@ namespace Gekko
                     Series tsGrund = sh.series2;
 
                     double max = 0d;
-                    double maxAbs = 0d;
-                    double maxRel = 0d;
+                    bool differs = false;  //true when some period exceeds both criteria (abs and rel) at the same time
+
+                    //if no <abs=...> or <rel=...> are given, crit_abs and crit_rel are = 0.
+                    if (G.IsNumericalError(crit_abs) || crit_abs < 0d) crit_abs = 0d; //can be called with NaN
+                    if (G.IsNumericalError(crit_rel) || crit_rel < 0d) crit_rel = 0d; //can be called with NaN
 
                     foreach (GekkoTime t in new GekkoTimeIterator(ConvertFreqs(tStart, tEnd, ts.freq)))
                     {
@@ -35142,6 +35145,9 @@ namespace Gekko
                         double var0Lag1 = tsGrund.GetDataSimple(t.Add(-1));
                         double var0lag2 = tsGrund.GetDataSimple(t.Add(-2));
 
+                        if (ts.name.Contains("owbcp_z_cf"))
+                        {
+                        }
                         CompareTwoValues(out varDelta, out varPch, history, missingZero, true, var1, var0, var0Lag1, var0lag2);
 
                         if (compareType == "absolute" || compareType == "alphabetical")
@@ -35152,8 +35158,15 @@ namespace Gekko
                         {
                             max = Math.Max(Math.Abs(varPch), max);
                         }
-                        maxAbs = Math.Max(Math.Abs(varDelta), maxAbs);
-                        maxRel = Math.Max(Math.Abs(varPch / 100d), maxRel);
+
+                        //Both criteria must be exceeded in the same period. Before, the largest abs and the largest rel
+                        //difference were taken over the whole period separately, so a series could be shown because of
+                        //an abs difference in one year and a rel difference in another year, with no year exceeding both.
+                        //A numerical error (NaN, e.g. a value against a missing value) counts as exceeding, as before
+                        //(then max became NaN and the series was always shown): hence !(x <= crit) instead of x > crit.
+                        double diffAbs = Math.Abs(varDelta);
+                        double diffRel = Math.Abs(varPch / 100d);
+                        if (!(diffAbs <= crit_abs) && !(diffRel <= crit_rel)) differs = true;
 
                         if (G.IsNumericalError(max))
                         {
@@ -35166,17 +35179,12 @@ namespace Gekko
                     {
                         //This probably never happens... for safety...
                         max = 1e+100d;
-                        maxAbs = 1e+100d;
-                        maxRel = 1e+100d;
+                        differs = true;
                     }
 
                     //if (max == 0) continue;  //don't show vars if they are identical
-                    //if no <abs=...> or <rel=...> are given, crit_abs and crit_rel are = 0.
 
-                    if (G.IsNumericalError(crit_abs) || crit_abs < 0d) crit_abs = 0d; //can be called with NaN
-                    if (G.IsNumericalError(crit_rel) || crit_rel < 0d) crit_rel = 0d; //can be called with NaN
-
-                    if (maxRel > crit_rel && maxAbs > crit_abs)
+                    if (differs)
                     {
                         seriesShown++;
                         //show this one
@@ -35197,7 +35205,7 @@ namespace Gekko
                                 //this is very seldom, multiply with something small and add something small
                                 //Random r = new Random();
                                 double r2 = Program.RandomDouble();
-                                max = max * (1 + r2 / 1000000d) + r2 / 1000000d;
+                                max1 = max1 * (1 + r2 / 1000000d) + r2 / 1000000d;  //max1, not max: else this loop never ends
                             }
                             else break;
                         }
@@ -35461,7 +35469,7 @@ namespace Gekko
             {
                 varPch = ComparePch(history, mayReturn1e100, x1, x0, x0Lag1, x0Lag2);
                 varDelta = x1 - x0;
-            }            
+            }
         }
 
         /// <summary>
@@ -35482,7 +35490,7 @@ namespace Gekko
             if (history)
             {
                 //This corresponds perfectly with the way convergence is checked in gauss-seidel SIM (per default)
-                double d = (Math.Abs(var2 - var2_lag1) + Math.Abs(var2_lag1 - var2_lag2)) / 2;                
+                double d = (Math.Abs(var2 - var2_lag1) + Math.Abs(var2_lag1 - var2_lag2)) / 2;
                 varPch = Math.Abs(var1 - var2) / d * 100d;  //if d provides NaN, varPch = 0 almost, and only abs check is performed.
                 if (G.IsNumericalError(varPch)) varPch = missingValue;
             }
@@ -38239,7 +38247,7 @@ namespace Gekko
             RegexOptions.Compiled);
 
         static readonly Regex Extension = new Regex(@"\.[A-Za-z0-9]+$", RegexOptions.Compiled);
-        
+
         public static string CsvToXlsx(string xml, string sheetName = "data", string xlsxFile = null)
         {
             int replaced;
@@ -38267,11 +38275,11 @@ namespace Gekko
                 {
                     string id = System.Net.WebUtility.HtmlDecode(p.Groups["val"].Value); // &amp; -> &
                     Match m = TxtId.Match(id);
-                    if (!m.Success) return p.Value;                       
+                    if (!m.Success) return p.Value;
 
                     string encFile = GetQueryParam(m.Groups["query"].Value, "file");
                     if (encFile == null) return p.Value;
-                                        
+
                     string newEncFile = xlsxFile != null
                         ? Uri.EscapeDataString(xlsxFile)
                         : Extension.Replace(encFile, ".xlsx");

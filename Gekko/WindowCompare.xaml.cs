@@ -342,12 +342,6 @@ namespace Gekko
         {
             InitializeComponent();
 
-            // The window is opened with Show() from Gekko's WinForms main window. Without this, the keyboard messages of
-            // a modeless WPF window go through the WinForms message loop, and keys like Esc (Window_KeyDown), Tab and
-            // the arrows do not arrive as they should. ShowDialog() has its own WPF message loop, so it works there.
-            // Needs a reference to WindowsFormsIntegration.dll.
-            System.Windows.Forms.Integration.ElementHost.EnableModelessKeyboardInterop(this);
-
             // Create the busy circle as soon as the window has been drawn, so its visual is connected before the
             // first long piece of work (created lazily, it did not show the first time folders were dropped).
             ContentRendered += (s, e) => EnsureBusyCircle();
@@ -556,8 +550,8 @@ namespace Gekko
                 recomputeTimer.Stop();
                 MarkDirty(state, DirtyRecompute);
             }
+            ApplyEditsForSwitch();
             SaveView();
-            SaveFilter();
             state = to;
             LoadView();
             LoadFilter();
@@ -615,13 +609,6 @@ namespace Gekko
             v.Active = active;
         }
 
-        /// <summary>The filter box belongs to the state: series names (Datafiles) or data files (Folders).</summary>
-        void SaveFilter()
-        {
-            View.FilterText = FilterBox.Text;
-            View.FilterRegex = RegexCheck.IsChecked == true;
-        }
-
         void LoadFilter()
         {
             loadingFilter = true;
@@ -629,6 +616,7 @@ namespace Gekko
             {
                 FilterBox.Text = View.FilterText ?? "";
                 RegexCheck.IsChecked = View.FilterRegex;
+                filterError = null;
                 FilterBox.ClearValue(Control.BackgroundProperty);
             }
             finally
@@ -645,16 +633,16 @@ namespace Gekko
             if (state == CompareState.Folders)
                 FilterHint.Text = regex
                     ? "Data files: regular expression, case-insensitive, e.g. \\.gbk$"
-                    : "Data files: wildcards * and ?, several patterns separated by spaces, e.g. *.gbk";
+                    : "Data files: wildcards * and ?, patterns separated by spaces, - excludes, e.g. *.gbk -old\\*";
             else
                 FilterHint.Text = regex
                     ? "Series: regular expression, case-insensitive, e.g. ^x\\d+$"
-                    : "Series: wildcards * and ?, several patterns separated by spaces";
+                    : "Series: wildcards * and ?, patterns separated by spaces, - excludes, e.g. p* q* -pa* -pd*";
         }
 
         string FilterTip => state == CompareState.Folders
-            ? "Only these data files are compared (matched against the file name and the path inside the folder, e.g. *.gbk or sub\\*.gbk). Empty: all files."
-            : "Only these series are compared. Empty: all series.";
+            ? "Only these data files are compared (matched against the file name and the path inside the folder, e.g. *.gbk or sub\\*.gbk). A pattern starting with - leaves files out, e.g. *.gbk -old\\*. Empty: all files."
+            : "Only these series are compared. A pattern starting with - leaves series out: p* q* -pa* -pd* is all p... and q... series except pa... and pd.... Empty: all series.";
 
         void LoadView()
         {
@@ -770,8 +758,7 @@ namespace Gekko
         {
             if (!fc.IsReadable)
             {
-                SetStatus(fc.RelativePath + " cannot be opened: only the series of "
-                          + string.Join(", ", FolderCompareEngine.ReadableExtensions) + " files are read for now.");
+                SetStatus(fc.RelativePath + " cannot be opened: only the timeseries of " + string.Join(", ", FolderCompareEngine.ReadableExtensions) + " files can be read for now.");
                 return;
             }
             using (ShowBusy()) OpenFileInDatafilesBusy(fc);
@@ -1140,13 +1127,16 @@ namespace Gekko
         Func<string, bool> ReadFilter()
         {
             string error;
-            Func<string, bool> filter = CompareEngine.BuildFilter(FilterBox.Text, RegexCheck.IsChecked == true, out error);
-            if (error == null) FilterBox.ClearValue(Control.BackgroundProperty);
-            else
-            {
-                FilterBox.Background = InvalidBack;
-                SetStatus(error);
-            }
+            // Datafiles: series names. Folders: data files, by file name or relative path (the function takes the path).
+            // The filter in force is the one applied (Enter) for this state, not what is being typed in the box.
+            string text = View.FilterText ?? "";
+            bool regex = View.FilterRegex;
+            Func<string, bool> filter = state == CompareState.Folders
+                ? CompareEngine.BuildFileFilter(text, regex, out error)
+                : CompareEngine.BuildFilter(text, regex, out error);
+            filterError = error;
+            if (error != null) SetStatus(error);
+            UpdateEditLook(FilterBox);
             FilterBox.ToolTip = error ?? FilterTip;
             return filter;
         }
@@ -1413,50 +1403,162 @@ namespace Gekko
             Refresh();  // all checks are computed already (the other state applies it when shown)
         }
 
-        /// <summary>Reads the thresholds into the settings. Returns false (and marks the box) if one is not valid.</summary>
-        bool ReadThresholds()
+        /// <summary>One threshold box: false (and the box marked) if it is not a valid threshold.</summary>
+        static bool ReadThreshold(TextBox box, out double value)
         {
-            bool ok = true;
-            double diff, zero;
-            if (CompareEngine.TryParseThreshold(DiffThresholdBox.Text, out diff))
+            if (CompareEngine.TryParseThreshold(box.Text, out value))
             {
-                settings.DiffThreshold = diff;
-                DiffThresholdBox.ClearValue(Control.BackgroundProperty);
+                box.ClearValue(Control.BackgroundProperty);
+                return true;
             }
-            else
-            {
-                DiffThresholdBox.Background = InvalidBack;
-                ok = false;
-            }
-            if (CompareEngine.TryParseThreshold(ZeroThresholdBox.Text, out zero))
-            {
-                settings.ZeroThreshold = zero;
-                ZeroThresholdBox.ClearValue(Control.BackgroundProperty);
-            }
-            else
-            {
-                ZeroThresholdBox.Background = InvalidBack;
-                ok = false;
-            }
-            settings.DiffRelative = DiffRelativeCheck.IsChecked == true;
-            if (!ok) SetStatus("A threshold must be a number of 0 or more, e.g. 0.001.");
-            return ok;
+            box.Background = InvalidBack;
+            return false;
         }
 
         /// <summary>
-        /// A threshold box or the "relative" box changed. Datafiles: recomputes (after a short pause while typing).
-        /// Folders: re-evaluates at once from the stored summaries (no reading); the Datafiles state recomputes when shown.
+        /// Reads the thresholds and the Absolute/Relative boxes of the Differences check into the settings. Returns
+        /// false (and marks the box) if a threshold is not valid.
         /// </summary>
-        void Threshold_Changed(object sender, RoutedEventArgs e)
+        bool ReadThresholds()
         {
-            if (!ready) return;
-            if (!ReadThresholds()) return;
-            if (state == CompareState.Datafiles) ScheduleRecompute();
-            else
+            double abs, rel, zero;
+            bool ok = ReadThreshold(DiffAbsThresholdBox, out abs);
+            ok &= ReadThreshold(DiffRelThresholdBox, out rel);
+            ok &= ReadThreshold(ZeroThresholdBox, out zero);
+            if (!ok)
             {
-                MarkDirty(CompareState.Datafiles, DirtyRecompute);
-                Refresh();
+                SetStatus("A threshold must be a number of 0 or more, e.g. 0.001.");
+                return false;  // nothing changes until all are valid
             }
+            settings.DiffAbsThreshold = abs;
+            settings.DiffRelThreshold = rel;
+            settings.ZeroThreshold = zero;
+            settings.DiffAbsOn = DiffAbsCheck.IsChecked == true;
+            settings.DiffRelOn = DiffRelCheck.IsChecked == true;
+            appliedAbsText = DiffAbsThresholdBox.Text;
+            appliedRelText = DiffRelThresholdBox.Text;
+            appliedZeroText = ZeroThresholdBox.Text;
+            foreach (TextBox box in ThresholdBoxes) UpdateEditLook(box);
+            return true;
+        }
+
+        // ---------------------------------------------------------------- applying the filter and threshold boxes
+
+        // The filter and threshold boxes are applied with Enter (or when the box is left), not while typing: applying
+        // can take a while (Datafiles compares the banks again). A box with typed, not yet applied text is pale yellow;
+        // Esc puts back the text in force. The Absolute/Relative and Regex boxes apply at once.
+        static readonly Brush PendingBack = BankColors.FromRgb(0xFF, 0xF6, 0xD5);
+        string appliedAbsText = "0", appliedRelText = "0", appliedZeroText = "0";
+        string filterError;  // the applied filter is not valid (shown in red)
+
+        IEnumerable<TextBox> ThresholdBoxes => new[] { DiffAbsThresholdBox, DiffRelThresholdBox, ZeroThresholdBox };
+
+        /// <summary>The text in force for one of the boxes (what Esc goes back to).</summary>
+        string AppliedText(TextBox box)
+        {
+            if (ReferenceEquals(box, FilterBox)) return View.FilterText ?? "";
+            if (ReferenceEquals(box, DiffAbsThresholdBox)) return appliedAbsText;
+            if (ReferenceEquals(box, DiffRelThresholdBox)) return appliedRelText;
+            return appliedZeroText;
+        }
+
+        bool IsPending(TextBox box)
+        {
+            return !string.Equals(box.Text, AppliedText(box), StringComparison.Ordinal);
+        }
+
+        /// <summary>Pale yellow while typed text is not applied; red when the applied filter is not valid.</summary>
+        void UpdateEditLook(TextBox box)
+        {
+            if (IsPending(box)) box.Background = PendingBack;
+            else if (ReferenceEquals(box, FilterBox) && filterError != null) box.Background = InvalidBack;
+            else box.ClearValue(Control.BackgroundProperty);
+        }
+
+        /// <summary>Typing in the filter box or a threshold box: only marks it as not applied yet.</summary>
+        void EditBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (!ready || loadingFilter) return;
+            var box = (TextBox)sender;
+            bool wasPending = box.Background == PendingBack;
+            UpdateEditLook(box);
+            if (!wasPending && IsPending(box)) SetStatus("Press Enter to apply (Esc to undo).");
+        }
+
+        void EditBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (Keyboard.Modifiers != ModifierKeys.None) return;
+            var box = (TextBox)sender;
+            if (e.Key == Key.Enter)
+            {
+                ApplyEdits();
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Escape && IsPending(box))
+            {
+                // Back to the text in force. Nothing typed to undo: Esc closes the window (Window_KeyDown).
+                box.Text = AppliedText(box);
+                box.CaretIndex = box.Text.Length;
+                UpdateEditLook(box);
+                SetStatus("");
+                e.Handled = true;
+            }
+        }
+
+        void EditBox_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            if (ready) ApplyEdits();
+        }
+
+        /// <summary>The Absolute/Relative boxes of the Differences check apply at once.</summary>
+        void ThresholdCheck_Changed(object sender, RoutedEventArgs e)
+        {
+            if (ready) ApplyEdits();
+        }
+
+        /// <summary>
+        /// Applies what is typed in the filter and threshold boxes, and the Absolute/Relative choice, with the busy
+        /// circle while it works. Nothing changed: nothing happens.
+        ///   Filter (of the current state): compares again.
+        ///   Thresholds: Datafiles compares again; Folders only re-evaluates the stored summaries, and the other state
+        ///   catches up when it is shown.
+        /// </summary>
+        void ApplyEdits()
+        {
+            if (!ready || busy) return;
+            bool filterChanged = IsPending(FilterBox);
+            bool checksChanged = (DiffAbsCheck.IsChecked == true) != settings.DiffAbsOn
+                                 || (DiffRelCheck.IsChecked == true) != settings.DiffRelOn;
+            bool thresholdsChanged = checksChanged || ThresholdBoxes.Any(IsPending);
+            if (!filterChanged && !thresholdsChanged) return;
+            if (thresholdsChanged && !ReadThresholds())
+            {
+                thresholdsChanged = false;  // the invalid box stays red; nothing of the thresholds is applied
+                if (!filterChanged) return;
+            }
+            if (filterChanged) View.FilterText = FilterBox.Text;
+            // The Datafiles comparison depends on the thresholds; the Folders one only needs the refresh it gets when shown.
+            if (thresholdsChanged && state == CompareState.Folders) MarkDirty(CompareState.Datafiles, DirtyRecompute);
+            using (ShowBusy())
+            {
+                if (filterChanged || state == CompareState.Datafiles) Recompute();  // Folders: in the background
+                else Refresh();
+            }
+            UpdateEditLook(FilterBox);
+        }
+
+        /// <summary>Before the state changes: what is typed (and not applied) in the boxes is applied when it is shown.</summary>
+        void ApplyEditsForSwitch()
+        {
+            if (IsPending(FilterBox))
+            {
+                View.FilterText = FilterBox.Text;
+                MarkDirty(state, DirtyRecompute);
+            }
+            bool checksChanged = (DiffAbsCheck.IsChecked == true) != settings.DiffAbsOn
+                                 || (DiffRelCheck.IsChecked == true) != settings.DiffRelOn;
+            if ((checksChanged || ThresholdBoxes.Any(IsPending)) && ReadThresholds())
+                MarkDirty(CompareState.Datafiles, DirtyRecompute);  // Folders only needs the refresh it gets anyway
         }
 
         // ---------------------------------------------------------------- the area filter
@@ -1749,7 +1851,7 @@ namespace Gekko
                 .Where(s => SeriesComparison.Passes(foundFilter, s.FoundIn(check, from, to, mask)))
                 .ToList();
             // The order of the Names and Values tabs: by name, or by the largest deviation in the period.
-            if (SortByDeviation) shown = CompareEngine.SortByMaxDeviation(shown, from, to, settings.DiffRelative);
+            if (SortByDeviation) shown = CompareEngine.SortByMaxDeviation(shown, from, to, settings);
 
             ShowNames();
             ShowHistogram();
@@ -2063,7 +2165,8 @@ namespace Gekko
         void RefreshForPeriod()
         {
             if (state == CompareState.Datafiles && current == null) UpdatePeriodBoxes();
-            else Refresh();
+            else
+                using (ShowBusy()) Refresh();  // re-filters every view: the busy circle if it takes a while
         }
 
         void SpinButton_Click(object sender, RoutedEventArgs e)
@@ -2168,7 +2271,8 @@ namespace Gekko
         void SortByDeviation_Changed(object sender, RoutedEventArgs e)
         {
             if (!ready) return;
-            if (state == CompareState.Datafiles && current != null) Refresh();
+            if (state == CompareState.Datafiles && current != null)
+                using (ShowBusy()) Refresh();
             UpdateSortCheck();
         }
 
@@ -3247,19 +3351,16 @@ namespace Gekko
             BanksChanged();
         }
 
-        /// <summary>The filter belongs to the current state (series or data files); the other state keeps its own.</summary>
-        void FilterBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (!ready || loadingFilter) return;
-            ScheduleRecompute();
-        }
-
+        /// <summary>Regex on/off applies at once (with what is typed in the filter box), with the busy circle.</summary>
         void RegexCheck_Changed(object sender, RoutedEventArgs e)
         {
             if (!ready) return;
             UpdateFilterHint();
             if (loadingFilter) return;
-            Recompute();
+            View.FilterRegex = RegexCheck.IsChecked == true;
+            View.FilterText = FilterBox.Text;
+            using (ShowBusy()) Recompute();
+            UpdateEditLook(FilterBox);
         }
 
         void CloseButton_Click(object sender, RoutedEventArgs e)

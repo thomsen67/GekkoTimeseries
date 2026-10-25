@@ -69,33 +69,102 @@ namespace Gekko
         public int SeriesCount => Freqs.Values.Sum(f => f.Count);
     }
 
-    /// <summary>Per frequency: the largest difference in each period between the common series of two copies.</summary>
+    /// <summary>
+    /// Per frequency and period, the differences between the common series of two copies, as (absolute, relative %)
+    /// pairs (CheckSettings.Measure). Only the pairs that no other pair beats in both are kept (the Pareto front):
+    /// that is all it takes to tell, for any thresholds, whether some series differs, also when both the absolute and
+    /// the relative criterion must be exceeded (the largest absolute and the largest relative difference may belong to
+    /// different series). Usually there are only a few pairs per period.
+    /// </summary>
     public sealed class PairFreqStats
     {
-        public PairFreqStats(GekkoTime start, double[] abs, double[] rel)
+        /// <param name="front">[offset from start]: the pairs as a1, r1, a2, r2, ... (null: no difference there).</param>
+        public PairFreqStats(GekkoTime start, List<double>[] front)
         {
             Start = start;
-            End = start.Add(abs.Length - 1);
-            Abs = abs;
-            Rel = rel;
+            End = start.Add(front.Length - 1);
+            Front = new double[front.Length][];
+            Abs = new double[front.Length];
+            Rel = new double[front.Length];
+            for (int k = 0; k < front.Length; k++)
+            {
+                if (front[k] == null) continue;
+                Front[k] = front[k].ToArray();
+                for (int i = 0; i < Front[k].Length; i += 2)
+                {
+                    if (Front[k][i] > Abs[k]) Abs[k] = Front[k][i];
+                    if (Front[k][i + 1] > Rel[k]) Rel[k] = Front[k][i + 1];
+                }
+            }
         }
 
         public readonly GekkoTime Start, End;
-        public readonly double[] Abs;   // [offset from Start]; M against a number: infinity; M against M: 0
-        public readonly double[] Rel;   // the same, in percent of the larger absolute value
+        public readonly double[][] Front;  // [offset from Start]: a1, r1, a2, r2, ... or null
+        public readonly double[] Abs;      // [offset from Start]: the largest absolute difference (M against a number: infinity)
+        public readonly double[] Rel;      // the same, relative (%)
+
+        /// <summary>Adds the pair (abs, rel) to a front (see the class), unless another pair beats it in both.</summary>
+        public static void AddToFront(ref List<double> front, double abs, double rel)
+        {
+            if (front == null) front = new List<double>(2);
+            for (int i = 0; i < front.Count; i += 2)
+                if (front[i] >= abs && front[i + 1] >= rel) return;
+            for (int i = front.Count - 2; i >= 0; i -= 2)
+                if (abs >= front[i] && rel >= front[i + 1]) front.RemoveRange(i, 2);
+            front.Add(abs);
+            front.Add(rel);
+        }
+
+        /// <summary>Clamps lo..hi (a null end is open) to the offsets of this span. False if nothing is left.</summary>
+        bool Offsets(GekkoTime lo, GekkoTime hi, out int a, out int b)
+        {
+            a = 0;
+            b = -1;
+            lo = ComparePeriods.Later(lo, Start);
+            hi = ComparePeriods.Earlier(hi, End);
+            if (!ComparePeriods.IsRange(lo, hi)) return false;
+            a = GekkoTime.Observations(Start, lo) - 1;
+            b = GekkoTime.Observations(Start, hi) - 1;
+            return true;
+        }
 
         /// <summary>Widens abs and rel with the largest differences in lo..hi (a null end is open).</summary>
         public void Largest(GekkoTime lo, GekkoTime hi, ref double abs, ref double rel)
         {
-            lo = ComparePeriods.Later(lo, Start);
-            hi = ComparePeriods.Earlier(hi, End);
-            if (!ComparePeriods.IsRange(lo, hi)) return;
-            int a = GekkoTime.Observations(Start, lo) - 1, b = GekkoTime.Observations(Start, hi) - 1;
+            int a, b;
+            if (!Offsets(lo, hi, out a, out b)) return;
             for (int k = a; k <= b; k++)
             {
                 if (Abs[k] > abs) abs = Abs[k];
                 if (Rel[k] > rel) rel = Rel[k];
             }
+        }
+
+        /// <summary>
+        /// The largest difference in lo..hi that counts by the settings (CheckSettings.Exceeds); "largest" by the %
+        /// when the relative criterion is on, else absolute. False (and 0, 0) when no difference counts.
+        /// </summary>
+        public bool LargestCounting(CheckSettings s, GekkoTime lo, GekkoTime hi, ref double abs, ref double rel)
+        {
+            int a, b;
+            bool any = false;
+            if (!Offsets(lo, hi, out a, out b)) return false;
+            for (int k = a; k <= b; k++)
+            {
+                double[] f = Front[k];
+                if (f == null) continue;
+                for (int i = 0; i < f.Length; i += 2)
+                {
+                    if (!s.Exceeds(f[i], f[i + 1])) continue;
+                    any = true;
+                    if (s.DiffRelOn ? f[i + 1] > rel : f[i] > abs)
+                    {
+                        abs = f[i];
+                        rel = f[i + 1];
+                    }
+                }
+            }
+            return any;
         }
     }
 
@@ -130,13 +199,29 @@ namespace Gekko
                 kv.Value.Largest(range.From(kv.Key), range.To(kv.Key), ref abs, ref rel);
         }
 
-        /// <summary>Not the same series, or a common series differs beyond the threshold in the period.</summary>
+        /// <summary>
+        /// The largest difference of a common series in the period that counts by the settings (see
+        /// PairFreqStats.LargestCounting), over all frequencies. False when none counts.
+        /// </summary>
+        public bool LargestCounting(CheckSettings s, PeriodRange range, out double abs, out double rel)
+        {
+            abs = 0;
+            rel = 0;
+            bool any = false;
+            foreach (KeyValuePair<EFreq, PairFreqStats> kv in Freqs)
+                if (kv.Value.LargestCounting(s, range.From(kv.Key), range.To(kv.Key), ref abs, ref rel)) any = true;
+            return any;
+        }
+
+        /// <summary>
+        /// Not the same series, or a common series differs in the period by the settings (CheckSettings.Exceeds: with
+        /// both criteria on, one and the same series must exceed both thresholds in one period).
+        /// </summary>
         public bool Differs(CheckSettings s, PeriodRange range)
         {
             if (Error != null || StructureDiffers || ContentDiffers) return true;
             double abs, rel;
-            Largest(range, out abs, out rel);
-            return (s.DiffRelative ? rel : abs) > s.DiffThreshold;
+            return LargestCounting(s, range, out abs, out rel);
         }
     }
 
@@ -260,9 +345,10 @@ namespace Gekko
                             continue;
                         }
                         double abs, rel;
-                        p.Largest(range, out abs, out rel);
-                        double d = settings.DiffRelative ? rel : abs;
-                        reasons.Add(pair + ": " + (double.IsInfinity(d) ? "a value against M" : "largest difference " + FormatDiff(d, settings.DiffRelative)));
+                        p.LargestCounting(settings, range, out abs, out rel);
+                        reasons.Add(pair + ": " + (double.IsInfinity(abs) ? "a value against M"
+                                                   : "largest difference " + FormatDiff(abs, false)
+                                                     + (double.IsInfinity(rel) ? "" : " (" + FormatDiff(rel, true) + ")")));  // % against 0: left out
                     }
                 for (int i = 0; i < n; i++) FoundInCopy[i] = Found;
                 Why = string.Join("; ", reasons);
@@ -514,14 +600,12 @@ namespace Gekko
         public static string DefaultFileFilter => "";
 
         /// <summary>
-        /// Whether a file is compared. fileFilter (null: all files) is tried on the file name and on the path relative to
-        /// the folder without the leading separator, so both "*.gbk" and "sub\*.gbk" work.
+        /// Whether a file is compared. fileFilter (null: all files) gets the path relative to the folder and tries it and
+        /// the file name (CompareEngine.BuildFileFilter), so both "*.gbk" and "sub\*.gbk" work, also to exclude ("-sub\*").
         /// </summary>
         public static bool IsDataFile(string relativePath, Func<string, bool> fileFilter)
         {
-            if (fileFilter == null) return true;
-            string rel = relativePath.TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-            return fileFilter(Path.GetFileName(rel)) || fileFilter(rel);
+            return fileFilter == null || fileFilter(relativePath);
         }
 
         /// <summary>
@@ -917,42 +1001,24 @@ namespace Gekko
                 if (!ComparePeriods.IsRange(start, end)) continue;
 
                 var axis = new PeriodAxis(start, end);
-                double[] abs = null, rel = null;
+                List<double>[] front = null;
                 for (int p = 0; p < common.Count; p++)
                 {
-                    Series[] pair = common[p];
+                    Series[] pair = common[p];                    
                     int lo = axis.OffsetOf(ranges[p][0]), hi = axis.OffsetOf(ranges[p][1]);
                     for (int k = lo; k <= hi; k++)
                     {
                         GekkoTime t = axis.At(k);
                         double d, r;
-                        Measure(pair[0].GetDataSimple(t), pair[1].GetDataSimple(t), out d, out r);
-                        if (d <= 0) continue;
-                        if (abs == null)
-                        {
-                            abs = new double[axis.Length];
-                            rel = new double[axis.Length];
-                        }
-                        if (d > abs[k]) abs[k] = d;
-                        if (r > rel[k]) rel[k] = r;
+                        CheckSettings.Measure(pair[0].GetDataSimple(t), pair[1].GetDataSimple(t), out d, out r);
+                        if (d <= 0 && r <= 0) continue;  // equal
+                        if (front == null) front = new List<double>[axis.Length];
+                        PairFreqStats.AddToFront(ref front[k], d, r);
                     }
                 }
-                if (abs != null) ps.Freqs[freq] = new PairFreqStats(start, abs, rel);
+                if (front != null) ps.Freqs[freq] = new PairFreqStats(start, front);
             }
             return ps;
-        }
-
-        /// <summary>
-        /// The same rule as CheckSettings.AreEqual, as the absolute and relative (%) difference: 0 when equal
-        /// (also M against M), infinity for M against a number.
-        /// </summary>
-        static void Measure(double x1, double x0, out double abs, out double rel)
-        {
-            //Note: denominator in 3-way compares...???
-            double tempAbs, tempRel;
-            Program.CompareTwoValues(out tempAbs, out tempRel, false, x1, x0);
-            abs = Math.Abs(tempAbs);
-            rel = Math.Abs(tempRel);
         }
 
         /// <summary>
