@@ -514,11 +514,75 @@ namespace Gekko
         }
     }
 
-    /// <summary>Text lines for the value listing, plus which line shows which period (by offset on the axis).</summary>
+    /// <summary>Text lines for the value listing (header, rule, one line per period), plus which line shows which period (by offset on the axis).</summary>
     public sealed class DeviationListing
     {
         public List<string> Lines { get; } = new List<string>();
         public Dictionary<int, int> LineOfPeriod { get; } = new Dictionary<int, int>();
+    }
+
+    /// <summary>
+    /// The layout of the Values tab (see CompareEngine.FormatComparison), in one place: for each column type its width
+    /// and the padding (spaces) to the next column. Numbers are right-aligned in their width. The first column (the
+    /// series name over the periods) is left-aligned; its width is computed (FirstColumnWidth): the longest name or
+    /// period shown, plus NamePad. With the defaults the text looks like this:
+    ///
+    ///     x123            (1)            (2)             ABS DIFF      % DIFF
+    ///     -------------------------------------------------------------------
+    ///     2003         6.0000         5.0000               1.0000       20.00         +++
+    /// </summary>
+    public static class ValuesLayout
+    {
+        /// <summary>A column type: its width, and the spaces after it when another column follows.</summary>
+        public sealed class Column
+        {
+            public Column(int width, int pad)
+            {
+                Width = width;
+                Pad = pad;
+            }
+
+            public int Width { get; set; }
+            public int Pad { get; set; }
+        }
+
+        /// <summary>The first column: spaces after the longest name or period.</summary>
+        public static int NamePad = 2;
+
+        /// <summary>The values of the banks: (1), (2), (3).</summary>
+        public static readonly Column Level = new Column(13, 2);
+
+        /// <summary>ABS DIFF (two banks).</summary>
+        public static readonly Column Abs = new Column(19, 2);
+
+        /// <summary>% DIFF (two banks).</summary>
+        public static readonly Column Pct = new Column(10, 2);
+
+        /// <summary>The mark of a period found by the check, and the spaces between the last column and it.</summary>
+        public const string Mark = "+++";
+        public static int MarkGap = 9;
+
+        /// <summary>The line under the header.</summary>
+        public const char RuleChar = '-';
+
+        /// <summary>The width of the first column, for these names (as shown) and periods (as text).</summary>
+        public static int FirstColumnWidth(IEnumerable<string> names, IEnumerable<string> periods)
+        {
+            int w = 0;
+            foreach (string s in names) if (s != null) w = Math.Max(w, s.Length);
+            foreach (string s in periods) if (s != null) w = Math.Max(w, s.Length);
+            return w + NamePad;
+        }
+
+        /// <summary>
+        /// Appends text right-aligned in the column (trimmed first, so a formatter that pads on its own does not
+        /// shift it), then the column's padding unless it is the last column of the line.
+        /// </summary>
+        public static void Append(StringBuilder sb, string text, Column column, bool lastColumn)
+        {
+            sb.Append((text ?? "").Trim().PadLeft(column.Width));
+            if (!lastColumn) sb.Append(' ', column.Pad);
+        }
     }
 
     public static class CompareEngine
@@ -730,8 +794,11 @@ namespace Gekko
             return i < 0 ? name : name.Substring(0, i);
         }
 
-        /// <summary>With ignoreDimensions, x[a,b] and x[a,c] both become x (listed once).</summary>
-        public static List<string> NamesForDisplay(IEnumerable<string> names, bool ignoreDimensions)
+        /// <summary>
+        /// With ignoreDimensions, x[a,b] and x[a,c] both become x (listed once, sorted by name unless keepOrder: then in
+        /// the order of their first element, e.g. sorted by deviation).
+        /// </summary>
+        public static List<string> NamesForDisplay(IEnumerable<string> names, bool ignoreDimensions, bool keepOrder = false)
         {
             if (!ignoreDimensions) return names.ToList();
             var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -741,7 +808,7 @@ namespace Gekko
                 string stripped = StripDimensions(name);
                 if (seen.Add(stripped)) list.Add(stripped);
             }
-            list.Sort(StringComparer.OrdinalIgnoreCase);
+            if (!keepOrder) list.Sort(StringComparer.OrdinalIgnoreCase);
             return list;
         }
 
@@ -785,31 +852,38 @@ namespace Gekko
         }
 
         /// <summary>
-        /// Text listing of one series for the offsets lo..hi on its axis. Two banks: period, x(1), x(2), abs dev., rel. dev.
-        /// One or three banks: period and the values. Periods found by the check end with "***".
-        /// onlyFound: only those periods. displayName (may be null: c.Name) is the name used in the column heads.
+        /// Text listing of one series for the offsets lo..hi on its axis, laid out by ValuesLayout:
+        ///
+        ///     x123            (1)            (2)             ABS DIFF      % DIFF
+        ///     -------------------------------------------------------------------
+        ///     2003         6.0000         5.0000               1.0000       20.00         +++
+        ///
+        /// A column per bank of the series ((1), (2), (3): the bank numbers); with two banks also ABS DIFF and % DIFF
+        /// ((1) compared to (2), see Deviation). Periods found by the check end with ValuesLayout.Mark.
+        /// onlyFound: only those periods. displayName (may be null: c.Name) heads the first column, which is
+        /// firstColumnWidth wide (ValuesLayout.FirstColumnWidth) so that all series of the text line up.
         /// </summary>
-        public static DeviationListing FormatComparison(SeriesComparison c, int lo, int hi, CheckKind check, int slotMask, bool onlyFound, string displayName = null)
+        public static DeviationListing FormatComparison(SeriesComparison c, int lo, int hi, CheckKind check, int slotMask,
+                                                        bool onlyFound, string displayName, int firstColumnWidth)
         {
             var listing = new DeviationListing();
             int n = c.Series.Length;
             bool pair = n == 2;
-            string[] heads = new string[n];
-            //for (int i = 0; i < n; i++) heads[i] = (displayName ?? c.Name) + "(" + (c.Slots[i] + 1).ToString(Inv) + ")";
-            for (int i = 0; i < n; i++) heads[i] = (displayName ?? "(" + (i + 1) + ")");
+            int first = Math.Max(firstColumnWidth, (displayName ?? c.Name).Length + ValuesLayout.NamePad);
 
-            const int periodWidth = 12, absWidth = 14, relWidth = 12;  // 12: room for daily periods like 2020m12d31
-            int valueWidth = Math.Max(13, heads.Max(h => h.Length) + 3);
-
+            // The header and the rule under it (as long as the columns, without the mark).
             var sb = new StringBuilder();
-            sb.Append("".PadRight(periodWidth));
-            foreach (string h in heads) sb.Append(h.PadLeft(valueWidth));
+            sb.Append((displayName ?? c.Name).PadRight(first));
+            for (int i = 0; i < n; i++)
+                ValuesLayout.Append(sb, "(" + (c.Slots[i] + 1).ToString(Inv) + ")", ValuesLayout.Level, i == n - 1 && !pair);
             if (pair)
             {
-                sb.Append("ABS DIFF".PadLeft(absWidth));
-                sb.Append("% DIFF".PadLeft(relWidth));
+                ValuesLayout.Append(sb, "ABS DIFF", ValuesLayout.Abs, false);
+                ValuesLayout.Append(sb, "% DIFF", ValuesLayout.Pct, true);
             }
-            listing.Lines.Add(sb.ToString());
+            string header = sb.ToString();
+            listing.Lines.Add(header);
+            listing.Lines.Add(new string(ValuesLayout.RuleChar, header.Length));
 
             var values = new double[n];
             int last = Math.Min(hi, c.Deviates.Length - 1);
@@ -820,24 +894,71 @@ namespace Gekko
                 for (int i = 0; i < n; i++) values[i] = c.Value(i, k);
 
                 sb.Clear();
-                sb.Append(c.Axis.At(k).ToString().PadRight(periodWidth));
-                for (int i = 0; i < n; i++) sb.Append(G.levelFormatOld(values[i], 14));
+                sb.Append(c.Axis.At(k).ToString().PadRight(first));
+                for (int i = 0; i < n; i++)
+                    ValuesLayout.Append(sb, G.levelFormatOld(values[i], ValuesLayout.Level.Width), ValuesLayout.Level, i == n - 1 && !pair);
                 if (pair)
                 {
-                    double x0 = values[0];
-                    double x1 = values[1];
-                    double varDelta; double varPch;
-                    //Note: denominator in 3-way compares...???
-                    Program.CompareTwoValues(out varDelta, out varPch, false, x1, x0);                    
-                    sb.Append(G.levelFormatOld(varDelta, 14));
-                    sb.Append(G.pchFormatOld(varPch, 8));
+                    // The same direction as the threshold test (CheckSettings.AreEqual(values[0], values[1])):
+                    // (1) compared to (2), so 6 against 5 is 1.0000 and 20.00 %.
+                    double varDelta, varPch;
+                    Program.CompareTwoValues(out varDelta, out varPch, false, values[0], values[1]);
+                    ValuesLayout.Append(sb, G.levelFormatOld(varDelta, ValuesLayout.Abs.Width), ValuesLayout.Abs, false);
+                    ValuesLayout.Append(sb, G.pchFormatOld(varPch, ValuesLayout.Pct.Width), ValuesLayout.Pct, true);
                 }
-                if (found) sb.Append("      +++");
+                if (found) sb.Append(' ', ValuesLayout.MarkGap).Append(ValuesLayout.Mark);
                 listing.LineOfPeriod[k] = listing.Lines.Count;
                 listing.Lines.Add(sb.ToString());
             }
             return listing;
-        }     
+        }
+
+        /// <summary>
+        /// The size of a difference between two values, for sorting by deviation: |ABS DIFF| or |% DIFF| as the Values
+        /// tab shows them (relative: the % DIFF), by Program.CompareTwoValues with x1 compared to x0. M against M and
+        /// equal values: 0. M against a number, or a % DIFF that cannot be computed (against 0): +infinity.
+        /// </summary>
+        public static double Deviation(double x1, double x0, bool relative)
+        {
+            bool m1 = double.IsNaN(x1), m0 = double.IsNaN(x0);
+            if (m1 && m0) return 0;
+            if (m1 || m0) return double.PositiveInfinity;
+            if (x1 == x0) return 0;
+            double varDelta, varPch;
+            Program.CompareTwoValues(out varDelta, out varPch, false, x1, x0);
+            double d = Math.Abs(relative ? varPch : varDelta);
+            return double.IsNaN(d) ? double.PositiveInfinity : d;
+        }
+
+        /// <summary>
+        /// The largest Deviation of a series in two banks over the offsets lo..hi, (1) compared to (2). -1 for a series
+        /// that is not in exactly two banks (nothing to compare: sorted last).
+        /// </summary>
+        public static double MaxDeviation(SeriesComparison c, int lo, int hi, bool relative)
+        {
+            if (c.Series.Length != 2) return -1;
+            double max = 0;
+            int last = Math.Min(hi, c.Deviates.Length - 1);
+            for (int k = Math.Max(lo, 0); k <= last; k++)
+            {
+                double d = Deviation(c.Value(0, k), c.Value(1, k), relative);
+                if (d > max) max = d;
+                if (double.IsPositiveInfinity(max)) break;
+            }
+            return max;
+        }
+
+        /// <summary>
+        /// The series sorted by MaxDeviation in lo..hi, largest first. The sort is stable, so equal deviations keep
+        /// their order (by name).
+        /// </summary>
+        public static List<SeriesComparison> SortByMaxDeviation(IEnumerable<SeriesComparison> series, int lo, int hi, bool relative)
+        {
+            return series.Select(c => new { c, d = MaxDeviation(c, lo, hi, relative) })
+                         .OrderByDescending(x => x.d)
+                         .Select(x => x.c)
+                         .ToList();
+        }
 
         /// <summary>Parses a threshold typed by the user (invariant or current culture). Must be a number &gt;= 0.</summary>
         public static bool TryParseThreshold(string text, out double value)

@@ -477,6 +477,13 @@
                                     ToolTip="Remove the period filter: all periods"/>
                         </Grid>
 
+                        <!-- Datafiles, two banks: the Names and Values tabs sorted by each series' largest deviation -->
+                        <TextBlock Grid.Row="2" Text="Sort" Style="{StaticResource PanelLabelStyle}" Margin="0,0,8,10"/>
+                        <CheckBox Grid.Row="2" Grid.Column="1" Name="SortByDeviationCheck" Content="largest deviation first (2 banks)"
+                                  VerticalAlignment="Center" Margin="0,0,0,10"
+                                  Checked="SortByDeviation_Changed" Unchecked="SortByDeviation_Changed"
+                                  ToolTip="Two banks: list the series in the Names and Values tabs by their largest deviation in the period, largest first (absolute, or in % when 'relative (%)' is ticked). Unticked: by name."/>
+
                         <TextBlock Grid.Row="3" Text="Filter" Style="{StaticResource PanelLabelStyle}"/>
                         <TextBox Grid.Row="3" Grid.Column="1" Name="FilterBox" Height="22" VerticalContentAlignment="Center"
                                  TextChanged="FilterBox_TextChanged"
@@ -593,7 +600,7 @@
                                      MouseLeftButtonUp="FilesList_MouseLeftButtonUp" KeyDown="FilesList_KeyDown">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding Text}" Foreground="{Binding Foreground}"
+                                        <TextBlock Text="{Binding Text}" Foreground="{Binding Foreground}" Background="{Binding Background}"
                                                    ToolTip="{Binding Tip}" Cursor="{Binding Cursor}"/>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>

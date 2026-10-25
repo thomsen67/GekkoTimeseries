@@ -186,6 +186,9 @@ namespace Gekko
         public Brush Foreground { get; set; }
         public string Tip { get; set; }
         public Cursor Cursor { get; set; }
+
+        /// <summary>Grey for the file last opened in the Datafiles state (like the bookmarked name in the Names tab).</summary>
+        public Brush Background { get; set; }
     }
 
     /// <summary>
@@ -338,6 +341,17 @@ namespace Gekko
         public WindowCompare()
         {
             InitializeComponent();
+
+            // The window is opened with Show() from Gekko's WinForms main window. Without this, the keyboard messages of
+            // a modeless WPF window go through the WinForms message loop, and keys like Esc (Window_KeyDown), Tab and
+            // the arrows do not arrive as they should. ShowDialog() has its own WPF message loop, so it works there.
+            // Needs a reference to WindowsFormsIntegration.dll.
+            System.Windows.Forms.Integration.ElementHost.EnableModelessKeyboardInterop(this);
+
+            // Create the busy circle as soon as the window has been drawn, so its visual is connected before the
+            // first long piece of work (created lazily, it did not show the first time folders were dropped).
+            ContentRendered += (s, e) => EnsureBusyCircle();
+
             bankListSource = new CompositeCollection
             {
                 new CollectionContainer { Collection = bankItems },
@@ -983,6 +997,9 @@ namespace Gekko
 
         readonly List<FreqButton> freqButtons = new List<FreqButton>();
 
+        /// <summary>Space (pixels) between two frequency buttons.</summary>
+        const double FreqButtonGap = 6;
+
         /// <summary>Datafiles: the number of banks compared (2 or 3), also while the Folders state is shown.</summary>
         int DatafilesSlotCount => bankItems.Count <= 1 ? 1 : compare3Choice && bankItems.Count >= 3 ? 3 : 2;
 
@@ -1040,17 +1057,14 @@ namespace Gekko
                 });
                 content.Children.Add(line);
                 content.Children.Add(spanText);
-                // CornerRadius(topLeft, topRight, bottomRight, bottomLeft): round the outer ends of the row.
-                CornerRadius corners = freqs.Count == 1 ? new CornerRadius(r)
-                                     : i == 0 ? new CornerRadius(r, 0, 0, r)
-                                     : i == freqs.Count - 1 ? new CornerRadius(0, r, r, 0)
-                                     : new CornerRadius(0);
+                // Separate buttons with a little air between them (FreqButtonGap), each with all corners rounded,
+                // so the row does not look like one broad button.
                 var button = new RadioButton
                 {
                     Style = (Style)FindResource("FreqButtonStyle"),
                     Content = content,
-                    Tag = corners,
-                    Margin = new Thickness(i == 0 ? 0 : -1, 0, 0, 0),
+                    Tag = new CornerRadius(r),
+                    Margin = new Thickness(i == 0 ? 0 : FreqButtonGap, 0, 0, 0),
                     IsChecked = selectedFreq.HasValue && f.Equals(selectedFreq.Value)
                 };
                 EFreq chosen = f;
@@ -1380,6 +1394,7 @@ namespace Gekko
 
         void UpdateListBadges()
         {
+            UpdateSortCheck();  // called after every refresh, in both states
             IVennModel m = Model;
             for (int i = 0; i < banks.Count; i++)
                 banks[i].HiddenInDiagram = m != null && i < m.SlotCount && !m.Active[i];
@@ -1733,6 +1748,8 @@ namespace Gekko
             shown = selection.Series
                 .Where(s => SeriesComparison.Passes(foundFilter, s.FoundIn(check, from, to, mask)))
                 .ToList();
+            // The order of the Names and Values tabs: by name, or by the largest deviation in the period.
+            if (SortByDeviation) shown = CompareEngine.SortByMaxDeviation(shown, from, to, settings.DiffRelative);
 
             ShowNames();
             ShowHistogram();
@@ -1744,8 +1761,8 @@ namespace Gekko
 
         /// <summary>
         /// The histogram: per period, the number of series in the area (or whole bank) found by the current check.
-        /// It shows the whole universal period for the area only (not the found or period filters), so the time
-        /// profile stays visible while drilling down. The selected periods are highlighted.
+        /// It counts all series of the area (not the found filter). With a period filter only its periods are shown,
+        /// else the whole universal period.
         /// </summary>
         void ShowHistogram()
         {
@@ -1771,12 +1788,19 @@ namespace Gekko
                 Histogram.ShowMessage("No periods to show.");
                 return;
             }
-            int? hiFrom = current.IsPeriodRestricted ? PeriodFrom : (int?)null;
-            int? hiTo = current.IsPeriodRestricted ? PeriodTo : (int?)null;
+            // With a period filter, only its periods are shown.
+            int? showFrom = current.IsPeriodRestricted ? PeriodFrom : (int?)null;
+            int? showTo = current.IsPeriodRestricted ? PeriodTo : (int?)null;
+            if (showFrom.HasValue && showFrom.Value > showTo.Value)
+            {
+                Histogram.ShowMessage("There are no " + PeriodConvert.FrequencyName(current.Freq).ToLowerInvariant()
+                                      + " periods in the chosen period.");
+                return;
+            }
             string phrase = "series " + CheckText.Phrase(check);
-            Histogram.SetData(selection.Description + ": number of " + phrase + ", per period",
+            Histogram.SetData(selection.Description + ": number of " + phrase + ", per period" + current.CountPeriodText,
                               current.Axis, CompareEngine.FoundCounts(selection.Series, check, selection.SlotMask, current.Axis.Length),
-                              phrase, null, hiFrom, hiTo);
+                              phrase, null, showFrom, showTo);
         }
 
         /// <summary>Folders: the Files tab, the (absent) histogram and the Details tab.</summary>
@@ -1834,11 +1858,16 @@ namespace Gekko
             tip += !f.IsReadable ? "\nOnly the series of " + string.Join(", ", FolderCompareEngine.ReadableExtensions) + " files are read for now."
                  : f.IsComparison ? "\nClick to compare its series."
                  : "\nClick to look at its series.";
+            // The file last opened in the Datafiles state gets a grey background, so it is easy to find when coming
+            // back. Matched by path: the folders may have been compared again since, which makes new FileComparisons.
+            bool opened = openedFrom != null && string.Equals(openedFrom.RelativePath, f.RelativePath, StringComparison.OrdinalIgnoreCase);
+            if (opened) tip += "\nThe file last opened in the Datafiles view.";
             return new FileRow
             {
                 File = f,
                 Text = f.RelativePath,
                 Foreground = found && RedNames ? DeviatingNameBrush : Brushes.Black,
+                Background = opened ? BookmarkBrush : Brushes.Transparent,
                 Tip = tip,
                 Cursor = f.IsReadable ? Cursors.Hand : Cursors.Arrow
             };
@@ -2129,6 +2158,27 @@ namespace Gekko
 
         // ---------------------------------------------------------------- names tab (Datafiles)
 
+        /// <summary>
+        /// The "Sort" box is ticked and two banks are compared (shown): the Names and Values tabs list the series by
+        /// their largest deviation in the period, largest first (CompareEngine.SortByMaxDeviation).
+        /// </summary>
+        bool SortByDeviation => SortByDeviationCheck.IsChecked == true && state == CompareState.Datafiles
+                                && current != null && current.ActiveCount == 2;
+
+        void SortByDeviation_Changed(object sender, RoutedEventArgs e)
+        {
+            if (!ready) return;
+            if (state == CompareState.Datafiles && current != null) Refresh();
+            UpdateSortCheck();
+        }
+
+        /// <summary>The "Sort" box only does something in the Datafiles state, with two banks shown.</summary>
+        void UpdateSortCheck()
+        {
+            bool usable = state == CompareState.Datafiles && current != null && current.ActiveCount == 2;
+            SortByDeviationCheck.IsEnabled = usable;
+        }
+
         /// <summary>Whether found names/files are shown in dark red (the "Red names" box). Off: all black.</summary>
         bool RedNames => RedNamesCheck.IsChecked == true;
 
@@ -2156,7 +2206,7 @@ namespace Gekko
             }
             int from = PeriodFrom, to = PeriodTo;
             bool ignore = IgnoreDimsCheck.IsChecked == true;
-            List<string> names = CompareEngine.NamesForDisplay(shown.Select(s => CompareEngine.Freqpretty(s.Name)), ignore);
+            List<string> names = CompareEngine.NamesForDisplay(shown.Select(s => CompareEngine.Freqpretty(s.Name)), ignore, SortByDeviation);
             List<string> found = shown.Where(s => s.FoundIn(check, from, to, selection.SlotMask)).Select(s => CompareEngine.Freqpretty(s.Name)).ToList();
             var red = new HashSet<string>(RedNames ? CompareEngine.NamesForDisplay(found, ignore) : new List<string>(), StringComparer.OrdinalIgnoreCase);
             string phrase = CheckText.Phrase(check);
@@ -2743,8 +2793,8 @@ namespace Gekko
         }
 
         /// <summary>
-        /// All series of the Names list in one text, for the selected periods. Per series: a title line, the column
-        /// header ("period ...") and one line per period, then an empty line.
+        /// All series of the Names list in one text, for the selected periods, in the order of the Names list. Per
+        /// series only its table (see CompareEngine.FormatComparison and ValuesLayout), then an empty line.
         /// The series that was at the top stays at the top. Previous/Next jump between the series.
         /// </summary>
         void BuildValuesText()
@@ -2769,37 +2819,37 @@ namespace Gekko
 
             int from = PeriodFrom, to = PeriodTo;
             bool onlyFound = OnlyFoundCheck.IsChecked == true;
-            string what = check == CheckKind.Missings ? " with M" : check == CheckKind.Zeroes ? " with zero" : " that differ";
+
+            // The first column is as wide as the longest name shown (or period), so all the tables line up.
+            int firstWidth = 0;
+            if (from <= to)
+            {
+                IEnumerable<string> periods = Enumerable.Range(from, to - from + 1).Select(k => current.Axis.At(k).ToString());
+                firstWidth = ValuesLayout.FirstColumnWidth(navList.Select(c => CompareEngine.Freqpretty(c.Name)), periods);
+            }
+
+            // Only the tables (see CompareEngine.FormatComparison), each followed by an empty line.
             var sb = new StringBuilder();
             int line = 0;
             foreach (SeriesComparison c in navList)
             {
                 if (line >= MaxValueLines) break;
-                int found = c.FoundPeriods(check, from, to, selection.SlotMask);
                 blockStarts.Add(line);
                 blockSeries.Add(c);
-                sb.Append(CompareEngine.Freqpretty(c.Name) + "   (" + blockSeries.Count + " of " + navList.Count + ": " + found
-                          + (found == 1 ? " period" : " periods") + what + current.CountPeriodText + ")\r\n");
-                line++;
-                DeviationListing listing = CompareEngine.FormatComparison(c, from, to, check, selection.SlotMask, onlyFound, CompareEngine.Freqpretty(c.Name));
+                DeviationListing listing = CompareEngine.FormatComparison(c, from, to, check, selection.SlotMask, onlyFound,
+                                                                          CompareEngine.Freqpretty(c.Name), firstWidth);
                 foreach (string l in listing.Lines)
                 {
                     sb.Append(l).Append("\r\n");
-                    line++;
-                }
-                if (onlyFound && found == 0)
-                {
-                    sb.Append("(no periods marked *)\r\n");
                     line++;
                 }
                 sb.Append("\r\n");
                 line++;
             }
             if (blockSeries.Count < navList.Count)
-                sb.Append("... and " + (navList.Count - blockSeries.Count) + " more series, left out to keep the text manageable. Narrow the "
-                          + "selection (a red number, a histogram bar or the filter), or tick 'Only periods marked *'.");
+                SetStatus("The Values tab shows the first " + blockSeries.Count + " of " + navList.Count + " series, to keep the text "
+                          + "manageable. Narrow the selection (a red number, a histogram bar or the filter) to see the others.");
 
-            string star = check == CheckKind.Missings ? "M in a bank" : check == CheckKind.Zeroes ? "zero in a bank" : "differs";
             LegendText.Text = string.Join("   ", Enumerable.Range(0, current.SlotCount).Where(s => current.Active[s])
                                                           .Select(s => "(" + (s + 1) + ") " + current.Banks[s].Name));                              
             DevText.Text = sb.ToString();
@@ -3240,20 +3290,24 @@ namespace Gekko
         {
             if (busyCount++ == 0)
             {
-                if (busyCircle == null && !busyCircleFailed)
-                {
-                    try
-                    {
-                        busyCircle = new BusyCircle(BusyHost);
-                    }
-                    catch (Exception)
-                    {
-                        busyCircleFailed = true;  // the circle is only a nicety: never fail the work because of it
-                    }
-                }
+                EnsureBusyCircle();
                 busyCircle?.Show();
             }
             return new BusyToken(this);
+        }
+
+        /// <summary>Creates the busy circle (once). Called when the window has been drawn, and by ShowBusy as a fallback.</summary>
+        void EnsureBusyCircle()
+        {
+            if (busyCircle != null || busyCircleFailed) return;
+            try
+            {
+                busyCircle = new BusyCircle(BusyHost);
+            }
+            catch (Exception)
+            {
+                busyCircleFailed = true;  // the circle is only a nicety: never fail the work because of it
+            }
         }
 
         void EndBusy()
@@ -4390,10 +4444,10 @@ namespace Gekko
     // ======================= HISTOGRAM
 
     /// <summary>
-    /// Bar chart per period over the whole universal period: the number of series found by the current check
-    /// (series that differ, with missing values, or with zeroes). Bar k is the period axis.At(k).
-    /// The selected periods (the period filter) are highlighted; bars outside them are paler.
-    /// Click a bar: BarClicked(k, modifiers). Double-click: BarDoubleClicked(k). k is the offset on the axis.
+    /// Bar chart per period: the number of series found by the current check (series that differ, with missing
+    /// values, or with zeroes). Only the periods first..last of the axis are shown (the period filter; the whole
+    /// universal period when there is none). Bar k is the period axis.At(k).
+    /// Click a bar: BarClicked(k, modifiers). Double-click: BarDoubleClicked(k). k is the offset on the whole axis.
     /// </summary>
     public sealed class HistogramView : Canvas
     {
@@ -4402,8 +4456,6 @@ namespace Gekko
 
         static readonly Brush DevBrush = BankColors.FromRgb(0xB8, 0x45, 0x3C);
         static readonly Brush DevHoverBrush = BankColors.FromRgb(0x7A, 0x22, 0x1C);
-        static readonly Brush DevPaleBrush = BankColors.FromRgb(0xE3, 0xB5, 0xB1);
-        static readonly Brush SelectionBand = BankColors.FromArgb(0x22, 0x60, 0x60, 0x60);
         static readonly Brush AxisBrush = BankColors.FromRgb(0x88, 0x88, 0x88);
         static readonly Brush GridBrush = BankColors.FromRgb(0xE6, 0xE6, 0xE6);
         static readonly Brush TextBrush = BankColors.FromRgb(0x44, 0x44, 0x44);
@@ -4414,8 +4466,8 @@ namespace Gekko
         int[] counts;
         string itemPhrase = "series";
         Func<int, string> extraTip;
-        int? highlightFrom;
-        int? highlightTo;
+        int first;   // the first and last offset on the axis that are shown
+        int last;
         string message = "Click a number, an area or a bank in the diagram.";
 
         public HistogramView()
@@ -4427,8 +4479,8 @@ namespace Gekko
 
         /// <summary>
         /// counts[k] belongs to the period periods.At(k). phrase: what a bar counts, e.g. "series with missing values"
-        /// (for tooltips). tip (may be null) adds a line to a bar's tooltip, given k. highlightFrom/To: the selected
-        /// periods as offsets, or null.
+        /// (for tooltips). tip (may be null) adds a line to a bar's tooltip, given k. from/to: the periods to show,
+        /// as offsets on the axis (the period filter), or null for all of them.
         /// </summary>
         public void SetData(string newTitle, PeriodAxis periods, int[] newCounts, string phrase,
                             Func<int, string> tip, int? from, int? to)
@@ -4438,8 +4490,9 @@ namespace Gekko
             axis = periods;
             counts = newCounts;
             extraTip = tip;
-            highlightFrom = from;
-            highlightTo = to;
+            int length = counts == null ? 0 : counts.Length;
+            first = from.HasValue ? Math.Max(0, from.Value) : 0;
+            last = to.HasValue ? Math.Min(length - 1, to.Value) : length - 1;
             Rebuild();
         }
 
@@ -4450,18 +4503,13 @@ namespace Gekko
             Rebuild();
         }
 
-        bool IsHighlighted(int k)
-        {
-            return !highlightFrom.HasValue || (k >= highlightFrom.Value && k <= highlightTo.Value);
-        }
-
         void Rebuild()
         {
             Children.Clear();
             double width = ActualWidth, height = ActualHeight;
             if (width < 100 || height < 80) return;
 
-            if (counts == null || counts.Length == 0 || axis == null || axis.Length != counts.Length)
+            if (counts == null || counts.Length == 0 || axis == null || axis.Length != counts.Length || first > last)
             {
                 AddCenteredText(message, 13, 20, width - 40, height / 2);
                 return;
@@ -4481,19 +4529,12 @@ namespace Gekko
                 Width = width - left
             }, left, 4);
 
-            int n = counts.Length;
+            int n = last - first + 1;   // the bars shown: offsets first..last on the axis
             double slot = pw / n;
+            int maxCount = 0;
+            for (int k = first; k <= last; k++) maxCount = Math.Max(maxCount, counts[k]);
 
-            // The selected periods as a light band behind the bars.
-            if (highlightFrom.HasValue)
-            {
-                int a = Math.Max(0, highlightFrom.Value), b = Math.Min(n - 1, highlightTo.Value);
-                if (a <= b)
-                    Add(new Rectangle { Width = (b - a + 1) * slot, Height = ph, Fill = SelectionBand, IsHitTestVisible = false },
-                        left + a * slot, top);
-            }
-
-            if (counts.All(c => c == 0))
+            if (maxCount == 0)
             {
                 double baseY = Math.Round(top + ph) + 0.5;
                 Children.Add(new Line { X1 = left, X2 = left + pw, Y1 = baseY, Y2 = baseY, Stroke = AxisBrush, StrokeThickness = 1 });
@@ -4504,7 +4545,7 @@ namespace Gekko
 
             // Y axis: series count. The top grid line is always above the highest bar (one more line when the
             // highest bar would end exactly on a line).
-            int max = Math.Max(1, counts.Max());
+            int max = Math.Max(1, maxCount);
             double step = Math.Max(1, NiceStep(max / 5.0));
             double yMax = (Math.Floor(max / step) + 1) * step;
             for (double v = 0; v <= yMax + 1e-9; v += step)
@@ -4526,17 +4567,17 @@ namespace Gekko
             Brush hover = DevHoverBrush;
             for (int i = 0; i < n; i++)
             {
-                int k = i;
-                Brush normal = IsHighlighted(k) ? DevBrush : DevPaleBrush;
+                int k = first + i;   // the offset on the whole axis
+                Brush normal = DevBrush;
                 Rectangle bar = null;
-                if (counts[i] > 0)
+                if (counts[k] > 0)
                 {
-                    double h = counts[i] / yMax * ph;
+                    double h = counts[k] / yMax * ph;
                     bar = new Rectangle { Width = barWidth, Height = Math.Max(1, h), Fill = normal, IsHitTestVisible = false };
                     Add(bar, left + i * slot + (slot - barWidth) / 2, top + ph - h);
                 }
 
-                string tip = axis.At(k) + ": " + counts[i] + " " + itemPhrase;
+                string tip = axis.At(k) + ": " + counts[k] + " " + itemPhrase;
                 string more = extraTip?.Invoke(k);
                 if (!string.IsNullOrEmpty(more)) tip += "\n" + more;
                 tip += "\nClick: select this period (Shift: extend, Ctrl: add to the filter). Double-click: list the names.";
@@ -4574,14 +4615,14 @@ namespace Gekko
         /// </summary>
         void DrawYears(double left, double top, double ph, double slot, int n)
         {
-            int firstYear = axis.At(0).super, lastYear = axis.At(n - 1).super;
+            int firstYear = axis.At(first).super, lastYear = axis.At(first + n - 1).super;
             double periodsPerYear = Math.Max(1.0, n / (double)Math.Max(1, lastYear - firstYear + 1));
             bool onePerYear = n == lastYear - firstYear + 1;
             int yearStep = NiceInt((int)Math.Ceiling(44 / (slot * periodsPerYear)));
             int previous = int.MinValue;
             for (int k = 0; k < n; k++)
             {
-                GekkoTime t = axis.At(k);
+                GekkoTime t = axis.At(first + k);
                 int year = t.super;
                 bool startsYear = year != previous && (k > 0 || onePerYear || t.sub == 1);
                 previous = year;
